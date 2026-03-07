@@ -8,7 +8,14 @@ st.set_page_config(page_title="1-MINUTE RPG", page_icon="⚡", layout="wide")
 try:
     MY_KEY = st.secrets["GEMINI_KEY"]
     genai.configure(api_key=MY_KEY)
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    # INCREASED CREATIVITY SETTINGS
+    generation_config = {
+        "temperature": 0.9, # Higher temperature = more creative/less boring
+        "top_p": 1,
+        "top_k": 1,
+        "max_output_tokens": 500,
+    }
+    model = genai.GenerativeModel('gemini-1.5-flash', generation_config=generation_config)
 except:
     model = None
 
@@ -18,32 +25,34 @@ if 'gold' not in st.session_state:
         'user_name': None, 'xp': 0, 'gold': 10.0, 'level': 1, 
         'world_data': {}, 'user_theme': "Default", 'view': 'main',
         'pending_gold': 0.0, 'pending_xp': 0, 'needs_verification': False,
-        'evolution': "Novice", 'vibe_color': "#FFD700", 'xp_multiplier': 1,
+        'vibe_color': "#FFD700", 'xp_multiplier': 1,
         'sub_tier': "Free", 'sub_multiplier': 1
     })
 
-# --- 2. THE INFINITE FORGE GATEWAY ---
+# --- 2. THE TITAN FORGE GATEWAY ---
 if st.session_state.user_name is None:
-    st.markdown("<h1 style='text-align: center; color: #FFD700; text-shadow: 0 0 40px #FFD700;'>⚡ 1-MINUTE RPG</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center; color: #FFD700; text-shadow: 0 0 50px #FFD700;'>⚡ 1-MINUTE RPG</h1>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         name_input = st.text_input("Champion Name:")
-        theme_input = st.text_input("World Theme (e.g. Ancient Rome, Cyberpunk, One Piece):")
+        theme_input = st.text_input("World Theme (e.g. One Piece, Ancient Rome, Cyberpunk):")
         
         if st.button("🔥 AWAKEN"):
             if name_input:
                 st.session_state.user_name = name_input
-                t = theme_input.strip() if theme_input.strip() else "Titan Power"
+                t = theme_input.strip() if theme_input.strip() else "Titan"
                 
-                with st.spinner(f"FORGING {t.upper()}..."):
+                with st.spinner(f"EXTRACTING LORE FOR {t.upper()}..."):
                     try:
-                        # THE LORE-HUNTER PROMPT
-                        prompt = (f"Act as a Master Worldbuilder for theme '{t}'. "
-                                 f"DO NOT use generic names. Use the EXACT currency and power names. "
-                                 f"Example: Rome = Denarii, One Piece = Berries, Naruto = Ryo. "
+                        # THE "NO-BORING-ZONE" PROMPT
+                        prompt = (f"Act as a God-Tier RPG Worldbuilder. Forge a world for '{t}'. "
+                                 f"STRICT RULE: DO NOT use the words 'Essence', 'Aegis', 'Shield', or 'Guard' if specific lore exists. "
+                                 f"If the theme is One Piece, you MUST use 'Berries', 'Haki', 'Devil Fruits'. "
+                                 f"If the theme is Rome, use 'Denarii' and 'Gladius'. "
+                                 f"Be infinitely creative and lore-accurate. "
                                  f"Return ONLY JSON: {{'currency': 'lore currency', 'unit': 'lore unit', 'color': 'hex', "
-                                 f"'shield_name': 'lore defense', 'booster_name': 'lore speed', "
-                                 f"'shield_lore': '1 sentence', 'booster_lore': '1 sentence', "
+                                 f"'shield_name': 'unique lore defense', 'booster_name': 'unique lore speed', "
+                                 f"'shield_lore': 'Lore-heavy description', 'booster_lore': 'Lore-heavy description', "
                                  f"'evo_1': 'rank 1', 'evo_2': 'rank 2', 'evo_3': 'rank 3'}}")
                         
                         res = model.generate_content(prompt)
@@ -54,20 +63,23 @@ if st.session_state.user_name is None:
                             st.session_state.vibe_color = st.session_state.world_data.get('color', "#FFD700")
                             st.rerun()
                     except:
-                        # SMART BACKUP
+                        # BETTER DYNAMIC BACKUP
                         st.session_state.world_data = {
-                            "currency": f"{t} Essence", "unit": "Unit", "color": "#00FFCC",
-                            "shield_name": f"{t} Shield", "booster_name": f"{t} Surge",
-                            "shield_lore": "Forged from the heart of this realm.", 
-                            "booster_lore": "Maximum velocity engaged.",
-                            "evo_1": "Novice", "evo_2": "Elite", "evo_3": "Legend"
+                            "currency": "Gold Berries" if "piece" in t.lower() else "Gold",
+                            "unit": "Beli" if "piece" in t.lower() else "Unit",
+                            "color": "#FF4500" if "piece" in t.lower() else "#00FFCC",
+                            "shield_name": "Armament Haki" if "piece" in t.lower() else f"{t} Guard",
+                            "booster_name": "Gear Second" if "piece" in t.lower() else f"{t} Surge",
+                            "shield_lore": "Absolute spiritual defense.", 
+                            "booster_lore": "Pumping blood for extreme speed.",
+                            "evo_1": "Novice", "evo_2": "Warrior", "evo_3": "Legend"
                         }
                         st.session_state.user_theme = t
-                        st.session_state.vibe_color = "#00FFCC"
+                        st.session_state.vibe_color = st.session_state.world_data["color"]
                         st.rerun()
     st.stop()
 
-# --- 3. DYNAMIC UI (MAX TITAN GLOW) ---
+# --- 3. DYNAMIC UI (THE 10PX DASHED TITAN GLOW) ---
 w = st.session_state.world_data
 active_color = st.session_state.vibe_color if st.session_state.sub_tier != "Elite" else "#FFFFFF"
 
@@ -75,9 +87,9 @@ st.markdown(f"""
     <style>
     .main {{ background-color: #050505; color: white; }}
     @keyframes titan-glow {{
-        0% {{ box-shadow: 0 0 15px {active_color}; border-color: {active_color}; }}
+        0% {{ box-shadow: 0 0 20px {active_color}; border-color: {active_color}; }}
         50% {{ box-shadow: 0 0 60px {active_color}, inset 0 0 30px {active_color}; border-color: #FFFFFF; }}
-        100% {{ box-shadow: 0 0 15px {active_color}; border-color: {active_color}; }}
+        100% {{ box-shadow: 0 0 20px {active_color}; border-color: {active_color}; }}
     }}
     div.stButton > button {{
         border: 10px dashed {active_color} !important;
@@ -85,11 +97,11 @@ st.markdown(f"""
         color: white !important;
         font-weight: 950 !important;
         font-size: 28px !important;
-        padding: 45px !important;
-        border-radius: 25px !important;
+        padding: 50px !important;
+        border-radius: 30px !important;
         animation: titan-glow 2s infinite ease-in-out !important;
         width: 100%;
-        margin-bottom: 35px;
+        margin-bottom: 40px;
         text-transform: uppercase;
     }}
     </style>
@@ -150,6 +162,3 @@ if st.session_state.needs_verification:
             st.session_state.gold += st.session_state.pending_gold
             st.session_state.xp += st.session_state.pending_xp
             st.session_state.needs_verification = False; st.balloons(); st.rerun()
-
-if st.session_state.xp >= 100:
-    st.session_state.level += 1; st.session_state.xp -= 100; st.toast("🧬 LEVEL UP!"); st.rerun()
