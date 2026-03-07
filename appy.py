@@ -22,7 +22,7 @@ if 'gold' not in st.session_state:
         'sub_tier': "Free", 'sub_multiplier': 1
     })
 
-# --- 2. THE "BYPASS" GATEWAY ---
+# --- 2. THE SMART FORGE GATEWAY ---
 if st.session_state.user_name is None:
     st.markdown("<h1 style='text-align: center; color: #FFD700; text-shadow: 0 0 35px #FFD700;'>⚡ 1-MINUTE RPG</h1>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 2, 1])
@@ -33,42 +33,35 @@ if st.session_state.user_name is None:
         if st.button("🔥 AWAKEN"):
             if name_input:
                 st.session_state.user_name = name_input
-                # LOGIC: If blank OR AI is slow, use Shadow Forge
-                if not theme_input.strip():
-                    st.session_state.world_data = {
-                        "currency": "Power", "unit": "Burst", "color": "#FFD700",
-                        "shield_name": "Titan Guard", "booster_name": "Infinite Surge",
-                        "shield_lore": "Divine barrier of absolute reality.", 
-                        "booster_lore": "Focus for your ultimate rank.",
-                        "evo_1": "Aspirant", "evo_2": "Titan", "evo_3": "Eternal"
-                    }
-                    st.session_state.user_theme = "Infinite Power"
-                    st.rerun()
-                else:
-                    with st.spinner("Forging..."):
-                        try:
-                            # ULTRA-FAST PROMPT
-                            res = model.generate_content(f"JSON for RPG '{theme_input}': currency, unit, color(hex), shield_name, booster_name, shield_lore, booster_lore, evo_1, evo_2, evo_3.")
-                            match = re.search(r'\{.*\}', res.text, re.DOTALL)
-                            if match:
-                                st.session_state.world_data = json.loads(match.group())
-                                st.session_state.user_theme = theme_input
-                                st.session_state.vibe_color = st.session_state.world_data.get('color', "#FFD700")
-                                st.rerun()
-                        except:
-                            # THE BYPASS: If AI fails, we forge it ourselves instantly!
-                            st.session_state.world_data = {
-                                "currency": "Essence", "unit": "Pulse", "color": "#00FFCC",
-                                "shield_name": "Shadow Aegis", "booster_name": "Void Drive",
-                                "shield_lore": "Automatic defense system engaged.", 
-                                "booster_lore": "Speed forced by the Shadow Forge.",
-                                "evo_1": "Novice", "evo_2": "Elite", "evo_3": "Legend"
-                            }
-                            st.session_state.user_theme = f"{theme_input} (Shadow Forge)"
+                t = theme_input.strip() if theme_input.strip() else "Titan"
+                
+                with st.spinner("Forging..."):
+                    try:
+                        # Attempt AI Forge
+                        res = model.generate_content(f"JSON for RPG '{t}': currency, unit, color(hex), shield_name, booster_name, shield_lore, booster_lore, evo_1, evo_2, evo_3.")
+                        match = re.search(r'\{.*\}', res.text, re.DOTALL)
+                        if match:
+                            st.session_state.world_data = json.loads(match.group())
+                            st.session_state.user_theme = t
+                            st.session_state.vibe_color = st.session_state.world_data.get('color', "#FFD700")
                             st.rerun()
+                    except:
+                        # THE SMART BYPASS: Matches your theme even if AI is busy!
+                        color_list = ["#FF3366", "#00FFCC", "#9933FF", "#FFCC00", "#33CCFF"]
+                        chosen_color = random.choice(color_list)
+                        st.session_state.world_data = {
+                            "currency": f"{t} Coin", "unit": "Credit", "color": chosen_color,
+                            "shield_name": f"{t} Guard", "booster_name": f"{t} Overdrive",
+                            "shield_lore": f"A specialized barrier forged from {t} energy.", 
+                            "booster_lore": f"Maximum velocity tuned for the {t} realm.",
+                            "evo_1": "Aspirant", "evo_2": "Titan", "evo_3": "Eternal"
+                        }
+                        st.session_state.user_theme = f"{t} (Instant Forge)"
+                        st.session_state.vibe_color = chosen_color
+                        st.rerun()
     st.stop()
 
-# --- 3. DYNAMIC UI (THE TITAN LOOK - 10PX DASHED) ---
+# --- 3. DYNAMIC UI (TITAN BOXES) ---
 w = st.session_state.world_data
 active_color = st.session_state.vibe_color if st.session_state.sub_tier != "Elite" else "#FFFFFF"
 
@@ -108,8 +101,7 @@ with st.sidebar:
     if code == "TITAN10" and st.session_state.sub_tier != "Elite":
         st.session_state.sub_tier, st.session_state.sub_multiplier = "Elite", 3
         st.success("👑 ELITE STATUS ACTIVATED!")
-        st.balloons()
-        time.sleep(1); st.rerun()
+        st.balloons(); time.sleep(1); st.rerun()
 
     if st.button("🚀 HUB"): st.session_state.view = 'main'; st.rerun()
     if st.button("🛒 SHOP"): st.session_state.view = 'shop'; st.rerun()
