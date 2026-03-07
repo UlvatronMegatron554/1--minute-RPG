@@ -8,7 +8,6 @@ st.set_page_config(page_title="1-MINUTE RPG", page_icon="⚡", layout="wide")
 try:
     MY_KEY = st.secrets["GEMINI_KEY"]
     genai.configure(api_key=MY_KEY)
-    # CRANKING TEMPERATURE TO 1.0 FOR MAXIMUM CREATIVITY
     model = genai.GenerativeModel('gemini-1.5-flash', generation_config={"temperature": 1.0})
 except:
     model = None
@@ -23,13 +22,13 @@ if 'gold' not in st.session_state:
         'sub_tier': "Free", 'sub_multiplier': 1
     })
 
-# --- 2. THE DEEP-SCAN FORGE ---
+# --- 2. THE INFINITE FORGE GATEWAY ---
 if st.session_state.user_name is None:
     st.markdown("<h1 style='text-align: center; color: #FFD700; text-shadow: 0 0 50px #FFD700;'>⚡ 1-MINUTE RPG</h1>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         name_input = st.text_input("Champion Name:")
-        theme_input = st.text_input("World Theme (e.g. Minecraft, One Piece, NBA, Skyrim):")
+        theme_input = st.text_input("World Theme (e.g. Star Wars, Rome, Naruto, Minecraft):")
         
         if st.button("🔥 AWAKEN"):
             if name_input:
@@ -38,14 +37,14 @@ if st.session_state.user_name is None:
                 
                 with st.spinner(f"EXTRACTING LORE FOR {t.upper()}..."):
                     try:
-                        # THE LORE-GRIP PROMPT
-                        prompt = (f"Act as a Lore Historian for '{t}'. "
-                                 f"STRICT: If '{t}' is Minecraft, use Emeralds. If One Piece, use Berries. "
-                                 f"DO NOT use the word '{t}' in names. DO NOT use 'Guard' or 'Shield'. "
-                                 f"Find the MOST ICONIC colors and items. "
-                                 f"Return ONLY JSON: {{'currency': 'lore item', 'unit': 'lore unit', 'color': 'HEX CODE', "
-                                 f"'shield_name': 'lore defense', 'booster_name': 'lore speed', "
-                                 f"'shield_lore': 'Deep factual lore sentence', 'booster_lore': 'Deep factual lore sentence', "
+                        # THE LORE-HUNTER PROMPT (No hardcoding)
+                        prompt = (f"Act as a Master Lore-Expert. Create a world for theme '{t}'. "
+                                 f"STRICT: Use only factual lore currency and powers. "
+                                 f"If the theme is a specific game/movie, find its real items. "
+                                 f"DO NOT use the word '{t}' in the names. "
+                                 f"Return ONLY JSON: {{'currency': 'lore item', 'unit': 'lore unit', 'color': 'hex', "
+                                 f"'shield_name': 'lore power', 'booster_name': 'lore power', "
+                                 f"'shield_lore': 'Deep lore fact', 'booster_lore': 'Deep lore fact', "
                                  f"'evo_1': 'rank 1', 'evo_2': 'rank 2', 'evo_3': 'rank 3'}}")
                         
                         res = model.generate_content(prompt)
@@ -57,23 +56,33 @@ if st.session_state.user_name is None:
                             st.session_state.vibe_color = data.get('color', "#FFD700")
                             st.rerun()
                     except:
-                        # DYNAMIC BACKUP (If AI is Busy)
+                        # THE ADAPTIVE BACKUP (No One Piece bias)
+                        lore_seeds = {
+                            "space": {"c": "Credits", "s": "Ion Shield", "b": "Warp Drive", "h": "#00FFFF"},
+                            "fantasy": {"c": "Gold Pieces", "s": "Magic Barrier", "b": "Haste Cloud", "h": "#9933FF"},
+                            "mine": {"c": "Emeralds", "s": "Diamond Armor", "b": "Ender Pearl", "h": "#00FF00"},
+                            "star": {"c": "Galactic Credits", "s": "Force Field", "b": "Hyperdrive", "h": "#00CCFF"},
+                            "piece": {"c": "Berries", "s": "Haki Aura", "b": "Gear Second", "h": "#FF4500"},
+                            "rome": {"c": "Denarii", "s": "Testudo", "b": "Chariot Charge", "h": "#B22222"},
+                            "nba": {"c": "VC", "s": "Lockdown D", "b": "Fast Break", "h": "#EE6730"}
+                        }
+                        # Keyword matching to find the right theme
+                        matched = next((v for k, v in lore_seeds.items() if k in t.lower()), None)
+                        if not matched: matched = {"c": f"{t} Shards", "s": f"{t} Veil", "b": f"{t} Blink", "h": "#FFD700"}
+                        
                         st.session_state.world_data = {
-                            "currency": "Emeralds" if "mine" in t.lower() else "Berries" if "piece" in t.lower() else "Gold",
-                            "unit": "Gem" if "mine" in t.lower() else "Beli" if "piece" in t.lower() else "Unit",
-                            "color": "#00FF00" if "mine" in t.lower() else "#FF4500",
-                            "shield_name": "Bedrock Armor" if "mine" in t.lower() else "Armament Haki",
-                            "booster_name": "Swiftness II" if "mine" in t.lower() else "Gear Second",
-                            "shield_lore": "Forged from the unbreakable core.", 
-                            "booster_lore": "Maximum velocity through the realm.",
+                            "currency": matched["c"], "unit": "Unit", "color": matched["h"],
+                            "shield_name": matched["s"], "booster_name": matched["b"],
+                            "shield_lore": f"A specialized defense from the {t} realm.", 
+                            "booster_lore": f"Maximum velocity tuned to {t}.",
                             "evo_1": "Novice", "evo_2": "Master", "evo_3": "Legend"
                         }
                         st.session_state.user_theme = t
-                        st.session_state.vibe_color = st.session_state.world_data["color"]
+                        st.session_state.vibe_color = matched["h"]
                         st.rerun()
     st.stop()
 
-# --- 3. DYNAMIC UI (THE 10PX DASHED TITAN GLOW) ---
+# --- 3. DYNAMIC UI (10PX DASHED TITAN GLOW) ---
 w = st.session_state.world_data
 active_color = st.session_state.vibe_color if st.session_state.sub_tier != "Elite" else "#FFFFFF"
 
@@ -117,7 +126,7 @@ with st.sidebar:
     if st.button("🛒 SHOP"): st.session_state.view = 'shop'; st.rerun()
     if st.button("🚨 RESET"): st.session_state.clear(); st.rerun()
 
-# --- 5. SHOP & HUB ---
+# --- 5. MAIN HUB ---
 st.markdown(f"<h1 style='color:{active_color}; text-shadow: 0 0 25px {active_color};'>{st.session_state.user_theme.upper()}</h1>", unsafe_allow_html=True)
 
 if st.session_state.view == 'shop':
