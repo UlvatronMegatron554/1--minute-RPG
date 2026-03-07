@@ -37,13 +37,13 @@ if st.session_state.user_name is None:
                 
                 with st.spinner(f"FORGING {t.upper()}..."):
                     try:
-                        # THE LORE-COMMAND PROMPT (Aggressive Creativity)
+                        # THE LORE-HUNTER PROMPT
                         prompt = (f"Act as a Master Worldbuilder for theme '{t}'. "
-                                 f"DO NOT use generic names. If the theme is real or fictional, use the EXACT currency and power names. "
+                                 f"DO NOT use generic names. Use the EXACT currency and power names. "
                                  f"Example: Rome = Denarii, One Piece = Berries, Naruto = Ryo. "
-                                 f"Return ONLY JSON: {{'currency': 'real lore currency', 'unit': 'lore unit', 'color': 'hex', "
-                                 f"'shield_name': 'lore defense power', 'booster_name': 'lore speed power', "
-                                 f"'shield_lore': '1 sentence lore', 'booster_lore': '1 sentence lore', "
+                                 f"Return ONLY JSON: {{'currency': 'lore currency', 'unit': 'lore unit', 'color': 'hex', "
+                                 f"'shield_name': 'lore defense', 'booster_name': 'lore speed', "
+                                 f"'shield_lore': '1 sentence', 'booster_lore': '1 sentence', "
                                  f"'evo_1': 'rank 1', 'evo_2': 'rank 2', 'evo_3': 'rank 3'}}")
                         
                         res = model.generate_content(prompt)
@@ -54,20 +54,20 @@ if st.session_state.user_name is None:
                             st.session_state.vibe_color = st.session_state.world_data.get('color', "#FFD700")
                             st.rerun()
                     except:
-                        # DYNAMIC BACKUP (If AI is Busy, it still uses your theme name)
+                        # SMART BACKUP
                         st.session_state.world_data = {
-                            "currency": f"{t} Credits", "unit": "Unit", "color": "#00FFCC",
-                            "shield_name": f"{t} Barrier", "booster_name": f"{t} Overdrive",
+                            "currency": f"{t} Essence", "unit": "Unit", "color": "#00FFCC",
+                            "shield_name": f"{t} Shield", "booster_name": f"{t} Surge",
                             "shield_lore": "Forged from the heart of this realm.", 
                             "booster_lore": "Maximum velocity engaged.",
-                            "evo_1": "Novice", "evo_2": "Titan", "evo_3": "Eternal"
+                            "evo_1": "Novice", "evo_2": "Elite", "evo_3": "Legend"
                         }
                         st.session_state.user_theme = t
                         st.session_state.vibe_color = "#00FFCC"
                         st.rerun()
     st.stop()
 
-# --- 3. DYNAMIC UI (MAX TITAN GLOW - 10PX DASHED) ---
+# --- 3. DYNAMIC UI (MAX TITAN GLOW) ---
 w = st.session_state.world_data
 active_color = st.session_state.vibe_color if st.session_state.sub_tier != "Elite" else "#FFFFFF"
 
@@ -134,4 +134,22 @@ if st.session_state.view == 'shop':
             if st.session_state.gold >= 25: st.session_state.gold -= 25; st.session_state.xp_multiplier = 2; st.success("Surge Active!")
 
 else:
-    mins = st.select_slider("Burst Time:", options=
+    mins = st.select_slider("Select Burst Time:", options=[1, 3, 5])
+    if st.button("START MISSION", disabled=st.session_state.needs_verification):
+        bar = st.progress(0)
+        for i in range(mins * 60):
+            time.sleep(1); bar.progress((i+1)/(mins*60))
+        st.session_state.pending_gold = mins * 1.0
+        st.session_state.pending_xp = (mins * 25) * st.session_state.xp_multiplier * st.session_state.sub_multiplier
+        st.session_state.needs_verification = True; st.rerun()
+
+if st.session_state.needs_verification:
+    with st.expander("⚖️ TRIBUNAL", expanded=True):
+        f = st.file_uploader("Upload proof:")
+        if f and st.button("JUDGE"):
+            st.session_state.gold += st.session_state.pending_gold
+            st.session_state.xp += st.session_state.pending_xp
+            st.session_state.needs_verification = False; st.balloons(); st.rerun()
+
+if st.session_state.xp >= 100:
+    st.session_state.level += 1; st.session_state.xp -= 100; st.toast("🧬 LEVEL UP!"); st.rerun()
