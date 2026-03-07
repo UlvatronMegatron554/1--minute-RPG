@@ -24,7 +24,7 @@ if 'gold' not in st.session_state:
 
 # --- 2. THE INFINITE FORGE GATEWAY ---
 if st.session_state.user_name is None:
-    st.markdown("<h1 style='text-align: center; color: #FFD700; text-shadow: 0 0 35px #FFD700;'>⚡ 1-MINUTE RPG</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center; color: #FFD700; text-shadow: 0 0 40px #FFD700;'>⚡ 1-MINUTE RPG</h1>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         name_input = st.text_input("Champion Name:")
@@ -33,15 +33,19 @@ if st.session_state.user_name is None:
         if st.button("🔥 AWAKEN"):
             if name_input:
                 st.session_state.user_name = name_input
-                t = theme_input.strip() if theme_input.strip() else "Titan"
+                t = theme_input.strip() if theme_input.strip() else "Titan Power"
                 
-                with st.spinner("Forging..."):
+                with st.spinner(f"FORGING {t.upper()}..."):
                     try:
-                        # THE LORE-HUNTER PROMPT
-                        prompt = (f"Return ONLY JSON for RPG theme '{t}'. "
-                                 f"IMPORTANT: Use famous lore names (e.g. if One Piece, use Berries/Haki). "
-                                 f"Keys: 'currency', 'unit', 'color' (hex), 'shield_name', 'booster_name', "
-                                 f"'shield_lore', 'booster_lore', 'evo_1', 'evo_2', 'evo_3'.")
+                        # THE LORE-COMMAND PROMPT (Aggressive Creativity)
+                        prompt = (f"Act as a Master Worldbuilder for theme '{t}'. "
+                                 f"DO NOT use generic names. If the theme is real or fictional, use the EXACT currency and power names. "
+                                 f"Example: Rome = Denarii, One Piece = Berries, Naruto = Ryo. "
+                                 f"Return ONLY JSON: {{'currency': 'real lore currency', 'unit': 'lore unit', 'color': 'hex', "
+                                 f"'shield_name': 'lore defense power', 'booster_name': 'lore speed power', "
+                                 f"'shield_lore': '1 sentence lore', 'booster_lore': '1 sentence lore', "
+                                 f"'evo_1': 'rank 1', 'evo_2': 'rank 2', 'evo_3': 'rank 3'}}")
+                        
                         res = model.generate_content(prompt)
                         match = re.search(r'\{.*\}', res.text, re.DOTALL)
                         if match:
@@ -50,20 +54,20 @@ if st.session_state.user_name is None:
                             st.session_state.vibe_color = st.session_state.world_data.get('color', "#FFD700")
                             st.rerun()
                     except:
-                        # SMART BACKUP (Matches theme name if AI stalls)
+                        # DYNAMIC BACKUP (If AI is Busy, it still uses your theme name)
                         st.session_state.world_data = {
-                            "currency": f"{t} Essence", "unit": "Pulse", "color": "#00FFCC",
-                            "shield_name": f"{t} Aegis", "booster_name": f"{t} Drive",
-                            "shield_lore": f"A specialized barrier forged from {t} energy.", 
-                            "booster_lore": f"Maximum velocity tuned for the {t} realm.",
-                            "evo_1": "Novice", "evo_2": "Elite", "evo_3": "Legend"
+                            "currency": f"{t} Credits", "unit": "Unit", "color": "#00FFCC",
+                            "shield_name": f"{t} Barrier", "booster_name": f"{t} Overdrive",
+                            "shield_lore": "Forged from the heart of this realm.", 
+                            "booster_lore": "Maximum velocity engaged.",
+                            "evo_1": "Novice", "evo_2": "Titan", "evo_3": "Eternal"
                         }
                         st.session_state.user_theme = t
                         st.session_state.vibe_color = "#00FFCC"
                         st.rerun()
     st.stop()
 
-# --- 3. DYNAMIC UI (TITAN BOXES - 10PX DASHED) ---
+# --- 3. DYNAMIC UI (MAX TITAN GLOW - 10PX DASHED) ---
 w = st.session_state.world_data
 active_color = st.session_state.vibe_color if st.session_state.sub_tier != "Elite" else "#FFFFFF"
 
@@ -72,7 +76,7 @@ st.markdown(f"""
     .main {{ background-color: #050505; color: white; }}
     @keyframes titan-glow {{
         0% {{ box-shadow: 0 0 15px {active_color}; border-color: {active_color}; }}
-        50% {{ box-shadow: 0 0 55px {active_color}, inset 0 0 25px {active_color}; border-color: #FFFFFF; }}
+        50% {{ box-shadow: 0 0 60px {active_color}, inset 0 0 30px {active_color}; border-color: #FFFFFF; }}
         100% {{ box-shadow: 0 0 15px {active_color}; border-color: {active_color}; }}
     }}
     div.stButton > button {{
@@ -80,12 +84,13 @@ st.markdown(f"""
         background-color: #000000 !important;
         color: white !important;
         font-weight: 950 !important;
-        font-size: 26px !important;
-        padding: 40px !important;
+        font-size: 28px !important;
+        padding: 45px !important;
         border-radius: 25px !important;
-        animation: titan-glow 2.5s infinite ease-in-out !important;
+        animation: titan-glow 2s infinite ease-in-out !important;
         width: 100%;
-        margin-bottom: 30px;
+        margin-bottom: 35px;
+        text-transform: uppercase;
     }}
     </style>
     """, unsafe_allow_html=True)
@@ -117,30 +122,16 @@ if st.session_state.view == 'shop':
     col1, col2 = st.columns(2)
     with col1:
         st.subheader(w.get('shield_name', 'Guardian'))
-        st.write(f"_{w.get('shield_lore', 'Legendary defense.')}_")
+        st.write(f"_{w.get('shield_lore', 'The ultimate defense.')}_")
         st.success("✨ ABILITY: REMOVES ALL DEBT")
         if st.button(f"CLAIM (15 {w.get('currency', 'Gold')})"):
             if st.session_state.gold >= 15: st.session_state.gold -= 15; st.success("Debt Wiped!")
     with col2:
         st.subheader(w.get('booster_name', 'Surge'))
-        st.write(f"_{w.get('booster_lore', 'Unstoppable speed.')}_")
+        st.write(f"_{w.get('booster_lore', 'The ultimate speed.')}_")
         st.success("🚀 ABILITY: DOUBLE XP SPEED")
         if st.button(f"CLAIM (25 {w.get('currency', 'Gold')})"):
             if st.session_state.gold >= 25: st.session_state.gold -= 25; st.session_state.xp_multiplier = 2; st.success("Surge Active!")
 
 else:
-    mins = st.select_slider("Select Burst Time:", options=[1, 3, 5])
-    if st.button("START MISSION", disabled=st.session_state.needs_verification):
-        bar = st.progress(0)
-        for i in range(mins * 60):
-            time.sleep(1); bar.progress((i+1)/(mins*60))
-        st.session_state.pending_gold, st.session_state.pending_xp = mins * 1.0, (mins * 25) * st.session_state.xp_multiplier * st.session_state.sub_multiplier
-        st.session_state.needs_verification = True; st.rerun()
-
-if st.session_state.needs_verification:
-    with st.expander("⚖️ TRIBUNAL", expanded=True):
-        f = st.file_uploader("Upload proof:")
-        if f and st.button("JUDGE"):
-            st.session_state.gold += st.session_state.pending_gold
-            st.session_state.xp += st.session_state.pending_xp
-            st.session_state.needs_verification = False; st.balloons(); st.rerun()
+    mins = st.select_slider("Burst Time:", options=
