@@ -8,8 +8,8 @@ st.set_page_config(page_title="1-MINUTE RPG", page_icon="⚡", layout="wide")
 try:
     MY_KEY = st.secrets["GEMINI_KEY"]
     genai.configure(api_key=MY_KEY)
-    # MAX CREATIVITY
-    model = genai.GenerativeModel('gemini-1.5-flash', generation_config={"temperature": 1.0})
+    # TEMPERATURE 1.0 + TOP_P 1.0 FOR MAXIMUM UNPREDICTABILITY
+    model = genai.GenerativeModel('gemini-1.5-flash', generation_config={"temperature": 1.0, "top_p": 1.0})
 except:
     model = None
 
@@ -29,7 +29,7 @@ if st.session_state.user_name is None:
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         name_input = st.text_input("Champion Name:")
-        theme_input = st.text_input("World Theme (e.g. Star Wars, Naruto, Elden Ring):")
+        theme_input = st.text_input("World Theme (e.g. Naruto, One Piece, Star Wars):")
         
         if st.button("🔥 AWAKEN"):
             if name_input:
@@ -38,43 +38,54 @@ if st.session_state.user_name is None:
                 
                 with st.spinner(f"SEARCHING MULTIVERSE FOR {t.upper()}..."):
                     try:
-                        # THE LORE-CRUSHER PROMPT
-                        prompt = (f"Act as a Lore Expert. Forge a world for '{t}'. "
-                                 f"STRICT PROHIBITION: Do not use generic words like 'Shield', 'Guard', 'Surge', 'Drive', 'Essence', 'Gold', or 'Coin' unless they are the ACTUAL lore names. "
-                                 f"Example: Star Wars = Credits/Force Barrier/Force Speed. Naruto = Ryo/Chakra Shield/Body Flicker. "
+                        # THE "IDENTITY-STRIPPER" PROMPT
+                        prompt = (f"Act as a Lore Expert for the concept of '{t}'. "
+                                 f"STRICT RULE 1: NEVER use the word '{t}' in your response. "
+                                 f"STRICT RULE 2: Find the canonical currency, defense, and speed powers for '{t}'. "
+                                 f"If the theme is a specific franchise, use its real items. "
                                  f"Return ONLY JSON: {{'currency': 'lore name', 'unit': 'lore unit', 'color': 'hex', "
-                                 f"'shield_name': 'unique lore power', 'booster_name': 'unique lore speed', "
-                                 f"'shield_lore': 'Lore description', 'booster_lore': 'Lore description', "
+                                 f"'shield_name': 'lore power', 'booster_name': 'lore power', "
+                                 f"'shield_lore': 'Lore-specific lore', 'booster_lore': 'Lore-specific lore', "
                                  f"'evo_1': 'rank 1', 'evo_2': 'rank 2', 'evo_3': 'rank 3'}}")
                         
                         res = model.generate_content(prompt)
                         match = re.search(r'\{.*\}', res.text, re.DOTALL)
                         if match:
-                            st.session_state.world_data = json.loads(match.group())
+                            data = json.loads(match.group())
+                            
+                            # THE CLEANER: Scrub the theme name if the AI was lazy
+                            forbidden = t.lower().split()
+                            for key in ['currency', 'shield_name', 'booster_name']:
+                                for word in forbidden:
+                                    if len(word) > 2: # Avoid scrubbing small words like 'the'
+                                        data[key] = data[key].lower().replace(word, "").strip().title()
+                            
+                            # If scrubbed names are empty, give them a Lore-Pulse
+                            if not data['shield_name']: data['shield_name'] = "Divine Barrier"
+                            if not data['booster_name']: data['booster_name'] = "Light-Speed Warp"
+                            
+                            st.session_state.world_data = data
                             st.session_state.user_theme = t
-                            st.session_state.vibe_color = st.session_state.world_data.get('color', "#FFD700")
+                            st.session_state.vibe_color = data.get('color', "#FFD700")
                             st.rerun()
                     except:
-                        # THE DEEP LORE BACKUP (Bypasses AI Garbage)
+                        # LORE-ACCURATE HARDCODED BACKUP
                         lore_db = {
-                            "star wars": {"c": "Credits", "s": "Force Barrier", "b": "Force Dash", "h": "#0099FF"},
-                            "naruto": {"c": "Ryo", "s": "Chakra Armor", "b": "Body Flicker", "h": "#FF6600"},
-                            "elden ring": {"c": "Runes", "s": "Ironjar Aromatic", "b": "Bloodhound Step", "h": "#FFD700"},
-                            "cyberpunk": {"c": "Eddies", "s": "Sandevistan", "b": "Kerenzikov", "h": "#FFFF00"}
+                            "one piece": {"c": "Berries", "s": "Haki Aura", "b": "Gear Second", "col": "#FF4500"},
+                            "naruto": {"c": "Ryo", "s": "Susanoo Ribs", "b": "Shunshin", "col": "#FF9900"},
+                            "star wars": {"c": "Galactic Credits", "s": "Force Shield", "b": "Force Speed", "h": "#00CCFF"}
                         }
-                        
                         low_t = t.lower()
-                        base = lore_db.get(low_t, {"c": f"{t} Shards", "s": f"{t} Veil", "b": f"{t} Blink", "h": "#00FFCC"})
-                        
+                        base = lore_db.get(low_t, {"c": "Ancient Gold", "s": "Mystic Veil", "b": "Ethereal Step", "h": "#00FFCC"})
                         st.session_state.world_data = {
-                            "currency": base["c"], "unit": "Shards", "color": base["h"],
+                            "currency": base["c"], "unit": "Credit", "color": base.get("h", "#00FFCC"),
                             "shield_name": base["s"], "booster_name": base["b"],
-                            "shield_lore": f"Ancient protection from the {t} dimension.", 
-                            "booster_lore": f"Extreme speed tuned to {t}.",
+                            "shield_lore": f"A specialized defense from the realm of {t}.", 
+                            "booster_lore": f"Maximum velocity tuned to {t}.",
                             "evo_1": "Novice", "evo_2": "Master", "evo_3": "Legend"
                         }
                         st.session_state.user_theme = t
-                        st.session_state.vibe_color = base["h"]
+                        st.session_state.vibe_color = st.session_state.world_data["color"]
                         st.rerun()
     st.stop()
 
@@ -100,7 +111,8 @@ st.markdown(f"""
         border-radius: 35px !important;
         animation: titan-glow 2s infinite ease-in-out !important;
         width: 100%;
-        margin-bottom: 45px;
+        margin-bottom: 40px;
+        text-transform: uppercase;
     }}
     </style>
     """, unsafe_allow_html=True)
@@ -131,13 +143,13 @@ if st.session_state.view == 'shop':
         st.subheader(w.get('shield_name'))
         st.write(f"_{w.get('shield_lore')}_")
         st.success("✨ REMOVES DEBT")
-        if st.button(f"BUY (15 {w.get('currency')})"):
+        if st.button(f"CLAIM (15 {w.get('currency')})"):
             if st.session_state.gold >= 15: st.session_state.gold -= 15; st.success("Debt Wiped!")
     with col2:
         st.subheader(w.get('booster_name'))
         st.write(f"_{w.get('booster_lore')}_")
         st.success("🚀 DOUBLE XP")
-        if st.button(f"BUY (25 {w.get('currency')})"):
+        if st.button(f"CLAIM (25 {w.get('currency')})"):
             if st.session_state.gold >= 25: st.session_state.gold -= 25; st.session_state.xp_multiplier = 2; st.success("Surge Active!")
 
 else:
