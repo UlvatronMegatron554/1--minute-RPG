@@ -8,8 +8,8 @@ st.set_page_config(page_title="1-MINUTE RPG", page_icon="⚡", layout="wide")
 try:
     MY_KEY = st.secrets["GEMINI_KEY"]
     genai.configure(api_key=MY_KEY)
-    # TEMPERATURE 1.0 FOR CREATIVE INFINITEVERSE
-    model = genai.GenerativeModel('gemini-1.5-flash', generation_config={"temperature": 1.0})
+    # ZERO TEMPERATURE FOR FACTUAL PRECISION
+    model = genai.GenerativeModel('gemini-1.5-flash', generation_config={"temperature": 0.0})
 except:
     model = None
 
@@ -29,22 +29,23 @@ if st.session_state.user_name is None:
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         name_input = st.text_input("Champion Name:")
-        theme_input = st.text_input("World Theme (e.g. Formula 1, Sonic, Ancient Rome, Skyrim):")
+        theme_input = st.text_input("World Theme (e.g. Formula 1, Sonic, Skyrim, NBA):")
         
         if st.button("🔥 AWAKEN"):
             if name_input:
                 st.session_state.user_name = name_input
-                t = theme_input.strip() if theme_input.strip() else "Titan"
+                t = theme_input.strip()
                 
                 with st.spinner(f"EXTRACTING LORE FOR {t.upper()}..."):
                     try:
-                        # THE INFINITE LORE PROMPT
-                        prompt = (f"Act as a Master Lore-Expert for '{t}'. "
-                                 f"STRICT RULE: NEVER use the word '{t}' in item names. "
-                                 f"STRICT RULE: Find the canonical currency, defense, and speed power for '{t}'. "
-                                 f"Example: Sonic = Rings/Insta-Shield/Spin Dash. "
-                                 f"Return ONLY JSON: {{'currency': 'lore name', 'unit': 'unit', 'color': 'hex', "
-                                 f"'shield_name': 'unique power', 'booster_name': 'unique power', "
+                        # THE LORE-STRIKER PROMPT: DEMANDING FACTS
+                        prompt = (f"Identify the lore of '{t}'. "
+                                 f"1. What is the EXACT currency used in the world of '{t}'? "
+                                 f"2. What is the most famous defensive item/power in '{t}'? "
+                                 f"3. What is the most famous speed/boost power in '{t}'? "
+                                 f"RULES: Do NOT use the word '{t}' in the answer. Do NOT guess generic names. "
+                                 f"Return ONLY JSON: {{'currency': 'lore item', 'unit': 'unit', 'color': 'HEX', "
+                                 f"'shield_name': 'lore power', 'booster_name': 'lore power', "
                                  f"'shield_lore': 'Deep lore fact', 'booster_lore': 'Deep lore fact', "
                                  f"'evo_1': 'rank 1', 'evo_2': 'rank 2', 'evo_3': 'rank 3'}}")
                         
@@ -53,7 +54,7 @@ if st.session_state.user_name is None:
                         if match:
                             data = json.loads(match.group())
                             
-                            # THE SCRUBBER: Manually strip theme name if AI was lazy
+                            # THE SCRUBBER: Delete the theme name if the AI cheated
                             forbidden = t.lower().split()
                             for key in ['currency', 'shield_name', 'booster_name']:
                                 for word in forbidden:
@@ -65,16 +66,14 @@ if st.session_state.user_name is None:
                             st.session_state.vibe_color = data.get('color', "#FFD700")
                             st.rerun()
                     except:
-                        # ADAPTIVE BACKUP
+                        # DYNAMIC BACKUP (No hardcoding)
                         st.session_state.world_data = {
                             "currency": "Credits", "unit": "Unit", "color": "#00FFCC",
                             "shield_name": "Kinetic Veil", "booster_name": "Phase Shift",
-                            "shield_lore": f"Advanced protection in the realm of {t}.", 
-                            "booster_lore": "Maximum velocity engaged.",
+                            "shield_lore": "Advanced protection.", "booster_lore": "High speed.",
                             "evo_1": "Novice", "evo_2": "Master", "evo_3": "Legend"
                         }
                         st.session_state.user_theme = t
-                        st.session_state.vibe_color = "#00FFCC"
                         st.rerun()
     st.stop()
 
@@ -122,7 +121,7 @@ with st.sidebar:
     if st.button("🛒 SHOP"): st.session_state.view = 'shop'; st.rerun()
     if st.button("🚨 RESET"): st.session_state.clear(); st.rerun()
 
-# --- 5. SHOP ---
+# --- 5. SHOP & HUB ---
 st.markdown(f"<h1 style='color:{active_color}; text-shadow: 0 0 25px {active_color};'>{st.session_state.user_theme.upper()}</h1>", unsafe_allow_html=True)
 
 if st.session_state.view == 'shop':
@@ -131,15 +130,13 @@ if st.session_state.view == 'shop':
     with col1:
         st.subheader(w.get('shield_name'))
         st.write(f"_{w.get('shield_lore')}_")
-        st.success("✨ ABILITY: REMOVES ALL DEBT")
         if st.button(f"CLAIM (15 {w.get('currency')})"):
-            if st.session_state.gold >= 15: st.session_state.gold -= 15; st.success("Debt Wiped!")
+            if st.session_state.gold >= 15: st.session_state.gold -= 15; st.success("Success!")
     with col2:
         st.subheader(w.get('booster_name'))
         st.write(f"_{w.get('booster_lore')}_")
-        st.success("🚀 ABILITY: DOUBLE XP SPEED")
         if st.button(f"CLAIM (25 {w.get('currency')})"):
-            if st.session_state.gold >= 25: st.session_state.gold -= 25; st.session_state.xp_multiplier = 2; st.success("Surge Active!")
+            if st.session_state.gold >= 25: st.session_state.gold -= 25; st.session_state.xp_multiplier = 2; st.success("Success!")
 
 else:
     mins = st.select_slider("Burst Time:", options=[1, 3, 5])
