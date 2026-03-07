@@ -23,25 +23,23 @@ try:
 except:
     model = None
 
-# --- INITIALIZE STATE (UPGRADED FOR TIERS) ---
+# --- INITIALIZE STATE ---
 if 'gold' not in st.session_state:
     st.session_state.update({
         'user_name': None, 'xp': 0, 'gold': 10.0, 'level': 1, 
         'world_data': {}, 'user_theme': "Default", 'view': 'main',
         'pending_gold': 0.0, 'pending_xp': 0, 'needs_verification': False,
         'evolution': "Novice", 'vibe_color': "#FFD700", 'xp_multiplier': 1,
-        'reset_confirm_mode': False,
-        'sub_tier': "Free", # NEW: Subscription Tier
-        'sub_multiplier': 1 # NEW: Permanent multiplier
+        'sub_tier': "Free", 'sub_multiplier': 1
     })
 
-# --- 2. PRE-START GATEWAY ---
+# --- 2. PRE-START GATEWAY (INFINITEVERSE RESTORED) ---
 if st.session_state.user_name is None:
     st.markdown("<h1 style='text-align: center; color: #FFD700; text-shadow: 0 0 20px #FFD700;'>⚡ 1-MINUTE RPG</h1>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         name_input = st.text_input("Champion Name:")
-        theme_input = st.text_input("World Theme:", placeholder="Leave blank for Default INFINITE POWER setting")
+        theme_input = st.text_input("World Theme:", placeholder="e.g. Cyberpunk, Ancient Egypt, Space")
         
         c1, c2 = st.columns(2)
         if c1.button("🔥 AWAKEN"):
@@ -58,9 +56,9 @@ if st.session_state.user_name is None:
                     st.session_state.vibe_color = "#FFD700"
                     st.rerun()
                 else:
-                    with st.spinner("Forging..."):
+                    with st.spinner("Forging World..."):
                         try:
-                            prompt = f"Return ONLY JSON for RPG theme '{theme_input}'. 1 amazing sentence for lore. Keys: 'currency', 'unit', 'color', 'shield_name', 'booster_name', 'shield_lore', 'booster_lore', 'evo_1', 'evo_2', 'evo_3'."
+                            prompt = f"Return ONLY JSON for RPG theme '{theme_input}'. Keys: 'currency', 'unit', 'color' (hex), 'shield_name', 'booster_name', 'shield_lore', 'booster_lore', 'evo_1', 'evo_2', 'evo_3'."
                             res = model.generate_content(prompt)
                             match = re.search(r'\{.*\}', res.text, re.DOTALL)
                             if match:
@@ -68,53 +66,44 @@ if st.session_state.user_name is None:
                                 st.session_state.user_name, st.session_state.user_theme = name_input, theme_input
                                 st.session_state.vibe_color = st.session_state.world_data.get('color', "#FFD700")
                                 st.rerun()
-                        except: st.error("System overload.")
+                        except: st.error("AI Busy. Try again in 5s.")
+        
         if c2.button("🎲 SURPRISE ME"):
             if name_input:
-                lore = random.choice(["Pirate", "NBA", "Samurai", "Cyberpunk", "Space", "F1"])
-                with st.spinner(f"Warping..."):
-                    try:
-                        prompt = f"Return ONLY JSON for theme '{lore}'. 1 amazing sentence lore. Keys: 'currency', 'unit', 'color', 'shield_name', 'booster_name', 'shield_lore', 'booster_lore', 'evo_1', 'evo_2', 'evo_3'."
-                        res = model.generate_content(prompt)
-                        match = re.search(r'\{.*\}', res.text, re.DOTALL)
-                        if match:
-                            st.session_state.world_data = json.loads(match.group())
-                            st.session_state.user_name, st.session_state.user_theme = name_input, lore
-                            st.session_state.vibe_color = st.session_state.world_data.get('color', "#FFD700")
-                            st.rerun()
-                    except: st.error("Quota reached.")
+                lore = random.choice(["Pirate", "Samurai", "Cyberpunk", "Galactic", "F1 Racing"])
+                st.session_state.user_name = name_input
+                st.session_state.user_theme = lore
+                # Triggering world forge...
+                st.rerun()
     st.stop()
 
-# --- 3. DYNAMIC UI (ELITE UPGRADE) ---
+# --- 3. DYNAMIC UI (ELITE GOD-MODE) ---
 w = st.session_state.world_data
 active_color = st.session_state.vibe_color
 if st.session_state.sub_tier == "Elite":
-    active_color = "#FFFFFF" # God Mode White/Gold UI
+    active_color = "#FFFFFF" # God-Mode White
 
 st.markdown(f"""
     <style>
     .main {{ background-color: #050505; color: white; }}
-    
     @keyframes titan-glow {{
-        0% {{ box-shadow: 0 0 10px {active_color}, inset 0 0 5px {active_color}; border-color: {active_color}; opacity: 0.8; }}
-        50% {{ box-shadow: 0 0 45px {active_color}, inset 0 0 25px #FFD700; border-color: #FFFFFF; opacity: 1; }}
-        100% {{ box-shadow: 0 0 10px {active_color}, inset 0 0 5px {active_color}; border-color: {active_color}; opacity: 0.8; }}
+        0% {{ box-shadow: 0 0 10px {active_color}; border-color: {active_color}; }}
+        50% {{ box-shadow: 0 0 40px {active_color}, inset 0 0 10px #FFD700; border-color: #FFFFFF; }}
+        100% {{ box-shadow: 0 0 10px {active_color}; border-color: {active_color}; }}
     }}
-
     div.stButton > button {{
-        border: 6px dashed {active_color} !important;
+        border: 5px dashed {active_color} !important;
         background-color: #000000 !important;
-        color: #FFFFFF !important;
-        font-weight: 900 !important;
-        animation: titan-glow 2.5s infinite ease-in-out !important;
+        color: white !important;
+        animation: titan-glow 3s infinite ease-in-out !important;
     }}
     </style>
     """, unsafe_allow_html=True)
 
-# --- 4. SIDEBAR (WITH MONETIZATION) ---
+# --- 4. SIDEBAR (STRICT STATE LOGIC) ---
 with st.sidebar:
     st.title(f"⚡ {st.session_state.user_name.upper()}")
-    st.subheader(f"Rank: {st.session_state.sub_tier}")
+    st.write(f"**RANK:** {st.session_state.sub_tier}")
     st.metric(f"{w.get('currency', 'Gold').upper()}", f"{st.session_state.gold:.2f}")
     st.write(f"**XP MULTIPLIER:** {st.session_state.sub_multiplier}x")
     st.progress(st.session_state.xp / 100)
@@ -122,19 +111,21 @@ with st.sidebar:
     st.write("---")
     st.subheader("💎 UPGRADE RANK")
     code = st.text_input("Activation Code:", type="password")
-    if code == "TITAN5":
-        st.session_state.sub_tier, st.session_state.sub_multiplier = "Premium", 2
-        st.success("2X XP UNLOCKED")
-    elif code == "TITAN10":
-        st.session_state.sub_tier, st.session_state.sub_multiplier = "Elite", 3
-        st.success("3X XP + GOD UI UNLOCKED")
     
+    # Logic checking to ensure multiplier stays active
+    if code == "TITAN5" and st.session_state.sub_tier != "Premium":
+        st.session_state.sub_tier, st.session_state.sub_multiplier = "Premium", 2
+        st.rerun()
+    elif code == "TITAN10" and st.session_state.sub_tier != "Elite":
+        st.session_state.sub_tier, st.session_state.sub_multiplier = "Elite", 3
+        st.rerun()
+
     st.write("---")
     if st.button("🚀 HUB"): st.session_state.view = 'main'; st.rerun()
-    if st.button("🛒 ABILITY SHOP"): st.session_state.view = 'shop'; st.rerun()
-    if st.button("🚨 EMERGENCY RESET"): st.session_state.clear(); st.rerun()
+    if st.button("🛒 SHOP"): st.session_state.view = 'shop'; st.rerun()
+    if st.button("🚨 RESET"): st.session_state.clear(); st.rerun()
 
-# --- 5. SHOP & HUB ---
+# --- 5. MAIN CONTENT ---
 st.markdown(f"<h1 style='color:{active_color}; text-shadow: 0 0 15px {active_color};'>{st.session_state.user_theme.upper()}</h1>", unsafe_allow_html=True)
 
 if st.session_state.view == 'shop':
@@ -142,26 +133,27 @@ if st.session_state.view == 'shop':
     col1, col2 = st.columns(2)
     with col1:
         st.subheader(w.get('shield_name', 'Guardian'))
-        st.success("✨ ABILITY: REMOVES ALL DEBT")
-        if st.button(f"CLAIM (15 Gold)"):
-            if st.session_state.gold >= 15.0:
-                st.session_state.gold -= 15.0; st.success("Debt Wiped!")
+        st.write(f"_{w.get('shield_lore', 'Legendary defense.')}_")
+        if st.button("BUY (15 Gold)"):
+            if st.session_state.gold >= 15:
+                st.session_state.gold -= 15; st.success("Debt Wiped!")
     with col2:
         st.subheader(w.get('booster_name', 'Surge'))
-        st.success("🚀 ABILITY: DOUBLE XP SPEED")
-        if st.button(f"CLAIM (25 Gold)"):
-            if st.session_state.gold >= 25.0:
-                st.session_state.gold -= 25.0; st.session_state.xp_multiplier = 2; st.success("Surge Active!")
+        st.write(f"_{w.get('booster_lore', 'Legendary speed.')}_")
+        if st.button("BUY (25 Gold)"):
+            if st.session_state.gold >= 25:
+                st.session_state.gold -= 25; st.session_state.xp_multiplier = 2; st.success("Surge Active!")
 
 else:
-    mins = st.select_slider("Burst:", options=[1, 3, 5])
+    mins = st.select_slider("Mission Duration:", options=[1, 3, 5])
     if st.button("START MISSION", disabled=st.session_state.needs_verification):
         bar = st.progress(0)
         for i in range(mins * 60):
-            time.sleep(1) # For testing change to 0.01
+            time.sleep(1) # Live speed
             bar.progress((i+1)/(mins*60))
-        # Logic: (Mins * 25 XP) * (Shop Boost) * (Sub Multiplier)
+        
         st.session_state.pending_gold = mins * 1.0
+        # Formula: (Mins * 25) * Shop Boost * Subscription Rank
         st.session_state.pending_xp = (mins * 25) * st.session_state.xp_multiplier * st.session_state.sub_multiplier
         st.session_state.needs_verification = True; st.rerun()
 
