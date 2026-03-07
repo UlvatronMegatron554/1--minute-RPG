@@ -8,8 +8,8 @@ st.set_page_config(page_title="1-MINUTE RPG", page_icon="⚡", layout="wide")
 try:
     MY_KEY = st.secrets["GEMINI_KEY"]
     genai.configure(api_key=MY_KEY)
-    # TEMPERATURE 1.0 + TOP_P 1.0 FOR MAXIMUM UNPREDICTABILITY
-    model = genai.GenerativeModel('gemini-1.5-flash', generation_config={"temperature": 1.0, "top_p": 1.0})
+    # CRANKING TEMPERATURE TO 1.0 FOR MAXIMUM CREATIVITY
+    model = genai.GenerativeModel('gemini-1.5-flash', generation_config={"temperature": 1.0})
 except:
     model = None
 
@@ -23,65 +23,49 @@ if 'gold' not in st.session_state:
         'sub_tier': "Free", 'sub_multiplier': 1
     })
 
-# --- 2. THE INFINITE FORGE GATEWAY ---
+# --- 2. THE DEEP-SCAN FORGE ---
 if st.session_state.user_name is None:
     st.markdown("<h1 style='text-align: center; color: #FFD700; text-shadow: 0 0 50px #FFD700;'>⚡ 1-MINUTE RPG</h1>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         name_input = st.text_input("Champion Name:")
-        theme_input = st.text_input("World Theme (e.g. Naruto, One Piece, Star Wars):")
+        theme_input = st.text_input("World Theme (e.g. Minecraft, One Piece, NBA, Skyrim):")
         
         if st.button("🔥 AWAKEN"):
             if name_input:
                 st.session_state.user_name = name_input
                 t = theme_input.strip() if theme_input.strip() else "Titan"
                 
-                with st.spinner(f"SEARCHING MULTIVERSE FOR {t.upper()}..."):
+                with st.spinner(f"EXTRACTING LORE FOR {t.upper()}..."):
                     try:
-                        # THE "IDENTITY-STRIPPER" PROMPT
-                        prompt = (f"Act as a Lore Expert for the concept of '{t}'. "
-                                 f"STRICT RULE 1: NEVER use the word '{t}' in your response. "
-                                 f"STRICT RULE 2: Find the canonical currency, defense, and speed powers for '{t}'. "
-                                 f"If the theme is a specific franchise, use its real items. "
-                                 f"Return ONLY JSON: {{'currency': 'lore name', 'unit': 'lore unit', 'color': 'hex', "
-                                 f"'shield_name': 'lore power', 'booster_name': 'lore power', "
-                                 f"'shield_lore': 'Lore-specific lore', 'booster_lore': 'Lore-specific lore', "
+                        # THE LORE-GRIP PROMPT
+                        prompt = (f"Act as a Lore Historian for '{t}'. "
+                                 f"STRICT: If '{t}' is Minecraft, use Emeralds. If One Piece, use Berries. "
+                                 f"DO NOT use the word '{t}' in names. DO NOT use 'Guard' or 'Shield'. "
+                                 f"Find the MOST ICONIC colors and items. "
+                                 f"Return ONLY JSON: {{'currency': 'lore item', 'unit': 'lore unit', 'color': 'HEX CODE', "
+                                 f"'shield_name': 'lore defense', 'booster_name': 'lore speed', "
+                                 f"'shield_lore': 'Deep factual lore sentence', 'booster_lore': 'Deep factual lore sentence', "
                                  f"'evo_1': 'rank 1', 'evo_2': 'rank 2', 'evo_3': 'rank 3'}}")
                         
                         res = model.generate_content(prompt)
                         match = re.search(r'\{.*\}', res.text, re.DOTALL)
                         if match:
                             data = json.loads(match.group())
-                            
-                            # THE CLEANER: Scrub the theme name if the AI was lazy
-                            forbidden = t.lower().split()
-                            for key in ['currency', 'shield_name', 'booster_name']:
-                                for word in forbidden:
-                                    if len(word) > 2: # Avoid scrubbing small words like 'the'
-                                        data[key] = data[key].lower().replace(word, "").strip().title()
-                            
-                            # If scrubbed names are empty, give them a Lore-Pulse
-                            if not data['shield_name']: data['shield_name'] = "Divine Barrier"
-                            if not data['booster_name']: data['booster_name'] = "Light-Speed Warp"
-                            
                             st.session_state.world_data = data
                             st.session_state.user_theme = t
                             st.session_state.vibe_color = data.get('color', "#FFD700")
                             st.rerun()
                     except:
-                        # LORE-ACCURATE HARDCODED BACKUP
-                        lore_db = {
-                            "one piece": {"c": "Berries", "s": "Haki Aura", "b": "Gear Second", "col": "#FF4500"},
-                            "naruto": {"c": "Ryo", "s": "Susanoo Ribs", "b": "Shunshin", "col": "#FF9900"},
-                            "star wars": {"c": "Galactic Credits", "s": "Force Shield", "b": "Force Speed", "h": "#00CCFF"}
-                        }
-                        low_t = t.lower()
-                        base = lore_db.get(low_t, {"c": "Ancient Gold", "s": "Mystic Veil", "b": "Ethereal Step", "h": "#00FFCC"})
+                        # DYNAMIC BACKUP (If AI is Busy)
                         st.session_state.world_data = {
-                            "currency": base["c"], "unit": "Credit", "color": base.get("h", "#00FFCC"),
-                            "shield_name": base["s"], "booster_name": base["b"],
-                            "shield_lore": f"A specialized defense from the realm of {t}.", 
-                            "booster_lore": f"Maximum velocity tuned to {t}.",
+                            "currency": "Emeralds" if "mine" in t.lower() else "Berries" if "piece" in t.lower() else "Gold",
+                            "unit": "Gem" if "mine" in t.lower() else "Beli" if "piece" in t.lower() else "Unit",
+                            "color": "#00FF00" if "mine" in t.lower() else "#FF4500",
+                            "shield_name": "Bedrock Armor" if "mine" in t.lower() else "Armament Haki",
+                            "booster_name": "Swiftness II" if "mine" in t.lower() else "Gear Second",
+                            "shield_lore": "Forged from the unbreakable core.", 
+                            "booster_lore": "Maximum velocity through the realm.",
                             "evo_1": "Novice", "evo_2": "Master", "evo_3": "Legend"
                         }
                         st.session_state.user_theme = t
@@ -89,7 +73,7 @@ if st.session_state.user_name is None:
                         st.rerun()
     st.stop()
 
-# --- 3. DYNAMIC UI (THE 10PX DASHED GLOW) ---
+# --- 3. DYNAMIC UI (THE 10PX DASHED TITAN GLOW) ---
 w = st.session_state.world_data
 active_color = st.session_state.vibe_color if st.session_state.sub_tier != "Elite" else "#FFFFFF"
 
