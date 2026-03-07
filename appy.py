@@ -8,6 +8,7 @@ st.set_page_config(page_title="1-MINUTE RPG", page_icon="⚡", layout="wide")
 try:
     MY_KEY = st.secrets["GEMINI_KEY"]
     genai.configure(api_key=MY_KEY)
+    # TEMPERATURE 1.0 TO FORCE CREATIVITY
     model = genai.GenerativeModel('gemini-1.5-flash', generation_config={"temperature": 1.0})
 except:
     model = None
@@ -22,28 +23,28 @@ if 'gold' not in st.session_state:
         'sub_tier': "Free", 'sub_multiplier': 1
     })
 
-# --- 2. THE INFINITE FORGE GATEWAY ---
+# --- 2. THE BLACKLIST FORGE ---
 if st.session_state.user_name is None:
     st.markdown("<h1 style='text-align: center; color: #FFD700; text-shadow: 0 0 50px #FFD700;'>⚡ 1-MINUTE RPG</h1>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         name_input = st.text_input("Champion Name:")
-        theme_input = st.text_input("World Theme (e.g. Star Wars, Rome, Naruto, Minecraft):")
+        theme_input = st.text_input("World Theme (e.g. Minecraft, Naruto, Star Wars):")
         
         if st.button("🔥 AWAKEN"):
             if name_input:
                 st.session_state.user_name = name_input
                 t = theme_input.strip() if theme_input.strip() else "Titan"
                 
-                with st.spinner(f"EXTRACTING LORE FOR {t.upper()}..."):
+                with st.spinner(f"DE-CODING LORE FOR {t.upper()}..."):
                     try:
-                        # THE LORE-HUNTER PROMPT (No hardcoding)
-                        prompt = (f"Act as a Master Lore-Expert. Create a world for theme '{t}'. "
-                                 f"STRICT: Use only factual lore currency and powers. "
-                                 f"If the theme is a specific game/movie, find its real items. "
-                                 f"DO NOT use the word '{t}' in the names. "
-                                 f"Return ONLY JSON: {{'currency': 'lore item', 'unit': 'lore unit', 'color': 'hex', "
-                                 f"'shield_name': 'lore power', 'booster_name': 'lore power', "
+                        # THE BLACKLIST PROMPT: Forces AI to stay away from the name
+                        prompt = (f"Act as a Master Worldbuilder for '{t}'. "
+                                 f"CRITICAL RULE: NEVER use the word '{t}' or its parts in any item names. "
+                                 f"If '{t}' is Minecraft, use 'Emeralds' and 'Obsidian'. If Star Wars, use 'Credits' and 'The Force'. "
+                                 f"Be highly specific and creative. NO GENERIC NAMES. "
+                                 f"Return ONLY JSON: {{'currency': 'lore name', 'unit': 'lore unit', 'color': 'hex', "
+                                 f"'shield_name': 'unique lore power', 'booster_name': 'unique lore speed', "
                                  f"'shield_lore': 'Deep lore fact', 'booster_lore': 'Deep lore fact', "
                                  f"'evo_1': 'rank 1', 'evo_2': 'rank 2', 'evo_3': 'rank 3'}}")
                         
@@ -51,34 +52,31 @@ if st.session_state.user_name is None:
                         match = re.search(r'\{.*\}', res.text, re.DOTALL)
                         if match:
                             data = json.loads(match.group())
+                            
+                            # THE TITAN SCRUBBER: Manually verify the AI didn't cheat
+                            t_lower = t.lower()
+                            for key in ['currency', 'shield_name', 'booster_name']:
+                                if t_lower in data[key].lower():
+                                    # If AI cheated, we pull from an internal lore-set or use a generic cool name
+                                    data[key] = "Mystic Core" if "shield" in key else "Void Pulse"
+                            
                             st.session_state.world_data = data
                             st.session_state.user_theme = t
                             st.session_state.vibe_color = data.get('color', "#FFD700")
                             st.rerun()
                     except:
-                        # THE ADAPTIVE BACKUP (No One Piece bias)
-                        lore_seeds = {
-                            "space": {"c": "Credits", "s": "Ion Shield", "b": "Warp Drive", "h": "#00FFFF"},
-                            "fantasy": {"c": "Gold Pieces", "s": "Magic Barrier", "b": "Haste Cloud", "h": "#9933FF"},
-                            "mine": {"c": "Emeralds", "s": "Diamond Armor", "b": "Ender Pearl", "h": "#00FF00"},
-                            "star": {"c": "Galactic Credits", "s": "Force Field", "b": "Hyperdrive", "h": "#00CCFF"},
-                            "piece": {"c": "Berries", "s": "Haki Aura", "b": "Gear Second", "h": "#FF4500"},
-                            "rome": {"c": "Denarii", "s": "Testudo", "b": "Chariot Charge", "h": "#B22222"},
-                            "nba": {"c": "VC", "s": "Lockdown D", "b": "Fast Break", "h": "#EE6730"}
-                        }
-                        # Keyword matching to find the right theme
-                        matched = next((v for k, v in lore_seeds.items() if k in t.lower()), None)
-                        if not matched: matched = {"c": f"{t} Shards", "s": f"{t} Veil", "b": f"{t} Blink", "h": "#FFD700"}
-                        
+                        # ADAPTIVE BACKUP
                         st.session_state.world_data = {
-                            "currency": matched["c"], "unit": "Unit", "color": matched["h"],
-                            "shield_name": matched["s"], "booster_name": matched["b"],
-                            "shield_lore": f"A specialized defense from the {t} realm.", 
-                            "booster_lore": f"Maximum velocity tuned to {t}.",
+                            "currency": "Emeralds" if "mine" in t.lower() else "Berries" if "piece" in t.lower() else "Mana Shards",
+                            "unit": "Gem", "color": "#00FFCC",
+                            "shield_name": "Bedrock Plating" if "mine" in t.lower() else "Spirit Veil",
+                            "booster_name": "Ender Warp" if "mine" in t.lower() else "Phase Shift",
+                            "shield_lore": f"Ancient defense adapted for the {t} realm.", 
+                            "booster_lore": f"Maximum speed enhancement.",
                             "evo_1": "Novice", "evo_2": "Master", "evo_3": "Legend"
                         }
                         st.session_state.user_theme = t
-                        st.session_state.vibe_color = matched["h"]
+                        st.session_state.vibe_color = "#00FFCC"
                         st.rerun()
     st.stop()
 
@@ -126,7 +124,7 @@ with st.sidebar:
     if st.button("🛒 SHOP"): st.session_state.view = 'shop'; st.rerun()
     if st.button("🚨 RESET"): st.session_state.clear(); st.rerun()
 
-# --- 5. MAIN HUB ---
+# --- 5. SHOP & HUB ---
 st.markdown(f"<h1 style='color:{active_color}; text-shadow: 0 0 25px {active_color};'>{st.session_state.user_theme.upper()}</h1>", unsafe_allow_html=True)
 
 if st.session_state.view == 'shop':
