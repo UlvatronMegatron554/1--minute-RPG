@@ -22,13 +22,13 @@ if 'gold' not in st.session_state:
         'sub_tier': "Free", 'sub_multiplier': 1
     })
 
-# --- 2. THE SMART FORGE GATEWAY ---
+# --- 2. THE INFINITE FORGE GATEWAY ---
 if st.session_state.user_name is None:
     st.markdown("<h1 style='text-align: center; color: #FFD700; text-shadow: 0 0 35px #FFD700;'>⚡ 1-MINUTE RPG</h1>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         name_input = st.text_input("Champion Name:")
-        theme_input = st.text_input("World Theme (Leave blank for Titan Power):")
+        theme_input = st.text_input("World Theme (e.g. Ancient Rome, Cyberpunk, One Piece):")
         
         if st.button("🔥 AWAKEN"):
             if name_input:
@@ -37,8 +37,12 @@ if st.session_state.user_name is None:
                 
                 with st.spinner("Forging..."):
                     try:
-                        # Attempt AI Forge
-                        res = model.generate_content(f"JSON for RPG '{t}': currency, unit, color(hex), shield_name, booster_name, shield_lore, booster_lore, evo_1, evo_2, evo_3.")
+                        # THE LORE-HUNTER PROMPT
+                        prompt = (f"Return ONLY JSON for RPG theme '{t}'. "
+                                 f"IMPORTANT: Use famous lore names (e.g. if One Piece, use Berries/Haki). "
+                                 f"Keys: 'currency', 'unit', 'color' (hex), 'shield_name', 'booster_name', "
+                                 f"'shield_lore', 'booster_lore', 'evo_1', 'evo_2', 'evo_3'.")
+                        res = model.generate_content(prompt)
                         match = re.search(r'\{.*\}', res.text, re.DOTALL)
                         if match:
                             st.session_state.world_data = json.loads(match.group())
@@ -46,22 +50,20 @@ if st.session_state.user_name is None:
                             st.session_state.vibe_color = st.session_state.world_data.get('color', "#FFD700")
                             st.rerun()
                     except:
-                        # THE SMART BYPASS: Matches your theme even if AI is busy!
-                        color_list = ["#FF3366", "#00FFCC", "#9933FF", "#FFCC00", "#33CCFF"]
-                        chosen_color = random.choice(color_list)
+                        # SMART BACKUP (Matches theme name if AI stalls)
                         st.session_state.world_data = {
-                            "currency": f"{t} Coin", "unit": "Credit", "color": chosen_color,
-                            "shield_name": f"{t} Guard", "booster_name": f"{t} Overdrive",
+                            "currency": f"{t} Essence", "unit": "Pulse", "color": "#00FFCC",
+                            "shield_name": f"{t} Aegis", "booster_name": f"{t} Drive",
                             "shield_lore": f"A specialized barrier forged from {t} energy.", 
                             "booster_lore": f"Maximum velocity tuned for the {t} realm.",
-                            "evo_1": "Aspirant", "evo_2": "Titan", "evo_3": "Eternal"
+                            "evo_1": "Novice", "evo_2": "Elite", "evo_3": "Legend"
                         }
-                        st.session_state.user_theme = f"{t} (Instant Forge)"
-                        st.session_state.vibe_color = chosen_color
+                        st.session_state.user_theme = t
+                        st.session_state.vibe_color = "#00FFCC"
                         st.rerun()
     st.stop()
 
-# --- 3. DYNAMIC UI (TITAN BOXES) ---
+# --- 3. DYNAMIC UI (TITAN BOXES - 10PX DASHED) ---
 w = st.session_state.world_data
 active_color = st.session_state.vibe_color if st.session_state.sub_tier != "Elite" else "#FFFFFF"
 
@@ -81,7 +83,7 @@ st.markdown(f"""
         font-size: 26px !important;
         padding: 40px !important;
         border-radius: 25px !important;
-        animation: titan-glow 2s infinite ease-in-out !important;
+        animation: titan-glow 2.5s infinite ease-in-out !important;
         width: 100%;
         margin-bottom: 30px;
     }}
@@ -115,13 +117,13 @@ if st.session_state.view == 'shop':
     col1, col2 = st.columns(2)
     with col1:
         st.subheader(w.get('shield_name', 'Guardian'))
-        st.write(f"_{w.get('shield_lore', 'The ultimate defense.')}_")
+        st.write(f"_{w.get('shield_lore', 'Legendary defense.')}_")
         st.success("✨ ABILITY: REMOVES ALL DEBT")
         if st.button(f"CLAIM (15 {w.get('currency', 'Gold')})"):
             if st.session_state.gold >= 15: st.session_state.gold -= 15; st.success("Debt Wiped!")
     with col2:
         st.subheader(w.get('booster_name', 'Surge'))
-        st.write(f"_{w.get('booster_lore', 'The ultimate speed.')}_")
+        st.write(f"_{w.get('booster_lore', 'Unstoppable speed.')}_")
         st.success("🚀 ABILITY: DOUBLE XP SPEED")
         if st.button(f"CLAIM (25 {w.get('currency', 'Gold')})"):
             if st.session_state.gold >= 25: st.session_state.gold -= 25; st.session_state.xp_multiplier = 2; st.success("Surge Active!")
