@@ -1,14 +1,14 @@
 import streamlit as st
 import google.generativeai as genai
-import time, json, re, random
+import time, json, re
 
-# --- 1. THE TITAN ARCHITECTURE ---
+# --- 1. THE ARCHITECT'S CORE ---
 st.set_page_config(page_title="1-MINUTE RPG", page_icon="⚡", layout="wide")
 
 try:
     MY_KEY = st.secrets["GEMINI_KEY"]
     genai.configure(api_key=MY_KEY)
-    # TEMPERATURE 0.0 FOR ABSOLUTE FACTUAL ACCURACY - NO GUESSING
+    # FORCING 0.0 TEMPERATURE FOR RAW FACTUAL DATA
     model = genai.GenerativeModel('gemini-1.5-flash', generation_config={"temperature": 0.0})
 except:
     model = None
@@ -16,20 +16,18 @@ except:
 # --- INITIALIZE STATE ---
 if 'gold' not in st.session_state:
     st.session_state.update({
-        'user_name': None, 'xp': 0, 'gold': 10.0, 'level': 1, 
-        'world_data': {}, 'user_theme': "Default", 'view': 'main',
-        'pending_gold': 0.0, 'pending_xp': 0, 'needs_verification': False,
-        'vibe_color': "#FFD700", 'xp_multiplier': 1,
-        'sub_tier': "Free", 'sub_multiplier': 1
+        'user_name': None, 'gold': 10.0, 'world_data': {}, 'user_theme': "Default", 
+        'view': 'main', 'pending_gold': 0.0, 'needs_verification': False, 
+        'vibe_color': "#FFD700", 'sub_tier': "Free", 'sub_multiplier': 1
     })
 
 # --- 2. THE INFINITE FORGE GATEWAY ---
 if st.session_state.user_name is None:
-    st.markdown("<h1 style='text-align: center; color: #FFD700; text-shadow: 0 0 60px #FFD700;'>⚡ 1-MINUTE RPG</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center; color: #FFD700; text-shadow: 0 0 50px #FFD700;'>⚡ 1-MINUTE RPG</h1>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         name_input = st.text_input("Champion Name:")
-        theme_input = st.text_input("World Theme (e.g. Formula 1, Sonic, NBA, Ancient Rome):")
+        theme_input = st.text_input("World Theme (e.g. Formula 1, Sonic, Ancient Rome, Skyrim):")
         
         if st.button("🔥 AWAKEN"):
             if name_input and theme_input:
@@ -38,34 +36,37 @@ if st.session_state.user_name is None:
                 
                 with st.spinner(f"DECODING {t.upper()} REALITY..."):
                     try:
-                        # THE TITAN PROMPT (Aggressive Factual Demands)
-                        prompt = (f"Identify the LORE for '{t}'. Match the quality of One Piece or Formula 1. "
-                                 f"1. Factual currency used in the '{t}' world. "
-                                 f"2. Factual defensive power (NOT 'Shield', NOT 'Guard'). "
-                                 f"3. Factual speed power (NOT 'Surge', NOT 'Drive'). "
-                                 f"4. The most iconic high-contrast HEX color. "
-                                 f"STRICT RULE: DO NOT use the word '{t}' in any item names. "
+                        # THE ABSOLUTE PROMPT: NO GUESSING, NO GENERIC NAMES
+                        prompt = (f"Identify the canonical lore for '{t}'. "
+                                 f"1. What is the EXACT currency used in '{t}'? "
+                                 f"2. What is a FAMOUS defensive item or power in '{t}'? (NOT 'Shield', NOT 'Guard'). "
+                                 f"3. What is a FAMOUS speed item or power in '{t}'? (NOT 'Surge', NOT 'Drive'). "
+                                 f"4. What is the most iconic high-contrast HEX color for '{t}'? "
+                                 f"STRICT RULE: Do NOT use the word '{t}' in any names. "
                                  f"RETURN JSON ONLY: {{'currency': 'name', 'color': 'HEX', 'shield_name': 'name', "
                                  f"'booster_name': 'name', 'shield_lore': 'Deep fact', 'booster_lore': 'Deep fact'}}")
                         
                         res = model.generate_content(prompt)
                         data = json.loads(re.search(r'\{.*\}', res.text, re.DOTALL).group())
                         
-                        # THE IDENTITY SCRUBBER: Manually strip theme name if AI cheats
+                        # THE LORE SCRUBBER: Kill any generic drift or echoes
+                        forbidden = [t.lower(), "shield", "guard", "surge", "drive", "essence"]
                         for key in ['currency', 'shield_name', 'booster_name']:
-                            cleaned = data[key].lower().replace(t.lower(), "").strip()
-                            data[key] = cleaned.title() if cleaned else "Core Power"
+                            val = data[key].lower()
+                            for f in forbidden:
+                                val = val.replace(f, "").strip()
+                            data[key] = val.title() if val else "Primal Core"
                         
                         st.session_state.world_data = data
                         st.session_state.user_theme = t
                         st.session_state.vibe_color = data.get('color', "#FFD700")
                         st.rerun()
                     except:
-                        # PINNACLE FALLBACK
+                        # TITAN FALLBACK
                         st.session_state.world_data = {
                             "currency": "Credits", "color": "#00FFCC", 
                             "shield_name": "Kinetic Veil", "booster_name": "Phase Shift", 
-                            "shield_lore": "Advanced atomic defense.", "booster_lore": "Space-time translocation."
+                            "shield_lore": "Universal defense.", "booster_lore": "Universal speed."
                         }
                         st.session_state.user_theme = t
                         st.rerun()
@@ -79,7 +80,7 @@ st.markdown(f"""
     .main {{ background-color: #050505; color: white; }}
     @keyframes titan-glow {{
         0% {{ box-shadow: 0 0 20px {active_color}; border-color: {active_color}; }}
-        50% {{ box-shadow: 0 0 80px {active_color}, inset 0 0 40px {active_color}; border-color: #FFFFFF; }}
+        50% {{ box-shadow: 0 0 75px {active_color}, inset 0 0 35px {active_color}; border-color: #FFFFFF; }}
         100% {{ box-shadow: 0 0 20px {active_color}; border-color: {active_color}; }}
     }}
     div.stButton > button {{
