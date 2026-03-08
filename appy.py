@@ -5,14 +5,17 @@ import time, json, re
 # --- 1. SETUP ---
 st.set_page_config(page_title="1-MINUTE RPG", page_icon="⚡", layout="wide")
 
+# FIX: Explicitly using the stable model name to prevent 'NotFound' error
+MODEL_NAME = 'gemini-1.5-flash'
+
 try:
     MY_KEY = st.secrets["GEMINI_KEY"]
     genai.configure(api_key=MY_KEY)
-    model = genai.GenerativeModel('gemini-1.5-flash', generation_config={"temperature": 0.0})
-except:
+    model = genai.GenerativeModel(MODEL_NAME)
+except Exception as e:
     model = None
 
-# --- 2. THE MASTER LORE DATABASE ---
+# --- 2. THE MASTER LORE DATABASE (THE DNA) ---
 LORE_DB = {
     "formula 1": {"c": "Championship Points", "s": "Halo Titanium", "b": "DRS Activation", "h": "#FF1801"},
     "f1": {"c": "Championship Points", "s": "Halo Titanium", "b": "DRS Activation", "h": "#FF1801"},
@@ -55,27 +58,39 @@ if st.session_state.user_name is None:
             if name_input:
                 st.session_state.user_name = name_input
                 t = theme_input.strip().lower()
-                if t in LORE_DB:
-                    d = LORE_DB[t]
-                    st.session_state.world_data = {"currency": d["c"], "shield_name": d["s"], "booster_name": d["b"], "color": d["h"], "shield_lore": "Factual Lore.", "booster_lore": "Factual Lore."}
+                
+                # Check Local Database First
+                matched_key = next((k for k in LORE_DB if k in t), None)
+                if matched_key:
+                    d = LORE_DB[matched_key]
+                    st.session_state.world_data = {
+                        "currency": d["c"], "shield_name": d["s"], "booster_name": d["b"], 
+                        "color": d["h"], "shield_lore": "Factual Lore.", "booster_lore": "Factual Lore."
+                    }
                     st.session_state.user_theme = theme_input
                     st.session_state.vibe_color = d["h"]
                     st.rerun()
                 else:
-                    # AI FALLBACK WITH EXAMPLES
+                    # AI Fallback
                     with st.spinner("ANALYZING MULTIVERSE..."):
-                        prompt = f"Identify lore for '{t}'. Match the quality of Sonic (Rings/Spin Dash) or F1 (Points/DRS). No generic names. Return JSON: {{'currency': 'name', 'color': 'HEX', 'shield_name': 'name', 'booster_name': 'name', 'shield_lore': 'fact', 'booster_lore': 'fact'}}"
-                        res = model.generate_content(prompt)
-                        match = re.search(r'\{.*\}', res.text, re.DOTALL)
-                        if match:
-                            data = json.loads(match.group())
-                            st.session_state.world_data = data
+                        try:
+                            prompt = f"Identify lore for '{t}'. Match the quality of Sonic (Rings/Spin Dash). No generic names. Return ONLY JSON: {{'currency': 'name', 'color': 'HEX', 'shield_name': 'name', 'booster_name': 'name', 'shield_lore': 'fact', 'booster_lore': 'fact'}}"
+                            res = model.generate_content(prompt)
+                            match = re.search(r'\{.*\}', res.text, re.DOTALL)
+                            if match:
+                                data = json.loads(match.group())
+                                st.session_state.world_data = data
+                                st.session_state.user_theme = theme_input
+                                st.session_state.vibe_color = data.get('color', "#FFD700")
+                                st.rerun()
+                        except Exception:
+                            # Emergency Backup if AI completely fails
+                            st.session_state.world_data = {"currency": "Gold", "color": "#FFD700", "shield_name": "Defense", "booster_name": "Speed", "shield_lore": "Safe-mode engaged.", "booster_lore": "Safe-mode engaged."}
                             st.session_state.user_theme = theme_input
-                            st.session_state.vibe_color = data.get('color', "#FFD700")
                             st.rerun()
     st.stop()
 
-# --- 4. THE TITAN UI (10PX DASHED ONLY INSIDE APP) ---
+# --- 4. THE TITAN UI (10PX DASHED) ---
 active_color = st.session_state.vibe_color
 st.markdown(f"""
     <style>
