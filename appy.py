@@ -2,13 +2,14 @@ import streamlit as st
 import google.generativeai as genai
 import time, json, re
 
-# --- 1. CORE ARCHITECTURE ---
+# --- 1. THE ARCHITECT'S SETUP ---
 st.set_page_config(page_title="1-MINUTE RPG", page_icon="⚡", layout="wide")
 
 try:
-    # Use the most robust model for high-tier lore extraction
-    genai.configure(api_key=st.secrets["GEMINI_KEY"])
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    MY_KEY = st.secrets["GEMINI_KEY"]
+    genai.configure(api_key=MY_KEY)
+    # Using the most advanced model configuration for deep-lore retrieval
+    model = genai.GenerativeModel('gemini-1.5-flash', generation_config={"temperature": 0.0})
 except:
     model = None
 
@@ -20,35 +21,35 @@ if 'gold' not in st.session_state:
         'vibe_color': "#FFD700", 'sub_tier': "Free", 'sub_multiplier': 1
     })
 
-# --- 2. THE LORE ARCHITECT (GATEWAY) ---
+# --- 2. THE LORE-SYNC GATEWAY ---
 if st.session_state.user_name is None:
     st.markdown("<h1 style='text-align: center; color: #FFD700; text-shadow: 0 0 50px #FFD700;'>⚡ 1-MINUTE RPG</h1>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         name_input = st.text_input("Champion Name:")
-        theme_input = st.text_input("World Theme (e.g. Formula 1, Sonic, Ancient Rome, Skyrim):")
+        theme_input = st.text_input("World Theme (e.g. Formula 1, Sonic, NBA, Ancient Rome):")
         
         if st.button("🔥 AWAKEN"):
             if name_input and theme_input:
                 st.session_state.user_name = name_input
                 t = theme_input.strip()
                 
-                with st.spinner(f"DECODING {t.upper()} DNA..."):
+                with st.spinner(f"SYNTHESIZING {t.upper()} LORE..."):
                     try:
-                        # THE ARCHITECT PROMPT - FORCING FACTUAL PRECISION
-                        prompt = (f"Identify the factual lore for '{t}'. "
-                                 f"1. Actual currency used in '{t}'. "
-                                 f"2. Most iconic defensive power/item (NOT 'Shield' or 'Guard'). "
-                                 f"3. Most iconic speed power/item (NOT 'Surge' or 'Drive'). "
-                                 f"4. The most iconic high-contrast HEX color. "
+                        # THE LORE-ISOLATION PROMPT (Zero-Guessing Mode)
+                        prompt = (f"Identify canonical lore for '{t}'. Match the density of Star Wars (Credits/Deflect/Speed). "
+                                 f"1. Factual currency used in the '{t}' universe. "
+                                 f"2. A famous defensive item/power in '{t}' (NOT 'Shield' or 'Guard'). "
+                                 f"3. A famous speed item/power in '{t}' (NOT 'Surge' or 'Drive'). "
+                                 f"4. The most iconic high-contrast HEX color for '{t}'. "
                                  f"RULE: NEVER use '{t}' in item names. "
-                                 f"JSON ONLY: {{'currency': 'name', 'color': 'HEX', 'shield_name': 'name', "
-                                 f"'booster_name': 'name', 'shield_lore': 'Deep fact', 'booster_lore': 'Deep fact'}}")
+                                 f"RETURN JSON ONLY: {{'currency': 'name', 'color': 'HEX', 'shield_name': 'name', "
+                                 f"'booster_name': 'name', 'shield_lore': 'Deep factual detail', 'booster_lore': 'Deep factual detail'}}")
                         
                         res = model.generate_content(prompt)
                         data = json.loads(re.search(r'\{.*\}', res.text, re.DOTALL).group())
                         
-                        # SCRUBBER: Kill theme name echoes
+                        # THE SCRUBBER: Manually force iconic colors and clean echoes
                         for key in ['currency', 'shield_name', 'booster_name']:
                             data[key] = data[key].lower().replace(t.lower(), "").strip().title()
                         
@@ -57,17 +58,18 @@ if st.session_state.user_name is None:
                         st.session_state.vibe_color = data.get('color', "#FFD700")
                         st.rerun()
                     except:
-                        # THE 'FAILURE IS NOT AN OPTION' BACKUP
+                        # LOGICAL FALLBACK (High-Tier Generic)
                         st.session_state.world_data = {
                             "currency": "Credits", "color": "#00FFCC", 
                             "shield_name": "Kinetic Veil", "booster_name": "Phase Shift", 
-                            "shield_lore": "Molecular protection.", "booster_lore": "High-velocity shift."
+                            "shield_lore": "Advanced atomic-level protection.", "booster_lore": "Localized space-time folding."
                         }
                         st.session_state.user_theme = t
                         st.rerun()
     st.stop()
 
 # --- 3. THE TITAN UI (10PX DASHED GLOW) ---
+# Locked to 10px dashed glowing borders as per the Pinnacle standard.
 active_color = st.session_state.vibe_color if st.session_state.sub_tier != "Elite" else "#FFFFFF"
 
 st.markdown(f"""
@@ -75,7 +77,7 @@ st.markdown(f"""
     .main {{ background-color: #050505; color: white; }}
     @keyframes titan-glow {{
         0% {{ box-shadow: 0 0 15px {active_color}; border-color: {active_color}; }}
-        50% {{ box-shadow: 0 0 65px {active_color}, inset 0 0 30px {active_color}; border-color: #FFFFFF; }}
+        50% {{ box-shadow: 0 0 70px {active_color}, inset 0 0 35px {active_color}; border-color: #FFFFFF; }}
         100% {{ box-shadow: 0 0 15px {active_color}; border-color: {active_color}; }}
     }}
     div.stButton > button {{
@@ -84,16 +86,17 @@ st.markdown(f"""
         color: white !important;
         font-weight: 950 !important;
         font-size: 28px !important;
-        padding: 50px !important;
-        border-radius: 25px !important;
+        padding: 55px !important;
+        border-radius: 30px !important;
         animation: titan-glow 2s infinite ease-in-out !important;
         width: 100%;
-        margin-bottom: 40px;
+        margin-bottom: 45px;
+        text-transform: uppercase;
     }}
     </style>
     """, unsafe_allow_html=True)
 
-# --- 4. SIDEBAR & SURPRISE ---
+# --- 4. SIDEBAR & ELITE PROTOCOL ---
 with st.sidebar:
     st.title(f"⚡ {st.session_state.user_name.upper()}")
     st.metric(f"{st.session_state.world_data['currency'].upper()}", f"{st.session_state.gold:.2f}")
@@ -108,7 +111,7 @@ with st.sidebar:
     if st.button("🛒 SHOP"): st.session_state.view = 'shop'; st.rerun()
     if st.button("🚨 RESET"): st.session_state.clear(); st.rerun()
 
-# --- 5. GAMEPLAY ---
+# --- 5. THE INFINITEVERSE INTERFACE ---
 st.markdown(f"<h1 style='color:{active_color}; text-shadow: 0 0 25px {active_color};'>{st.session_state.user_theme.upper()}</h1>", unsafe_allow_html=True)
 
 if st.session_state.view == 'shop':
