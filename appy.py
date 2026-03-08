@@ -8,7 +8,6 @@ st.set_page_config(page_title="1-MINUTE RPG", page_icon="⚡", layout="wide")
 try:
     MY_KEY = st.secrets["GEMINI_KEY"]
     genai.configure(api_key=MY_KEY)
-    # TEMPERATURE 1.0 FOR PEAK CREATIVITY
     model = genai.GenerativeModel('gemini-1.5-flash', generation_config={"temperature": 1.0})
 except:
     model = None
@@ -29,7 +28,7 @@ if st.session_state.user_name is None:
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         name_input = st.text_input("Champion Name:")
-        theme_input = st.text_input("World Theme (e.g. Sonic, F1, Minecraft, NBA, Rome):")
+        theme_input = st.text_input("World Theme (e.g. Sonic, F1, Minecraft, NBA):")
         
         if st.button("🔥 AWAKEN"):
             if name_input:
@@ -38,13 +37,12 @@ if st.session_state.user_name is None:
                 
                 with st.spinner(f"EXTRACTING LORE FOR {t.upper()}..."):
                     try:
-                        # THE LORE-HUNTER PROMPT (Aggressive & Factual)
                         prompt = (f"Act as a Master Worldbuilder for theme '{t}'. "
                                  f"DO NOT use generic names. If the theme is real or fictional, use the EXACT lore currency and power names. "
                                  f"NEVER use the word '{t}' in item names. "
                                  f"Return ONLY JSON: {{'currency': 'real lore currency', 'unit': 'lore unit', 'color': 'HEX', "
                                  f"'shield_name': 'lore defense power', 'booster_name': 'lore speed power', "
-                                 f"'shield_lore': '1 sentence deep factual lore', 'booster_lore': '1 sentence deep factual lore', "
+                                 f"'shield_lore': 'Deep factual lore sentence', 'booster_lore': 'Deep factual lore sentence', "
                                  f"'evo_1': 'rank 1', 'evo_2': 'rank 2', 'evo_3': 'rank 3'}}")
                         
                         res = model.generate_content(prompt)
@@ -55,7 +53,6 @@ if st.session_state.user_name is None:
                             st.session_state.vibe_color = st.session_state.world_data.get('color', "#FFD700")
                             st.rerun()
                     except:
-                        # DYNAMIC BACKUP (If API fails, it still uses your theme)
                         st.session_state.world_data = {
                             "currency": "Credits", "unit": "Unit", "color": "#00FFCC",
                             "shield_name": "Kinetic Barrier", "booster_name": "Phase Warp",
@@ -96,7 +93,7 @@ st.markdown(f"""
     </style>
     """, unsafe_allow_html=True)
 
-# --- 4. SIDEBAR & SURPRISE FEATURE ---
+# --- 4. SIDEBAR ---
 with st.sidebar:
     st.title(f"⚡ {st.session_state.user_name.upper()}")
     st.write(f"**RANK:** {st.session_state.sub_tier}")
@@ -114,7 +111,7 @@ with st.sidebar:
     if st.button("🛒 SHOP"): st.session_state.view = 'shop'; st.rerun()
     if st.button("🚨 RESET"): st.session_state.clear(); st.rerun()
 
-# --- 5. SHOP & HUB ---
+# --- 5. SHOP & HUB (FIXED INDENTATION) ---
 st.markdown(f"<h1 style='color:{active_color}; text-shadow: 0 0 25px {active_color};'>{st.session_state.user_theme.upper()}</h1>", unsafe_allow_html=True)
 
 if st.session_state.view == 'shop':
@@ -123,14 +120,28 @@ if st.session_state.view == 'shop':
     with col1:
         st.subheader(w.get('shield_name', 'Guardian'))
         st.write(f"_{w.get('shield_lore', 'The ultimate defense.')}_")
-        st.success("✨ ABILITY: REMOVES ALL DEBT")
         if st.button(f"CLAIM (15 {w.get('currency', 'Gold')})"):
             if st.session_state.gold >= 15: st.session_state.gold -= 15; st.success("Debt Wiped!")
     with col2:
         st.subheader(w.get('booster_name', 'Surge'))
         st.write(f"_{w.get('booster_lore', 'The ultimate speed.')}_")
-        st.success("🚀 ABILITY: DOUBLE XP SPEED")
         if st.button(f"CLAIM (25 {w.get('currency', 'Gold')})"):
             if st.session_state.gold >= 25: st.session_state.gold -= 25; st.session_state.xp_multiplier = 2; st.success("Surge Active!")
 
 else:
+    mins = st.select_slider("Burst Time:", options=[1, 3, 5])
+    if st.button("START MISSION", disabled=st.session_state.needs_verification):
+        bar = st.progress(0)
+        for i in range(mins * 60):
+            time.sleep(1); bar.progress((i+1)/(mins*60))
+        st.session_state.pending_gold, st.session_state.pending_xp = mins * 1.0, (mins * 25) * st.session_state.sub_multiplier
+        st.session_state.needs_verification = True; st.rerun()
+
+if st.session_state.needs_verification:
+    with st.expander("⚖️ TRIBUNAL", expanded=True):
+        f = st.file_uploader("Upload proof:")
+        if f and st.button("JUDGE"):
+            st.session_state.gold += st.session_state.pending_gold
+            st.session_state.xp += st.session_state.pending_xp
+            st.session_state.needs_verification = False; st.balloons(); st.rerun()
+
