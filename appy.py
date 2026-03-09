@@ -603,11 +603,20 @@ label,.stTextInput label,.stSelectbox label,.stTextArea label,.stFileUploader la
 div.stButton>button{{border:6px solid {C}!important;background:#000000!important;color:#ffffff!important;font-family:'Bebas Neue',sans-serif!important;font-size:28px!important;letter-spacing:4px!important;padding:50px 30px!important;border-radius:40px!important;animation:titan-pulse 2.5s infinite ease-in-out!important;width:100%;text-transform:uppercase;transition:transform 0.3s;margin-bottom:20px;}}
 div.stButton>button:hover{{transform:scale(1.02);}}
 
-.metric-card{{background:rgba({CR},{CG},{CB},0.08);border:2px solid {C};padding:18px;border-radius:14px;text-align:center;margin-bottom:12px;}}
-.shop-card{{border:3px solid {C};padding:24px;border-radius:18px;background:rgba({CR},{CG},{CB},0.06);margin-bottom:12px;}}
-.ach-card{{background:rgba({CR},{CG},{CB},0.06);border:1px solid {C};border-radius:12px;padding:14px 16px;margin:8px 0;}}
-.monster-card{{background:rgba({CR},{CG},{CB},0.07);border:2px solid {C};border-radius:16px;padding:20px;text-align:center;margin:12px 0;}}
-.secret-card{{background:linear-gradient(135deg,rgba({CR},{CG},{CB},0.10),rgba({CR},{CG},{CB},0.06));border:1px solid {C};border-radius:16px;padding:20px 24px;margin:12px 0;font-family:'Space Mono',monospace;font-size:14px;color:{TEXT};line-height:1.8;text-align:center;}}
+.metric-card{{background:rgba({CR},{CG},{CB},0.08);border:2px solid {C};padding:18px;border-radius:14px;text-align:center;margin-bottom:12px;color:{TEXT}!important;}}
+.metric-card *{{color:{TEXT}!important;}}
+.shop-card{{border:3px solid {C};padding:24px;border-radius:18px;background:rgba({CR},{CG},{CB},0.06);margin-bottom:12px;color:{TEXT}!important;}}
+.shop-card *{{color:{TEXT}!important;}}
+.ach-card{{background:rgba({CR},{CG},{CB},0.06);border:1px solid {C};border-radius:12px;padding:14px 16px;margin:8px 0;color:{TEXT}!important;}}
+.ach-card *{{color:{TEXT}!important;}}
+.monster-card{{background:rgba({CR},{CG},{CB},0.07);border:2px solid {C};border-radius:16px;padding:20px;text-align:center;margin:12px 0;color:{TEXT}!important;}}
+.monster-card *{{color:{TEXT}!important;}}
+.secret-card{{background:linear-gradient(135deg,rgba({CR},{CG},{CB},0.10),rgba({CR},{CG},{CB},0.06));border:1px solid {C};border-radius:16px;padding:20px 24px;margin:12px 0;font-family:'Space Mono',monospace;font-size:14px;color:{TEXT}!important;line-height:1.8;text-align:center;}}
+.secret-card *{{color:{TEXT}!important;}}
+/* Force all inline HTML text to be readable */
+[data-testid="stMarkdownContainer"] p,
+[data-testid="stMarkdownContainer"] div,
+[data-testid="stMarkdownContainer"] span {{color:{TEXT}!important;}}
 </style>
 """, unsafe_allow_html=True)
 
@@ -638,6 +647,7 @@ with st.sidebar:
     st.write("---")
     # NAV TABS based on mode
     if st.button("🚀 MISSION HUB",  key="nav_hub"):      st.session_state.view = "main";     st.rerun()
+    if st.button("⚔️ BATTLE",       key="nav_battle"):   st.session_state.view = "battle";   st.rerun()
     if st.button("🛒 ARSENAL",      key="nav_shop"):     st.session_state.view = "shop";     st.rerun()
     if st.button("🔮 SECRETS",      key="nav_secrets"):  st.session_state.view = "secrets";  st.rerun()
     if st.button("💬 FEEDBACK",     key="nav_feedback"): st.session_state.view = "feedback"; st.rerun()
@@ -711,9 +721,9 @@ font-size:clamp(48px,10vw,100px);text-align:center;letter-spacing:6px;margin-bot
 st.markdown("---")
 
 # ─────────────────────────────────────────────────────────────────────────────
-# BATTLE SCREEN (auto after mission)
+# BATTLE SCREEN (auto after mission OR from nav)
 # ─────────────────────────────────────────────────────────────────────────────
-if st.session_state.get("battle_state") == "ready" and MODE in ("grinder","obsessed"):
+if st.session_state.get("battle_state") == "ready" or st.session_state.view == "battle":
     battle_style = wd.get("battle_style","random")
     if battle_style == "random":
         battle_style = random.choice(["shooter","turnbased","reaction","survival","rhythm"])
@@ -848,6 +858,7 @@ if st.session_state.get("battle_state") == "ready" and MODE in ("grinder","obses
 
         if st.button("⏩ SKIP BATTLE", key="skip_battle"):
             st.session_state.battle_state = None
+            st.session_state.view = "main"
             st.rerun()
 
     st.stop()
