@@ -197,302 +197,204 @@ if st.session_state.user_name is None:
     }
     [data-testid="stHeader"], [data-testid="stToolbar"],
     [data-testid="stDecoration"], #MainMenu, footer { display: none !important; }
-    .block-container { padding: 0 !important; max-width: 100% !important; }
+    .block-container { padding: 0 1rem !important; max-width: 100% !important; }
 
-    /* ── ANIMATED SPACE BACKGROUND ── */
-    .gateway-bg {
-        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-        background: #000008;
-        overflow: hidden; z-index: 0;
+    /* ── ANIMATED RADIAL GLOW BACKGROUND — works within Streamlit ── */
+    [data-testid="stAppViewContainer"] {
+        background:
+            radial-gradient(ellipse 70% 50% at 10% 15%,  rgba(255,215,0,0.18) 0%, transparent 55%),
+            radial-gradient(ellipse 55% 45% at 92% 8%,   rgba(255,60,60,0.14)  0%, transparent 55%),
+            radial-gradient(ellipse 65% 45% at 50% 95%,  rgba(0,212,255,0.14)  0%, transparent 55%),
+            radial-gradient(ellipse 45% 35% at 85% 65%,  rgba(155,89,182,0.12) 0%, transparent 55%),
+            radial-gradient(ellipse 40% 30% at 15% 75%,  rgba(0,255,136,0.10)  0%, transparent 55%),
+            #000008 !important;
+        animation: bg-breathe 10s ease-in-out infinite alternate !important;
+    }
+    @keyframes bg-breathe {
+        0%   { filter: brightness(1.0) saturate(1.0); }
+        50%  { filter: brightness(1.15) saturate(1.2); }
+        100% { filter: brightness(1.0) saturate(1.0); }
     }
 
-    /* Stars layer */
-    .stars {
-        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-        background-image:
-            radial-gradient(1px 1px at 10% 15%, #fff 0%, transparent 100%),
-            radial-gradient(1px 1px at 25% 40%, #fff 0%, transparent 100%),
-            radial-gradient(1px 1px at 40% 10%, #fff 0%, transparent 100%),
-            radial-gradient(1px 1px at 55% 60%, #fff 0%, transparent 100%),
-            radial-gradient(1px 1px at 70% 25%, #fff 0%, transparent 100%),
-            radial-gradient(1px 1px at 85% 75%, #fff 0%, transparent 100%),
-            radial-gradient(1px 1px at 15% 80%, #fff 0%, transparent 100%),
-            radial-gradient(1px 1px at 90% 45%, #fff 0%, transparent 100%),
-            radial-gradient(1px 1px at 35% 90%, #fff 0%, transparent 100%),
-            radial-gradient(1px 1px at 60% 85%, #fff 0%, transparent 100%),
-            radial-gradient(2px 2px at 20% 55%, rgba(255,215,0,0.8) 0%, transparent 100%),
-            radial-gradient(2px 2px at 75% 35%, rgba(0,212,255,0.8) 0%, transparent 100%),
-            radial-gradient(2px 2px at 45% 70%, rgba(255,60,60,0.8) 0%, transparent 100%),
-            radial-gradient(1px 1px at 5%  30%, #fff 0%, transparent 100%),
-            radial-gradient(1px 1px at 95% 10%, #fff 0%, transparent 100%),
-            radial-gradient(1px 1px at 50% 5%,  #fff 0%, transparent 100%),
-            radial-gradient(1px 1px at 80% 90%, #fff 0%, transparent 100%),
-            radial-gradient(1px 1px at 30% 65%, #fff 0%, transparent 100%),
-            radial-gradient(1px 1px at 65% 50%, #fff 0%, transparent 100%),
-            radial-gradient(1px 1px at 12% 95%, #fff 0%, transparent 100%);
-        animation: twinkle 4s ease-in-out infinite alternate;
-    }
-    @keyframes twinkle {
-        0%   { opacity: 0.6; transform: scale(1); }
-        100% { opacity: 1;   transform: scale(1.02); }
-    }
-
-    /* Floating orbs */
-    .orb {
-        position: absolute; border-radius: 50%;
-        filter: blur(60px); animation: float-orb linear infinite;
-        opacity: 0.25;
-    }
-    .orb1 { width:500px; height:500px; background:#FFD700; top:-100px; left:-100px; animation-duration:20s; }
-    .orb2 { width:400px; height:400px; background:#FF3C3C; top:40%; right:-150px; animation-duration:25s; animation-delay:-8s; }
-    .orb3 { width:350px; height:350px; background:#00D4FF; bottom:-100px; left:30%; animation-duration:18s; animation-delay:-4s; }
-    .orb4 { width:250px; height:250px; background:#9B59B6; top:20%; left:50%; animation-duration:22s; animation-delay:-12s; }
-    .orb5 { width:200px; height:200px; background:#00FF88; bottom:20%; left:10%; animation-duration:16s; animation-delay:-6s; }
-
-    @keyframes float-orb {
-        0%   { transform: translate(0px, 0px) rotate(0deg); }
-        25%  { transform: translate(40px, -60px) rotate(90deg); }
-        50%  { transform: translate(-30px, 40px) rotate(180deg); }
-        75%  { transform: translate(60px, 20px) rotate(270deg); }
-        100% { transform: translate(0px, 0px) rotate(360deg); }
-    }
-
-    /* Grid lines */
-    .grid-overlay {
-        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    /* Grid overlay on page */
+    [data-testid="stAppViewContainer"]::before {
+        content: '';
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
         background-image:
             linear-gradient(rgba(255,215,0,0.03) 1px, transparent 1px),
             linear-gradient(90deg, rgba(255,215,0,0.03) 1px, transparent 1px);
         background-size: 60px 60px;
-        animation: grid-pulse 6s ease-in-out infinite alternate;
-    }
-    @keyframes grid-pulse {
-        0%   { opacity: 0.3; }
-        100% { opacity: 0.8; }
+        pointer-events: none; z-index: 0;
     }
 
-    /* Scan line */
+    /* Scan line — horizontal sweep */
+    .scanline-wrap { width: 100%; height: 3px; overflow: hidden; margin-bottom: 8px; }
     .scanline {
-        position: absolute; top: -100%; left: 0;
-        width: 100%; height: 3px;
-        background: linear-gradient(90deg, transparent, rgba(255,215,0,0.6), transparent);
-        animation: scan 8s linear infinite;
-        box-shadow: 0 0 20px rgba(255,215,0,0.4);
+        width: 50%; height: 3px;
+        background: linear-gradient(90deg, transparent, rgba(255,215,0,0.9), transparent);
+        animation: scan 2.5s linear infinite;
+        box-shadow: 0 0 16px rgba(255,215,0,0.5);
     }
-    @keyframes scan {
-        0%   { top: -5%; }
-        100% { top: 105%; }
-    }
+    @keyframes scan { 0% { transform: translateX(-100%); } 100% { transform: translateX(300%); } }
 
-    /* Top badge */
+    /* Star field */
+    .star-field {
+        width: 100%; height: 80px; position: relative;
+        background-image:
+            radial-gradient(1.5px 1.5px at 8%  40%, rgba(255,255,255,0.95) 0%, transparent 100%),
+            radial-gradient(1px   1px   at 20% 70%, rgba(255,255,255,0.80) 0%, transparent 100%),
+            radial-gradient(1.5px 1.5px at 35% 25%, rgba(255,255,255,0.90) 0%, transparent 100%),
+            radial-gradient(1px   1px   at 52% 80%, rgba(255,255,255,0.75) 0%, transparent 100%),
+            radial-gradient(1.5px 1.5px at 67% 35%, rgba(255,255,255,0.95) 0%, transparent 100%),
+            radial-gradient(1px   1px   at 80% 60%, rgba(255,255,255,0.80) 0%, transparent 100%),
+            radial-gradient(1.5px 1.5px at 93% 20%, rgba(255,255,255,0.90) 0%, transparent 100%),
+            radial-gradient(2px   2px   at 15% 55%, rgba(255,215,0,1.0)    0%, transparent 100%),
+            radial-gradient(2px   2px   at 72% 45%, rgba(0,212,255,1.0)    0%, transparent 100%),
+            radial-gradient(2px   2px   at 44% 75%, rgba(255,100,100,1.0)  0%, transparent 100%),
+            radial-gradient(1.5px 1.5px at 58% 15%, rgba(255,255,255,0.85) 0%, transparent 100%),
+            radial-gradient(1px   1px   at 3%  80%, rgba(255,255,255,0.70) 0%, transparent 100%),
+            radial-gradient(1.5px 1.5px at 88% 85%, rgba(255,255,255,0.90) 0%, transparent 100%);
+        animation: twinkle 3.5s ease-in-out infinite alternate;
+        margin-bottom: 12px;
+    }
+    @keyframes twinkle { 0% { opacity:0.4; } 100% { opacity:1.0; } }
+
+    /* Badge */
     .top-badge {
         background: rgba(255,215,0,0.08);
-        border: 1px solid rgba(255,215,0,0.3);
-        border-radius: 99px;
-        padding: 6px 20px;
+        border: 1px solid rgba(255,215,0,0.35);
+        border-radius: 99px; padding: 7px 22px;
         font-family: 'Space Mono', monospace;
         font-size: 11px; letter-spacing: 3px;
         color: #FFD700; text-transform: uppercase;
-        margin-bottom: 24px;
+        text-align: center; margin: 0 auto 20px;
+        display: table;
         animation: badge-glow 3s ease-in-out infinite alternate;
     }
     @keyframes badge-glow {
         0%   { box-shadow: 0 0 10px rgba(255,215,0,0.2); }
-        100% { box-shadow: 0 0 30px rgba(255,215,0,0.5); }
+        100% { box-shadow: 0 0 35px rgba(255,215,0,0.55); }
     }
 
     /* Main title */
     .gw-main-title {
         font-family: 'Bebas Neue', sans-serif;
-        font-size: clamp(70px, 14vw, 140px);
-        text-align: center; letter-spacing: 8px; line-height: 0.9;
-        background: linear-gradient(135deg, #FFD700 0%, #FF8C00 30%, #FF3C3C 60%, #FF00FF 100%);
+        font-size: clamp(72px, 14vw, 150px);
+        text-align: center; letter-spacing: 8px; line-height: 0.88;
+        background: linear-gradient(135deg, #FFD700 0%, #FF8C00 30%, #FF3C3C 65%, #CC00FF 100%);
         -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         background-clip: text;
-        animation: title-shimmer 4s ease-in-out infinite alternate;
-        filter: drop-shadow(0 0 40px rgba(255,215,0,0.3));
-        margin-bottom: 4px;
+        animation: title-glow 4s ease-in-out infinite alternate;
+        margin-bottom: 8px;
     }
-    @keyframes title-shimmer {
-        0%   { filter: drop-shadow(0 0 20px rgba(255,215,0,0.3)); }
-        100% { filter: drop-shadow(0 0 60px rgba(255,140,0,0.6)); }
+    @keyframes title-glow {
+        0%   { filter: drop-shadow(0 0 15px rgba(255,215,0,0.4)); }
+        100% { filter: drop-shadow(0 0 55px rgba(255,140,0,0.7)); }
     }
 
     .gw-subtitle {
         font-family: 'Orbitron', sans-serif;
-        font-size: clamp(12px, 2vw, 18px);
-        text-align: center; letter-spacing: 6px;
-        color: rgba(255,255,255,0.4);
-        text-transform: uppercase; margin-bottom: 12px;
+        font-size: clamp(11px, 1.8vw, 17px);
+        text-align: center; letter-spacing: 5px;
+        color: rgba(255,255,255,0.45);
+        text-transform: uppercase; margin-bottom: 20px;
     }
 
-    /* Feature pills row */
-    .features-row {
-        display: flex; flex-wrap: wrap; gap: 10px;
-        justify-content: center; margin: 16px 0 32px;
-    }
+    /* Feature pills */
+    .features-row { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin: 12px 0 24px; }
     .feature-pill {
-        background: rgba(255,255,255,0.04);
-        border: 1px solid rgba(255,255,255,0.1);
-        border-radius: 99px; padding: 6px 16px;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 99px; padding: 6px 14px;
         font-family: 'Space Mono', monospace;
-        font-size: 11px; color: rgba(255,255,255,0.5);
+        font-size: 11px; color: rgba(255,255,255,0.6);
         letter-spacing: 1px;
-        transition: all 0.3s;
     }
-    .feature-pill span { margin-right: 6px; }
+    .feature-pill span { margin-right: 5px; }
 
-    /* Stats ticker */
-    .stats-ticker {
-        display: flex; gap: 32px; justify-content: center;
-        margin-bottom: 32px; flex-wrap: wrap;
-    }
-    .stat-item {
-        text-align: center;
-        animation: stat-float 3s ease-in-out infinite alternate;
-    }
-    .stat-item:nth-child(2) { animation-delay: -1s; }
-    .stat-item:nth-child(3) { animation-delay: -2s; }
-    @keyframes stat-float {
-        0%   { transform: translateY(0px); }
-        100% { transform: translateY(-6px); }
-    }
-    .stat-num {
-        font-family: 'Bebas Neue', sans-serif;
-        font-size: 36px; color: #FFD700; line-height: 1;
-    }
-    .stat-label {
-        font-family: 'Space Mono', monospace;
-        font-size: 9px; color: #555; letter-spacing: 2px;
-        text-transform: uppercase;
-    }
+    /* Stats */
+    .stats-ticker { display:flex; gap:28px; justify-content:center; margin-bottom:24px; flex-wrap:wrap; }
+    .stat-item { text-align:center; animation: stat-float 3s ease-in-out infinite alternate; }
+    .stat-item:nth-child(2) { animation-delay:-1s; }
+    .stat-item:nth-child(3) { animation-delay:-2s; }
+    @keyframes stat-float { 0%{transform:translateY(0)} 100%{transform:translateY(-6px)} }
+    .stat-num { font-family:'Bebas Neue',sans-serif; font-size:38px; color:#FFD700; line-height:1; }
+    .stat-label { font-family:'Space Mono',monospace; font-size:9px; color:#555; letter-spacing:2px; text-transform:uppercase; }
 
     /* Divider */
-    .gw-divider {
-        width: 100%; max-width: 600px;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(255,215,0,0.3), transparent);
-        margin: 8px 0 28px;
-    }
+    .gw-divider { width:100%; height:1px; background:linear-gradient(90deg,transparent,rgba(255,215,0,0.35),transparent); margin:4px 0 24px; }
 
-    /* Form card */
-    .form-card {
-        width: 100%; max-width: 580px;
-        background: rgba(8, 8, 20, 0.85);
-        border: 1px solid rgba(255,215,0,0.15);
-        border-radius: 24px; padding: 36px 40px;
-        backdrop-filter: blur(20px);
-        box-shadow: 0 0 80px rgba(255,215,0,0.05), inset 0 1px 0 rgba(255,255,255,0.05);
-    }
-
-    .form-label {
-        font-family: 'Space Mono', monospace;
-        font-size: 10px; letter-spacing: 3px;
-        color: #555; text-transform: uppercase;
-        margin-bottom: 4px;
-    }
-
-    /* Universe chips */
-    .chip-section-label {
-        font-family: 'Space Mono', monospace;
-        font-size: 10px; color: #444; letter-spacing: 2px;
-        text-transform: uppercase; margin: 16px 0 8px;
-    }
-    .chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
-    .chip {
-        background: rgba(255,215,0,0.06);
-        border: 1px solid rgba(255,215,0,0.15);
-        border-radius: 99px; padding: 4px 12px;
-        font-size: 11px; color: #666;
-        font-family: 'Space Mono', monospace;
-        letter-spacing: 1px; cursor: pointer;
-        transition: all 0.2s;
-    }
-    .chip:hover { background: rgba(255,215,0,0.12); color: #FFD700; }
-
-    .default-hint {
-        font-family: 'Space Mono', monospace;
-        font-size: 10px; color: #333;
-        font-style: italic; margin-top: 6px;
-        letter-spacing: 1px;
-    }
-    .default-hint strong { color: #FFD700; }
-
-    /* How it works */
-    .how-it-works {
-        width: 100%; max-width: 580px; margin-top: 32px;
-    }
+    /* HOW IT WORKS — big, clear, impossible to miss */
+    .how-it-works { width:100%; margin-top:28px; }
     .how-title {
-        font-family: 'Bebas Neue', sans-serif;
-        font-size: 22px; letter-spacing: 3px;
-        color: rgba(255,255,255,0.3); text-align: center;
-        margin-bottom: 16px;
+        font-family:'Bebas Neue',sans-serif; font-size:28px; letter-spacing:4px;
+        color:#FFD700; text-align:center; margin-bottom:16px;
+        text-shadow: 0 0 20px rgba(255,215,0,0.5);
     }
-    .how-grid {
-        display: grid; grid-template-columns: 1fr 1fr;
-        gap: 12px;
-    }
+    .how-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
     .how-card {
-        background: rgba(255,255,255,0.02);
-        border: 1px solid rgba(255,255,255,0.05);
-        border-radius: 12px; padding: 14px 16px;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,215,0,0.2);
+        border-radius: 16px; padding: 20px 18px;
+        transition: all 0.3s;
     }
-    .how-icon { font-size: 20px; margin-bottom: 6px; }
+    .how-card:hover { background:rgba(255,215,0,0.08); border-color:rgba(255,215,0,0.4); }
+    .how-icon { font-size:28px; margin-bottom:10px; display:block; }
     .how-card-title {
-        font-family: 'Bebas Neue', sans-serif;
-        font-size: 15px; letter-spacing: 2px;
-        color: #FFD700; margin-bottom: 4px;
+        font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:2px;
+        color:#FFD700; margin-bottom:8px;
     }
     .how-card-desc {
-        font-family: 'Space Mono', monospace;
-        font-size: 10px; color: #444; line-height: 1.5;
+        font-family:'Space Mono',monospace; font-size:12px;
+        color:rgba(255,255,255,0.7); line-height:1.7;
     }
 
-    /* Streamlit overrides for gateway */
-    div.stButton > button {
-        background: linear-gradient(135deg, #FFD700, #FF8C00) !important;
-        border: none !important; color: #000 !important;
-        font-family: 'Bebas Neue', sans-serif !important;
-        font-size: 22px !important; letter-spacing: 4px !important;
-        padding: 18px 40px !important; border-radius: 14px !important;
-        width: 100% !important; font-weight: 900 !important;
-        transition: all 0.3s !important;
-        box-shadow: 0 0 30px rgba(255,215,0,0.3) !important;
-        margin-top: 8px !important;
+    /* Chips */
+    .chip-section-label { font-family:'Space Mono',monospace; font-size:10px; color:#555; letter-spacing:2px; text-transform:uppercase; margin:14px 0 8px; }
+    .chip-row { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px; }
+    .chip {
+        background:rgba(255,215,0,0.07); border:1px solid rgba(255,215,0,0.18);
+        border-radius:99px; padding:4px 12px; font-size:11px; color:#777;
+        font-family:'Space Mono',monospace; letter-spacing:1px;
     }
-    div.stButton > button:hover {
-        transform: scale(1.02) !important;
-        box-shadow: 0 0 60px rgba(255,215,0,0.5) !important;
-    }
+
+    /* Hint */
+    .default-hint { font-family:'Space Mono',monospace; font-size:10px; color:#444; font-style:italic; margin-top:6px; }
+    .default-hint strong { color:#FFD700; }
+
+    /* Streamlit input overrides */
     .stTextInput > div > div > input {
-        background: rgba(255,255,255,0.04) !important;
-        border: 1px solid rgba(255,255,255,0.1) !important;
+        background: rgba(255,255,255,0.05) !important;
+        border: 1px solid rgba(255,215,0,0.2) !important;
         border-radius: 10px !important; color: white !important;
         font-family: 'Space Mono', monospace !important;
         font-size: 14px !important; padding: 12px 16px !important;
     }
     .stTextInput > div > div > input:focus {
-        border-color: rgba(255,215,0,0.5) !important;
-        box-shadow: 0 0 20px rgba(255,215,0,0.1) !important;
+        border-color: rgba(255,215,0,0.6) !important;
+        box-shadow: 0 0 20px rgba(255,215,0,0.15) !important;
     }
     .stTextInput label {
-        font-family: 'Space Mono', monospace !important;
-        font-size: 10px !important; letter-spacing: 3px !important;
-        color: #555 !important; text-transform: uppercase !important;
+        font-family:'Space Mono',monospace !important; font-size:11px !important;
+        letter-spacing:3px !important; color:#666 !important; text-transform:uppercase !important;
+    }
+    div.stButton > button {
+        background: linear-gradient(135deg, #FFD700, #FF8C00) !important;
+        border: none !important; color: #000 !important;
+        font-family:'Bebas Neue',sans-serif !important; font-size:24px !important;
+        letter-spacing:4px !important; padding:18px !important;
+        border-radius:14px !important; width:100% !important;
+        box-shadow: 0 0 30px rgba(255,215,0,0.35) !important;
+        transition: all 0.3s !important; margin-top:10px !important;
+    }
+    div.stButton > button:hover {
+        transform:scale(1.02) !important;
+        box-shadow:0 0 60px rgba(255,215,0,0.6) !important;
     }
     </style>
 
-    <!-- ANIMATED BACKGROUND + ALL DECORATIVE CONTENT IN ONE BLOCK -->
-    <div class="gateway-bg">
-        <div class="orb orb1"></div>
-        <div class="orb orb2"></div>
-        <div class="orb orb3"></div>
-        <div class="orb orb4"></div>
-        <div class="orb orb5"></div>
-        <div class="stars"></div>
-        <div class="grid-overlay"></div>
-        <div class="scanline"></div>
-    </div>
+    <div class="scanline-wrap"><div class="scanline"></div></div>
+    <div class="star-field"></div>
     <div class="top-badge">⚡ 30-Second RPG Study System · Any Universe · Zero Limits</div>
     <div class="gw-main-title">TITAN<br>OMNIVERSE</div>
     <div class="gw-subtitle">Infiniteverse · Study RPG · Unlock Your Power</div>
@@ -513,14 +415,22 @@ if st.session_state.user_name is None:
     <div class="gw-divider"></div>
     """, unsafe_allow_html=True)
 
-    # ── Form — pure Streamlit widgets, styled via CSS only ────────────────────
     _, col, _ = st.columns([1, 2, 1])
     with col:
-        name_input = st.text_input("⚡ CHAMPION NAME", placeholder="What are you called, Champion?", key="gw_name")
-        theme_input = st.text_input("🌌 YOUR UNIVERSE", placeholder="Minecraft · Naruto · F1 · Nike · anything imaginable...", key="gw_theme")
-
+        name_input = st.text_input("⚡ Champion Name", placeholder="What are you called?", key="gw_name")
+        theme_input = st.text_input(
+            "🌌 Your Universe",
+            placeholder="e.g. Minecraft, Naruto, F1, Nike, Ancient Rome, Germa 66...",
+            key="gw_theme"
+        )
         st.markdown("""
-        <p class="default-hint">💡 Leave empty for the default universe: <strong>INFINITE POWER</strong></p>
+        <p class="default-hint">💡 Leave empty for default universe: <strong>INFINITE POWER</strong></p>
+        <p class="default-hint" style="color:#555;margin-top:4px">
+            ✨ Be as specific or creative as you want! Merge universes, invent custom worlds,
+            or go deep — <strong style="color:#FFD700">"Germa 66 meets Halo"</strong>,
+            <strong style="color:#FFD700">"Dark Souls Ninja"</strong>,
+            <strong style="color:#FFD700">"Cyberpunk Basketball"</strong> — anything goes.
+        </p>
         <div class="chip-section-label">⚡ Quick picks</div>
         <div class="chip-row">
             <span class="chip">Minecraft</span><span class="chip">Super Smash Bros</span>
@@ -549,33 +459,34 @@ if st.session_state.user_name is None:
 
         st.markdown("""
         <div class="how-it-works">
-            <div class="how-title">HOW IT WORKS</div>
+            <div class="how-title">⚡ HOW IT WORKS</div>
             <div class="how-grid">
                 <div class="how-card">
-                    <div class="how-icon">🌌</div>
+                    <span class="how-icon">🌌</span>
                     <div class="how-card-title">PICK YOUR UNIVERSE</div>
-                    <div class="how-card-desc">Any game, anime, sport, brand — AI builds your world instantly.</div>
+                    <div class="how-card-desc">Any game, anime, sport, brand, or custom world — the AI builds it for you instantly with the perfect colors, currency and abilities.</div>
                 </div>
                 <div class="how-card">
-                    <div class="how-icon">⏱</div>
+                    <span class="how-icon">⏱</span>
                     <div class="how-card-title">START A MISSION</div>
-                    <div class="how-card-desc">30 seconds or 1 minute. Study, work, grind. Every second earns currency.</div>
+                    <div class="how-card-desc">30 seconds or 1 minute. Study, work, grind. Every second you put in earns you real in-universe currency.</div>
                 </div>
                 <div class="how-card">
-                    <div class="how-icon">📸</div>
+                    <span class="how-icon">📸</span>
                     <div class="how-card-title">PROVE YOUR WORK</div>
-                    <div class="how-card-desc">Upload proof to The Tribunal. Real effort = real rewards. No cheating.</div>
+                    <div class="how-card-desc">Upload proof to The Tribunal — a screenshot, photo, or notes. Real effort only. No shortcuts, no cheating.</div>
                 </div>
                 <div class="how-card">
-                    <div class="how-icon">🏆</div>
+                    <span class="how-icon">🏆</span>
                     <div class="how-card-title">LEVEL UP</div>
-                    <div class="how-card-desc">Buy abilities, unlock Elite status, dominate your universe.</div>
+                    <div class="how-card-desc">Spend your earnings on abilities, unlock Elite status with TITAN10, and dominate your universe. Study = power.</div>
                 </div>
             </div>
         </div>
         """, unsafe_allow_html=True)
 
     st.stop()
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # MAIN APP
