@@ -284,15 +284,6 @@ if st.session_state.user_name is None:
         100% { top: 105%; }
     }
 
-    /* ── GATEWAY CONTENT ── */
-    .gateway-wrapper {
-        position: relative; z-index: 10;
-        min-height: 100vh;
-        display: flex; flex-direction: column;
-        align-items: center; justify-content: flex-start;
-        padding: 40px 20px 60px;
-    }
-
     /* Top badge */
     .top-badge {
         background: rgba(255,215,0,0.08);
@@ -491,7 +482,7 @@ if st.session_state.user_name is None:
     }
     </style>
 
-    <!-- ANIMATED BACKGROUND -->
+    <!-- ANIMATED BACKGROUND + ALL DECORATIVE CONTENT IN ONE BLOCK -->
     <div class="gateway-bg">
         <div class="orb orb1"></div>
         <div class="orb orb2"></div>
@@ -502,44 +493,24 @@ if st.session_state.user_name is None:
         <div class="grid-overlay"></div>
         <div class="scanline"></div>
     </div>
-
-    <!-- GATEWAY CONTENT -->
-    <div class="gateway-wrapper">
-        <div class="top-badge">⚡ 30-Second RPG Study System · Any Universe · Zero Limits</div>
-
-        <div class="gw-main-title">TITAN<br>OMNIVERSE</div>
-        <div class="gw-subtitle">Infiniteverse · Study RPG · Unlock Your Power</div>
-
-        <div class="features-row">
-            <div class="feature-pill"><span>🎮</span>Pick ANY Universe</div>
-            <div class="feature-pill"><span>⏱</span>30-Second Missions</div>
-            <div class="feature-pill"><span>💰</span>Earn Real Rewards</div>
-            <div class="feature-pill"><span>🔥</span>Study Like a Champion</div>
-            <div class="feature-pill"><span>🌈</span>Fully Customizable</div>
-            <div class="feature-pill"><span>⚡</span>Powered by AI</div>
-        </div>
-
-        <div class="stats-ticker">
-            <div class="stat-item">
-                <div class="stat-num">∞</div>
-                <div class="stat-label">Universes</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-num">30s</div>
-                <div class="stat-label">To Start</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-num">100%</div>
-                <div class="stat-label">Free</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-num">0</div>
-                <div class="stat-label">Excuses</div>
-            </div>
-        </div>
-
-        <div class="gw-divider"></div>
+    <div class="top-badge">⚡ 30-Second RPG Study System · Any Universe · Zero Limits</div>
+    <div class="gw-main-title">TITAN<br>OMNIVERSE</div>
+    <div class="gw-subtitle">Infiniteverse · Study RPG · Unlock Your Power</div>
+    <div class="features-row">
+        <div class="feature-pill"><span>🎮</span>Pick ANY Universe</div>
+        <div class="feature-pill"><span>⏱</span>30-Second Missions</div>
+        <div class="feature-pill"><span>💰</span>Earn Real Rewards</div>
+        <div class="feature-pill"><span>🔥</span>Study Like a Champion</div>
+        <div class="feature-pill"><span>🌈</span>Fully Customizable</div>
+        <div class="feature-pill"><span>⚡</span>Powered by AI</div>
     </div>
+    <div class="stats-ticker">
+        <div class="stat-item"><div class="stat-num">∞</div><div class="stat-label">Universes</div></div>
+        <div class="stat-item"><div class="stat-num">30s</div><div class="stat-label">To Start</div></div>
+        <div class="stat-item"><div class="stat-num">100%</div><div class="stat-label">Free</div></div>
+        <div class="stat-item"><div class="stat-num">0</div><div class="stat-label">Excuses</div></div>
+    </div>
+    <div class="gw-divider"></div>
     """, unsafe_allow_html=True)
 
     # ── Form — pure Streamlit widgets, styled via CSS only ────────────────────
