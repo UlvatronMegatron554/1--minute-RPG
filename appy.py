@@ -590,8 +590,35 @@ st.markdown(f"""
 
 html,body,[data-testid="stAppViewContainer"]{{background:{BG}!important;color:{TEXT}!important;font-family:'Space Mono',monospace;}}
 [data-testid="stHeader"],[data-testid="stToolbar"]{{background:transparent!important;}}
-[data-testid="stSidebar"]{{background:{BG}!important;}}
-[data-testid="stSidebar"] p,[data-testid="stSidebar"] label,[data-testid="stSidebar"] div,[data-testid="stSidebar"] span{{color:{TEXT}!important;}}
+
+/* SIDEBAR — always dark, always white text, no exceptions */
+[data-testid="stSidebar"]{{background:#111111!important;}}
+[data-testid="stSidebar"] p,
+[data-testid="stSidebar"] label,
+[data-testid="stSidebar"] div,
+[data-testid="stSidebar"] span,
+[data-testid="stSidebar"] h1,
+[data-testid="stSidebar"] h2,
+[data-testid="stSidebar"] h3,
+[data-testid="stSidebar"] b,
+[data-testid="stSidebar"] strong,
+[data-testid="stSidebar"] li,
+[data-testid="stSidebar"] a {{color:#ffffff!important;}}
+/* Sidebar buttons — compact, white text on dark */
+[data-testid="stSidebar"] div.stButton>button{{
+    border:2px solid {C}!important;
+    background:#1a1a1a!important;
+    color:#ffffff!important;
+    font-family:'Bebas Neue',sans-serif!important;
+    font-size:16px!important;
+    letter-spacing:2px!important;
+    padding:10px 16px!important;
+    border-radius:10px!important;
+    animation:none!important;
+    width:100%!important;
+    margin-bottom:6px!important;
+}}
+
 #MainMenu,footer{{visibility:hidden;}}
 
 input,textarea{{background:#ffffff!important;color:#000000!important;caret-color:#000000!important;border:2px solid {C}!important;border-radius:10px!important;font-family:'Space Mono',monospace!important;font-size:14px!important;padding:10px 14px!important;}}
@@ -636,11 +663,11 @@ div.stButton>button:hover{{transform:scale(1.02);}}
 # ─────────────────────────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown(f"<h1 style='font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:3px;margin:0'>⚡ TITAN HUB</h1>", unsafe_allow_html=True)
-    st.markdown(f"<p style='color:{TEXT};margin:3px 0'><b>CHAMPION:</b> {st.session_state.user_name.upper()}</p>", unsafe_allow_html=True)
-    st.markdown(f"<p style='color:{TEXT};margin:3px 0'><b>UNIVERSE:</b> {st.session_state.user_theme}</p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='color:#ffffff;margin:3px 0'><b>CHAMPION:</b> {st.session_state.user_name.upper()}</p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='color:#ffffff;margin:3px 0'><b>UNIVERSE:</b> {st.session_state.user_theme}</p>", unsafe_allow_html=True)
     mode_badge = {"chill":"⚡ CHILL","grinder":"🔥 GRINDER","obsessed":"💀 OBSESSED"}.get(MODE,"⚡ CHILL")
-    st.markdown(f"<p style='color:{TEXT};margin:3px 0'><b>MODE:</b> {mode_badge}</p>", unsafe_allow_html=True)
-    st.markdown(f"<p style='color:{TEXT};margin:3px 0'><b>RANK:</b> {st.session_state.sub_tier.upper()}</p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='color:#ffffff;margin:3px 0'><b>MODE:</b> {mode_badge}</p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='color:#ffffff;margin:3px 0'><b>RANK:</b> {st.session_state.sub_tier.upper()}</p>", unsafe_allow_html=True)
 
     st.markdown(f"""<div class='metric-card'>
         <div style='font-family:Bebas Neue,sans-serif;font-size:40px;color:{C}'>{st.session_state.gold:.1f}</div>
@@ -649,7 +676,7 @@ with st.sidebar:
     </div>""", unsafe_allow_html=True)
 
     st.write("---")
-    st.markdown(f"<p style='color:{TEXT};font-weight:bold'>👑 ELITE CODE</p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='color:#ffffff;font-weight:bold'>👑 ELITE CODE</p>", unsafe_allow_html=True)
     code = st.text_input("Protocol Code:", type="password", key="elite_code")
     if code == "TITAN10" and st.session_state.sub_tier != "Elite":
         st.session_state.sub_tier = "Elite"; st.session_state.sub_multiplier = 3
@@ -672,18 +699,18 @@ with st.sidebar:
         if st.button("💳 PLANS",    key="nav_plans"):   st.session_state.view = "plans";   st.rerun()
 
     st.write("---")
-    st.markdown(f"<p style='color:{TEXT};font-weight:bold'>🎨 BACKGROUND</p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='color:#ffffff;font-weight:bold'>🎨 BACKGROUND</p>", unsafe_allow_html=True)
     new_bg = st.color_picker("", value=st.session_state.get("bg_color","#ffffff"), key="bg_picker", label_visibility="collapsed")
     if new_bg != st.session_state.get("bg_color","#ffffff"):
         st.session_state.bg_color = new_bg; st.rerun()
 
-    st.markdown(f"<p style='color:{TEXT};font-weight:bold'>🌈 THEME COLOR</p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='color:#ffffff;font-weight:bold'>🌈 THEME COLOR</p>", unsafe_allow_html=True)
     new_tc = st.color_picker("", value=st.session_state.vibe_color, key="theme_picker", label_visibility="collapsed")
     if new_tc != st.session_state.vibe_color:
         st.session_state.vibe_color = new_tc; st.rerun()
 
     st.write("---")
-    st.markdown(f"<p style='color:{TEXT};font-weight:bold'>🌐 SWITCH UNIVERSE</p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='color:#ffffff;font-weight:bold'>🌐 SWITCH UNIVERSE</p>", unsafe_allow_html=True)
     new_theme = st.text_input("New universe:", placeholder="Try anything...", key="switch_theme")
     if st.button("🔄 WARP", key="warp_btn"):
         if new_theme.strip():
@@ -695,7 +722,7 @@ with st.sidebar:
             st.rerun()
 
     st.write("---")
-    st.markdown(f"<p style='color:{TEXT};font-weight:bold'>🚨 RESET</p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='color:#ffffff;font-weight:bold'>🚨 RESET</p>", unsafe_allow_html=True)
     reset_input = st.text_input("Type RESET to confirm:", key="reset_confirm_input", placeholder="RESET")
     if st.button("🚨 RESET ALL", key="reset_btn"):
         if reset_input.strip().upper() == "RESET":
