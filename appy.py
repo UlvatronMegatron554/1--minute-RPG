@@ -55,113 +55,142 @@ def extract_json(raw_text):
     return result if len(result) >= 4 else None
 
 # ── Prompt ────────────────────────────────────────────────────────────────────
-LORE_PROMPT = """You are a universe data encoder. Return ONLY a raw JSON object — no explanation, no markdown, no code fences, nothing else.
+# KEY DESIGN:
+# - shield_name / booster_name = ultra-specific item FROM that universe
+# - shield_effect / booster_effect = ALWAYS fixed (we inject these ourselves)
+# - color = the SINGLE most recognizable color tied to that IP/brand/topic
+# - currency = the most logical reward/value unit for that universe
 
-For the universe: "{theme}"
+LORE_PROMPT = """You are a universe lore encoder. Return ONLY a raw JSON object. No markdown, no code fences, no explanation whatsoever.
 
-Return exactly this structure:
-{{
-  "currency": "the canonical in-universe currency or reward",
-  "color": "#RRGGBB hex color most iconic to this universe",
-  "shield_name": "the most iconic defensive ability or item (2-4 words)",
-  "booster_name": "the most iconic speed or movement ability (2-4 words)",
-  "shield_lore": "one sentence of authentic lore about this defense",
-  "booster_lore": "one sentence of authentic lore about this movement ability",
-  "description": "one punchy sentence describing this universe's essence"
-}}
+UNIVERSE: "{theme}"
 
-Example for "Minecraft":
-{{"currency": "Emeralds", "color": "#00AA00", "shield_name": "Netherite Armor", "booster_name": "Ender Pearl Warp", "shield_lore": "Forged from ancient debris in the Nether, Netherite is virtually indestructible.", "booster_lore": "Teleportation via thrown ender pearls, instant relocation across the world.", "description": "A boundless world of blocks where creativity and survival collide."}}
+RULES:
+1. "currency" = the most well-known in-universe coin, reward, or value unit. Examples: Minecraft→"Emeralds", Mario→"Coins", F1→"Championship Points", Nike→"NikeCash", NBA→"VC", Naruto→"Ryo", Dune→"Solaris". Be creative and specific — never use generic words like "Credits" or "Points" unless that universe literally uses them.
+2. "color" = the single most ICONIC hex color for this universe. Be exact and precise:
+   - Super Smash Bros = #E4000F (bright Nintendo red from the logo/title screen)
+   - Mario = #E52521 (Mario's red)
+   - Sonic = #0057A8 (Sega blue)
+   - Minecraft = #5D9E35 (grass green)
+   - Fortnite = #BEFF00 (neon yellow-green)
+   - One Piece = #E8372B (Luffy's red vest)
+   - Dragon Ball = #FF8C00 (orange gi)
+   - Naruto = #FF6600 (orange jumpsuit)
+   - F1 = #FF1801 (Formula 1 red)
+   - NBA = #EE6730 (NBA orange)
+   - Pokemon = #FFCB05 (Pikachu yellow)
+   - Harry Potter = #740001 (Gryffindor red)
+   - Star Wars = #FFE81F (crawl yellow)
+   - Valorant = #FF4655 (Valorant red)
+   - Halo = #008000 (Master Chief green)
+   - Dead by Daylight = #8B0000 (blood red)
+   - Roblox = #E8272A (Roblox red)
+   - For anything else: pick the dominant brand/title/logo color, not a character color.
+3. "shield_name" = the most iconic DEFENSIVE item, armor, technique, or concept from this universe. Must be specific — not generic.
+4. "booster_name" = the most iconic SPEED or MOVEMENT ability, item, or technique. Must be specific — not generic.
+5. "description" = one punchy sentence capturing the soul of this universe.
+
+Return exactly:
+{{"currency": "...", "color": "#RRGGBB", "shield_name": "...", "booster_name": "...", "description": "..."}}
+
+Examples:
+- "Minecraft": {{"currency": "Emeralds", "color": "#5D9E35", "shield_name": "Protection IV Netherite Chestplate", "booster_name": "Ender Pearl Warp", "description": "A boundless world of blocks where creativity and survival collide."}}
+- "Super Smash Bros": {{"currency": "KO Points", "color": "#E4000F", "shield_name": "Perfect Shield", "booster_name": "Wavedash", "description": "The ultimate crossover battle arena where gaming legends clash."}}
+- "Formula 1": {{"currency": "Championship Points", "color": "#FF1801", "shield_name": "Halo Titanium", "booster_name": "DRS Activation", "description": "The pinnacle of motorsport where speed, strategy and nerve collide."}}
+- "One Piece": {{"currency": "Berries", "color": "#E8372B", "shield_name": "Armament Haki", "booster_name": "Gear Second", "description": "A pirate's odyssey across infinite oceans in search of the ultimate treasure."}}
 
 Now return ONLY the JSON for "{theme}":"""
 
-# ── Smart domain fallbacks ─────────────────────────────────────────────────────
-DOMAIN_FALLBACKS = [
-    (("football","soccer","nfl","nba","mlb","nhl","basketball","baseball","tennis",
-      "golf","cricket","rugby","f1","formula","racing","nascar","mma","ufc","boxing","sports"),
-     {"currency":"Trophy Points","color":"#FFD700","shield_name":"Iron Defense","booster_name":"Turbo Sprint",
-      "shield_lore":"The ultimate defensive stance used by champions the world over.",
-      "booster_lore":"Explosive acceleration that leaves every opponent behind.",
-      "description":"The ultimate competitive arena where legends are made."}),
-
-    (("anime","manga","one piece","naruto","bleach","dragon ball","attack on titan",
-      "demon slayer","jujutsu","my hero","hunter","fullmetal","sword art","fairy tail"),
-     {"currency":"Ryo","color":"#FF4500","shield_name":"Armament Haki","booster_name":"Body Flicker",
-      "shield_lore":"Hardening of spirit into an impenetrable aura of combat energy.",
-      "booster_lore":"Movement so fast the human eye cannot track its path.",
-      "description":"A world of extraordinary power, honour, and relentless destiny."}),
-
-    (("minecraft","roblox","fortnite","valorant","league","apex","overwatch","cod",
-      "gta","zelda","mario","pokemon","skyrim","elden","souls","dead by daylight",
-      "dbd","among us","fall guys","terraria","stardew","game","gaming"),
-     {"currency":"Gold Coins","color":"#00AA00","shield_name":"Barrier Shield","booster_name":"Phase Dash",
-      "shield_lore":"A protective barrier forged from the world's deepest energy reserves.",
-      "booster_lore":"Instant blink across space, leaving only afterimages behind.",
-      "description":"An infinite digital universe where skill and strategy reign supreme."}),
-
-    (("fashion","clothing","style","brand","retail","luxury","streetwear",
-      "nike","adidas","gucci","supreme","vans","off-white","zara","h&m"),
-     {"currency":"Style Credits","color":"#FF69B4","shield_name":"Signature Drip","booster_name":"Trend Surge",
-      "shield_lore":"A curated aesthetic armour that commands attention in any room.",
-      "booster_lore":"Riding the cultural wave at peak momentum and maximum visibility.",
-      "description":"Where identity becomes art and every fit tells a story."}),
-
-    (("book","novel","fantasy","sci-fi","scifi","harry potter","lord of the rings",
-      "dune","witcher","tolkien","marvel","dc","comics","star wars","batman","superman"),
-     {"currency":"Arcane Tokens","color":"#9B59B6","shield_name":"Arcane Ward","booster_name":"Dimensional Step",
-      "shield_lore":"An ancient ward woven from the very fabric of pure concentrated magic.",
-      "booster_lore":"A fold in space that collapses impossible distances to nothing.",
-      "description":"A realm where legends echo across time and worlds collide."}),
-
-    (("music","rap","hiphop","hip-hop","pop","rock","jazz","edm","kpop","k-pop",
-      "artist","band","album","concert","spotify","playlist"),
-     {"currency":"Streams","color":"#1DB954","shield_name":"Noise Cancel","booster_name":"Drop Surge",
-      "shield_lore":"Pure sonic energy condensed into an impenetrable audio shield.",
-      "booster_lore":"The bass drop that launches you forward at the speed of sound.",
-      "description":"A universe built on rhythm, bars, and cultural resonance."}),
-
-    (("history","ancient","rome","egypt","greek","medieval","viking","samurai",
-      "war","military","ww2","napoleon","empire","civilization"),
-     {"currency":"Denarii","color":"#B22222","shield_name":"Testudo Formation","booster_name":"Cavalry Charge",
-      "shield_lore":"Overlapping shields locked together into an impenetrable iron tortoise.",
-      "booster_lore":"A thundering wall of horses and steel that breaks any battle line.",
-      "description":"The rise and fall of civilisations written in blood and glory."}),
-]
-
-ULTIMATE_FALLBACK = {
-    "currency": "Titan Shards", "color": "#00FFCC",
-    "shield_name": "Kinetic Barrier", "booster_name": "Void Dash",
-    "shield_lore": "A force field of concentrated kinetic energy.",
-    "booster_lore": "A burst of velocity that bends local spacetime.",
-    "description": "A realm of boundless power and infinite possibility."
+# ── Hardcoded fallbacks for when AI is unavailable ────────────────────────────
+# Covers the most popular universes with pixel-perfect data.
+HARD_FALLBACKS = {
+    "super smash bros": {"currency":"KO Points","color":"#E4000F","shield_name":"Perfect Shield","booster_name":"Wavedash","description":"The ultimate crossover arena where every gaming legend settles the score."},
+    "smash bros":       {"currency":"KO Points","color":"#E4000F","shield_name":"Perfect Shield","booster_name":"Wavedash","description":"The ultimate crossover arena where every gaming legend settles the score."},
+    "mario":            {"currency":"Coins","color":"#E52521","shield_name":"Super Star","booster_name":"Cape Feather","description":"The mushroom kingdom's greatest hero leaps through worlds beyond imagination."},
+    "sonic":            {"currency":"Gold Rings","color":"#0057A8","shield_name":"Insta-Shield","booster_name":"Spin Dash","description":"The fastest thing alive races through worlds at the speed of sound."},
+    "minecraft":        {"currency":"Emeralds","color":"#5D9E35","shield_name":"Protection IV Netherite Chestplate","booster_name":"Ender Pearl Warp","description":"A boundless world of blocks where creativity and survival collide."},
+    "fortnite":         {"currency":"V-Bucks","color":"#BEFF00","shield_name":"Shield Bubble","booster_name":"Shockwave Grenade","description":"100 players drop in. Only one walks out."},
+    "roblox":           {"currency":"Robux","color":"#E8272A","shield_name":"Force Field","booster_name":"Speed Coil","description":"An infinite universe of user-built worlds with no limits."},
+    "pokemon":          {"currency":"PokéDollars","color":"#FFCB05","shield_name":"Protect","booster_name":"Extreme Speed","description":"Catch, train, and battle creatures across a world of endless adventure."},
+    "valorant":         {"currency":"VP","color":"#FF4655","shield_name":"Sage Barrier","booster_name":"Jett Updraft","description":"Precise gunplay meets deadly abilities in a high-stakes tactical shooter."},
+    "dead by daylight":  {"currency":"Bloodpoints","color":"#8B0000","shield_name":"Dead Hard","booster_name":"Sprint Burst","description":"A nightmare realm where survivors and killers play an eternal game of death."},
+    "one piece":        {"currency":"Berries","color":"#E8372B","shield_name":"Armament Haki","booster_name":"Gear Second","description":"A pirate's odyssey across infinite oceans in search of the ultimate treasure."},
+    "naruto":           {"currency":"Ryo","color":"#FF6600","shield_name":"Susanoo","booster_name":"Body Flicker","description":"The path of the ninja — from outcast to the strongest in the village."},
+    "dragon ball":      {"currency":"Zeni","color":"#FF8C00","shield_name":"Barrier Blast","booster_name":"Instant Transmission","description":"Warriors transcend limits in an endless quest for power and battle."},
+    "demon slayer":     {"currency":"Yen","color":"#22AA44","shield_name":"Total Concentration","booster_name":"Thunder Breathing","description":"Demon hunters clash with ancient evil using breathing techniques and pure will."},
+    "attack on titan":  {"currency":"Eldian Marks","color":"#8B6914","shield_name":"Hardening Crystal","booster_name":"ODM Gear Swing","description":"Humanity's last survivors fight back against giants behind crumbling walls."},
+    "f1":               {"currency":"Championship Points","color":"#FF1801","shield_name":"Halo Titanium","booster_name":"DRS Activation","description":"The pinnacle of motorsport where speed, strategy and nerve collide."},
+    "formula 1":        {"currency":"Championship Points","color":"#FF1801","shield_name":"Halo Titanium","booster_name":"DRS Activation","description":"The pinnacle of motorsport where speed, strategy and nerve collide."},
+    "nba":              {"currency":"VC","color":"#EE6730","shield_name":"Lockdown Defense","booster_name":"Fast Break","description":"The greatest basketball league on Earth where legends are born every night."},
+    "nfl":              {"currency":"Fan Tokens","color":"#013369","shield_name":"Blitz Package","booster_name":"Hail Mary","description":"America's most electrifying sport played by the world's greatest athletes."},
+    "harry potter":     {"currency":"Galleons","color":"#740001","shield_name":"Protego Totalum","booster_name":"Apparition","description":"A world of magic, mystery, and courage hidden behind ordinary life."},
+    "star wars":        {"currency":"Credits","color":"#FFE81F","shield_name":"Lightsaber Deflect","booster_name":"Force Speed","description":"A galaxy far, far away locked in eternal war between light and dark."},
+    "marvel":           {"currency":"Stark Credits","color":"#ED1D24","shield_name":"Vibranium Shield","booster_name":"Repulsor Boost","description":"Earth's mightiest heroes stand between humanity and total annihilation."},
+    "skyrim":           {"currency":"Septims","color":"#C0C0C0","shield_name":"Dragonhide","booster_name":"Whirlwind Sprint","description":"The Dragonborn's destiny unfolds across a frozen land of ancient power."},
+    "elden ring":       {"currency":"Runes","color":"#C8A951","shield_name":"Erdtree Greatshield","booster_name":"Bloodhound Step","description":"A shattered world of demigods, death, and the pursuit of the Elden Ring."},
+    "gta":              {"currency":"GTA$","color":"#F4B000","shield_name":"Body Armor","booster_name":"Rocket Boost","description":"Life on the streets where power, money, and chaos rule everything."},
+    "nike":             {"currency":"NikeCash","color":"#111111","shield_name":"Air Max Cushion","booster_name":"React Foam Burst","description":"Just Do It — where athletic performance meets street culture."},
+    "adidas":           {"currency":"Stripes Points","color":"#000000","shield_name":"Boost Sole","booster_name":"Ultraboost Launch","description":"Impossible is Nothing — three stripes that define sport and culture."},
+    "music":            {"currency":"Streams","color":"#1DB954","shield_name":"Noise Cancelling","booster_name":"Drop Surge","description":"A universe built on rhythm, bars, and raw cultural resonance."},
+    "kpop":             {"currency":"Fancash","color":"#FF6699","shield_name":"Fan Shield","booster_name":"Comeback Drop","description":"The global phenomenon of precision performance and undeniable charisma."},
+    "ancient rome":     {"currency":"Denarii","color":"#B22222","shield_name":"Testudo Formation","booster_name":"Cavalry Charge","description":"The eternal city's iron legions built the greatest empire the world has ever seen."},
+    "vikings":          {"currency":"Silver Hack","color":"#4A4A8A","shield_name":"Shieldwall","booster_name":"Berserker Rush","description":"Norse warriors who crossed uncharted seas and carved history with axes."},
 }
 
 def get_smart_fallback(theme):
-    t = theme.lower()
-    for keywords, data in DOMAIN_FALLBACKS:
-        if any(kw in t for kw in keywords):
+    t = theme.lower().strip()
+    # Exact match first
+    if t in HARD_FALLBACKS:
+        return HARD_FALLBACKS[t]
+    # Partial match
+    for key, data in HARD_FALLBACKS.items():
+        if key in t or t in key:
             return data
-    return ULTIMATE_FALLBACK
+    # Generic domain match
+    if any(w in t for w in ("game","gaming","rpg","fps","moba")):
+        return {"currency":"Gold","color":"#FFD700","shield_name":"Barrier Shield","booster_name":"Phase Dash","description":"An infinite digital universe where skill and legend are born."}
+    if any(w in t for w in ("anime","manga")):
+        return {"currency":"Ryo","color":"#FF4500","shield_name":"Armament Haki","booster_name":"Body Flicker","description":"A world of extraordinary power, honour, and relentless destiny."}
+    if any(w in t for w in ("sport","league","cup","championship","team")):
+        return {"currency":"Trophy Points","color":"#FFD700","shield_name":"Iron Defense","booster_name":"Turbo Sprint","description":"The ultimate competitive arena where legends are made."}
+    if any(w in t for w in ("fashion","brand","wear","style","cloth","retail","shop")):
+        return {"currency":"Style Credits","color":"#FF69B4","shield_name":"Signature Drip","booster_name":"Trend Surge","description":"Where identity becomes art and every fit tells a story."}
+    # Last resort
+    return {"currency":"Titan Shards","color":"#00FFCC","shield_name":"Kinetic Barrier","booster_name":"Void Dash","description":"A realm of boundless power and infinite possibility."}
 
 # ── Main resolver ─────────────────────────────────────────────────────────────
-REQUIRED_KEYS = ["currency", "color", "shield_name", "booster_name",
-                 "shield_lore", "booster_lore", "description"]
+REQUIRED_KEYS = ["currency", "color", "shield_name", "booster_name", "description"]
+
+# Fixed effect descriptions — these NEVER change regardless of universe
+SHIELD_EFFECT = "Negates any debt that was earned."
+BOOSTER_EFFECT = "Grants a 3× multiplier on all mission rewards."
 
 def resolve_universe(theme, model):
+    data = None
+
+    # 1. Try AI
     if model is not None:
         try:
             prompt = LORE_PROMPT.format(theme=theme)
             response = model.generate_content(prompt)
             raw = response.text.strip() if response.text else ""
-            data = extract_json(raw)
-            if data and all(k in data for k in REQUIRED_KEYS):
-                # Validate hex color
-                if not re.match(r"^#[0-9A-Fa-f]{6}$", data.get("color", "")):
-                    data["color"] = "#FFD700"
-                return data
+            parsed = extract_json(raw)
+            if parsed and all(k in parsed for k in REQUIRED_KEYS):
+                if not re.match(r"^#[0-9A-Fa-f]{6}$", parsed.get("color", "")):
+                    parsed["color"] = "#FFD700"
+                data = parsed
         except Exception:
             pass
-    return get_smart_fallback(theme)
+
+    # 2. Fallback if AI failed
+    if not data:
+        data = get_smart_fallback(theme)
+
+    # 3. ALWAYS inject fixed effect descriptions (never let AI override these)
+    data["shield_effect"] = SHIELD_EFFECT
+    data["booster_effect"] = BOOSTER_EFFECT
+
+    return data
 
 # ── Session State Init ─────────────────────────────────────────────────────────
 if "gold" not in st.session_state:
@@ -368,31 +397,49 @@ if st.session_state.view == "shop":
 
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown(f"<div class='shop-card'>", unsafe_allow_html=True)
-        st.markdown(f"<h3 style='font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:2px'>{wd.get('shield_name','Shield').upper()}</h3>", unsafe_allow_html=True)
-        st.write(f"_{wd.get('shield_lore','Legendary protection.')}_")
-        st.write("**EFFECT:** Negates incoming debt")
-        if st.button(f"ACQUIRE · 15 {currency}", key="buy_shield"):
+        st.markdown(f"""
+        <div class='shop-card'>
+            <div style='font-size:11px;color:#555;letter-spacing:2px;margin-bottom:6px'>⚔️ DEFENSE ABILITY</div>
+            <h3 style='font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:2px;margin:0 0 10px'>
+                {wd.get('shield_name','Shield').upper()}
+            </h3>
+            <div style='background:rgba(255,255,255,0.04);border-left:3px solid {C};
+                        padding:10px 12px;border-radius:0 8px 8px 0;margin-bottom:14px'>
+                <div style='font-size:10px;color:#555;letter-spacing:2px'>EFFECT</div>
+                <div style='font-size:14px;color:#ddd;margin-top:2px'>Negates any debt that was earned.</div>
+            </div>
+            <div style='font-size:12px;color:#444;margin-bottom:14px'>Cost: <span style='color:{C}'>15 {currency}</span></div>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button(f"⚔️ ACQUIRE SHIELD · 15 {currency}", key="buy_shield"):
             if st.session_state.gold >= 15:
                 st.session_state.gold -= 15
                 st.success(f"⚔️ {wd.get('shield_name')} activated!")
             else:
                 st.error("Not enough currency.")
-        st.markdown("</div>", unsafe_allow_html=True)
 
     with col2:
-        st.markdown(f"<div class='shop-card'>", unsafe_allow_html=True)
-        st.markdown(f"<h3 style='font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:2px'>{wd.get('booster_name','Booster').upper()}</h3>", unsafe_allow_html=True)
-        st.write(f"_{wd.get('booster_lore','Pure velocity unleashed.')}_")
-        st.write("**EFFECT:** 3× reward multiplier")
-        if st.button(f"ACQUIRE · 25 {currency}", key="buy_booster"):
+        st.markdown(f"""
+        <div class='shop-card'>
+            <div style='font-size:11px;color:#555;letter-spacing:2px;margin-bottom:6px'>⚡ SPEED ABILITY</div>
+            <h3 style='font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:2px;margin:0 0 10px'>
+                {wd.get('booster_name','Booster').upper()}
+            </h3>
+            <div style='background:rgba(255,255,255,0.04);border-left:3px solid {C};
+                        padding:10px 12px;border-radius:0 8px 8px 0;margin-bottom:14px'>
+                <div style='font-size:10px;color:#555;letter-spacing:2px'>EFFECT</div>
+                <div style='font-size:14px;color:#ddd;margin-top:2px'>Grants a 3× multiplier on all mission rewards.</div>
+            </div>
+            <div style='font-size:12px;color:#444;margin-bottom:14px'>Cost: <span style='color:{C}'>25 {currency}</span></div>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button(f"⚡ ACQUIRE BOOSTER · 25 {currency}", key="buy_booster"):
             if st.session_state.gold >= 25:
                 st.session_state.gold -= 25
                 st.session_state.sub_multiplier = 3
                 st.success(f"⚡ {wd.get('booster_name')} engaged!")
             else:
                 st.error("Not enough currency.")
-        st.markdown("</div>", unsafe_allow_html=True)
 
 # ── MISSION HUB VIEW ──────────────────────────────────────────────────────────
 else:
