@@ -542,30 +542,26 @@ if st.session_state.user_name is None:
     </div>
     """, unsafe_allow_html=True)
 
-    # ── Form (Streamlit widgets must be outside raw HTML) ──────────────────────
+    # ── Form — pure Streamlit widgets, styled via CSS only ────────────────────
     _, col, _ = st.columns([1, 2, 1])
     with col:
-        st.markdown('<div class="form-card">', unsafe_allow_html=True)
+        name_input = st.text_input("⚡ CHAMPION NAME", placeholder="What are you called, Champion?", key="gw_name")
+        theme_input = st.text_input("🌌 YOUR UNIVERSE", placeholder="Minecraft · Naruto · F1 · Nike · anything imaginable...", key="gw_theme")
 
-        st.markdown('<div class="form-label">⚡ Your Champion Name</div>', unsafe_allow_html=True)
-        name_input = st.text_input("", placeholder="What are you called, Champion?", key="gw_name", label_visibility="collapsed")
+        st.markdown("""
+        <p class="default-hint">💡 Leave empty for the default universe: <strong>INFINITE POWER</strong></p>
+        <div class="chip-section-label">⚡ Quick picks</div>
+        <div class="chip-row">
+            <span class="chip">Minecraft</span><span class="chip">Super Smash Bros</span>
+            <span class="chip">One Piece</span><span class="chip">Formula 1</span>
+            <span class="chip">Dead by Daylight</span><span class="chip">Pokemon</span>
+            <span class="chip">Naruto</span><span class="chip">NBA</span>
+            <span class="chip">Roblox</span><span class="chip">Harry Potter</span>
+            <span class="chip">Valorant</span><span class="chip">Nike</span>
+            <span class="chip">K-Pop</span><span class="chip">Ancient Rome</span>
+        </div>
+        """, unsafe_allow_html=True)
 
-        st.markdown('<div class="form-label" style="margin-top:16px">🌌 Your Universe</div>', unsafe_allow_html=True)
-        theme_input = st.text_input("", placeholder="Minecraft · Naruto · F1 · Nike · anything imaginable...", key="gw_theme", label_visibility="collapsed")
-
-        st.markdown('<p class="default-hint">💡 Leave empty for the default universe: <strong>INFINITE POWER</strong></p>', unsafe_allow_html=True)
-
-        st.markdown('<div class="chip-section-label">⚡ Quick picks</div>', unsafe_allow_html=True)
-        examples = ["Minecraft","Super Smash Bros","One Piece","Formula 1","Dead by Daylight",
-                    "Pokemon","Naruto","NBA","Roblox","Harry Potter","Valorant","Nike","K-Pop","Ancient Rome"]
-        st.markdown(
-            '<div class="chip-row">' +
-            "".join(f'<span class="chip">{e}</span>' for e in examples) +
-            '</div>',
-            unsafe_allow_html=True
-        )
-
-        st.markdown("<br>", unsafe_allow_html=True)
         if st.button("⚡ ENTER THE INFINITEVERSE", key="gw_enter"):
             if not name_input.strip():
                 st.error("Enter your champion name to begin.")
@@ -580,9 +576,6 @@ if st.session_state.user_name is None:
                 st.session_state.user_theme = display_name
                 st.rerun()
 
-        st.markdown('</div>', unsafe_allow_html=True)
-
-        # How it works cards
         st.markdown("""
         <div class="how-it-works">
             <div class="how-title">HOW IT WORKS</div>
@@ -590,22 +583,22 @@ if st.session_state.user_name is None:
                 <div class="how-card">
                     <div class="how-icon">🌌</div>
                     <div class="how-card-title">PICK YOUR UNIVERSE</div>
-                    <div class="how-card-desc">Any game, anime, sport, brand, show — the AI builds your world instantly.</div>
+                    <div class="how-card-desc">Any game, anime, sport, brand — AI builds your world instantly.</div>
                 </div>
                 <div class="how-card">
                     <div class="how-icon">⏱</div>
                     <div class="how-card-title">START A MISSION</div>
-                    <div class="how-card-desc">30 seconds or 1 minute. Study, work, grind. Every second earns you currency.</div>
+                    <div class="how-card-desc">30 seconds or 1 minute. Study, work, grind. Every second earns currency.</div>
                 </div>
                 <div class="how-card">
                     <div class="how-icon">📸</div>
                     <div class="how-card-title">PROVE YOUR WORK</div>
-                    <div class="how-card-desc">Upload proof to The Tribunal. No cheating. Real effort = real rewards.</div>
+                    <div class="how-card-desc">Upload proof to The Tribunal. Real effort = real rewards. No cheating.</div>
                 </div>
                 <div class="how-card">
                     <div class="how-icon">🏆</div>
                     <div class="how-card-title">LEVEL UP</div>
-                    <div class="how-card-desc">Buy abilities, unlock Elite status, dominate your universe. Study = power.</div>
+                    <div class="how-card-desc">Buy abilities, unlock Elite status, dominate your universe.</div>
                 </div>
             </div>
         </div>
