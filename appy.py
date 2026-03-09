@@ -3,7 +3,7 @@ import anthropic
 import time, json, re
 
 # ─────────────────────────────────────────────────────────────────────────────
-# TITAN OMNIVERSE v6.0 — CRYSTAL CLEAR GATEWAY EDITION
+# TITAN OMNIVERSE v7.0 — NO EXCUSES EDITION
 # ─────────────────────────────────────────────────────────────────────────────
 
 st.set_page_config(page_title="TITAN OMNIVERSE", page_icon="⚡", layout="wide")
@@ -53,6 +53,7 @@ def extract_json(raw_text):
             result[key] = m.group(1).strip()
     return result if len(result) >= 4 else None
 
+# RESTORED to v5.0 prompt — the one that got Germa 66 perfect
 LORE_PROMPT = """You are an expert on every game, anime, sport, brand, show, movie, book, music genre, fashion brand, and cultural phenomenon that exists.
 
 A user has chosen the universe: "{theme}"
@@ -60,10 +61,13 @@ A user has chosen the universe: "{theme}"
 Return ONLY a single raw JSON object with no explanation, no markdown, no code fences, nothing else.
 
 Rules:
-- "currency": The EXACT in-universe currency or most fitting value unit. Ultra-specific — never generic "Credits" or "Points" unless that franchise literally uses those words.
-- "color": The single most ICONIC hex color for this universe. You MUST use these exact values when they apply:
-  Super Smash Bros=#E4000F, Mario=#E52521, Sonic=#0057A8, Minecraft=#5D9E35, Fortnite=#BEFF00, Roblox=#E8272A, Pokemon=#FFCB05, Valorant=#FF4655, One Piece=#E8372B, Naruto=#FF6600, Dragon Ball=#FF8C00, Demon Slayer=#22AA44, JJK=#6600CC, Bleach=#1a1a1a, F1=#FF1801, NBA=#EE6730, NFL=#013369, FIFA=#326B2E, Star Wars=#FFE81F, Marvel=#ED1D24, DC=#0476F2, Harry Potter=#740001, Skyrim=#C0C0C0, Elden Ring=#C8A951, GTA=#F4B000, Halo=#00B4D8, Dead by Daylight=#8B0000, Among Us=#C51111, Apex Legends=#DA292A, Nike=#E8000D, Adidas=#000000, Supreme=#FF0000, Spotify=#1DB954, Netflix=#E50914, Attack on Titan=#8B6914, Bleach=#2C2C2C, My Hero Academia=#1DA462, Demon Slayer=#22AA44.
-  For anything not listed: pick the single most dominant color from that franchise's logo, title screen, or iconic imagery.
+- "currency": The EXACT in-universe currency or most fitting value unit. Ultra-specific — never generic "Credits" or "Points" unless that franchise literally uses those words. Examples: Minecraft=Emeralds, Mario=Coins, Naruto=Ryo, One Piece=Berries, F1=Championship Points, NBA=VC, Roblox=Robux, Fortnite=V-Bucks, Nike=NikeCash, Spotify=Streams.
+
+- "color": The single most ICONIC hex color for this universe — use the exact brand/logo/title screen color:
+  Super Smash Bros=#E4000F, Mario=#E52521, Sonic=#0057A8, Minecraft=#5D9E35, Fortnite=#BEFF00, Roblox=#E8272A, Pokemon=#FFCB05, Valorant=#FF4655, One Piece=#E8372B, Naruto=#FF6600, Dragon Ball=#FF8C00, Demon Slayer=#22AA44, JJK=#6600CC, Bleach=#4A4A4A, F1=#FF1801, NBA=#EE6730, NFL=#013369, FIFA=#326B2E, Star Wars=#FFE81F, Marvel=#ED1D24, DC=#0476F2, Harry Potter=#740001, Skyrim=#C0C0C0, Elden Ring=#C8A951, GTA=#F4B000, Halo=#00B4D8, Dead by Daylight=#8B0000, Among Us=#C51111, Apex=#DA292A, Nike=#111111, Adidas=#000000, Supreme=#FF0000, Spotify=#1DB954, Netflix=#E50914.
+  For anything not listed: pick the single most iconic color tied to that specific franchise, character, or concept — not a generic color.
+  For sub-franchises or specific characters (like "Zoro from One Piece", "Germa 66", a specific team, etc.) use the color most associated with THAT specific character or sub-group, not the parent franchise.
+
 - "shield_name": The most iconic DEFENSIVE item, armor, or technique from this exact universe. 100% specific — never generic.
 - "booster_name": The most iconic SPEED or MOVEMENT ability from this exact universe. 100% specific.
 - "description": One punchy sentence (max 12 words) capturing the soul of this universe.
@@ -89,7 +93,7 @@ HARD_FALLBACKS = {
     "demon slayer":      {"currency":"Yen","color":"#22AA44","shield_name":"Total Concentration Breathing","booster_name":"Thunder Breathing First Form","description":"Demon hunters clash with ancient evil using breathing and will."},
     "attack on titan":   {"currency":"Eldian Marks","color":"#8B6914","shield_name":"Hardening Crystal","booster_name":"ODM Gear Swing","description":"Humanity fights back against titans behind crumbling walls."},
     "jujutsu kaisen":    {"currency":"Cursed Tokens","color":"#6600CC","shield_name":"Infinity Barrier","booster_name":"Divergent Fist","description":"Cursed energy battles rage beneath everyday life."},
-    "bleach":            {"currency":"Spirit Coins","color":"#2C2C2C","shield_name":"Hierro Skin","booster_name":"Shunpo Flash Step","description":"Soul Reapers clash with Hollows in a war between life and death."},
+    "bleach":            {"currency":"Spirit Coins","color":"#4A4A4A","shield_name":"Hierro Skin","booster_name":"Shunpo Flash Step","description":"Soul Reapers clash with Hollows in a war between life and death."},
     "my hero academia":  {"currency":"Hero Credits","color":"#1DA462","shield_name":"Full Cowl Armor","booster_name":"One For All Smash","description":"Heroes and villains clash where quirks define destiny."},
     "f1":                {"currency":"Championship Points","color":"#FF1801","shield_name":"Halo Titanium Cockpit","booster_name":"DRS Activation","description":"The pinnacle of motorsport where speed and nerve collide."},
     "formula 1":         {"currency":"Championship Points","color":"#FF1801","shield_name":"Halo Titanium Cockpit","booster_name":"DRS Activation","description":"The pinnacle of motorsport where speed and nerve collide."},
@@ -112,7 +116,7 @@ HARD_FALLBACKS = {
     "call of duty":      {"currency":"CoD Points","color":"#FF6600","shield_name":"Trophy System","booster_name":"Tactical Sprint","description":"The world's most intense military shooter — no mercy in ranked."},
     "zelda":             {"currency":"Rupees","color":"#5ACD3D","shield_name":"Hylian Shield","booster_name":"Ocarina Serenade","description":"The hero of time journeys through Hyrule to defeat darkness."},
     "overwatch":         {"currency":"Overwatch Coins","color":"#F99E1A","shield_name":"Reinhardt Barrier","booster_name":"Lucio Speed Boost","description":"Colorful heroes battle across a futuristic world in conflict."},
-    "nike":              {"currency":"NikeCash","color":"#E8000D","shield_name":"Air Max Cushioning","booster_name":"ReactX Foam Propulsion","description":"Just Do It — where athletic performance meets street culture."},
+    "nike":              {"currency":"NikeCash","color":"#111111","shield_name":"Air Max Cushioning","booster_name":"ReactX Foam Propulsion","description":"Just Do It — where athletic performance meets street culture."},
     "adidas":            {"currency":"StripePoints","color":"#000000","shield_name":"Boost Sole Absorption","booster_name":"Ultraboost Launch","description":"Impossible Is Nothing — three stripes defining sport and culture."},
     "supreme":           {"currency":"SupremeCreds","color":"#FF0000","shield_name":"Box Logo Drop","booster_name":"Hype Wave","description":"The most coveted box logo in streetwear — drop day is everything."},
     "spotify":           {"currency":"Streams","color":"#1DB954","shield_name":"Noise Cancelling","booster_name":"Algorithmic Surge","description":"Music for everyone — three million songs, infinite discovery."},
@@ -181,7 +185,7 @@ if "gold" not in st.session_state:
     })
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 🌌 GATEWAY SCREEN v6.0
+# 🌌 GATEWAY SCREEN v7.0
 # ─────────────────────────────────────────────────────────────────────────────
 if st.session_state.user_name is None:
 
@@ -190,30 +194,29 @@ if st.session_state.user_name is None:
     @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Orbitron:wght@400;700;900&display=swap');
 
     html, body, [data-testid="stAppViewContainer"], [data-testid="stApp"] {
-        background: #000008 !important;
-        color: white !important;
+        background: #000008 !important; color: white !important;
     }
     [data-testid="stHeader"],[data-testid="stToolbar"],[data-testid="stDecoration"],#MainMenu,footer { display:none !important; }
     .block-container { padding: 0 1rem 2rem !important; max-width: 100% !important; }
 
-    /* ── GUARANTEED RADIAL ORB BACKGROUND ── */
+    /* RADIAL ORB BACKGROUND */
     [data-testid="stAppViewContainer"] {
         background:
             radial-gradient(ellipse 65% 55% at 5%  10%,  rgba(255,215,0,0.22)   0%, transparent 60%),
-            radial-gradient(ellipse 55% 45% at 95% 5%,   rgba(255,50,50,0.18)   0%, transparent 60%),
+            radial-gradient(ellipse 55% 45% at 95%  5%,  rgba(255,50,50,0.18)   0%, transparent 60%),
             radial-gradient(ellipse 60% 50% at 50% 100%, rgba(0,200,255,0.18)   0%, transparent 60%),
-            radial-gradient(ellipse 45% 40% at 90% 70%,  rgba(160,80,220,0.15)  0%, transparent 60%),
-            radial-gradient(ellipse 40% 35% at 10% 80%,  rgba(0,255,130,0.12)   0%, transparent 60%),
+            radial-gradient(ellipse 45% 40% at 90%  70%, rgba(160,80,220,0.15)  0%, transparent 60%),
+            radial-gradient(ellipse 40% 35% at 10%  80%, rgba(0,255,130,0.12)   0%, transparent 60%),
             #000008 !important;
         animation: orb-breathe 8s ease-in-out infinite alternate !important;
     }
     @keyframes orb-breathe {
-        0%   { filter: brightness(0.9) saturate(0.9); }
-        50%  { filter: brightness(1.2) saturate(1.3); }
-        100% { filter: brightness(0.9) saturate(0.9); }
+        0%   { filter: brightness(0.85) saturate(0.85); }
+        50%  { filter: brightness(1.25) saturate(1.35); }
+        100% { filter: brightness(0.85) saturate(0.85); }
     }
 
-    /* ── GUARANTEED GRID OVERLAY ── */
+    /* GRID OVERLAY */
     [data-testid="stAppViewContainer"]::before {
         content: '';
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -224,110 +227,103 @@ if st.session_state.user_name is None:
         pointer-events: none; z-index: 0;
         animation: grid-breathe 5s ease-in-out infinite alternate;
     }
-    @keyframes grid-breathe { 0% { opacity:0.3; } 100% { opacity:1.0; } }
+    @keyframes grid-breathe { 0% { opacity:0.25; } 100% { opacity:0.9; } }
 
-    /* ── GUARANTEED STAR FIELD ── */
+    /* STAR FIELD */
     .star-field {
         width: 100%; height: 90px;
         background-image:
-            radial-gradient(2px 2px at 5%   30%, rgba(255,255,255,1.0) 0%, transparent 100%),
-            radial-gradient(2px 2px at 18%  70%, rgba(255,255,255,0.9) 0%, transparent 100%),
-            radial-gradient(2px 2px at 32%  20%, rgba(255,255,255,1.0) 0%, transparent 100%),
-            radial-gradient(2px 2px at 47%  85%, rgba(255,255,255,0.8) 0%, transparent 100%),
-            radial-gradient(2px 2px at 61%  40%, rgba(255,255,255,1.0) 0%, transparent 100%),
-            radial-gradient(2px 2px at 75%  65%, rgba(255,255,255,0.9) 0%, transparent 100%),
-            radial-gradient(2px 2px at 89%  15%, rgba(255,255,255,1.0) 0%, transparent 100%),
-            radial-gradient(2px 2px at 95%  55%, rgba(255,255,255,0.8) 0%, transparent 100%),
-            radial-gradient(2px 2px at 12%  50%, rgba(255,255,255,0.9) 0%, transparent 100%),
-            radial-gradient(2px 2px at 27%  90%, rgba(255,255,255,1.0) 0%, transparent 100%),
-            radial-gradient(3px 3px at 14%  60%, rgba(255,215,0,1.0)   0%, transparent 100%),
-            radial-gradient(3px 3px at 70%  35%, rgba(0,200,255,1.0)   0%, transparent 100%),
-            radial-gradient(3px 3px at 43%  75%, rgba(255,80,80,1.0)   0%, transparent 100%),
-            radial-gradient(2px 2px at 55%  10%, rgba(255,255,255,1.0) 0%, transparent 100%),
-            radial-gradient(2px 2px at 82%  80%, rgba(255,255,255,0.9) 0%, transparent 100%),
-            radial-gradient(2px 2px at 38%  45%, rgba(255,255,255,1.0) 0%, transparent 100%),
-            radial-gradient(3px 3px at 90%  90%, rgba(160,80,220,1.0)  0%, transparent 100%),
-            radial-gradient(2px 2px at 3%   90%, rgba(255,255,255,0.8) 0%, transparent 100%),
-            radial-gradient(2px 2px at 66%  25%, rgba(255,255,255,1.0) 0%, transparent 100%),
-            radial-gradient(2px 2px at 50%  55%, rgba(255,255,255,0.9) 0%, transparent 100%);
+            radial-gradient(2px 2px at 5%   30%, #ffffff 0%, transparent 100%),
+            radial-gradient(2px 2px at 18%  70%, #ffffff 0%, transparent 100%),
+            radial-gradient(2px 2px at 32%  20%, #ffffff 0%, transparent 100%),
+            radial-gradient(2px 2px at 47%  85%, #ffffff 0%, transparent 100%),
+            radial-gradient(2px 2px at 61%  40%, #ffffff 0%, transparent 100%),
+            radial-gradient(2px 2px at 75%  65%, #ffffff 0%, transparent 100%),
+            radial-gradient(2px 2px at 89%  15%, #ffffff 0%, transparent 100%),
+            radial-gradient(2px 2px at 95%  55%, #ffffff 0%, transparent 100%),
+            radial-gradient(2px 2px at 12%  50%, #ffffff 0%, transparent 100%),
+            radial-gradient(2px 2px at 27%  90%, #ffffff 0%, transparent 100%),
+            radial-gradient(3px 3px at 14%  60%, #FFD700 0%, transparent 100%),
+            radial-gradient(3px 3px at 70%  35%, #00C8FF 0%, transparent 100%),
+            radial-gradient(3px 3px at 43%  75%, #FF5050 0%, transparent 100%),
+            radial-gradient(2px 2px at 55%  10%, #ffffff 0%, transparent 100%),
+            radial-gradient(2px 2px at 82%  80%, #ffffff 0%, transparent 100%),
+            radial-gradient(2px 2px at 38%  45%, #ffffff 0%, transparent 100%),
+            radial-gradient(3px 3px at 90%  90%, #A050DC 0%, transparent 100%),
+            radial-gradient(2px 2px at 3%   90%, #ffffff 0%, transparent 100%),
+            radial-gradient(2px 2px at 66%  25%, #ffffff 0%, transparent 100%),
+            radial-gradient(2px 2px at 50%  55%, #ffffff 0%, transparent 100%);
         animation: star-twinkle 3s ease-in-out infinite alternate;
         margin-bottom: 8px;
     }
-    @keyframes star-twinkle { 0% { opacity:0.35; } 100% { opacity:1.0; } }
+    @keyframes star-twinkle { 0% { opacity:0.3; } 100% { opacity:1.0; } }
 
-    /* ── GUARANTEED SCAN LINE ── */
-    .scanline-wrap { width:100%; height:4px; overflow:hidden; margin-bottom:16px; background:transparent; }
+    /* SCAN LINE */
+    .scanline-wrap { width:100%; height:4px; overflow:hidden; margin-bottom:16px; }
     .scanline {
         width: 40%; height: 4px;
-        background: linear-gradient(90deg, transparent 0%, rgba(255,215,0,1.0) 50%, transparent 100%);
+        background: linear-gradient(90deg, transparent, #FFD700, transparent);
         animation: scan-sweep 2s linear infinite;
         box-shadow: 0 0 20px 4px rgba(255,215,0,0.6);
     }
-    @keyframes scan-sweep { 0% { transform: translateX(-150%); } 100% { transform: translateX(400%); } }
+    @keyframes scan-sweep { 0% { transform:translateX(-150%); } 100% { transform:translateX(400%); } }
 
-    /* Badge */
+    /* BADGE */
     .top-badge {
-        background: rgba(255,215,0,0.1);
-        border: 1px solid rgba(255,215,0,0.4);
+        background: rgba(255,215,0,0.1); border: 1px solid rgba(255,215,0,0.4);
         border-radius: 99px; padding: 8px 24px;
-        font-family: 'Space Mono', monospace;
-        font-size: 11px; letter-spacing: 3px; color: #FFD700;
-        text-transform: uppercase; text-align: center;
+        font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 3px;
+        color: #FFD700; text-transform: uppercase; text-align: center;
         display: table; margin: 0 auto 20px;
         animation: badge-pulse 3s ease-in-out infinite alternate;
     }
     @keyframes badge-pulse { 0% { box-shadow:0 0 10px rgba(255,215,0,0.2); } 100% { box-shadow:0 0 40px rgba(255,215,0,0.6); } }
 
-    /* Title */
+    /* TITLE */
     .gw-main-title {
         font-family: 'Bebas Neue', sans-serif;
         font-size: clamp(72px, 14vw, 150px);
         text-align: center; letter-spacing: 8px; line-height: 0.88;
         background: linear-gradient(135deg, #FFD700 0%, #FF8C00 30%, #FF3C3C 65%, #CC00FF 100%);
         -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-        animation: title-glow 4s ease-in-out infinite alternate;
-        margin-bottom: 8px;
+        animation: title-glow 4s ease-in-out infinite alternate; margin-bottom: 8px;
     }
     @keyframes title-glow {
         0%   { filter: drop-shadow(0 0 12px rgba(255,215,0,0.5)); }
         100% { filter: drop-shadow(0 0 60px rgba(255,140,0,0.8)); }
     }
 
-    /* Subtitle — CLEARLY VISIBLE */
+    /* SUBTITLE */
     .gw-subtitle {
-        font-family: 'Orbitron', sans-serif;
-        font-size: clamp(12px, 1.8vw, 18px);
-        text-align: center; letter-spacing: 5px;
-        color: rgba(255,255,255,0.75);
+        font-family: 'Orbitron', sans-serif; font-size: clamp(12px, 1.8vw, 18px);
+        text-align: center; letter-spacing: 5px; color: #ffffff;
         text-transform: uppercase; margin-bottom: 20px;
-        text-shadow: 0 0 20px rgba(255,255,255,0.3);
+        text-shadow: 0 0 20px rgba(255,255,255,0.4);
     }
 
-    /* Feature pills — CLEARLY VISIBLE */
+    /* FEATURE PILLS */
     .features-row { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin:12px 0 24px; }
     .feature-pill {
-        background: rgba(255,215,0,0.1);
-        border: 1px solid rgba(255,215,0,0.3);
+        background: rgba(255,215,0,0.12); border: 1px solid rgba(255,215,0,0.35);
         border-radius: 99px; padding: 7px 16px;
-        font-family: 'Space Mono', monospace;
-        font-size: 12px; color: rgba(255,255,255,0.9);
-        letter-spacing: 1px;
+        font-family: 'Space Mono', monospace; font-size: 12px;
+        color: #ffffff; letter-spacing: 1px;
     }
     .feature-pill span { margin-right: 5px; }
 
-    /* Stats — CLEARLY VISIBLE */
+    /* STATS */
     .stats-ticker { display:flex; gap:32px; justify-content:center; margin-bottom:24px; flex-wrap:wrap; }
     .stat-item { text-align:center; animation:stat-float 3s ease-in-out infinite alternate; }
     .stat-item:nth-child(2) { animation-delay:-1s; }
     .stat-item:nth-child(3) { animation-delay:-2s; }
     @keyframes stat-float { 0%{transform:translateY(0)} 100%{transform:translateY(-7px)} }
     .stat-num { font-family:'Bebas Neue',sans-serif; font-size:42px; color:#FFD700; line-height:1; text-shadow:0 0 20px rgba(255,215,0,0.5); }
-    .stat-label { font-family:'Space Mono',monospace; font-size:10px; color:rgba(255,255,255,0.5); letter-spacing:2px; text-transform:uppercase; margin-top:2px; }
+    .stat-label { font-family:'Space Mono',monospace; font-size:10px; color:#ffffff; letter-spacing:2px; text-transform:uppercase; margin-top:2px; }
 
-    /* Divider */
+    /* DIVIDER */
     .gw-divider { width:100%; height:1px; background:linear-gradient(90deg,transparent,rgba(255,215,0,0.4),transparent); margin:8px 0 28px; }
 
-    /* HOW IT WORKS — MAXIMUM VISIBILITY */
+    /* HOW IT WORKS */
     .how-it-works { width:100%; margin-top:32px; }
     .how-title {
         font-family:'Bebas Neue',sans-serif; font-size:32px; letter-spacing:5px;
@@ -336,56 +332,48 @@ if st.session_state.user_name is None:
     }
     .how-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
     .how-card {
-        background: rgba(255,255,255,0.07);
-        border: 2px solid rgba(255,215,0,0.3);
+        background: rgba(255,255,255,0.07); border: 2px solid rgba(255,215,0,0.3);
         border-radius: 18px; padding: 22px 20px;
     }
     .how-icon { font-size:32px; margin-bottom:12px; display:block; }
     .how-card-title {
         font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:2px;
-        color:#FFD700; margin-bottom:10px;
-        text-shadow: 0 0 15px rgba(255,215,0,0.4);
+        color:#FFD700; margin-bottom:10px; text-shadow: 0 0 15px rgba(255,215,0,0.4);
     }
-    .how-card-desc {
-        font-family:'Space Mono',monospace; font-size:12px;
-        color:rgba(255,255,255,0.85); line-height:1.8;
-    }
+    .how-card-desc { font-family:'Space Mono',monospace; font-size:12px; color:#ffffff; line-height:1.8; }
 
-    /* Chips */
-    .chip-section-label { font-family:'Space Mono',monospace; font-size:10px; color:rgba(255,255,255,0.4); letter-spacing:2px; text-transform:uppercase; margin:16px 0 8px; }
+    /* CHIPS */
+    .chip-section-label { font-family:'Space Mono',monospace; font-size:10px; color:#ffffff; letter-spacing:2px; text-transform:uppercase; margin:16px 0 8px; }
     .chip-row { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; }
     .chip {
-        background:rgba(255,215,0,0.08); border:1px solid rgba(255,215,0,0.2);
-        border-radius:99px; padding:5px 13px; font-size:11px; color:rgba(255,255,255,0.7);
+        background:rgba(255,215,0,0.1); border:1px solid rgba(255,215,0,0.25);
+        border-radius:99px; padding:5px 13px; font-size:11px; color:#ffffff;
         font-family:'Space Mono',monospace; letter-spacing:1px;
     }
 
-    /* Hint — VISIBLE */
-    .default-hint { font-family:'Space Mono',monospace; font-size:11px; color:rgba(255,255,255,0.45); font-style:italic; margin-top:6px; line-height:1.6; }
+    /* HINT TEXT */
+    .default-hint { font-family:'Space Mono',monospace; font-size:11px; color:#ffffff; margin-top:6px; line-height:1.7; }
     .default-hint strong { color:#FFD700; }
 
-    /* INPUT TEXT BLACK SO IT'S READABLE */
+    /* INPUT FIELDS — BLACK TEXT ON WHITE BACKGROUND */
     .stTextInput > div > div > input {
-        background: #ffffff !important;
-        border: 2px solid rgba(255,215,0,0.4) !important;
-        border-radius: 10px !important;
-        color: #000000 !important;
+        background: #ffffff !important; border: 2px solid rgba(255,215,0,0.5) !important;
+        border-radius: 10px !important; color: #000000 !important;
         font-family: 'Space Mono', monospace !important;
         font-size: 14px !important; padding: 12px 16px !important;
         caret-color: #000000 !important;
     }
-    .stTextInput > div > div > input::placeholder { color: #888888 !important; }
+    .stTextInput > div > div > input::placeholder { color: #666666 !important; }
     .stTextInput > div > div > input:focus {
-        border-color: rgba(255,215,0,0.8) !important;
-        box-shadow: 0 0 20px rgba(255,215,0,0.2) !important;
+        border-color: #FFD700 !important;
+        box-shadow: 0 0 20px rgba(255,215,0,0.25) !important;
     }
     .stTextInput label {
         font-family:'Space Mono',monospace !important; font-size:11px !important;
-        letter-spacing:3px !important; color:rgba(255,255,255,0.7) !important;
-        text-transform:uppercase !important;
+        letter-spacing:3px !important; color:#ffffff !important; text-transform:uppercase !important;
     }
 
-    /* Enter button */
+    /* ENTER BUTTON */
     div.stButton > button {
         background: linear-gradient(135deg, #FFD700, #FF8C00) !important;
         border: none !important; color: #000000 !important;
@@ -394,7 +382,6 @@ if st.session_state.user_name is None:
         border-radius:14px !important; width:100% !important;
         box-shadow: 0 0 35px rgba(255,215,0,0.4) !important;
         transition: all 0.3s !important; margin-top:12px !important;
-        font-weight:900 !important;
     }
     div.stButton > button:hover { transform:scale(1.02) !important; box-shadow:0 0 60px rgba(255,215,0,0.7) !important; }
     </style>
@@ -424,7 +411,7 @@ if st.session_state.user_name is None:
     _, col, _ = st.columns([1, 2, 1])
     with col:
         name_input  = st.text_input("⚡ Champion Name", placeholder="What are you called?", key="gw_name")
-        theme_input = st.text_input("🌌 Your Universe", placeholder="Minecraft, Naruto, F1, Nike, Ancient Rome, Germa 66...", key="gw_theme")
+        theme_input = st.text_input("🌌 Your Universe", placeholder="Minecraft, Naruto, F1, Nike, Germa 66...", key="gw_theme")
 
         st.markdown("""
         <p class="default-hint">💡 Leave empty for default universe: <strong>INFINITE POWER</strong></p>
@@ -493,58 +480,87 @@ wd       = st.session_state.world_data
 currency = wd.get("currency", "Credits")
 BG       = st.session_state.get("bg_color", "#050505")
 
-# Determine readable text color based on background brightness
 def is_light(hex_color):
-    hex_color = hex_color.lstrip('#')
-    r, g, b = int(hex_color[0:2],16), int(hex_color[2:4],16), int(hex_color[4:6],16)
+    h = hex_color.lstrip('#')
+    r, g, b = int(h[0:2],16), int(h[2:4],16), int(h[4:6],16)
     return (r*299 + g*587 + b*114) / 1000 > 128
 
-TEXT_COLOR = "#000000" if is_light(BG) else "#ffffff"
-SIDEBAR_TEXT = "#000000" if is_light(BG) else "#ffffff"
+TEXT  = "#000000" if is_light(BG) else "#ffffff"
+MUTED = "#333333" if is_light(BG) else "#aaaaaa"
 
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap');
+
 html, body, [data-testid="stAppViewContainer"] {{
-    background: {BG} !important; color: {TEXT_COLOR}; font-family: 'Space Mono', monospace;
+    background: {BG} !important; color: {TEXT} !important; font-family: 'Space Mono', monospace;
 }}
 [data-testid="stHeader"], [data-testid="stToolbar"] {{ background: transparent !important; }}
 [data-testid="stSidebar"] {{ background: {BG} !important; }}
-[data-testid="stSidebar"] * {{ color: {SIDEBAR_TEXT} !important; }}
+[data-testid="stSidebar"] p,
+[data-testid="stSidebar"] label,
+[data-testid="stSidebar"] div,
+[data-testid="stSidebar"] span {{ color: {TEXT} !important; }}
 #MainMenu, footer {{ visibility: hidden; }}
+
+/* ALL text inputs — black text on white background everywhere in the app */
+input, textarea, [data-testid="stTextInput"] input {{
+    background: #ffffff !important; color: #000000 !important;
+    caret-color: #000000 !important;
+    border: 2px solid {C} !important; border-radius: 10px !important;
+    font-family: 'Space Mono', monospace !important;
+    font-size: 14px !important; padding: 10px 14px !important;
+}}
+input::placeholder, textarea::placeholder {{ color: #666666 !important; }}
+input:focus, textarea:focus {{
+    border-color: {C} !important;
+    box-shadow: 0 0 15px rgba(255,215,0,0.2) !important;
+    outline: none !important;
+}}
+
+/* ALL labels fully visible */
+label, .stTextInput label, .stSelectbox label, .stTextArea label, .stFileUploader label {{
+    color: {TEXT} !important; font-family: 'Space Mono', monospace !important;
+    font-size: 11px !important; letter-spacing: 2px !important;
+}}
+
+/* Mission button — solid border, NOT dashed */
 @keyframes titan-pulse {{
     0%   {{ box-shadow: 0 0 20px {C}, inset 0 0 10px {C}; border-color: {C}; }}
-    50%  {{ box-shadow: 0 0 80px {C}, inset 0 0 40px {C}; border-color: #FFF; }}
+    50%  {{ box-shadow: 0 0 80px {C}, inset 0 0 40px {C}; border-color: #ffffff; }}
     100% {{ box-shadow: 0 0 20px {C}, inset 0 0 10px {C}; border-color: {C}; }}
 }}
 div.stButton > button {{
-    border: 8px dashed {C} !important; background: #000 !important; color: white !important;
+    border: 6px solid {C} !important;
+    background: #000000 !important; color: #ffffff !important;
     font-family: 'Bebas Neue', sans-serif !important; font-size: 28px !important;
-    letter-spacing: 4px !important; padding: 50px 30px !important; border-radius: 40px !important;
+    letter-spacing: 4px !important; padding: 50px 30px !important;
+    border-radius: 40px !important;
     animation: titan-pulse 2.5s infinite ease-in-out !important;
     width: 100%; text-transform: uppercase; transition: transform 0.3s; margin-bottom: 20px;
 }}
 div.stButton > button:hover {{ transform: scale(1.02); }}
+
 .metric-card {{ background: rgba(20,20,20,0.95); border: 2px solid {C}; padding: 18px; border-radius: 14px; text-align: center; margin-bottom: 12px; }}
 .shop-card   {{ border: 3px solid {C}; padding: 24px; border-radius: 18px; background: rgba(10,10,10,0.9); margin-bottom: 12px; }}
-.feedback-card {{ background: rgba(20,20,20,0.9); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 14px 18px; margin: 6px 0; font-size: 13px; color: #ccc; }}
+.feedback-card {{ background: rgba(20,20,20,0.9); border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 14px 18px; margin: 6px 0; font-size: 13px; color: #ffffff; }}
 </style>
 """, unsafe_allow_html=True)
 
 # ── SIDEBAR ───────────────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown(f"<h1 style='font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:3px;margin:0'>⚡ TITAN HUB</h1>", unsafe_allow_html=True)
-    st.write(f"**CHAMPION:** {st.session_state.user_name.upper()}")
-    st.write(f"**UNIVERSE:** {st.session_state.user_theme}")
-    st.write(f"**RANK:** {st.session_state.sub_tier.upper()}")
+    st.markdown(f"<p style='color:{TEXT};margin:4px 0'><b>CHAMPION:</b> {st.session_state.user_name.upper()}</p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='color:{TEXT};margin:4px 0'><b>UNIVERSE:</b> {st.session_state.user_theme}</p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='color:{TEXT};margin:4px 0'><b>RANK:</b> {st.session_state.sub_tier.upper()}</p>", unsafe_allow_html=True)
     st.markdown(f"""
     <div class='metric-card'>
         <div style='font-family:Bebas Neue,sans-serif;font-size:40px;color:{C};margin:0'>{st.session_state.gold:.2f}</div>
-        <div style='font-size:10px;color:#aaa;letter-spacing:2px'>{currency.upper()}</div>
+        <div style='font-size:10px;color:#aaaaaa;letter-spacing:2px'>{currency.upper()}</div>
     </div>""", unsafe_allow_html=True)
 
     st.write("---")
-    st.markdown("**👑 ELITE ACTIVATION**")
+    st.markdown(f"<p style='color:{TEXT};font-weight:bold'>👑 ELITE ACTIVATION</p>", unsafe_allow_html=True)
     code = st.text_input("Protocol Code:", type="password", key="elite_code")
     if code == "TITAN10" and st.session_state.sub_tier != "Elite":
         st.session_state.sub_tier = "Elite"; st.session_state.sub_multiplier = 3
@@ -556,18 +572,18 @@ with st.sidebar:
     if st.button("💬 FEEDBACK",     key="nav_feedback"): st.session_state.view = "feedback"; st.rerun()
 
     st.write("---")
-    st.markdown("**🎨 BACKGROUND COLOR**")
+    st.markdown(f"<p style='color:{TEXT};font-weight:bold'>🎨 BACKGROUND COLOR</p>", unsafe_allow_html=True)
     new_bg = st.color_picker("", value=st.session_state.get("bg_color","#050505"), key="bg_picker", label_visibility="collapsed")
     if new_bg != st.session_state.get("bg_color","#050505"):
         st.session_state.bg_color = new_bg; st.rerun()
 
-    st.markdown("**🌈 THEME COLOR**")
+    st.markdown(f"<p style='color:{TEXT};font-weight:bold'>🌈 THEME COLOR</p>", unsafe_allow_html=True)
     new_theme_color = st.color_picker("", value=st.session_state.vibe_color, key="theme_picker", label_visibility="collapsed")
     if new_theme_color != st.session_state.vibe_color:
         st.session_state.vibe_color = new_theme_color; st.rerun()
 
     st.write("---")
-    st.markdown("**🌐 SWITCH UNIVERSE**")
+    st.markdown(f"<p style='color:{TEXT};font-weight:bold'>🌐 SWITCH UNIVERSE</p>", unsafe_allow_html=True)
     new_theme = st.text_input("New universe:", placeholder="Try anything...", key="switch_theme")
     if st.button("🔄 WARP", key="warp_btn"):
         if new_theme.strip():
@@ -579,7 +595,7 @@ with st.sidebar:
             st.rerun()
 
     st.write("---")
-    st.markdown("**🚨 FULL RESET**")
+    st.markdown(f"<p style='color:{TEXT};font-weight:bold'>🚨 FULL RESET</p>", unsafe_allow_html=True)
     reset_input = st.text_input("Type RESET to confirm:", key="reset_confirm_input", placeholder="RESET")
     if st.button("🚨 RESET ALL PROGRESS", key="reset_btn"):
         if reset_input.strip().upper() == "RESET":
@@ -593,7 +609,7 @@ st.markdown(f"""
            font-size:clamp(48px,10vw,100px);text-align:center;letter-spacing:6px;margin-bottom:0'>
     {st.session_state.user_theme.upper()}
 </h1>
-<p style='text-align:center;font-size:16px;color:#666;margin-top:4px'>
+<p style='text-align:center;font-size:16px;color:{MUTED};margin-top:4px'>
     {wd.get("description","A realm of infinite power.")}
 </p>""", unsafe_allow_html=True)
 st.markdown("---")
@@ -620,7 +636,7 @@ if st.session_state.view == "feedback":
         if st.session_state.feedback_list:
             st.markdown("---")
             for fb in reversed(st.session_state.feedback_list):
-                st.markdown(f"<div class='feedback-card'><span style='color:{C}'>{fb['type']}</span> · <span style='color:#555;font-size:11px'>{fb['time']} · {fb['name']}</span><br>{fb['message']}</div>", unsafe_allow_html=True)
+                st.markdown(f"<div class='feedback-card'><span style='color:{C}'>{fb['type']}</span> · <span style='color:{MUTED};font-size:11px'>{fb['time']} · {fb['name']}</span><br>{fb['message']}</div>", unsafe_allow_html=True)
 
 # ── SHOP VIEW ─────────────────────────────────────────────────────────────────
 elif st.session_state.view == "shop":
@@ -628,26 +644,26 @@ elif st.session_state.view == "shop":
     col1, col2 = st.columns(2)
     with col1:
         st.markdown(f"""<div class='shop-card'>
-            <div style='font-size:10px;color:#555;letter-spacing:2px;margin-bottom:6px'>⚔️ DEFENSE ABILITY</div>
+            <div style='font-size:10px;color:{MUTED};letter-spacing:2px;margin-bottom:6px'>⚔️ DEFENSE ABILITY</div>
             <h3 style='font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:2px;margin:0 0 12px'>{wd.get('shield_name','Shield').upper()}</h3>
-            <div style='background:rgba(255,255,255,0.04);border-left:3px solid {C};padding:10px 14px;border-radius:0 8px 8px 0;margin-bottom:14px'>
-                <div style='font-size:10px;color:#555;letter-spacing:2px'>EFFECT</div>
-                <div style='font-size:14px;color:#ddd;margin-top:4px'>{SHIELD_EFFECT}</div>
+            <div style='background:rgba(255,255,255,0.06);border-left:3px solid {C};padding:10px 14px;border-radius:0 8px 8px 0;margin-bottom:14px'>
+                <div style='font-size:10px;color:{MUTED};letter-spacing:2px'>EFFECT</div>
+                <div style='font-size:14px;color:#ffffff;margin-top:4px'>{SHIELD_EFFECT}</div>
             </div>
-            <div style='font-size:12px;color:#444'>Cost: <span style='color:{C};font-weight:bold'>15 {currency}</span></div>
+            <div style='font-size:12px;color:{MUTED}'>Cost: <span style='color:{C};font-weight:bold'>15 {currency}</span></div>
         </div>""", unsafe_allow_html=True)
         if st.button(f"⚔️ ACQUIRE · 15 {currency}", key="buy_shield"):
             if st.session_state.gold >= 15: st.session_state.gold -= 15; st.success(f"⚔️ {wd.get('shield_name')} activated!")
             else: st.error("Not enough currency.")
     with col2:
         st.markdown(f"""<div class='shop-card'>
-            <div style='font-size:10px;color:#555;letter-spacing:2px;margin-bottom:6px'>⚡ SPEED ABILITY</div>
+            <div style='font-size:10px;color:{MUTED};letter-spacing:2px;margin-bottom:6px'>⚡ SPEED ABILITY</div>
             <h3 style='font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:2px;margin:0 0 12px'>{wd.get('booster_name','Booster').upper()}</h3>
-            <div style='background:rgba(255,255,255,0.04);border-left:3px solid {C};padding:10px 14px;border-radius:0 8px 8px 0;margin-bottom:14px'>
-                <div style='font-size:10px;color:#555;letter-spacing:2px'>EFFECT</div>
-                <div style='font-size:14px;color:#ddd;margin-top:4px'>{BOOSTER_EFFECT}</div>
+            <div style='background:rgba(255,255,255,0.06);border-left:3px solid {C};padding:10px 14px;border-radius:0 8px 8px 0;margin-bottom:14px'>
+                <div style='font-size:10px;color:{MUTED};letter-spacing:2px'>EFFECT</div>
+                <div style='font-size:14px;color:#ffffff;margin-top:4px'>{BOOSTER_EFFECT}</div>
             </div>
-            <div style='font-size:12px;color:#444'>Cost: <span style='color:{C};font-weight:bold'>25 {currency}</span></div>
+            <div style='font-size:12px;color:{MUTED}'>Cost: <span style='color:{C};font-weight:bold'>25 {currency}</span></div>
         </div>""", unsafe_allow_html=True)
         if st.button(f"⚡ ACQUIRE · 25 {currency}", key="buy_booster"):
             if st.session_state.gold >= 25: st.session_state.gold -= 25; st.session_state.sub_multiplier = 3; st.success(f"⚡ {wd.get('booster_name')} engaged!")
@@ -660,17 +676,17 @@ else:
         reward   = 1.0 * st.session_state.sub_multiplier
         mult_tag = f" ×{st.session_state.sub_multiplier}" if st.session_state.sub_multiplier > 1 else ""
         st.markdown(f"""
-        <div style='text-align:center;background:rgba(20,20,20,0.8);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:24px;margin-bottom:20px'>
-            <div style='font-size:11px;color:#444;letter-spacing:2px'>MISSION REWARD</div>
+        <div style='text-align:center;background:rgba(20,20,20,0.8);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:24px;margin-bottom:20px'>
+            <div style='font-size:11px;color:#aaaaaa;letter-spacing:2px'>MISSION REWARD</div>
             <div style='font-family:Bebas Neue,sans-serif;font-size:52px;color:{C};margin:6px 0'>{reward:.1f} {currency}{mult_tag}</div>
-            <div style='font-size:11px;color:#555'>per completed mission</div>
+            <div style='font-size:11px;color:#aaaaaa'>per completed mission</div>
         </div>""", unsafe_allow_html=True)
 
         st.markdown(f"""
-        <div style='background:rgba(20,20,20,0.8);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:20px;margin-bottom:16px;text-align:center'>
-            <div style='font-size:10px;color:#555;letter-spacing:2px;margin-bottom:8px'>⏱ MICRO TIMER</div>
+        <div style='background:rgba(20,20,20,0.8);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:20px;margin-bottom:16px;text-align:center'>
+            <div style='font-size:10px;color:#aaaaaa;letter-spacing:2px;margin-bottom:8px'>⏱ MICRO TIMER</div>
             <div style='font-family:Bebas Neue,sans-serif;font-size:48px;color:{C}'>{st.session_state.micro_timer_seconds}s</div>
-            <div style='font-size:11px;color:#444'>+30s per tap · max 6 minutes</div>
+            <div style='font-size:11px;color:#aaaaaa'>+30s per tap · max 6 minutes</div>
         </div>""", unsafe_allow_html=True)
 
         tc1, tc2, tc3 = st.columns(3)
@@ -696,7 +712,7 @@ else:
             bar = st.progress(0); status = st.empty()
             for i in range(60):
                 time.sleep(1); bar.progress((i+1)/60)
-                status.markdown(f"<p style='text-align:center;font-family:Space Mono,monospace;color:#555'>SYNCHRONIZING: {i+1}s / 60s</p>", unsafe_allow_html=True)
+                status.markdown(f"<p style='text-align:center;font-family:Space Mono,monospace;color:#aaaaaa'>SYNCHRONIZING: {i+1}s / 60s</p>", unsafe_allow_html=True)
             st.session_state.pending_gold = reward; st.session_state.needs_verification = True; st.rerun()
 
 # ── TRIBUNAL ──────────────────────────────────────────────────────────────────
