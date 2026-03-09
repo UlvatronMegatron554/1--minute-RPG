@@ -3,14 +3,26 @@ import anthropic
 import time, json, re
 
 # ─────────────────────────────────────────────────────────────────────────────
-# TITAN OMNIVERSE v3.0 — Powered by Claude Sonnet
+# TITAN OMNIVERSE v4.0 — All 7 Features Edition
 # ─────────────────────────────────────────────────────────────────────────────
 
 st.set_page_config(page_title="TITAN OMNIVERSE", page_icon="⚡", layout="wide")
 
-# ── Fixed ability effect descriptions (NEVER change regardless of universe) ───
+# ── Fixed ability effects ─────────────────────────────────────────────────────
 SHIELD_EFFECT  = "Negates any debt that was earned."
 BOOSTER_EFFECT = "Grants a 3× multiplier on all mission rewards."
+
+# ── Default universe (Feature 6 & 7) ─────────────────────────────────────────
+DEFAULT_UNIVERSE_NAME = "INFINITE POWER"
+DEFAULT_UNIVERSE = {
+    "currency": "Titan Shards",
+    "color": "#FFD700",
+    "shield_name": "Infinite Barrier",
+    "booster_name": "Limitless Surge",
+    "description": "No limits. No boundaries. Pure unstoppable power.",
+    "shield_effect": SHIELD_EFFECT,
+    "booster_effect": BOOSTER_EFFECT,
+}
 
 # ── Claude client ─────────────────────────────────────────────────────────────
 def get_claude_client():
@@ -19,7 +31,7 @@ def get_claude_client():
     except Exception:
         return None
 
-# ── Bulletproof JSON extractor ────────────────────────────────────────────────
+# ── JSON extractor ────────────────────────────────────────────────────────────
 def extract_json(raw_text):
     if not raw_text:
         return None
@@ -45,7 +57,7 @@ def extract_json(raw_text):
             result[key] = m.group(1).strip()
     return result if len(result) >= 4 else None
 
-# ── The prompt ────────────────────────────────────────────────────────────────
+# ── Prompt ────────────────────────────────────────────────────────────────────
 LORE_PROMPT = """You are an expert on every game, anime, sport, brand, show, movie, book, music genre, fashion brand, and cultural phenomenon that exists.
 
 A user has chosen the universe: "{theme}"
@@ -59,16 +71,14 @@ Rules:
   Super Smash Bros=#E4000F, Mario=#E52521, Sonic=#0057A8, Minecraft=#5D9E35, Fortnite=#BEFF00, Roblox=#E8272A, Pokemon=#FFCB05, Valorant=#FF4655, One Piece=#E8372B, Naruto=#FF6600, Dragon Ball=#FF8C00, Demon Slayer=#22AA44, JJK=#6600CC, Bleach=#000000, F1=#FF1801, NBA=#EE6730, NFL=#013369, FIFA=#326B2E, Star Wars=#FFE81F, Marvel=#ED1D24, DC=#0476F2, Harry Potter=#740001, Skyrim=#C0C0C0, Elden Ring=#C8A951, GTA=#F4B000, Halo=#00B4D8, Dead by Daylight=#8B0000, Among Us=#C51111, Apex=#DA292A, Nike=#111111, Adidas=#000000, Supreme=#FF0000, Spotify=#1DB954, Netflix=#E50914.
   For anything else: use the dominant color from that franchise logo or title card.
 
-- "shield_name": The most iconic DEFENSIVE item, armor, or technique from this exact universe. 100% specific — never generic. Examples: Minecraft="Protection IV Netherite Chestplate", Naruto="Susanoo Ribcage", F1="Halo Titanium Cockpit", NBA="Lockdown Defender", Harry Potter="Protego Totalum", Nike="Air Max Cushioning".
-
-- "booster_name": The most iconic SPEED or MOVEMENT ability from this exact universe. 100% specific. Examples: Minecraft="Ender Pearl Warp", Naruto="Flying Thunder God", F1="DRS Activation", NBA="Fast Break", Harry Potter="Apparition", Nike="ReactX Foam Propulsion".
-
+- "shield_name": The most iconic DEFENSIVE item, armor, or technique from this exact universe. 100% specific — never generic.
+- "booster_name": The most iconic SPEED or MOVEMENT ability from this exact universe. 100% specific.
 - "description": One punchy sentence (max 12 words) capturing the soul of this universe.
 
 Return exactly:
 {{"currency": "...", "color": "#RRGGBB", "shield_name": "...", "booster_name": "...", "description": "..."}}"""
 
-# ── Hardcoded safety net ──────────────────────────────────────────────────────
+# ── Hardcoded fallbacks ───────────────────────────────────────────────────────
 HARD_FALLBACKS = {
     "super smash bros":  {"currency":"KO Points","color":"#E4000F","shield_name":"Perfect Shield","booster_name":"Wavedash","description":"Every gaming legend meets in the ultimate crossover brawl."},
     "smash bros":        {"currency":"KO Points","color":"#E4000F","shield_name":"Perfect Shield","booster_name":"Wavedash","description":"Every gaming legend meets in the ultimate crossover brawl."},
@@ -140,10 +150,13 @@ def get_fallback(theme):
         return {"currency":"Streams","color":"#1DB954","shield_name":"Noise Cancel","booster_name":"Drop Surge","description":"A universe built on rhythm, bars, and raw cultural resonance."}
     return {"currency":"Titan Shards","color":"#00FFCC","shield_name":"Kinetic Barrier","booster_name":"Void Dash","description":"A realm of boundless power and infinite possibility."}
 
-# ── MAIN RESOLVER ─────────────────────────────────────────────────────────────
+# ── Resolver ──────────────────────────────────────────────────────────────────
 REQUIRED_KEYS = ["currency", "color", "shield_name", "booster_name", "description"]
 
 def resolve_universe(theme):
+    # Feature 6: empty = default universe
+    if not theme.strip():
+        return DEFAULT_UNIVERSE.copy()
     client = get_claude_client()
     if client is not None:
         try:
@@ -174,7 +187,12 @@ if "gold" not in st.session_state:
         "world_data": {}, "user_theme": "",
         "view": "main", "pending_gold": 0.0, "needs_verification": False,
         "vibe_color": "#FFD700", "sub_tier": "Free", "sub_multiplier": 1,
-        "total_missions": 0,
+        "total_missions": 0, "bg_color": "#050505",
+        "reset_confirm": False, "feedback_list": [],
+        # Feature 5: 30-second timer state
+        "micro_timer_seconds": 30,
+        "micro_timer_running": False,
+        "micro_timer_start": None,
     })
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -200,6 +218,7 @@ if st.session_state.user_name is None:
     .gw-card { background:rgba(12,12,12,0.97); border:1px solid rgba(255,215,0,0.12); border-radius:20px; padding:40px; }
     .chip-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
     .chip { background:rgba(255,215,0,0.07); border:1px solid rgba(255,215,0,0.18); border-radius:99px; padding:4px 12px; font-size:11px; color:#666; letter-spacing:1px; }
+    .default-hint { font-size:11px; color:#444; font-style:italic; margin-top:4px; letter-spacing:1px; }
     div.stButton > button {
         border:3px solid #FFD700 !important; background:#000 !important; color:white !important;
         font-family:'Bebas Neue',sans-serif !important; font-size:20px !important;
@@ -217,7 +236,13 @@ if st.session_state.user_name is None:
     with col:
         st.markdown('<div class="gw-card">', unsafe_allow_html=True)
         name_input  = st.text_input("YOUR CHAMPION NAME", placeholder="What are you called?", key="gw_name")
-        theme_input = st.text_input("YOUR UNIVERSE", placeholder="Minecraft · One Piece · F1 · Dead by Daylight · Nike · anything...", key="gw_theme")
+        theme_input = st.text_input(
+            "YOUR UNIVERSE",
+            placeholder="Minecraft · One Piece · F1 · Dead by Daylight · Nike · anything...",
+            key="gw_theme"
+        )
+        # Feature 7: hint text under universe input
+        st.markdown('<p class="default-hint">💡 Leave empty for Default Universe — INFINITE POWER</p>', unsafe_allow_html=True)
 
         examples = ["Minecraft","Super Smash Bros","One Piece","Formula 1","Dead by Daylight",
                     "Pokemon","Naruto","NBA","Roblox","Harry Potter","Valorant","Nike","K-Pop","Ancient Rome"]
@@ -226,15 +251,15 @@ if st.session_state.user_name is None:
         if st.button("⚡ ENTER THE INFINITEVERSE", key="gw_enter"):
             if not name_input.strip():
                 st.error("Enter your champion name.")
-            elif not theme_input.strip():
-                st.error("Choose a universe — anything works.")
             else:
-                with st.spinner(f"🌐 Loading {theme_input.upper()} universe data..."):
-                    world_data = resolve_universe(theme_input.strip())
+                theme_val = theme_input.strip()
+                display_name = theme_val if theme_val else DEFAULT_UNIVERSE_NAME
+                with st.spinner(f"🌐 Loading {display_name.upper()} universe data..."):
+                    world_data = resolve_universe(theme_val)
                 st.session_state.user_name  = name_input.strip()
                 st.session_state.world_data = world_data
                 st.session_state.vibe_color = world_data.get("color", "#FFD700")
-                st.session_state.user_theme = theme_input.strip()
+                st.session_state.user_theme = display_name
                 st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
     st.stop()
@@ -245,39 +270,47 @@ if st.session_state.user_name is None:
 C        = st.session_state.vibe_color
 wd       = st.session_state.world_data
 currency = wd.get("currency", "Credits")
+BG       = st.session_state.get("bg_color", "#050505")
 
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap');
-html, body, [data-testid="stAppViewContainer"] {{ background:#050505 !important; color:white; font-family:'Space Mono',monospace; }}
-[data-testid="stHeader"], [data-testid="stToolbar"] {{ background:transparent !important; }}
-[data-testid="stSidebar"] {{ background:#080808 !important; }}
-#MainMenu, footer {{ visibility:hidden; }}
+html, body, [data-testid="stAppViewContainer"] {{
+    background: {BG} !important; color: white; font-family: 'Space Mono', monospace;
+}}
+[data-testid="stHeader"], [data-testid="stToolbar"] {{ background: transparent !important; }}
+[data-testid="stSidebar"] {{ background: #080808 !important; }}
+#MainMenu, footer {{ visibility: hidden; }}
 @keyframes titan-pulse {{
-    0%   {{ box-shadow:0 0 20px {C},inset 0 0 10px {C}; border-color:{C}; }}
-    50%  {{ box-shadow:0 0 80px {C},inset 0 0 40px {C}; border-color:#FFF; }}
-    100% {{ box-shadow:0 0 20px {C},inset 0 0 10px {C}; border-color:{C}; }}
+    0%   {{ box-shadow: 0 0 20px {C}, inset 0 0 10px {C}; border-color: {C}; }}
+    50%  {{ box-shadow: 0 0 80px {C}, inset 0 0 40px {C}; border-color: #FFF; }}
+    100% {{ box-shadow: 0 0 20px {C}, inset 0 0 10px {C}; border-color: {C}; }}
 }}
 div.stButton > button {{
-    border:8px dashed {C} !important; background:#000 !important; color:white !important;
-    font-family:'Bebas Neue',sans-serif !important; font-size:28px !important;
-    letter-spacing:4px !important; padding:50px 30px !important; border-radius:40px !important;
-    animation:titan-pulse 2.5s infinite ease-in-out !important;
-    width:100%; text-transform:uppercase; transition:transform 0.3s; margin-bottom:20px;
+    border: 8px dashed {C} !important; background: #000 !important; color: white !important;
+    font-family: 'Bebas Neue', sans-serif !important; font-size: 28px !important;
+    letter-spacing: 4px !important; padding: 50px 30px !important; border-radius: 40px !important;
+    animation: titan-pulse 2.5s infinite ease-in-out !important;
+    width: 100%; text-transform: uppercase; transition: transform 0.3s; margin-bottom: 20px;
 }}
-div.stButton > button:hover {{ transform:scale(1.02); }}
-.metric-card {{ background:rgba(20,20,20,0.95); border:2px solid {C}; padding:18px; border-radius:14px; text-align:center; margin-bottom:12px; }}
-.shop-card   {{ border:3px solid {C}; padding:24px; border-radius:18px; background:rgba(10,10,10,0.9); margin-bottom:12px; }}
+div.stButton > button:hover {{ transform: scale(1.02); }}
+.metric-card {{ background: rgba(20,20,20,0.95); border: 2px solid {C}; padding: 18px; border-radius: 14px; text-align: center; margin-bottom: 12px; }}
+.shop-card   {{ border: 3px solid {C}; padding: 24px; border-radius: 18px; background: rgba(10,10,10,0.9); margin-bottom: 12px; }}
+.feedback-card {{ background: rgba(20,20,20,0.9); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 14px 18px; margin: 6px 0; font-size: 13px; color: #ccc; }}
 </style>
 """, unsafe_allow_html=True)
 
-# ── Sidebar ───────────────────────────────────────────────────────────────────
+# ── SIDEBAR ───────────────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown(f"<h1 style='font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:3px;margin:0'>⚡ TITAN HUB</h1>", unsafe_allow_html=True)
     st.write(f"**CHAMPION:** {st.session_state.user_name.upper()}")
     st.write(f"**UNIVERSE:** {st.session_state.user_theme}")
     st.write(f"**RANK:** {st.session_state.sub_tier.upper()}")
-    st.markdown(f"<div class='metric-card'><div style='font-family:Bebas Neue,sans-serif;font-size:40px;color:{C};margin:0'>{st.session_state.gold:.2f}</div><div style='font-size:10px;color:#555;letter-spacing:2px'>{currency.upper()}</div></div>", unsafe_allow_html=True)
+    st.markdown(f"""
+    <div class='metric-card'>
+        <div style='font-family:Bebas Neue,sans-serif;font-size:40px;color:{C};margin:0'>{st.session_state.gold:.2f}</div>
+        <div style='font-size:10px;color:#555;letter-spacing:2px'>{currency.upper()}</div>
+    </div>""", unsafe_allow_html=True)
 
     st.write("---")
     st.markdown("**👑 ELITE ACTIVATION**")
@@ -287,8 +320,24 @@ with st.sidebar:
         st.success("ELITE STATUS SECURED!"); st.balloons(); time.sleep(1); st.rerun()
 
     st.write("---")
-    if st.button("🚀 MISSION HUB", key="nav_hub"):  st.session_state.view = "main"; st.rerun()
-    if st.button("🛒 ARSENAL",     key="nav_shop"):  st.session_state.view = "shop"; st.rerun()
+    if st.button("🚀 MISSION HUB",  key="nav_hub"):      st.session_state.view = "main";     st.rerun()
+    if st.button("🛒 ARSENAL",      key="nav_shop"):     st.session_state.view = "shop";     st.rerun()
+    if st.button("💬 FEEDBACK",     key="nav_feedback"): st.session_state.view = "feedback"; st.rerun()
+
+    st.write("---")
+    # Feature 1 & 2: Background color picker
+    st.markdown("**🎨 BACKGROUND COLOR**")
+    new_bg = st.color_picker("Pick background color", value=st.session_state.get("bg_color","#050505"), key="bg_picker")
+    if new_bg != st.session_state.get("bg_color","#050505"):
+        st.session_state.bg_color = new_bg
+        st.rerun()
+
+    # Feature 2: Theme/accent color picker
+    st.markdown("**🌈 THEME COLOR**")
+    new_theme_color = st.color_picker("Pick theme color", value=st.session_state.vibe_color, key="theme_picker")
+    if new_theme_color != st.session_state.vibe_color:
+        st.session_state.vibe_color = new_theme_color
+        st.rerun()
 
     st.write("---")
     st.markdown("**🌐 SWITCH UNIVERSE**")
@@ -303,28 +352,98 @@ with st.sidebar:
             st.rerun()
 
     st.write("---")
-    if st.button("🚨 FULL RESET", key="reset_btn"):
-        st.session_state.clear(); st.rerun()
+    # Feature 4: Safe reset — requires typing RESET to confirm
+    st.markdown("**🚨 FULL RESET**")
+    reset_input = st.text_input("Type RESET to confirm:", key="reset_confirm_input", placeholder="RESET")
+    if st.button("🚨 RESET ALL PROGRESS", key="reset_btn"):
+        if reset_input.strip().upper() == "RESET":
+            st.session_state.clear()
+            st.rerun()
+        else:
+            st.error("Type RESET in the box to confirm. This cannot be undone.")
 
-# ── Header ────────────────────────────────────────────────────────────────────
+# ── HEADER ────────────────────────────────────────────────────────────────────
 st.markdown(f"""
 <h1 style='font-family:Bebas Neue,sans-serif;color:{C};text-shadow:0 0 40px {C};
            font-size:clamp(48px,10vw,100px);text-align:center;letter-spacing:6px;margin-bottom:0'>
     {st.session_state.user_theme.upper()}
 </h1>
-<p style='text-align:center;font-size:16px;color:#666;margin-top:4px'>{wd.get("description","A realm of infinite power.")}</p>
-""", unsafe_allow_html=True)
+<p style='text-align:center;font-size:16px;color:#666;margin-top:4px'>
+    {wd.get("description","A realm of infinite power.")}
+</p>""", unsafe_allow_html=True)
 st.markdown("---")
 
-# ── SHOP VIEW ─────────────────────────────────────────────────────────────────
-if st.session_state.view == "shop":
+# ─────────────────────────────────────────────────────────────────────────────
+# FEEDBACK VIEW (Feature 3)
+# ─────────────────────────────────────────────────────────────────────────────
+if st.session_state.view == "feedback":
+    st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>💬 FEEDBACK PORTAL</h2>", unsafe_allow_html=True)
+    _, col, _ = st.columns([1, 2, 1])
+    with col:
+        st.markdown(f"""
+        <div style='background:rgba(20,20,20,0.8);border:1px solid rgba(255,255,255,0.06);
+                    border-radius:16px;padding:24px;margin-bottom:20px'>
+            <div style='font-size:11px;color:#555;letter-spacing:2px;margin-bottom:8px'>
+                HELP US BUILD THE GREATEST STUDY APP EVER MADE
+            </div>
+            <div style='font-size:13px;color:#888'>
+                Your feedback shapes every future update. Nothing is ignored.
+            </div>
+        </div>""", unsafe_allow_html=True)
+
+        feedback_type = st.selectbox(
+            "TYPE OF FEEDBACK",
+            ["💡 Feature Idea", "🐛 Bug Report", "🔥 This is fire!", "😤 This needs fixing", "💭 General Thought"],
+            key="fb_type"
+        )
+        feedback_text = st.text_area(
+            "YOUR MESSAGE",
+            placeholder="Be as detailed as you want. We read everything.",
+            height=120,
+            key="fb_text"
+        )
+        feedback_name = st.text_input("YOUR NAME (optional)", placeholder="Anonymous", key="fb_name")
+
+        if st.button("🚀 SUBMIT FEEDBACK", key="submit_fb"):
+            if feedback_text.strip():
+                entry = {
+                    "type": feedback_type,
+                    "message": feedback_text.strip(),
+                    "name": feedback_name.strip() or "Anonymous",
+                    "universe": st.session_state.user_theme,
+                    "time": time.strftime("%Y-%m-%d %H:%M"),
+                }
+                st.session_state.feedback_list.append(entry)
+                st.success("✅ FEEDBACK RECEIVED. Thank you, Champion. 🔥")
+                st.balloons()
+            else:
+                st.error("Write something first!")
+
+        # Show submitted feedback
+        if st.session_state.feedback_list:
+            st.markdown("---")
+            st.markdown(f"<div style='font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:2px;font-size:20px'>SUBMITTED FEEDBACK ({len(st.session_state.feedback_list)})</div>", unsafe_allow_html=True)
+            for fb in reversed(st.session_state.feedback_list):
+                st.markdown(f"""
+                <div class='feedback-card'>
+                    <span style='color:{C}'>{fb['type']}</span> &nbsp;·&nbsp;
+                    <span style='color:#555;font-size:11px'>{fb['time']} · {fb['universe']} · {fb['name']}</span><br>
+                    <span style='color:#ccc'>{fb['message']}</span>
+                </div>""", unsafe_allow_html=True)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SHOP VIEW
+# ─────────────────────────────────────────────────────────────────────────────
+elif st.session_state.view == "shop":
     st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>MULTIVERSE ARSENAL</h2>", unsafe_allow_html=True)
     col1, col2 = st.columns(2)
     with col1:
         st.markdown(f"""
         <div class='shop-card'>
             <div style='font-size:10px;color:#555;letter-spacing:2px;margin-bottom:6px'>⚔️ DEFENSE ABILITY</div>
-            <h3 style='font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:2px;margin:0 0 12px'>{wd.get('shield_name','Shield').upper()}</h3>
+            <h3 style='font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:2px;margin:0 0 12px'>
+                {wd.get('shield_name','Shield').upper()}
+            </h3>
             <div style='background:rgba(255,255,255,0.04);border-left:3px solid {C};padding:10px 14px;border-radius:0 8px 8px 0;margin-bottom:14px'>
                 <div style='font-size:10px;color:#555;letter-spacing:2px'>EFFECT</div>
                 <div style='font-size:14px;color:#ddd;margin-top:4px'>{SHIELD_EFFECT}</div>
@@ -341,7 +460,9 @@ if st.session_state.view == "shop":
         st.markdown(f"""
         <div class='shop-card'>
             <div style='font-size:10px;color:#555;letter-spacing:2px;margin-bottom:6px'>⚡ SPEED ABILITY</div>
-            <h3 style='font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:2px;margin:0 0 12px'>{wd.get('booster_name','Booster').upper()}</h3>
+            <h3 style='font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:2px;margin:0 0 12px'>
+                {wd.get('booster_name','Booster').upper()}
+            </h3>
             <div style='background:rgba(255,255,255,0.04);border-left:3px solid {C};padding:10px 14px;border-radius:0 8px 8px 0;margin-bottom:14px'>
                 <div style='font-size:10px;color:#555;letter-spacing:2px'>EFFECT</div>
                 <div style='font-size:14px;color:#ddd;margin-top:4px'>{BOOSTER_EFFECT}</div>
@@ -350,31 +471,81 @@ if st.session_state.view == "shop":
         </div>""", unsafe_allow_html=True)
         if st.button(f"⚡ ACQUIRE · 25 {currency}", key="buy_booster"):
             if st.session_state.gold >= 25:
-                st.session_state.gold -= 25; st.session_state.sub_multiplier = 3; st.success(f"⚡ {wd.get('booster_name')} engaged!")
+                st.session_state.gold -= 25; st.session_state.sub_multiplier = 3
+                st.success(f"⚡ {wd.get('booster_name')} engaged!")
             else:
                 st.error("Not enough currency.")
 
-# ── MISSION HUB VIEW ──────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────────────────────
+# MISSION HUB VIEW
+# ─────────────────────────────────────────────────────────────────────────────
 else:
     _, col, _ = st.columns([1, 2, 1])
     with col:
         reward   = 1.0 * st.session_state.sub_multiplier
         mult_tag = f" ×{st.session_state.sub_multiplier}" if st.session_state.sub_multiplier > 1 else ""
         st.markdown(f"""
-        <div style='text-align:center;background:rgba(20,20,20,0.8);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:24px;margin-bottom:20px'>
+        <div style='text-align:center;background:rgba(20,20,20,0.8);border:1px solid rgba(255,255,255,0.06);
+                    border-radius:16px;padding:24px;margin-bottom:20px'>
             <div style='font-size:11px;color:#444;letter-spacing:2px'>MISSION REWARD</div>
-            <div style='font-family:Bebas Neue,sans-serif;font-size:52px;color:{C};margin:6px 0'>{reward:.1f} {currency}{mult_tag}</div>
-            <div style='font-size:11px;color:#333'>per completed 1-minute mission</div>
+            <div style='font-family:Bebas Neue,sans-serif;font-size:52px;color:{C};margin:6px 0'>
+                {reward:.1f} {currency}{mult_tag}
+            </div>
+            <div style='font-size:11px;color:#333'>per completed mission</div>
         </div>""", unsafe_allow_html=True)
 
+        # ── Feature 5: 30-second micro timer ─────────────────────────────────
+        st.markdown(f"""
+        <div style='background:rgba(20,20,20,0.8);border:1px solid rgba(255,255,255,0.06);
+                    border-radius:16px;padding:20px;margin-bottom:16px;text-align:center'>
+            <div style='font-size:10px;color:#555;letter-spacing:2px;margin-bottom:8px'>⏱ MICRO TIMER</div>
+            <div style='font-family:Bebas Neue,sans-serif;font-size:48px;color:{C}'>
+                {st.session_state.micro_timer_seconds}s
+            </div>
+            <div style='font-size:11px;color:#444'>+30s per tap · max 6 minutes (360s)</div>
+        </div>""", unsafe_allow_html=True)
+
+        tc1, tc2, tc3 = st.columns(3)
+        with tc1:
+            if st.button("➕ ADD 30s", key="add_30"):
+                if st.session_state.micro_timer_seconds < 360:
+                    st.session_state.micro_timer_seconds += 30
+                    st.rerun()
+                else:
+                    st.warning("Max 6 minutes reached!")
+        with tc2:
+            if st.button("▶ START", key="start_micro"):
+                secs = st.session_state.micro_timer_seconds
+                bar    = st.progress(0)
+                status = st.empty()
+                for i in range(secs):
+                    time.sleep(1)
+                    bar.progress((i + 1) / secs)
+                    remaining = secs - i - 1
+                    status.markdown(f"<p style='text-align:center;font-family:Space Mono,monospace;color:{C};font-size:20px'>{remaining}s remaining</p>", unsafe_allow_html=True)
+                st.session_state.micro_timer_seconds = 30  # reset to default
+                st.success("✅ Micro session complete! Nice work.")
+                time.sleep(1); st.rerun()
+        with tc3:
+            if st.button("🔄 RESET", key="reset_micro"):
+                st.session_state.micro_timer_seconds = 30
+                st.rerun()
+
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        # ── 1-minute mission button ───────────────────────────────────────────
         if st.button("▶  START 1-MINUTE MISSION", key="start_mission"):
             bar = st.progress(0); status = st.empty()
             for i in range(60):
                 time.sleep(1); bar.progress((i+1)/60)
                 status.markdown(f"<p style='text-align:center;font-family:Space Mono,monospace;color:#555'>SYNCHRONIZING: {i+1}s / 60s</p>", unsafe_allow_html=True)
-            st.session_state.pending_gold = reward; st.session_state.needs_verification = True; st.rerun()
+            st.session_state.pending_gold = reward
+            st.session_state.needs_verification = True
+            st.rerun()
 
-# ── TRIBUNAL ──────────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────────────────────
+# TRIBUNAL
+# ─────────────────────────────────────────────────────────────────────────────
 if st.session_state.needs_verification:
     st.markdown("---")
     st.markdown(f"<h2 style='text-align:center;font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:4px'>⚖️ THE TRIBUNAL</h2>", unsafe_allow_html=True)
@@ -384,7 +555,10 @@ if st.session_state.needs_verification:
         uploaded = st.file_uploader("PROOF OF LABOR (screenshot, photo, notes):", key="proof_upload")
         if uploaded and st.button("⚡ SUBMIT FOR JUDGMENT", key="submit_proof"):
             earned = st.session_state.pending_gold
-            st.session_state.gold += earned; st.session_state.total_missions += 1
-            st.session_state.needs_verification = False; st.session_state.pending_gold = 0.0
-            st.balloons(); st.success(f"✅ VERIFIED. +{earned:.1f} {currency} added to your balance.")
+            st.session_state.gold += earned
+            st.session_state.total_missions += 1
+            st.session_state.needs_verification = False
+            st.session_state.pending_gold = 0.0
+            st.balloons()
+            st.success(f"✅ VERIFIED. +{earned:.1f} {currency} added to your balance.")
             time.sleep(1); st.rerun()
