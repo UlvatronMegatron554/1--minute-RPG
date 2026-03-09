@@ -570,8 +570,12 @@ BG     = st.session_state.get("bg_color","#ffffff")
 RAW_C  = st.session_state.vibe_color
 C      = readable_color(RAW_C, BG)
 TEXT   = text_on(BG)
-MUTED  = "#555555" if is_light(BG) else "#aaaaaa"
+MUTED  = "#444444" if is_light(BG) else "#cccccc"
 currency = wd.get("currency","Credits")
+
+# Card background: solid dark on light page, solid light on dark page
+CARDBG   = "#1a1a1a" if is_light(BG) else "#f0f0f0"
+CARDTEXT = "#ffffff" if is_light(BG) else "#000000"
 
 # Extract RGB components of theme color for card backgrounds
 _ch = C.lstrip('#')
@@ -603,20 +607,19 @@ label,.stTextInput label,.stSelectbox label,.stTextArea label,.stFileUploader la
 div.stButton>button{{border:6px solid {C}!important;background:#000000!important;color:#ffffff!important;font-family:'Bebas Neue',sans-serif!important;font-size:28px!important;letter-spacing:4px!important;padding:50px 30px!important;border-radius:40px!important;animation:titan-pulse 2.5s infinite ease-in-out!important;width:100%;text-transform:uppercase;transition:transform 0.3s;margin-bottom:20px;}}
 div.stButton>button:hover{{transform:scale(1.02);}}
 
-.metric-card{{background:rgba({CR},{CG},{CB},0.08);border:2px solid {C};padding:18px;border-radius:14px;text-align:center;margin-bottom:12px;color:{TEXT}!important;}}
-.metric-card *{{color:{TEXT}!important;}}
-.shop-card{{border:3px solid {C};padding:24px;border-radius:18px;background:rgba({CR},{CG},{CB},0.06);margin-bottom:12px;color:{TEXT}!important;}}
-.shop-card *{{color:{TEXT}!important;}}
-.ach-card{{background:rgba({CR},{CG},{CB},0.06);border:1px solid {C};border-radius:12px;padding:14px 16px;margin:8px 0;color:{TEXT}!important;}}
-.ach-card *{{color:{TEXT}!important;}}
-.monster-card{{background:rgba({CR},{CG},{CB},0.07);border:2px solid {C};border-radius:16px;padding:20px;text-align:center;margin:12px 0;color:{TEXT}!important;}}
-.monster-card *{{color:{TEXT}!important;}}
-.secret-card{{background:linear-gradient(135deg,rgba({CR},{CG},{CB},0.10),rgba({CR},{CG},{CB},0.06));border:1px solid {C};border-radius:16px;padding:20px 24px;margin:12px 0;font-family:'Space Mono',monospace;font-size:14px;color:{TEXT}!important;line-height:1.8;text-align:center;}}
-.secret-card *{{color:{TEXT}!important;}}
-/* Force all inline HTML text to be readable */
-[data-testid="stMarkdownContainer"] p,
-[data-testid="stMarkdownContainer"] div,
-[data-testid="stMarkdownContainer"] span {{color:{TEXT}!important;}}
+/* CARD BACKGROUND — solid and always readable */
+.metric-card{{background:{CARDBG};border:2px solid {C};padding:18px;border-radius:14px;text-align:center;margin-bottom:12px;}}
+.metric-card,.metric-card p,.metric-card div,.metric-card span{{color:{CARDTEXT}!important;}}
+.shop-card{{border:3px solid {C};padding:24px;border-radius:18px;background:{CARDBG};margin-bottom:12px;}}
+.shop-card,.shop-card p,.shop-card div,.shop-card span,.shop-card h3{{color:{CARDTEXT}!important;}}
+.ach-card{{background:{CARDBG};border:1px solid {C};border-radius:12px;padding:14px 16px;margin:8px 0;}}
+.ach-card,.ach-card p,.ach-card div,.ach-card span{{color:{CARDTEXT}!important;}}
+.monster-card{{background:{CARDBG};border:2px solid {C};border-radius:16px;padding:20px;text-align:center;margin:12px 0;}}
+.monster-card,.monster-card p,.monster-card div,.monster-card span{{color:{CARDTEXT}!important;}}
+.secret-card{{background:{CARDBG};border:2px solid {C};border-radius:16px;padding:20px 24px;margin:12px 0;font-family:'Space Mono',monospace;font-size:14px;line-height:1.8;text-align:center;}}
+.secret-card,.secret-card p,.secret-card div,.secret-card span{{color:{CARDTEXT}!important;}}
+/* Force ALL markdown container text readable */
+[data-testid="stMarkdownContainer"] *{{color:{TEXT}!important;}}
 </style>
 """, unsafe_allow_html=True)
 
@@ -633,8 +636,8 @@ with st.sidebar:
 
     st.markdown(f"""<div class='metric-card'>
         <div style='font-family:Bebas Neue,sans-serif;font-size:40px;color:{C}'>{st.session_state.gold:.1f}</div>
-        <div style='font-size:10px;color:{MUTED};letter-spacing:2px'>{currency.upper()}</div>
-        <div style='font-size:11px;color:{MUTED};margin-top:4px'>XP: {st.session_state.xp} · LVL {st.session_state.level}</div>
+        <div style='font-size:10px;color:{CARDTEXT};letter-spacing:2px'>{currency.upper()}</div>
+        <div style='font-size:11px;color:{CARDTEXT};margin-top:4px'>XP: {st.session_state.xp} · LVL {st.session_state.level}</div>
     </div>""", unsafe_allow_html=True)
 
     st.write("---")
@@ -716,7 +719,7 @@ st.markdown(f"""
 <h1 style='font-family:Bebas Neue,sans-serif;color:{C};text-shadow:0 0 40px {C};
 font-size:clamp(48px,10vw,100px);text-align:center;letter-spacing:6px;margin-bottom:0'>
 {st.session_state.user_theme.upper()}</h1>
-<p style='text-align:center;font-size:15px;color:{MUTED};margin-top:4px'>{wd.get("description","A realm of infinite power.")}</p>
+<p style='text-align:center;font-size:15px;color:{CARDTEXT};margin-top:4px'>{wd.get("description","A realm of infinite power.")}</p>
 """, unsafe_allow_html=True)
 st.markdown("---")
 
@@ -744,7 +747,7 @@ if st.session_state.get("battle_state") == "ready" or st.session_state.view == "
     st.markdown(f"""<div class='monster-card'>
         <div style='font-size:11px;color:{rc};letter-spacing:3px;font-family:Space Mono,monospace'>{monster["rarity"].upper()} ENCOUNTER</div>
         <div style='font-family:Bebas Neue,sans-serif;font-size:36px;color:{C};margin:8px 0'>{monster["name"].upper()}</div>
-        <div style='font-size:13px;color:{MUTED}'>Defeat this enemy to earn <span style='color:{C};font-weight:bold'>{monster["reward"]} {currency}</span></div>
+        <div style='font-size:13px;color:{CARDTEXT}'>Defeat this enemy to earn <span style='color:{C};font-weight:bold'>{monster["reward"]} {currency}</span></div>
     </div>""", unsafe_allow_html=True)
 
     _, bcol, _ = st.columns([1,2,1])
@@ -871,13 +874,13 @@ view = st.session_state.view
 # ── SECRETS ───────────────────────────────────────────────────────────────────
 if view == "secrets":
     st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>🔮 UNIVERSE SECRETS</h2>", unsafe_allow_html=True)
-    st.markdown(f"<p style='text-align:center;color:{MUTED};font-family:Space Mono,monospace'>Every mission unlocks a secret. These are truths that will break your brain.</p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='text-align:center;color:{CARDTEXT};font-family:Space Mono,monospace'>Every mission unlocks a secret. These are truths that will break your brain.</p>", unsafe_allow_html=True)
     seen = st.session_state.get("secret_queue",[])
     if seen:
         for s in reversed(seen):
             st.markdown(f"<div class='secret-card'>{s}</div>", unsafe_allow_html=True)
     else:
-        st.markdown(f"<p style='text-align:center;color:{MUTED};font-size:14px'>Complete your first mission to unlock your first secret. 🔮</p>", unsafe_allow_html=True)
+        st.markdown(f"<p style='text-align:center;color:{CARDTEXT};font-size:14px'>Complete your first mission to unlock your first secret. 🔮</p>", unsafe_allow_html=True)
 
 # ── ACHIEVEMENTS ──────────────────────────────────────────────────────────────
 elif view == "achievements":
@@ -897,7 +900,7 @@ elif view == "incubator":
     st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>🥚 INCUBATOR</h2>", unsafe_allow_html=True)
     eggs = st.session_state.incubator_eggs
     st.markdown(f"<p style='text-align:center;font-family:Space Mono,monospace;color:{TEXT}'>You have <span style='color:{C};font-size:24px;font-family:Bebas Neue,sans-serif'>{eggs}</span> eggs ready to hatch.</p>", unsafe_allow_html=True)
-    st.markdown(f"<p style='text-align:center;font-family:Space Mono,monospace;font-size:11px;color:{MUTED}'>Earn eggs by completing missions and winning battles.</p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='text-align:center;font-family:Space Mono,monospace;font-size:11px;color:{CARDTEXT}'>Earn eggs by completing missions and winning battles.</p>", unsafe_allow_html=True)
 
     if eggs > 0:
         _, hcol, _ = st.columns([1,2,1])
@@ -918,7 +921,7 @@ elif view == "incubator":
                     <div style='font-size:36px'>{'🐉' if monster['rarity']=='Legendary' else '🐣'}</div>
                     <div style='font-size:11px;color:{rc};letter-spacing:3px;font-family:Space Mono,monospace'>{monster["rarity"].upper()} HATCHED!</div>
                     <div style='font-family:Bebas Neue,sans-serif;font-size:28px;color:{C}'>{monster["name"].upper()}</div>
-                    <div style='font-size:13px;color:{MUTED}'>+{reward} {currency} reward!</div>
+                    <div style='font-size:13px;color:{CARDTEXT}'>+{reward} {currency} reward!</div>
                 </div>""", unsafe_allow_html=True)
                 time.sleep(0.5); st.rerun()
 
@@ -953,14 +956,14 @@ elif view == "manual":
 # ── PLANS ─────────────────────────────────────────────────────────────────────
 elif view == "plans":
     st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>💳 UPGRADE PLANS</h2>", unsafe_allow_html=True)
-    st.markdown(f"<p style='text-align:center;font-family:Space Mono,monospace;color:{MUTED};font-size:12px'>Stripe payments coming soon. Get ready.</p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='text-align:center;font-family:Space Mono,monospace;color:{CARDTEXT};font-size:12px'>Stripe payments coming soon. Get ready.</p>", unsafe_allow_html=True)
 
     p_col, e_col = st.columns(2)
     with p_col:
         st.markdown(f"""<div class='shop-card'>
             <div style='text-align:center;margin-bottom:16px'>
                 <div style='font-family:Bebas Neue,sans-serif;font-size:32px;color:{C}'>⚡ PREMIUM</div>
-                <div style='font-family:Bebas Neue,sans-serif;font-size:48px;color:{TEXT}'>$5<span style='font-size:18px;color:{MUTED}'>/mo</span></div>
+                <div style='font-family:Bebas Neue,sans-serif;font-size:48px;color:{TEXT}'>$5<span style='font-size:18px;color:{CARDTEXT}'>/mo</span></div>
                 <div style='background:rgba(255,165,0,0.2);border:1px solid orange;border-radius:8px;padding:4px 12px;display:inline-block;font-family:Space Mono,monospace;font-size:10px;color:orange;letter-spacing:2px'>COMING SOON</div>
             </div>
             <div style='font-family:Space Mono,monospace;font-size:12px;color:{TEXT};line-height:2'>
@@ -977,7 +980,7 @@ elif view == "plans":
         st.markdown(f"""<div class='shop-card' style='border-color:#FFD700'>
             <div style='text-align:center;margin-bottom:16px'>
                 <div style='font-family:Bebas Neue,sans-serif;font-size:32px;color:#FFD700'>💀 ELITE</div>
-                <div style='font-family:Bebas Neue,sans-serif;font-size:48px;color:{TEXT}'>$10<span style='font-size:18px;color:{MUTED}'>/mo</span></div>
+                <div style='font-family:Bebas Neue,sans-serif;font-size:48px;color:{TEXT}'>$10<span style='font-size:18px;color:{CARDTEXT}'>/mo</span></div>
                 <div style='background:rgba(255,215,0,0.2);border:1px solid #FFD700;border-radius:8px;padding:4px 12px;display:inline-block;font-family:Space Mono,monospace;font-size:10px;color:#FFD700;letter-spacing:2px'>COMING SOON</div>
             </div>
             <div style='font-family:Space Mono,monospace;font-size:12px;color:{TEXT};line-height:2'>
@@ -1008,7 +1011,7 @@ elif view == "feedback":
         if st.session_state.feedback_list:
             st.markdown("---")
             for fb in reversed(st.session_state.feedback_list):
-                st.markdown(f"<div class='ach-card'><span style='color:{C}'>{fb['type']}</span> · <span style='color:{MUTED};font-size:11px'>{fb['time']} · {fb['name']}</span><br><span style='color:{TEXT}'>{fb['message']}</span></div>", unsafe_allow_html=True)
+                st.markdown(f"<div class='ach-card'><span style='color:{C}'>{fb['type']}</span> · <span style='color:{CARDTEXT};font-size:11px'>{fb['time']} · {fb['name']}</span><br><span style='color:{TEXT}'>{fb['message']}</span></div>", unsafe_allow_html=True)
 
 # ── SHOP ──────────────────────────────────────────────────────────────────────
 elif view == "shop":
@@ -1016,14 +1019,14 @@ elif view == "shop":
     col1, col2 = st.columns(2)
     with col1:
         st.markdown(f"""<div class='shop-card'>
-            <div style='font-size:10px;color:{MUTED};letter-spacing:2px;margin-bottom:6px'>⚔️ DEFENSE ABILITY</div>
+            <div style='font-size:10px;color:{CARDTEXT};letter-spacing:2px;margin-bottom:6px'>⚔️ DEFENSE ABILITY</div>
             <h3 style='font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:2px;margin:0 0 6px'>{wd.get('shield_name','Shield').upper()}</h3>
-            <div style='font-size:12px;color:{MUTED};font-style:italic;margin-bottom:12px'>{wd.get('shield_flavor','An ability forged in the heart of this universe.')}</div>
-            <div style='background:rgba({CR},{CG},{CB},0.07);border-left:3px solid {C};padding:10px 14px;border-radius:0 8px 8px 0;margin-bottom:14px'>
-                <div style='font-size:10px;color:{MUTED};letter-spacing:2px'>EFFECT</div>
+            <div style='font-size:12px;color:{CARDTEXT};font-style:italic;margin-bottom:12px'>{wd.get('shield_flavor','An ability forged in the heart of this universe.')}</div>
+            <div style='background:{CARDBG};border-left:3px solid {C};padding:10px 14px;border-radius:0 8px 8px 0;margin-bottom:14px'>
+                <div style='font-size:10px;color:{CARDTEXT};letter-spacing:2px'>EFFECT</div>
                 <div style='font-size:13px;color:{TEXT};margin-top:4px'>{SHIELD_EFFECT}</div>
             </div>
-            <div style='font-size:12px;color:{MUTED}'>Cost: <span style='color:{C};font-weight:bold'>15 {currency}</span></div>
+            <div style='font-size:12px;color:{CARDTEXT}'>Cost: <span style='color:{C};font-weight:bold'>15 {currency}</span></div>
         </div>""", unsafe_allow_html=True)
         if st.button(f"⚔️ ACQUIRE · 15 {currency}", key="buy_shield"):
             if st.session_state.gold >= 15:
@@ -1032,14 +1035,14 @@ elif view == "shop":
             else: st.error("Not enough currency.")
     with col2:
         st.markdown(f"""<div class='shop-card'>
-            <div style='font-size:10px;color:{MUTED};letter-spacing:2px;margin-bottom:6px'>⚡ SPEED ABILITY</div>
+            <div style='font-size:10px;color:{CARDTEXT};letter-spacing:2px;margin-bottom:6px'>⚡ SPEED ABILITY</div>
             <h3 style='font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:2px;margin:0 0 6px'>{wd.get('booster_name','Booster').upper()}</h3>
-            <div style='font-size:12px;color:{MUTED};font-style:italic;margin-bottom:12px'>{wd.get('booster_flavor','Speed that defies every known law of physics.')}</div>
-            <div style='background:rgba({CR},{CG},{CB},0.07);border-left:3px solid {C};padding:10px 14px;border-radius:0 8px 8px 0;margin-bottom:14px'>
-                <div style='font-size:10px;color:{MUTED};letter-spacing:2px'>EFFECT</div>
+            <div style='font-size:12px;color:{CARDTEXT};font-style:italic;margin-bottom:12px'>{wd.get('booster_flavor','Speed that defies every known law of physics.')}</div>
+            <div style='background:{CARDBG};border-left:3px solid {C};padding:10px 14px;border-radius:0 8px 8px 0;margin-bottom:14px'>
+                <div style='font-size:10px;color:{CARDTEXT};letter-spacing:2px'>EFFECT</div>
                 <div style='font-size:13px;color:{TEXT};margin-top:4px'>{BOOSTER_EFFECT}</div>
             </div>
-            <div style='font-size:12px;color:{MUTED}'>Cost: <span style='color:{C};font-weight:bold'>25 {currency}</span></div>
+            <div style='font-size:12px;color:{CARDTEXT}'>Cost: <span style='color:{C};font-weight:bold'>25 {currency}</span></div>
         </div>""", unsafe_allow_html=True)
         if st.button(f"⚡ ACQUIRE · 25 {currency}", key="buy_booster"):
             if st.session_state.gold >= 25:
@@ -1054,16 +1057,16 @@ else:
     with col:
         reward   = 1.0 * st.session_state.sub_multiplier
         mult_tag = f" ×{st.session_state.sub_multiplier}" if st.session_state.sub_multiplier > 1 else ""
-        st.markdown(f"""<div style='text-align:center;background:rgba({CR},{CG},{CB},0.07);border:1px solid rgba({CR},{CG},{CB},0.12);border-radius:16px;padding:24px;margin-bottom:20px'>
-            <div style='font-size:11px;color:{MUTED};letter-spacing:2px'>MISSION REWARD</div>
+        st.markdown(f"""<div style='text-align:center;background:{CARDBG};border:1px solid rgba({CR},{CG},{CB},0.12);border-radius:16px;padding:24px;margin-bottom:20px'>
+            <div style='font-size:11px;color:{CARDTEXT};letter-spacing:2px'>MISSION REWARD</div>
             <div style='font-family:Bebas Neue,sans-serif;font-size:52px;color:{C};margin:6px 0'>{reward:.1f} {currency}{mult_tag}</div>
-            <div style='font-size:11px;color:{MUTED}'>per completed mission</div>
+            <div style='font-size:11px;color:{CARDTEXT}'>per completed mission</div>
         </div>""", unsafe_allow_html=True)
 
-        st.markdown(f"""<div style='background:rgba({CR},{CG},{CB},0.07);border:1px solid rgba({CR},{CG},{CB},0.08);border-radius:16px;padding:20px;margin-bottom:16px;text-align:center'>
-            <div style='font-size:10px;color:{MUTED};letter-spacing:2px;margin-bottom:8px'>⏱ MICRO TIMER</div>
+        st.markdown(f"""<div style='background:{CARDBG};border:1px solid rgba({CR},{CG},{CB},0.08);border-radius:16px;padding:20px;margin-bottom:16px;text-align:center'>
+            <div style='font-size:10px;color:{CARDTEXT};letter-spacing:2px;margin-bottom:8px'>⏱ MICRO TIMER</div>
             <div style='font-family:Bebas Neue,sans-serif;font-size:48px;color:{C}'>{st.session_state.micro_timer_seconds}s</div>
-            <div style='font-size:11px;color:{MUTED}'>+30s per tap · max 6 minutes</div>
+            <div style='font-size:11px;color:{CARDTEXT}'>+30s per tap · max 6 minutes</div>
         </div>""", unsafe_allow_html=True)
 
         tc1, tc2, tc3 = st.columns(3)
@@ -1089,7 +1092,7 @@ else:
             bar = st.progress(0); status = st.empty()
             for i in range(60):
                 time.sleep(1); bar.progress((i+1)/60)
-                status.markdown(f"<p style='text-align:center;font-family:Space Mono,monospace;color:{MUTED}'>SYNCHRONIZING: {i+1}s / 60s</p>", unsafe_allow_html=True)
+                status.markdown(f"<p style='text-align:center;font-family:Space Mono,monospace;color:{CARDTEXT}'>SYNCHRONIZING: {i+1}s / 60s</p>", unsafe_allow_html=True)
             st.session_state.pending_gold = reward
             st.session_state.needs_verification = True
             st.rerun()
