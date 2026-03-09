@@ -526,11 +526,11 @@ if st.session_state.user_name is None:
         st.markdown("<br>", unsafe_allow_html=True)
 
         name_input  = st.text_input("⚡ Champion Name", placeholder="What are you called?", key="gw_name")
-        theme_input = st.text_input("🌌 Your Universe", placeholder="Minecraft, Naruto, F1, Germa 66, Vinsmoke Ichiji...", key="gw_theme")
+        theme_input = st.text_input("🌌 Your Universe", placeholder="Minecraft, Naruto, F1, Dark Souls Ninja, Medieval Space War...", key="gw_theme")
 
         st.markdown("""
         <p class="default-hint">💡 Leave empty for default universe: <strong>INFINITE POWER</strong></p>
-        <p class="default-hint">✨ Be SPECIFIC. Merge worlds. Invent something. <strong>"Germa 66 Stealth Black"</strong>, <strong>"Vinsmoke Ichiji"</strong>, <strong>"Dark Souls Ninja"</strong> — the more detail, the better the AI gets.</p>
+        <p class="default-hint">✨ Go broad or ultra-specific — <strong>"Naruto meets Cyberpunk"</strong>, <strong>"Medieval Space War"</strong>, <strong>"Stealth Assassin Nike"</strong> — the more detail you give, the better the AI builds your world.</p>
         <div class="chip-section-label">⚡ Quick picks</div>
         <div class="chip-row">
             <span class="chip">Minecraft</span><span class="chip">Super Smash Bros</span>
@@ -573,6 +573,13 @@ TEXT   = text_on(BG)
 MUTED  = "#555555" if is_light(BG) else "#aaaaaa"
 currency = wd.get("currency","Credits")
 
+# Extract RGB components of theme color for card backgrounds
+_ch = C.lstrip('#')
+try:
+    CR, CG, CB = int(_ch[0:2],16), int(_ch[2:4],16), int(_ch[4:6],16)
+except:
+    CR, CG, CB = 255, 215, 0
+
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap');
@@ -596,11 +603,11 @@ label,.stTextInput label,.stSelectbox label,.stTextArea label,.stFileUploader la
 div.stButton>button{{border:6px solid {C}!important;background:#000000!important;color:#ffffff!important;font-family:'Bebas Neue',sans-serif!important;font-size:28px!important;letter-spacing:4px!important;padding:50px 30px!important;border-radius:40px!important;animation:titan-pulse 2.5s infinite ease-in-out!important;width:100%;text-transform:uppercase;transition:transform 0.3s;margin-bottom:20px;}}
 div.stButton>button:hover{{transform:scale(1.02);}}
 
-.metric-card{{background:rgba(0,0,0,0.08);border:2px solid {C};padding:18px;border-radius:14px;text-align:center;margin-bottom:12px;}}
-.shop-card{{border:3px solid {C};padding:24px;border-radius:18px;background:rgba(0,0,0,0.05);margin-bottom:12px;}}
-.ach-card{{background:rgba(0,0,0,0.05);border:1px solid {C};border-radius:12px;padding:14px 16px;margin:8px 0;}}
-.monster-card{{background:rgba(0,0,0,0.06);border:2px solid {C};border-radius:16px;padding:20px;text-align:center;margin:12px 0;}}
-.secret-card{{background:linear-gradient(135deg,rgba(255,215,0,0.08),rgba(0,200,255,0.08));border:1px solid rgba(255,215,0,0.4);border-radius:16px;padding:20px 24px;margin:12px 0;font-family:'Space Mono',monospace;font-size:14px;color:{TEXT};line-height:1.8;text-align:center;}}
+.metric-card{{background:rgba({CR},{CG},{CB},0.08);border:2px solid {C};padding:18px;border-radius:14px;text-align:center;margin-bottom:12px;}}
+.shop-card{{border:3px solid {C};padding:24px;border-radius:18px;background:rgba({CR},{CG},{CB},0.06);margin-bottom:12px;}}
+.ach-card{{background:rgba({CR},{CG},{CB},0.06);border:1px solid {C};border-radius:12px;padding:14px 16px;margin:8px 0;}}
+.monster-card{{background:rgba({CR},{CG},{CB},0.07);border:2px solid {C};border-radius:16px;padding:20px;text-align:center;margin:12px 0;}}
+.secret-card{{background:linear-gradient(135deg,rgba({CR},{CG},{CB},0.10),rgba({CR},{CG},{CB},0.06));border:1px solid {C};border-radius:16px;padding:20px 24px;margin:12px 0;font-family:'Space Mono',monospace;font-size:14px;color:{TEXT};line-height:1.8;text-align:center;}}
 </style>
 """, unsafe_allow_html=True)
 
@@ -1001,7 +1008,7 @@ elif view == "shop":
             <div style='font-size:10px;color:{MUTED};letter-spacing:2px;margin-bottom:6px'>⚔️ DEFENSE ABILITY</div>
             <h3 style='font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:2px;margin:0 0 6px'>{wd.get('shield_name','Shield').upper()}</h3>
             <div style='font-size:12px;color:{MUTED};font-style:italic;margin-bottom:12px'>{wd.get('shield_flavor','An ability forged in the heart of this universe.')}</div>
-            <div style='background:rgba(0,0,0,0.05);border-left:3px solid {C};padding:10px 14px;border-radius:0 8px 8px 0;margin-bottom:14px'>
+            <div style='background:rgba({CR},{CG},{CB},0.07);border-left:3px solid {C};padding:10px 14px;border-radius:0 8px 8px 0;margin-bottom:14px'>
                 <div style='font-size:10px;color:{MUTED};letter-spacing:2px'>EFFECT</div>
                 <div style='font-size:13px;color:{TEXT};margin-top:4px'>{SHIELD_EFFECT}</div>
             </div>
@@ -1017,7 +1024,7 @@ elif view == "shop":
             <div style='font-size:10px;color:{MUTED};letter-spacing:2px;margin-bottom:6px'>⚡ SPEED ABILITY</div>
             <h3 style='font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:2px;margin:0 0 6px'>{wd.get('booster_name','Booster').upper()}</h3>
             <div style='font-size:12px;color:{MUTED};font-style:italic;margin-bottom:12px'>{wd.get('booster_flavor','Speed that defies every known law of physics.')}</div>
-            <div style='background:rgba(0,0,0,0.05);border-left:3px solid {C};padding:10px 14px;border-radius:0 8px 8px 0;margin-bottom:14px'>
+            <div style='background:rgba({CR},{CG},{CB},0.07);border-left:3px solid {C};padding:10px 14px;border-radius:0 8px 8px 0;margin-bottom:14px'>
                 <div style='font-size:10px;color:{MUTED};letter-spacing:2px'>EFFECT</div>
                 <div style='font-size:13px;color:{TEXT};margin-top:4px'>{BOOSTER_EFFECT}</div>
             </div>
@@ -1036,13 +1043,13 @@ else:
     with col:
         reward   = 1.0 * st.session_state.sub_multiplier
         mult_tag = f" ×{st.session_state.sub_multiplier}" if st.session_state.sub_multiplier > 1 else ""
-        st.markdown(f"""<div style='text-align:center;background:rgba(0,0,0,0.05);border:1px solid rgba(0,0,0,0.1);border-radius:16px;padding:24px;margin-bottom:20px'>
+        st.markdown(f"""<div style='text-align:center;background:rgba({CR},{CG},{CB},0.07);border:1px solid rgba({CR},{CG},{CB},0.12);border-radius:16px;padding:24px;margin-bottom:20px'>
             <div style='font-size:11px;color:{MUTED};letter-spacing:2px'>MISSION REWARD</div>
             <div style='font-family:Bebas Neue,sans-serif;font-size:52px;color:{C};margin:6px 0'>{reward:.1f} {currency}{mult_tag}</div>
             <div style='font-size:11px;color:{MUTED}'>per completed mission</div>
         </div>""", unsafe_allow_html=True)
 
-        st.markdown(f"""<div style='background:rgba(0,0,0,0.05);border:1px solid rgba(0,0,0,0.08);border-radius:16px;padding:20px;margin-bottom:16px;text-align:center'>
+        st.markdown(f"""<div style='background:rgba({CR},{CG},{CB},0.07);border:1px solid rgba({CR},{CG},{CB},0.08);border-radius:16px;padding:20px;margin-bottom:16px;text-align:center'>
             <div style='font-size:10px;color:{MUTED};letter-spacing:2px;margin-bottom:8px'>⏱ MICRO TIMER</div>
             <div style='font-family:Bebas Neue,sans-serif;font-size:48px;color:{C}'>{st.session_state.micro_timer_seconds}s</div>
             <div style='font-size:11px;color:{MUTED}'>+30s per tap · max 6 minutes</div>
@@ -1111,4 +1118,3 @@ if st.session_state.needs_verification:
             st.balloons()
             st.success(f"✅ VERIFIED. +{earned:.1f} {currency} added. 🔮 Secret unlocked!")
             time.sleep(1); st.rerun()
-
