@@ -1028,304 +1028,101 @@ font-size:clamp(48px,10vw,100px);text-align:center;letter-spacing:6px;margin-bot
 """, unsafe_allow_html=True)
 st.markdown("---")
 
+
 # ─────────────────────────────────────────────────────────────────────────────
-# BATTLE SCREEN — locked per battle, one reward only, universe-specific style
+# BATTLE SCREEN — Godot WebGL embedded + fallback turn-based
 # ─────────────────────────────────────────────────────────────────────────────
 if st.session_state.get("battle_state") == "ready" or st.session_state.view == "battle":
 
-    # Freeze monster + style at battle start so re-renders don't re-roll
+    # Freeze monster at battle start
     if "current_battle" not in st.session_state or st.session_state.current_battle is None:
-        battle_style = wd.get("battle_style", "random")
-        if battle_style == "random":
-            battle_style = random.choice(["shooter","turnbased","reaction","survival","rhythm","rpgclick","trivia"])
         monster_roll = random.randint(1,100)
         if monster_roll > 90:
-            mon = {"name":f"Legendary {st.session_state.user_theme} Titan", "hp":7,"reward":20,"rarity":"Legendary"}
+            mon = {"name":f"Legendary {st.session_state.user_theme} Titan","hp":7,"reward":20,"rarity":"Legendary"}
         elif monster_roll > 70:
-            mon = {"name":f"Epic {st.session_state.user_theme} Warlord",   "hp":5,"reward":12,"rarity":"Epic"}
+            mon = {"name":f"Epic {st.session_state.user_theme} Warlord",  "hp":5,"reward":12,"rarity":"Epic"}
         elif monster_roll > 40:
-            mon = {"name":f"Rare {st.session_state.user_theme} Hunter",    "hp":4,"reward":8, "rarity":"Rare"}
+            mon = {"name":f"Rare {st.session_state.user_theme} Hunter",   "hp":4,"reward":8, "rarity":"Rare"}
         else:
-            mon = {"name":f"{st.session_state.user_theme} Scout",          "hp":3,"reward":5, "rarity":"Common"}
+            mon = {"name":f"{st.session_state.user_theme} Scout",         "hp":3,"reward":5, "rarity":"Common"}
         st.session_state.current_battle = {
-            "style": battle_style, "monster": mon,
-            "reward_paid": False,   # LOCK — only pay once
-            "hp_remaining": mon["hp"],
-            "player_hp": 5,
-            "turn": 0,
-            "shooter_hits": 0,
-            "shooter_targets": random.sample(range(9), 3),  # 3 targets in 9-grid
-            "shooter_clicks": set(),
-            "trivia_answered": False,
+            "monster": mon, "reward_paid": False,
+            "hp_remaining": mon["hp"], "player_hp": 5, "turn": 0,
         }
 
-    cb     = st.session_state.current_battle
-    mon    = cb["monster"]
-    bstyle = cb["style"]
+    cb  = st.session_state.current_battle
+    mon = cb["monster"]
     rarity_colors = {"Common":"#aaaaaa","Rare":"#4488ff","Epic":"#aa44ff","Legendary":"#FFD700"}
-    rc = rarity_colors.get(mon["rarity"],"#ffffff")
+    rc  = rarity_colors.get(mon["rarity"],"#ffffff")
 
-    # HP bar helper
-    def hp_bar(current, maximum, color):
-        pct = max(0, current / maximum)
-        filled = int(pct * 20)
-        bar = "█" * filled + "░" * (20 - filled)
-        return f"<span style='color:{color};font-family:Space Mono,monospace;font-size:13px'>{bar} {current}/{maximum}</span>"
+    # Build Godot URL with universe params
+    theme_enc   = st.session_state.user_theme.replace(" ","%20")
+    currency_enc= currency.replace(" ","%20")
+    color_hex   = C.lstrip("#")
+    shield_enc  = wd.get("shield_name","Shield").replace(" ","%20")
+    booster_enc = wd.get("booster_name","Boost").replace(" ","%20")
+    sflavor_enc = wd.get("shield_flavor","").replace(" ","%20")
+    bflavor_enc = wd.get("booster_flavor","").replace(" ","%20")
+    bstyle      = wd.get("battle_style","turnbased")
+    reward_val  = mon["reward"]
+    rarity_val  = mon["rarity"]
+
+    godot_url = (
+        f"https://danantro32.itch.io/titan-omniverse-battle"
+        f"?universe={theme_enc}&currency={currency_enc}&color={color_hex}"
+        f"&shield={shield_enc}&booster={booster_enc}"
+        f"&sflavor={sflavor_enc}&bflavor={bflavor_enc}"
+        f"&style={bstyle}&reward={reward_val}&rarity={rarity_val}"
+    )
 
     st.markdown(f"""<div class='monster-card'>
-        <div style='font-size:11px;color:{rc};letter-spacing:3px;font-family:Space Mono,monospace'>{mon["rarity"].upper()} ENCOUNTER · {bstyle.upper()} BATTLE</div>
-        <div style='font-family:Bebas Neue,sans-serif;font-size:34px;color:{C};margin:8px 0'>{mon["name"].upper()}</div>
-        <div style='margin:6px 0'>Enemy HP: {hp_bar(cb["hp_remaining"], mon["hp"], "#ff4444")}</div>
-        <div style='margin:6px 0'>Your HP:  {hp_bar(cb["player_hp"], 5, "#44ff88")}</div>
-        <div style='font-size:12px;color:#ffffff;margin-top:8px'>Win reward: <span style='color:{C};font-weight:bold'>{mon["reward"]} {currency}</span>{"  ·  <span style='color:#aaaaaa;font-size:11px'>Reward already claimed</span>" if cb["reward_paid"] else ""}</div>
+        <div style='font-size:11px;color:{rc};letter-spacing:3px;font-family:Space Mono,monospace'>{mon["rarity"].upper()} ENCOUNTER</div>
+        <div style='font-family:Bebas Neue,sans-serif;font-size:32px;color:{C};margin:6px 0'>{mon["name"].upper()}</div>
+        <div style='font-size:12px;color:#ffffff'>Defeat to earn <span style='color:{C};font-weight:bold'>{mon["reward"]} {currency}</span>{"  · <span style='color:#aaaaaa;font-size:11px'>Reward claimed ✓</span>" if cb["reward_paid"] else ""}</div>
     </div>""", unsafe_allow_html=True)
 
-    _, bcol, _ = st.columns([1,2,1])
-    with bcol:
+    # Embed Godot game
+    import streamlit.components.v1 as components
+    components.html(f"""
+    <style>
+    body{{margin:0;background:#000;display:flex;flex-direction:column;align-items:center;}}
+    #game-frame{{width:100%;max-width:800px;height:480px;border:2px solid {C};border-radius:12px;background:#000;}}
+    #loading{{font-family:Space Mono,monospace;color:{C};font-size:13px;text-align:center;padding:16px;}}
+    </style>
+    <div id="loading">⚔️ LOADING BATTLE... ONE MOMENT</div>
+    <iframe id="game-frame"
+        src="{godot_url}"
+        frameborder="0"
+        allowfullscreen
+        allow="autoplay; fullscreen *; monetization; xr-spatial-tracking"
+        style="display:none"
+        onload="document.getElementById('loading').style.display='none';this.style.display='block'">
+    </iframe>
+    <script>
+    // Listen for battle result from Godot
+    window.addEventListener('message', function(e) {{
+        if(e.data && e.data.type === 'battleResult') {{
+            window.parent.postMessage(e.data, '*');
+        }}
+    }});
+    </script>
+    """, height=520)
 
-        # ── TURN-BASED (Anime, RPG, Fantasy) ──────────────────────────────
-        if bstyle == "turnbased":
-            st.markdown(f"<p style='text-align:center;color:#ffffff;font-family:Space Mono,monospace;font-size:13px'>⚔️ TURN-BASED COMBAT · Choose your move</p>", unsafe_allow_html=True)
-            move1 = wd.get("shield_name","DEFEND")[:18]
-            move2 = wd.get("booster_name","STRIKE")[:18]
-            a1, a2, a3 = st.columns(3)
-            outcome = None
-            with a1:
-                if st.button(f"⚔️ {move1}", key="tb_attack"):
-                    dmg = random.randint(1,3)
-                    cb["hp_remaining"] = max(0, cb["hp_remaining"] - dmg)
-                    enemy_dmg = random.randint(0,2)
-                    cb["player_hp"] = max(0, cb["player_hp"] - enemy_dmg)
-                    cb["turn"] += 1
-                    outcome = ("hit", dmg, enemy_dmg)
-            with a2:
-                if st.button(f"⚡ {move2}", key="tb_boost"):
-                    dmg = random.randint(2,4)
-                    cb["hp_remaining"] = max(0, cb["hp_remaining"] - dmg)
-                    enemy_dmg = random.randint(1,3)
-                    cb["player_hp"] = max(0, cb["player_hp"] - enemy_dmg)
-                    cb["turn"] += 1
-                    outcome = ("boost", dmg, enemy_dmg)
-            with a3:
-                if st.button("🛡️ DEFEND", key="tb_defend"):
-                    cb["player_hp"] = min(5, cb["player_hp"] + 1)
-                    enemy_dmg = random.randint(0,1)
-                    cb["player_hp"] = max(0, cb["player_hp"] - enemy_dmg)
-                    cb["turn"] += 1
-                    outcome = ("defend", 0, enemy_dmg)
-            if outcome:
-                otype, dealt, took = outcome
-                msg = f"⚔️ Dealt **{dealt}** damage" if otype != "defend" else "🛡️ You blocked and recovered HP"
-                if took > 0: msg += f" · Enemy struck back for **{took}**"
-                st.info(msg)
-                if cb["hp_remaining"] <= 0:
-                    if not cb["reward_paid"]:
-                        st.session_state.gold += mon["reward"]
-                        st.session_state.battles_won += 1
-                        cb["reward_paid"] = True
-                    st.session_state.battles_fought += 1
-                    st.session_state.incubator_eggs += 1
-                    st.session_state.current_battle = None
-                    st.session_state.battle_state = None
-                    st.success(f"🏆 ENEMY DEFEATED! +{mon['reward']} {currency}!")
-                    time.sleep(1); st.rerun()
-                elif cb["player_hp"] <= 0:
-                    st.session_state.battles_fought += 1
-                    st.session_state.current_battle = None
-                    st.session_state.battle_state = None
-                    st.error("💀 YOU FELL IN BATTLE. No reward. Try again next mission.")
-                    time.sleep(1); st.rerun()
-                else:
-                    st.rerun()
-
-        # ── SHOOTER (FPS games) ───────────────────────────────────────────
-        elif bstyle == "shooter":
-            st.markdown(f"<p style='text-align:center;color:#ffffff;font-family:Space Mono,monospace;font-size:13px'>🎯 SHOOTER — Tap the 🎯 targets, avoid the 💨 decoys</p>", unsafe_allow_html=True)
-            targets = cb["shooter_targets"]
-            clicks  = cb["shooter_clicks"]
-            grid = st.columns(3)
-            for i in range(9):
-                col = grid[i % 3]
-                with col:
-                    if i in clicks:
-                        st.markdown(f"<div style='text-align:center;font-size:24px;padding:8px'>✅</div>", unsafe_allow_html=True)
-                    else:
-                        label = "🎯" if i in targets else "💨"
-                        if st.button(label, key=f"shoot_{i}"):
-                            cb["shooter_clicks"].add(i)
-                            if i in targets:
-                                cb["hp_remaining"] = max(0, cb["hp_remaining"] - 1)
-                            else:
-                                cb["player_hp"] = max(0, cb["player_hp"] - 1)
-                            st.rerun()
-            hits = len(clicks & set(targets))
-            st.markdown(f"<p style='text-align:center;color:#ffffff;font-size:12px'>Hits: {hits}/{len(targets)}</p>", unsafe_allow_html=True)
-            if cb["hp_remaining"] <= 0:
-                if not cb["reward_paid"]:
-                    st.session_state.gold += mon["reward"]
-                    st.session_state.battles_won += 1
-                    cb["reward_paid"] = True
-                st.session_state.battles_fought += 1
+    col1, col2 = st.columns(2)
+    with col1:
+        if not cb["reward_paid"]:
+            if st.button("✅ I WON — CLAIM REWARD", key="claim_win"):
+                st.session_state.gold += mon["reward"]
+                st.session_state.battles_won += 1
+                cb["reward_paid"] = True
                 st.session_state.incubator_eggs += 1
-                st.session_state.current_battle = None
-                st.session_state.battle_state = None
-                st.success(f"🏆 ALL TARGETS DOWN! +{mon['reward']} {currency}!")
-                time.sleep(1); st.rerun()
-            elif cb["player_hp"] <= 0:
                 st.session_state.battles_fought += 1
-                st.session_state.current_battle = None
-                st.session_state.battle_state = None
-                st.error("💀 TOO MANY MISSES. You got eliminated.")
-                time.sleep(1); st.rerun()
-
-        # ── RPG CLICK (Minecraft, Terraria, sandbox) ──────────────────────
-        elif bstyle == "rpgclick":
-            st.markdown(f"<p style='text-align:center;color:#ffffff;font-family:Space Mono,monospace;font-size:13px'>⛏️ RPG COMBAT — Mine the enemy's HP down to zero!</p>", unsafe_allow_html=True)
-            st.markdown(f"<p style='text-align:center;color:#aaaaaa;font-size:12px'>Each click deals 1 damage · Enemy hits back randomly</p>", unsafe_allow_html=True)
-            if st.button(f"⛏️ ATTACK  ({cb['hp_remaining']} HP left)", key="rpg_click"):
-                cb["hp_remaining"] = max(0, cb["hp_remaining"] - 1)
-                if random.random() > 0.6:
-                    cb["player_hp"] = max(0, cb["player_hp"] - 1)
-                if cb["hp_remaining"] <= 0:
-                    if not cb["reward_paid"]:
-                        st.session_state.gold += mon["reward"]
-                        st.session_state.battles_won += 1
-                        cb["reward_paid"] = True
-                    st.session_state.battles_fought += 1
-                    st.session_state.incubator_eggs += 1
-                    st.session_state.current_battle = None
-                    st.session_state.battle_state = None
-                    st.success(f"🏆 DEFEATED! +{mon['reward']} {currency}!")
-                    time.sleep(1); st.rerun()
-                elif cb["player_hp"] <= 0:
-                    st.session_state.battles_fought += 1
-                    st.session_state.current_battle = None
-                    st.session_state.battle_state = None
-                    st.error("💀 YOU DIED. Respawn next mission.")
-                    time.sleep(1); st.rerun()
-                else:
-                    st.rerun()
-
-        # ── REACTION (Sports, Racing) ──────────────────────────────────────
-        elif bstyle in ("reaction","racing"):
-            label = "🏎️ OVERTAKE!" if bstyle == "racing" else "⚡ GO!"
-            desc  = "🏎️ RACING — Hit OVERTAKE at exactly the right moment!" if bstyle == "racing" else "⚡ REACTION — Hit GO the instant you see the signal!"
-            st.markdown(f"<p style='text-align:center;color:#ffffff;font-family:Space Mono,monospace;font-size:13px'>{desc}</p>", unsafe_allow_html=True)
-            # Fake delay signal using turn count
-            if cb["turn"] == 0:
-                st.markdown(f"<p style='text-align:center;font-size:40px'>🔴</p>", unsafe_allow_html=True)
-                if st.button("WAIT FOR GREEN...", key="react_wait"):
-                    cb["turn"] = 1
-                    st.rerun()
-            elif cb["turn"] == 1:
-                st.markdown(f"<p style='text-align:center;font-size:40px'>🟡</p>", unsafe_allow_html=True)
-                if st.button("ALMOST...", key="react_almost"):
-                    cb["turn"] = 2
-                    st.rerun()
-            else:
-                st.markdown(f"<p style='text-align:center;font-size:40px'>🟢</p>", unsafe_allow_html=True)
-                if st.button(label, key="react_go"):
-                    won = random.random() > 0.35
-                    if won and not cb["reward_paid"]:
-                        st.session_state.gold += mon["reward"]
-                        st.session_state.battles_won += 1
-                        cb["reward_paid"] = True
-                    st.session_state.battles_fought += 1
-                    st.session_state.incubator_eggs += 1
-                    st.session_state.current_battle = None
-                    st.session_state.battle_state = None
-                    if won: st.success(f"🏆 PERFECT TIMING! +{mon['reward']} {currency}!")
-                    else:   st.error("💀 TOO LATE! You missed the window.")
-                    time.sleep(1); st.rerun()
-
-        # ── SURVIVAL (Horror) ─────────────────────────────────────────────
-        elif bstyle == "survival":
-            st.markdown(f"<p style='text-align:center;color:#ffffff;font-family:Space Mono,monospace;font-size:13px'>😰 SURVIVAL — Make the right call or get caught!</p>", unsafe_allow_html=True)
-            actions = [("🏃 SPRINT", 0.55), ("🕳️ HIDE", 0.65), ("🪟 WINDOW", 0.45), ("🔇 SILENT WALK", 0.70)]
-            random.shuffle(actions)
-            cols = st.columns(2)
-            for idx, (act_label, win_chance) in enumerate(actions):
-                with cols[idx % 2]:
-                    if st.button(act_label, key=f"surv_{idx}"):
-                        won = random.random() < win_chance
-                        if won and not cb["reward_paid"]:
-                            st.session_state.gold += mon["reward"]
-                            st.session_state.battles_won += 1
-                            cb["reward_paid"] = True
-                        st.session_state.battles_fought += 1
-                        st.session_state.incubator_eggs += 1
-                        st.session_state.current_battle = None
-                        st.session_state.battle_state = None
-                        if won: st.success(f"🏆 YOU ESCAPED! +{mon['reward']} {currency}!")
-                        else:   st.error("💀 CAUGHT. You didn't make it out.")
-                        time.sleep(1); st.rerun()
-
-        # ── RHYTHM (Music, Fashion, K-pop) ───────────────────────────────
-        elif bstyle == "rhythm":
-            sequence = ["🎵","🥁","🎸","🎵","🥁"]
-            if "rhythm_seq" not in cb: cb["rhythm_seq"] = 0
-            step = cb["rhythm_seq"]
-            total = len(sequence)
-            st.markdown(f"<p style='text-align:center;color:#ffffff;font-family:Space Mono,monospace;font-size:13px'>🎵 RHYTHM BATTLE — Hit the beats in order! ({step}/{total})</p>", unsafe_allow_html=True)
-            st.progress(step / total)
-            beat_cols = st.columns(total)
-            for i, beat in enumerate(sequence):
-                with beat_cols[i]:
-                    if i < step:
-                        st.markdown(f"<div style='text-align:center;font-size:28px;opacity:0.4'>{beat}</div>", unsafe_allow_html=True)
-                    elif i == step:
-                        if st.button(beat, key=f"beat_{i}_{step}"):
-                            cb["rhythm_seq"] = step + 1
-                            st.rerun()
-                    else:
-                        st.markdown(f"<div style='text-align:center;font-size:28px;opacity:0.2'>⬜</div>", unsafe_allow_html=True)
-            if step >= total:
-                if not cb["reward_paid"]:
-                    st.session_state.gold += mon["reward"]
-                    st.session_state.battles_won += 1
-                    cb["reward_paid"] = True
-                st.session_state.battles_fought += 1
-                st.session_state.incubator_eggs += 1
-                st.session_state.current_battle = None
-                st.session_state.battle_state = None
-                st.success(f"🎵 PERFECT COMBO! +{mon['reward']} {currency}!")
-                time.sleep(1); st.rerun()
-
-        # ── TRIVIA (Academic, school themes) ─────────────────────────────
-        elif bstyle == "trivia":
-            trivia_q = [
-                ("What is 7 × 8?", ["54","56","58","64"], 1),
-                ("What planet is closest to the Sun?", ["Venus","Earth","Mercury","Mars"], 2),
-                ("What is H2O?", ["Oxygen","Hydrogen","Water","Salt"], 2),
-                ("What is 144 ÷ 12?", ["11","12","13","14"], 1),
-                ("Who wrote Romeo and Juliet?", ["Dickens","Shakespeare","Tolstoy","Austen"], 1),
-            ]
-            if "trivia_q" not in cb:
-                q = random.choice(trivia_q)
-                cb["trivia_q"] = q
-                cb["trivia_answered"] = False
-            q, opts, correct_idx = cb["trivia_q"]
-            st.markdown(f"<div class='monster-card'><p style='color:#ffffff;font-family:Space Mono,monospace;font-size:14px;text-align:center'>{q}</p></div>", unsafe_allow_html=True)
-            if not cb["trivia_answered"]:
-                opt_cols = st.columns(2)
-                for i, opt in enumerate(opts):
-                    with opt_cols[i % 2]:
-                        if st.button(opt, key=f"trivia_{i}"):
-                            cb["trivia_answered"] = True
-                            won = (i == correct_idx)
-                            if won and not cb["reward_paid"]:
-                                st.session_state.gold += mon["reward"]
-                                st.session_state.battles_won += 1
-                                cb["reward_paid"] = True
-                            st.session_state.battles_fought += 1
-                            st.session_state.incubator_eggs += 1
-                            st.session_state.current_battle = None
-                            st.session_state.battle_state = None
-                            if won: st.success(f"🏆 CORRECT! +{mon['reward']} {currency}!")
-                            else:   st.error(f"💀 WRONG! Answer was: {opts[correct_idx]}")
-                            time.sleep(1); st.rerun()
-
-        st.markdown("<br>", unsafe_allow_html=True)
+                st.session_state.spinner_available = True
+                st.success(f"🏆 +{mon['reward']} {currency} claimed!")
+                time.sleep(0.5); st.rerun()
+        else:
+            st.success("✅ Reward already claimed!")
+    with col2:
         if st.button("⏩ SKIP BATTLE", key="skip_battle"):
             st.session_state.current_battle = None
             st.session_state.battle_state = None
@@ -1846,4 +1643,3 @@ if st.session_state.needs_verification:
             st.balloons()
             st.success(f"✅ VERIFIED! +{earned:.1f} {currency} · 🎰 Spinner unlocked · 📖 New story chapter!")
             time.sleep(1); st.rerun()
-
