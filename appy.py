@@ -610,151 +610,201 @@ if st.session_state.user_name is None:
         name_input  = st.text_input("⚡ Champion Name", placeholder="What are you called?", key="gw_name")
         theme_input = st.text_input("🌌 Your Universe", placeholder="Leave empty for INFINITE POWER · or type anything: Naruto, F1, Nike, Medieval Space War...", key="gw_theme")
 
-        # FIDGET SPINNER
+        # FIDGET SPINNERS — multiple personalities
         import streamlit.components.v1 as components
         components.html("""
-        <style>
-        body{margin:0;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;}
-        #fs-wrap{position:relative;width:180px;height:180px;cursor:grab;user-select:none;}
-        #fs-wrap:active{cursor:grabbing;}
-        canvas#fsc{border-radius:50%;}
-        #fs-hint{font-family:'Space Mono',monospace;font-size:10px;color:rgba(255,255,255,0.5);letter-spacing:2px;margin-top:8px;text-align:center;}
-        #fs-rpm{font-family:'Space Mono',monospace;font-size:12px;color:#FFD700;letter-spacing:2px;margin-top:4px;text-align:center;min-height:18px;}
-        </style>
-        <div id="fs-wrap">
-          <canvas id="fsc" width="180" height="180"></canvas>
-        </div>
-        <div id="fs-hint">SPIN ME</div>
-        <div id="fs-rpm"></div>
-        <script>
-        const canvas = document.getElementById('fsc');
-        const ctx = canvas.getContext('2d');
-        const cx = 90, cy = 90;
-        let angle = 0;
-        let velocity = 0;
-        let dragging = false;
-        let lastAngle = 0;
-        let lastTime = 0;
-        let frameId;
+<style>
+body{margin:0;background:transparent;font-family:'Space Mono',monospace;}
+.spinner-rack{display:flex;gap:24px;justify-content:center;align-items:flex-end;flex-wrap:wrap;padding:8px 0;}
+.spinner-slot{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.spinner-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.5);}
+.spinner-rpm{font-size:10px;letter-spacing:1px;min-height:16px;text-align:center;}
+.nuke-btn{padding:6px 14px;font-size:10px;font-family:'Space Mono',monospace;border:1px solid;border-radius:6px;cursor:pointer;letter-spacing:1px;margin-top:2px;transition:all 0.2s;}
+.nuke-btn:hover{transform:scale(1.05);}
+</style>
+<div class="spinner-rack" id="rack"></div>
+<script>
+const SPINNERS = [
+  {id:'s0', size:90,  blades:3, colors:['#FFD700','#FF8C00','#FF3C3C'], friction:0.9995, label:'ETERNAL',   nuke:false, nukeVel:0},
+  {id:'s1', size:70,  blades:4, colors:['#00C8FF','#0044FF','#8800FF'], friction:0.9998, label:'FOREVER',   nuke:false, nukeVel:0},
+  {id:'s2', size:80,  blades:5, colors:['#00FF88','#00FFCC','#00CC44'], friction:0.9997, label:'INFINITE',  nuke:false, nukeVel:0},
+  {id:'s3', size:75,  blades:3, colors:['#FF44AA','#FF0066','#CC0044'], friction:0.9996, label:'HYPER 🔥',  nuke:true,  nukeVel:2.8},
+  {id:'s4', size:65,  blades:6, colors:['#FFFFFF','#AAAAAA','#FFD700'], friction:0.9994, label:'NUKE 💀',   nuke:true,  nukeVel:4.5},
+];
 
-        function getMouseAngle(e) {
-            const rect = canvas.getBoundingClientRect();
-            const x = (e.clientX || e.touches[0].clientX) - rect.left - cx;
-            const y = (e.clientY || e.touches[0].clientY) - rect.top - cy;
-            return Math.atan2(y, x);
-        }
+const rack = document.getElementById('rack');
+const states = {};
 
-        function drawSpinner(a) {
-            ctx.clearRect(0,0,180,180);
-            const blades = 3;
-            for(let i=0;i<blades;i++) {
-                const ba = a + (i * 2 * Math.PI / blades);
-                ctx.save();
-                ctx.translate(cx,cy);
-                ctx.rotate(ba);
-                // Blade
-                ctx.beginPath();
-                ctx.ellipse(38, 0, 38, 18, 0, 0, 2*Math.PI);
-                const grad = ctx.createRadialGradient(20,0,2,38,0,38);
-                grad.addColorStop(0,'#FFD700');
-                grad.addColorStop(0.5,'#FF8C00');
-                grad.addColorStop(1,'rgba(255,60,60,0.3)');
-                ctx.fillStyle = grad;
-                ctx.fill();
-                ctx.strokeStyle='rgba(255,215,0,0.6)';ctx.lineWidth=1.5;ctx.stroke();
-                // Glow trail based on speed
-                if(Math.abs(velocity) > 0.05) {
-                    ctx.globalAlpha = Math.min(Math.abs(velocity)*0.3, 0.4);
-                    ctx.beginPath();
-                    ctx.ellipse(38,0,38,18,0,0,2*Math.PI);
-                    ctx.fillStyle='#FFD700';
-                    ctx.fill();
-                    ctx.globalAlpha=1;
-                }
-                ctx.restore();
-            }
-            // Center hub
-            ctx.beginPath();
-            ctx.arc(cx,cy,18,0,2*Math.PI);
-            const hubGrad = ctx.createRadialGradient(cx-4,cy-4,2,cx,cy,18);
-            hubGrad.addColorStop(0,'#ffffff');
-            hubGrad.addColorStop(0.4,'#FFD700');
-            hubGrad.addColorStop(1,'#FF8C00');
-            ctx.fillStyle=hubGrad;
-            ctx.fill();
-            ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
-            // Center dot
-            ctx.beginPath();
-            ctx.arc(cx,cy,5,0,2*Math.PI);
-            ctx.fillStyle='#111';ctx.fill();
-            // Ring glow
-            ctx.beginPath();
-            ctx.arc(cx,cy,88,0,2*Math.PI);
-            ctx.strokeStyle=`rgba(255,215,0,${Math.min(Math.abs(velocity)*0.5,0.3)})`;
-            ctx.lineWidth=2;ctx.stroke();
-        }
+SPINNERS.forEach((sp, idx) => {
+  states[sp.id] = {angle:0, vel: 0.008 + idx*0.003, dragging:false, lastA:0, lastT:0};
+  // Eternal spinners get a permanent base velocity
+  if(!sp.nuke) states[sp.id].baseVel = 0.006 + idx*0.002;
 
-        function loop(ts) {
-            if(!dragging) {
-                velocity *= 0.985;
-                angle += velocity;
-            }
-            drawSpinner(angle);
-            const rpm = Math.abs(velocity * 60 / (2*Math.PI) * 60).toFixed(0);
-            const rpmEl = document.getElementById('fs-rpm');
-            const hintEl = document.getElementById('fs-hint');
-            if(Math.abs(velocity) > 0.02) {
-                rpmEl.textContent = rpm + ' RPM';
-                rpmEl.style.color = velocity > 0.3 ? '#FF4444' : velocity > 0.1 ? '#FF8C00' : '#FFD700';
-                hintEl.textContent = velocity > 0.5 ? '🔥 INSANE' : velocity > 0.2 ? '⚡ FAST' : '💫 SPINNING';
-            } else {
-                rpmEl.textContent = '';
-                hintEl.textContent = 'SPIN ME';
-            }
-            frameId = requestAnimationFrame(loop);
-        }
-        loop(0);
+  const slot = document.createElement('div');
+  slot.className = 'spinner-slot';
 
-        canvas.addEventListener('mousedown', e => {
-            dragging = true;
-            lastAngle = getMouseAngle(e);
-            lastTime = performance.now();
-        });
-        window.addEventListener('mousemove', e => {
-            if(!dragging) return;
-            const now = performance.now();
-            const a = getMouseAngle(e);
-            let delta = a - lastAngle;
-            if(delta > Math.PI) delta -= 2*Math.PI;
-            if(delta < -Math.PI) delta += 2*Math.PI;
-            velocity = delta / Math.max(now - lastTime, 1) * 16;
-            angle += delta;
-            lastAngle = a;
-            lastTime = now;
-        });
-        window.addEventListener('mouseup', () => { dragging = false; });
-        canvas.addEventListener('touchstart', e => {
-            dragging = true;
-            lastAngle = getMouseAngle(e);
-            lastTime = performance.now();
-            e.preventDefault();
-        }, {passive:false});
-        window.addEventListener('touchmove', e => {
-            if(!dragging) return;
-            const now = performance.now();
-            const a = getMouseAngle(e);
-            let delta = a - lastAngle;
-            if(delta > Math.PI) delta -= 2*Math.PI;
-            if(delta < -Math.PI) delta += 2*Math.PI;
-            velocity = delta / Math.max(now - lastTime, 1) * 16;
-            angle += delta;
-            lastAngle = a;
-            lastTime = now;
-            e.preventDefault();
-        }, {passive:false});
-        window.addEventListener('touchend', () => { dragging = false; });
-        </script>
-        """, height=230)
+  const canvas = document.createElement('canvas');
+  canvas.id = 'c_'+sp.id;
+  canvas.width = sp.size*2;
+  canvas.height = sp.size*2;
+  canvas.style.cursor = 'grab';
+  canvas.style.borderRadius = '50%';
+
+  const label = document.createElement('div');
+  label.className = 'spinner-label';
+  label.textContent = sp.label;
+
+  const rpm = document.createElement('div');
+  rpm.id = 'rpm_'+sp.id;
+  rpm.className = 'spinner-rpm';
+  rpm.style.color = sp.colors[0];
+
+  slot.appendChild(canvas);
+  slot.appendChild(label);
+  slot.appendChild(rpm);
+
+  if(sp.nuke) {
+    const btn = document.createElement('button');
+    btn.className = 'nuke-btn';
+    btn.textContent = sp.label === 'NUKE 💀' ? '☢️ NUKE' : '⚡ HYPER';
+    btn.style.borderColor = sp.colors[0];
+    btn.style.color = sp.colors[0];
+    btn.style.background = 'rgba(0,0,0,0.5)';
+    btn.onclick = () => {
+      states[sp.id].vel = sp.nukeVel;
+    };
+    slot.appendChild(btn);
+  }
+
+  rack.appendChild(slot);
+
+  // Drag interaction
+  function getAngle(e, c) {
+    const r = c.getBoundingClientRect();
+    const cx2 = r.left + r.width/2, cy2 = r.top + r.height/2;
+    const ex = (e.clientX || (e.touches && e.touches[0].clientX)) - cx2;
+    const ey = (e.clientY || (e.touches && e.touches[0].clientY)) - cy2;
+    return Math.atan2(ey, ex);
+  }
+  canvas.addEventListener('mousedown', e => {
+    states[sp.id].dragging = true;
+    states[sp.id].lastA = getAngle(e, canvas);
+    states[sp.id].lastT = performance.now();
+    canvas.style.cursor = 'grabbing';
+  });
+  window.addEventListener('mousemove', e => {
+    if(!states[sp.id].dragging) return;
+    const now = performance.now();
+    const a = getAngle(e, canvas);
+    let d = a - states[sp.id].lastA;
+    if(d > Math.PI) d -= 2*Math.PI;
+    if(d < -Math.PI) d += 2*Math.PI;
+    states[sp.id].vel = d / Math.max(now - states[sp.id].lastT, 1) * 16;
+    states[sp.id].angle += d;
+    states[sp.id].lastA = a;
+    states[sp.id].lastT = now;
+  });
+  window.addEventListener('mouseup', () => { states[sp.id].dragging = false; canvas.style.cursor='grab'; });
+  canvas.addEventListener('touchstart', e => {
+    states[sp.id].dragging = true;
+    states[sp.id].lastA = getAngle(e, canvas);
+    states[sp.id].lastT = performance.now();
+    e.preventDefault();
+  }, {passive:false});
+  window.addEventListener('touchmove', e => {
+    if(!states[sp.id].dragging) return;
+    const now = performance.now();
+    const a = getAngle(e, canvas);
+    let d = a - states[sp.id].lastA;
+    if(d > Math.PI) d -= 2*Math.PI;
+    if(d < -Math.PI) d += 2*Math.PI;
+    states[sp.id].vel = d / Math.max(now - states[sp.id].lastT, 1) * 16;
+    states[sp.id].angle += d;
+    states[sp.id].lastA = a;
+    states[sp.id].lastT = now;
+    e.preventDefault();
+  }, {passive:false});
+  window.addEventListener('touchend', () => { states[sp.id].dragging = false; });
+});
+
+function drawSpinner(sp, angle, vel) {
+  const canvas = document.getElementById('c_'+sp.id);
+  const ctx = canvas.getContext('2d');
+  const cx = sp.size, cy = sp.size, r = sp.size - 6;
+  ctx.clearRect(0,0,sp.size*2,sp.size*2);
+  const speed = Math.abs(vel);
+
+  for(let i=0;i<sp.blades;i++) {
+    const ba = angle + (i * 2 * Math.PI / sp.blades);
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(ba);
+    ctx.beginPath();
+    ctx.ellipse(r*0.42, 0, r*0.42, r*0.22, 0, 0, 2*Math.PI);
+    const g = ctx.createRadialGradient(r*0.2, 0, 2, r*0.42, 0, r*0.42);
+    g.addColorStop(0, sp.colors[0]);
+    g.addColorStop(0.5, sp.colors[1 % sp.colors.length]);
+    g.addColorStop(1, sp.colors[2 % sp.colors.length]+'44');
+    ctx.fillStyle = g;
+    ctx.fill();
+    if(speed > 0.08) {
+      ctx.globalAlpha = Math.min(speed * 0.15, 0.35);
+      ctx.fillStyle = sp.colors[0];
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+    ctx.restore();
+  }
+  // Hub
+  ctx.beginPath();
+  ctx.arc(cx, cy, r*0.18, 0, 2*Math.PI);
+  const hg = ctx.createRadialGradient(cx-2, cy-2, 1, cx, cy, r*0.18);
+  hg.addColorStop(0, '#ffffff');
+  hg.addColorStop(0.5, sp.colors[0]);
+  hg.addColorStop(1, sp.colors[1 % sp.colors.length]);
+  ctx.fillStyle = hg;
+  ctx.fill();
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx, cy, r*0.06, 0, 2*Math.PI);
+  ctx.fillStyle = '#111'; ctx.fill();
+  // Outer glow ring
+  if(speed > 0.05) {
+    ctx.beginPath();
+    ctx.arc(cx, cy, r+2, 0, 2*Math.PI);
+    ctx.strokeStyle = sp.colors[0] + Math.floor(Math.min(speed*80,200)).toString(16).padStart(2,'0');
+    ctx.lineWidth = 2; ctx.stroke();
+  }
+}
+
+function loop() {
+  SPINNERS.forEach(sp => {
+    const st = states[sp.id];
+    if(!st.dragging) {
+      if(sp.nuke) {
+        st.vel *= sp.friction;
+      } else {
+        // Eternal: never go below base velocity
+        st.vel = Math.max(st.vel * sp.friction, st.baseVel);
+      }
+      st.angle += st.vel;
+    }
+    drawSpinner(sp, st.angle, st.vel);
+    const rpmEl = document.getElementById('rpm_'+sp.id);
+    const rpmVal = Math.abs(st.vel * 60 / (2*Math.PI) * 60);
+    if(rpmVal > 5) {
+      rpmEl.textContent = Math.round(rpmVal) + ' RPM';
+      rpmEl.style.color = rpmVal > 2000 ? '#FF0000' : rpmVal > 500 ? '#FF8C00' : sp.colors[0];
+    } else {
+      rpmEl.textContent = sp.nuke ? 'TAP TO NUKE' : '∞';
+      rpmEl.style.color = 'rgba(255,255,255,0.3)';
+    }
+  });
+  requestAnimationFrame(loop);
+}
+loop();
+</script>
+        """, height=260)
+
 
         st.markdown("<br>", unsafe_allow_html=True)
 
@@ -1715,12 +1765,16 @@ else:
             <div style='font-size:11px;color:#ffffff'>+30s per tap · max 6 minutes</div>
         </div>""", unsafe_allow_html=True)
 
-        tc1, tc2, tc3 = st.columns(3)
+        tc1, tc2, tc3, tc4 = st.columns(4)
         with tc1:
+            if st.button("➖ MINUS 30s", key="sub_30"):
+                if st.session_state.micro_timer_seconds > 30: st.session_state.micro_timer_seconds -= 30; st.rerun()
+                else: st.warning("Minimum 30 seconds!")
+        with tc2:
             if st.button("➕ ADD 30s", key="add_30"):
                 if st.session_state.micro_timer_seconds < 360: st.session_state.micro_timer_seconds += 30; st.rerun()
                 else: st.warning("Max 6 minutes!")
-        with tc2:
+        with tc3:
             if st.button("▶ START", key="start_micro"):
                 secs = st.session_state.micro_timer_seconds
                 bar = st.progress(0); status = st.empty()
@@ -1729,7 +1783,7 @@ else:
                     status.markdown(f"<p style='text-align:center;font-family:Space Mono,monospace;color:{C};font-size:20px'>{secs-i-1}s remaining</p>", unsafe_allow_html=True)
                 st.session_state.micro_timer_seconds = 30
                 st.success("✅ Micro session done!"); time.sleep(1); st.rerun()
-        with tc3:
+        with tc4:
             if st.button("🔄 RESET", key="reset_micro"):
                 st.session_state.micro_timer_seconds = 30; st.rerun()
 
@@ -1792,3 +1846,4 @@ if st.session_state.needs_verification:
             st.balloons()
             st.success(f"✅ VERIFIED! +{earned:.1f} {currency} · 🎰 Spinner unlocked · 📖 New story chapter!")
             time.sleep(1); st.rerun()
+
