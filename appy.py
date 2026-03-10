@@ -608,22 +608,155 @@ if st.session_state.user_name is None:
         st.markdown("<br>", unsafe_allow_html=True)
 
         name_input  = st.text_input("⚡ Champion Name", placeholder="What are you called?", key="gw_name")
-        theme_input = st.text_input("🌌 Your Universe", placeholder="Minecraft, Naruto, F1, Dark Souls Ninja, Medieval Space War...", key="gw_theme")
+        theme_input = st.text_input("🌌 Your Universe", placeholder="Leave empty for INFINITE POWER · or type anything: Naruto, F1, Nike, Medieval Space War...", key="gw_theme")
 
-        st.markdown("""
-        <p class="default-hint">💡 Leave empty for default universe: <strong>INFINITE POWER</strong></p>
-        <p class="default-hint">✨ Go broad or ultra-specific — <strong>"Naruto meets Cyberpunk"</strong>, <strong>"Medieval Space War"</strong>, <strong>"Stealth Assassin Nike"</strong> — the more detail you give, the better the AI builds your world.</p>
-        <div class="chip-section-label">⚡ Quick picks</div>
-        <div class="chip-row">
-            <span class="chip">Minecraft</span><span class="chip">Super Smash Bros</span>
-            <span class="chip">One Piece</span><span class="chip">Formula 1</span>
-            <span class="chip">Dead by Daylight</span><span class="chip">Pokemon</span>
-            <span class="chip">Naruto</span><span class="chip">NBA</span>
-            <span class="chip">Roblox</span><span class="chip">Harry Potter</span>
-            <span class="chip">Valorant</span><span class="chip">Nike</span>
-            <span class="chip">K-Pop</span><span class="chip">Ancient Rome</span>
+        # FIDGET SPINNER
+        import streamlit.components.v1 as components
+        components.html("""
+        <style>
+        body{margin:0;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+        #fs-wrap{position:relative;width:180px;height:180px;cursor:grab;user-select:none;}
+        #fs-wrap:active{cursor:grabbing;}
+        canvas#fsc{border-radius:50%;}
+        #fs-hint{font-family:'Space Mono',monospace;font-size:10px;color:rgba(255,255,255,0.5);letter-spacing:2px;margin-top:8px;text-align:center;}
+        #fs-rpm{font-family:'Space Mono',monospace;font-size:12px;color:#FFD700;letter-spacing:2px;margin-top:4px;text-align:center;min-height:18px;}
+        </style>
+        <div id="fs-wrap">
+          <canvas id="fsc" width="180" height="180"></canvas>
         </div>
-        """, unsafe_allow_html=True)
+        <div id="fs-hint">SPIN ME</div>
+        <div id="fs-rpm"></div>
+        <script>
+        const canvas = document.getElementById('fsc');
+        const ctx = canvas.getContext('2d');
+        const cx = 90, cy = 90;
+        let angle = 0;
+        let velocity = 0;
+        let dragging = false;
+        let lastAngle = 0;
+        let lastTime = 0;
+        let frameId;
+
+        function getMouseAngle(e) {
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX || e.touches[0].clientX) - rect.left - cx;
+            const y = (e.clientY || e.touches[0].clientY) - rect.top - cy;
+            return Math.atan2(y, x);
+        }
+
+        function drawSpinner(a) {
+            ctx.clearRect(0,0,180,180);
+            const blades = 3;
+            for(let i=0;i<blades;i++) {
+                const ba = a + (i * 2 * Math.PI / blades);
+                ctx.save();
+                ctx.translate(cx,cy);
+                ctx.rotate(ba);
+                // Blade
+                ctx.beginPath();
+                ctx.ellipse(38, 0, 38, 18, 0, 0, 2*Math.PI);
+                const grad = ctx.createRadialGradient(20,0,2,38,0,38);
+                grad.addColorStop(0,'#FFD700');
+                grad.addColorStop(0.5,'#FF8C00');
+                grad.addColorStop(1,'rgba(255,60,60,0.3)');
+                ctx.fillStyle = grad;
+                ctx.fill();
+                ctx.strokeStyle='rgba(255,215,0,0.6)';ctx.lineWidth=1.5;ctx.stroke();
+                // Glow trail based on speed
+                if(Math.abs(velocity) > 0.05) {
+                    ctx.globalAlpha = Math.min(Math.abs(velocity)*0.3, 0.4);
+                    ctx.beginPath();
+                    ctx.ellipse(38,0,38,18,0,0,2*Math.PI);
+                    ctx.fillStyle='#FFD700';
+                    ctx.fill();
+                    ctx.globalAlpha=1;
+                }
+                ctx.restore();
+            }
+            // Center hub
+            ctx.beginPath();
+            ctx.arc(cx,cy,18,0,2*Math.PI);
+            const hubGrad = ctx.createRadialGradient(cx-4,cy-4,2,cx,cy,18);
+            hubGrad.addColorStop(0,'#ffffff');
+            hubGrad.addColorStop(0.4,'#FFD700');
+            hubGrad.addColorStop(1,'#FF8C00');
+            ctx.fillStyle=hubGrad;
+            ctx.fill();
+            ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+            // Center dot
+            ctx.beginPath();
+            ctx.arc(cx,cy,5,0,2*Math.PI);
+            ctx.fillStyle='#111';ctx.fill();
+            // Ring glow
+            ctx.beginPath();
+            ctx.arc(cx,cy,88,0,2*Math.PI);
+            ctx.strokeStyle=`rgba(255,215,0,${Math.min(Math.abs(velocity)*0.5,0.3)})`;
+            ctx.lineWidth=2;ctx.stroke();
+        }
+
+        function loop(ts) {
+            if(!dragging) {
+                velocity *= 0.985;
+                angle += velocity;
+            }
+            drawSpinner(angle);
+            const rpm = Math.abs(velocity * 60 / (2*Math.PI) * 60).toFixed(0);
+            const rpmEl = document.getElementById('fs-rpm');
+            const hintEl = document.getElementById('fs-hint');
+            if(Math.abs(velocity) > 0.02) {
+                rpmEl.textContent = rpm + ' RPM';
+                rpmEl.style.color = velocity > 0.3 ? '#FF4444' : velocity > 0.1 ? '#FF8C00' : '#FFD700';
+                hintEl.textContent = velocity > 0.5 ? '🔥 INSANE' : velocity > 0.2 ? '⚡ FAST' : '💫 SPINNING';
+            } else {
+                rpmEl.textContent = '';
+                hintEl.textContent = 'SPIN ME';
+            }
+            frameId = requestAnimationFrame(loop);
+        }
+        loop(0);
+
+        canvas.addEventListener('mousedown', e => {
+            dragging = true;
+            lastAngle = getMouseAngle(e);
+            lastTime = performance.now();
+        });
+        window.addEventListener('mousemove', e => {
+            if(!dragging) return;
+            const now = performance.now();
+            const a = getMouseAngle(e);
+            let delta = a - lastAngle;
+            if(delta > Math.PI) delta -= 2*Math.PI;
+            if(delta < -Math.PI) delta += 2*Math.PI;
+            velocity = delta / Math.max(now - lastTime, 1) * 16;
+            angle += delta;
+            lastAngle = a;
+            lastTime = now;
+        });
+        window.addEventListener('mouseup', () => { dragging = false; });
+        canvas.addEventListener('touchstart', e => {
+            dragging = true;
+            lastAngle = getMouseAngle(e);
+            lastTime = performance.now();
+            e.preventDefault();
+        }, {passive:false});
+        window.addEventListener('touchmove', e => {
+            if(!dragging) return;
+            const now = performance.now();
+            const a = getMouseAngle(e);
+            let delta = a - lastAngle;
+            if(delta > Math.PI) delta -= 2*Math.PI;
+            if(delta < -Math.PI) delta += 2*Math.PI;
+            velocity = delta / Math.max(now - lastTime, 1) * 16;
+            angle += delta;
+            lastAngle = a;
+            lastTime = now;
+            e.preventDefault();
+        }, {passive:false});
+        window.addEventListener('touchend', () => { dragging = false; });
+        </script>
+        """, height=230)
+
+        st.markdown("<br>", unsafe_allow_html=True)
 
         if st.button("⚡ ENTER THE INFINITEVERSE", key="gw_enter"):
             if not name_input.strip():
