@@ -1214,7 +1214,7 @@ elif view == "plans":
                 <div style='font-family:Bebas Neue,sans-serif;font-size:20px;color:{C};letter-spacing:4px'>1TR5LG89D</div>
             </div>
         </div>""", unsafe_allow_html=True)
-        st.link_button("⚡ SUBSCRIBE — PREMIUM $5/mo", "https://buy.stripe.com/test_9B6bIV5om9YScT33A39EI02", use_container_width=True)
+        st.link_button("⚡ SUBSCRIBE — PREMIUM $5/mo", "https://buy.stripe.com/7sY3co4RC36M0KY495dQQ02", use_container_width=True)
 
     with e_col:
         st.markdown(f"""<div class='shop-card' style='border-color:#FFD700'>
@@ -1235,7 +1235,7 @@ elif view == "plans":
                 <div style='font-family:Bebas Neue,sans-serif;font-size:20px;color:#FFD700;letter-spacing:4px'>4RJ1TV51Z</div>
             </div>
         </div>""", unsafe_allow_html=True)
-        st.link_button("💀 SUBSCRIBE — ELITE $10/mo", "https://buy.stripe.com/test_8x200d6sqdb48CNeeH9EI01", use_container_width=True)
+        st.link_button("💀 SUBSCRIBE — ELITE $10/mo", "https://buy.stripe.com/14A9AM83O0YE0KYgVRdQQ03", use_container_width=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown(f"""<div class='ach-card' style='text-align:center'>
