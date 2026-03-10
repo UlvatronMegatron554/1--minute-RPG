@@ -1191,43 +1191,61 @@ elif view == "manual":
 # ── PLANS ─────────────────────────────────────────────────────────────────────
 elif view == "plans":
     st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>💳 UPGRADE PLANS</h2>", unsafe_allow_html=True)
-    st.markdown(f"<p style='text-align:center;font-family:Space Mono,monospace;color:#ffffff;font-size:12px'>Stripe payments coming soon. Get ready.</p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='text-align:center;font-family:Space Mono,monospace;color:#ffffff;font-size:12px'>Subscribe below · Then enter your code in the sidebar to activate instantly ⚡</p>", unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
 
     p_col, e_col = st.columns(2)
     with p_col:
         st.markdown(f"""<div class='shop-card'>
             <div style='text-align:center;margin-bottom:16px'>
-                <div style='font-family:Bebas Neue,sans-serif;font-size:32px;color:{C}'>⚡ PREMIUM</div>
-                <div style='font-family:Bebas Neue,sans-serif;font-size:48px;color:{TEXT}'>$5<span style='font-size:18px;color:#ffffff'>/mo</span></div>
-                <div style='background:rgba(255,165,0,0.2);border:1px solid orange;border-radius:8px;padding:4px 12px;display:inline-block;font-family:Space Mono,monospace;font-size:10px;color:orange;letter-spacing:2px'>COMING SOON</div>
+                <div style='font-family:Bebas Neue,sans-serif;font-size:36px;color:{C}'>⚡ PREMIUM</div>
+                <div style='font-family:Bebas Neue,sans-serif;font-size:56px;color:#ffffff;line-height:1'>$5<span style='font-size:20px;color:#aaaaaa'>/mo</span></div>
+                <div style='font-family:Space Mono,monospace;font-size:11px;color:#aaaaaa;margin-top:4px'>Cancel anytime</div>
             </div>
-            <div style='font-family:Space Mono,monospace;font-size:12px;color:{TEXT};line-height:2'>
+            <div style='font-family:Space Mono,monospace;font-size:12px;color:#ffffff;line-height:2.2;margin-bottom:20px'>
                 ✅ 2× XP on every mission<br>
                 ✅ Rare+ ability upgrades<br>
                 ✅ Extended mission timer options<br>
-                ✅ Custom universe themes<br>
                 ✅ Priority AI universe generation<br>
-                ✅ Exclusive Premium badge
+                ✅ Exclusive ⚡ Premium badge
+            </div>
+            <div style='background:#1a1a1a;border:1px solid #444;border-radius:10px;padding:12px;text-align:center;margin-bottom:12px'>
+                <div style='font-family:Space Mono,monospace;font-size:10px;color:#aaaaaa;letter-spacing:2px;margin-bottom:4px'>AFTER PAYING — ENTER CODE IN SIDEBAR</div>
+                <div style='font-family:Bebas Neue,sans-serif;font-size:20px;color:{C};letter-spacing:4px'>1TR5LG89D</div>
             </div>
         </div>""", unsafe_allow_html=True)
+        st.link_button("⚡ SUBSCRIBE — PREMIUM $5/mo", "https://buy.stripe.com/test_9B6bIV5om9YScT33A39EI02", use_container_width=True)
 
     with e_col:
         st.markdown(f"""<div class='shop-card' style='border-color:#FFD700'>
             <div style='text-align:center;margin-bottom:16px'>
-                <div style='font-family:Bebas Neue,sans-serif;font-size:32px;color:#FFD700'>💀 ELITE</div>
-                <div style='font-family:Bebas Neue,sans-serif;font-size:48px;color:{TEXT}'>$10<span style='font-size:18px;color:#ffffff'>/mo</span></div>
-                <div style='background:rgba(255,215,0,0.2);border:1px solid #FFD700;border-radius:8px;padding:4px 12px;display:inline-block;font-family:Space Mono,monospace;font-size:10px;color:#FFD700;letter-spacing:2px'>COMING SOON</div>
+                <div style='font-family:Bebas Neue,sans-serif;font-size:36px;color:#FFD700'>💀 ELITE</div>
+                <div style='font-family:Bebas Neue,sans-serif;font-size:56px;color:#ffffff;line-height:1'>$10<span style='font-size:20px;color:#aaaaaa'>/mo</span></div>
+                <div style='font-family:Space Mono,monospace;font-size:11px;color:#aaaaaa;margin-top:4px'>Cancel anytime</div>
             </div>
-            <div style='font-family:Space Mono,monospace;font-size:12px;color:{TEXT};line-height:2'>
+            <div style='font-family:Space Mono,monospace;font-size:12px;color:#ffffff;line-height:2.2;margin-bottom:20px'>
                 ✅ 3× XP on every mission<br>
                 ✅ ALL ability tiers unlocked<br>
                 ✅ Full maximum customization<br>
-                ✅ Exclusive Elite 💀 badge<br>
-                ✅ Cashback on milestone rewards<br>
                 ✅ Legendary egg rate doubled<br>
-                ✅ Private universe vaults
+                ✅ Exclusive 💀 Elite badge
+            </div>
+            <div style='background:#1a1a1a;border:1px solid #FFD700;border-radius:10px;padding:12px;text-align:center;margin-bottom:12px'>
+                <div style='font-family:Space Mono,monospace;font-size:10px;color:#aaaaaa;letter-spacing:2px;margin-bottom:4px'>AFTER PAYING — ENTER CODE IN SIDEBAR</div>
+                <div style='font-family:Bebas Neue,sans-serif;font-size:20px;color:#FFD700;letter-spacing:4px'>4RJ1TV51Z</div>
             </div>
         </div>""", unsafe_allow_html=True)
+        st.link_button("💀 SUBSCRIBE — ELITE $10/mo", "https://buy.stripe.com/test_8x200d6sqdb48CNeeH9EI01", use_container_width=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown(f"""<div class='ach-card' style='text-align:center'>
+        <div style='font-family:Bebas Neue,sans-serif;font-size:18px;color:{C};letter-spacing:3px'>HOW IT WORKS</div>
+        <div style='font-family:Space Mono,monospace;font-size:12px;color:#ffffff;line-height:2;margin-top:8px'>
+            1️⃣ Click your plan above → complete Stripe checkout<br>
+            2️⃣ Come back here → go to the sidebar<br>
+            3️⃣ Enter your activation code → status unlocks instantly ⚡
+        </div>
+    </div>""", unsafe_allow_html=True)
 
 # ── FEEDBACK ──────────────────────────────────────────────────────────────────
 elif view == "feedback":
