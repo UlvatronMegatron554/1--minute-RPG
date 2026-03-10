@@ -25,26 +25,31 @@ DEFAULT_UNIVERSE = {
 # UNIVERSE SECRETS DATABASE
 # ─────────────────────────────────────────────────────────────────────────────
 UNIVERSE_SECRETS = [
-    "🌌 The observable universe is just 4% of all matter. The rest? Completely invisible dark energy we can't explain.",
-    "⚡ Every atom in your body was forged inside a dying star. You are literally made of stardust.",
-    "🧠 Your brain generates enough electricity to power a small LED bulb. You are a walking power source.",
-    "🌀 Time moves faster on top of mountains than at sea level. GPS satellites have to correct for this every single day.",
-    "🔮 Quantum particles can be in two places at once — until you look at them. Reality literally changes when observed.",
-    "💀 The universe is 13.8 billion years old. Humans have existed for 0.0015% of that time.",
-    "🌊 There are more possible chess games than atoms in the observable universe. Infinity is closer than you think.",
-    "🧬 Your DNA, if uncoiled, would stretch from Earth to the Sun and back — 600 times.",
-    "🕳️ A black hole the mass of Earth would be the size of a marble. That marble would destroy everything.",
-    "💫 The Milky Way galaxy is on a collision course with Andromeda. In 4 billion years — they merge.",
-    "🌡️ Space is not empty. It has a temperature: -270.45°C. Almost absolute zero but not quite.",
-    "⏰ If the history of Earth was compressed into 24 hours, humans appear at 11:59:58 PM.",
-    "🔬 There are more bacteria in your gut right now than stars in the Milky Way.",
-    "🌍 The Earth's magnetic poles are slowly drifting. North is moving toward Siberia as you read this.",
-    "💥 The sun loses 4 million tons of mass every single second converting it to pure energy.",
-    "🧲 If you removed all the empty space from every human on Earth, we'd fit in a sugar cube.",
-    "🌙 The Moon is slowly drifting away from Earth — 3.8cm per year. One day it will escape.",
-    "⚛️ Protons are made of quarks. Quarks are held together by gluons. If you tried to pull them apart — new quarks appear from nothing.",
-    "🕊️ Pigeons can detect magnetic fields. They literally have a compass built into their biology.",
-    "🌿 Trees communicate through underground fungal networks. Forests are talking right now.",
+    "🤯 WAIT WHAT: You cannot hum while holding your nose closed. Try it. You literally just tried it.",
+    "💀 REALITY CHECK: The CIA once tried to weaponize cats as spies. They spent $20 million. The first cat was immediately hit by a taxi.",
+    "🌌 EXISTENCE CRISIS: There are more possible iterations of a game of chess than atoms in the observable universe. Every game ever played is essentially unique.",
+    "🧠 BRAIN BREAK: Your brain is constantly hallucinating. What you see right now is a 0.1 second old prediction. You have never seen the present moment.",
+    "⚡ TIMELINE SHOCK: Cleopatra lived closer in time to the Moon landing than to the construction of the Great Pyramid. Let that sink in.",
+    "🔮 PHYSICS IS LYING: If you removed all empty space from every atom in every human on Earth, all 8 billion of us would fit inside a sugar cube.",
+    "💫 SCALE DESTROYER: A teaspoon of neutron star material weighs 10 billion tons. One teaspoon. 10 BILLION TONS.",
+    "🕳️ TIME IS FAKE: According to Einstein, time literally slows down the faster you move. Astronauts on the ISS age slightly slower than us. Time travel is real.",
+    "🧬 YOU ARE MOSTLY EMPTY: You are 99.9999999% empty space. The atoms that make you up are almost entirely nothing. You are basically a ghost.",
+    "🌊 THE SUN IS DELAYED: The light hitting your face right now left the Sun 8 minutes ago. You are always seeing the past. The Sun could explode and you wouldn't know for 8 minutes.",
+    "🔥 FIRE ISN'T A THING: Fire is not matter. It has no mass. It is a chemical reaction — pure energy made visible. You cannot touch fire. You can only touch heat.",
+    "🌍 EARTH IS FAKE ROUND: Earth is not a sphere. It bulges at the equator and is flattened at the poles. It's technically an oblate spheroid. Maps have been lying to you.",
+    "💥 YOUR MEMORY IS FICTION: Every time you remember something, you are not replaying it. You are reconstructing it. And every reconstruction changes it slightly. Your memories are edited every single time.",
+    "🧲 IMPOSSIBLE MATERIAL: Aerogel is 99.8% air. It looks like frozen smoke. It can support 4,000 times its own weight. It insulates so well you can hold a blowtorch on one side and touch the other.",
+    "⏰ BIOLOGICAL HORROR: You have a second brain in your gut. It has 100 million neurons. It makes decisions independently. Your gut literally thinks.",
+    "🌀 MANDELA EFFECT EXPLAINED: Your brain fills in gaps in your vision. There is a blind spot in each eye where the optic nerve connects. You have never seen a complete image in your entire life.",
+    "🔬 QUANTUM HORROR: Particles that have interacted remain connected FOREVER across any distance. Einstein called it spooky action at a distance. Changing one instantly affects the other. Nothing should be able to do this.",
+    "🕊️ BIRDS ARE DINOSAURS: When you look at a bird, you are looking at a living dinosaur. Birds are the direct descendants of theropod dinosaurs. The T-Rex is more closely related to a chicken than to a Triceratops.",
+    "🌿 TREES ARE ONE ORGANISM: The Pando aspen grove in Utah is a single organism connected by roots. It weighs 6 million kg. It is 80,000 years old. It is the largest and oldest living thing on Earth.",
+    "🤖 YOU ARE PROGRAMMABLE: Scientists have successfully implanted false memories into mice. The mice acted on memories of things that never happened. Human memory works the same way. You may already have false memories.",
+    "💀 DEATH PARADOX: The cells in your body are completely replaced every 7-10 years. You share zero atoms with the person you were a decade ago. Are you the same person? Philosophers have debated this for 2,000 years.",
+    "⚡ SPEED OF THOUGHT: A nerve impulse travels at 268 mph. But conscious thought is much slower. Your brain makes decisions up to 10 SECONDS before you are consciously aware of making them. Free will might be an illusion.",
+    "🌌 MULTIVERSE IS MATH: The equations of quantum mechanics don't predict ONE outcome. They predict ALL possible outcomes simultaneously. The many-worlds interpretation says every decision spawns a parallel universe. Every. Single. One.",
+    "🧠 PLACEBO IS REAL MEDICINE: In clinical trials, placebo surgery — where surgeons cut open patients, do nothing, and sew them back up — has the same results as real surgery for certain conditions. Your belief literally heals you.",
+    "🔮 NOTHING IS SOLID: The chair you are sitting on is not solid. The atoms repel each other electromagnetically creating the illusion of solidity. You are not touching anything. You never have. You never will.",
 ]
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -65,7 +70,81 @@ ACHIEVEMENTS = [
     {"id": "shield_bought",    "name": "🛡️ FORTIFIED",             "desc": "Defense ability acquired. Nothing can touch you now.",                "req": lambda s: s.get("shield_bought",False)},
     {"id": "booster_bought",   "name": "🚀 SPEED DEMON",           "desc": "Speed ability acquired. You move at a different frequency.",          "req": lambda s: s.get("booster_bought",False)},
     {"id": "secret_collector", "name": "🔮 TRUTH SEEKER",          "desc": "Collected 5 universe secrets. Your mind is expanding.",              "req": lambda s: s.get("secrets_seen",0) >= 5},
+    {"id": "spinner_winner",   "name": "🎰 LUCKY SPIN",            "desc": "Won your first prize on the spinner. Fortune favours the bold.",      "req": lambda s: s.get("spinner_wins",0) >= 1},
+    {"id": "storyline_deep",   "name": "📖 LORE KEEPER",           "desc": "Reached chapter 5 of your universe storyline. You are invested.",     "req": lambda s: s.get("story_chapter",0) >= 5},
 ]
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SPINNER PRIZES
+# ─────────────────────────────────────────────────────────────────────────────
+SPINNER_PRIZES = [
+    {"label": "2× GOLD",      "emoji": "💰", "color": "#FFD700", "type": "gold_mult",    "value": 2,   "weight": 25},
+    {"label": "5 BONUS",      "emoji": "⚡", "color": "#00FF88", "type": "gold_flat",    "value": 5,   "weight": 20},
+    {"label": "RARE EGG",     "emoji": "🥚", "color": "#4488ff", "type": "egg_rare",     "value": 1,   "weight": 15},
+    {"label": "EPIC EGG",     "emoji": "✨", "color": "#aa44ff", "type": "egg_epic",     "value": 1,   "weight": 8},
+    {"label": "SHIELD",       "emoji": "🛡️", "color": "#22CCFF", "type": "ability",      "value": "shield", "weight": 10},
+    {"label": "BOOSTER",      "emoji": "🚀", "color": "#FF6600", "type": "ability",      "value": "booster","weight": 8},
+    {"label": "STORY TWIST",  "emoji": "📖", "color": "#FF44AA", "type": "story_twist",  "value": 1,   "weight": 7},
+    {"label": "NOTHING",      "emoji": "💨", "color": "#444444", "type": "nothing",      "value": 0,   "weight": 7},
+]
+
+def spin_wheel():
+    weights = [p["weight"] for p in SPINNER_PRIZES]
+    total = sum(weights)
+    r = random.randint(1, total)
+    cumulative = 0
+    for prize in SPINNER_PRIZES:
+        cumulative += prize["weight"]
+        if r <= cumulative:
+            return prize
+    return SPINNER_PRIZES[-1]
+
+# ─────────────────────────────────────────────────────────────────────────────
+# AI STORYLINE + ACHIEVEMENT GENERATION
+# ─────────────────────────────────────────────────────────────────────────────
+def generate_story_chapter(theme, chapter, prev_story, client):
+    """Generate next chapter of the universe storyline."""
+    try:
+        is_milestone = (chapter % 5 == 0)
+        prompt = f"""You are the most creative storyteller alive. The user is studying in the universe of: "{theme}"
+
+They are on Chapter {chapter} of their universe storyline.
+Previous story so far: {prev_story[-300:] if prev_story else "This is the beginning."}
+
+{"This is a MILESTONE chapter — make it a MASSIVE plot twist or revelation. Something shocking that recontextualizes everything. Universe-specific. Jaw-dropping." if is_milestone else "Write the next short chapter (2-3 sentences max). Universe-specific. Gripping. Ends on a hook that makes you NEED to read the next one."}
+
+Rules:
+- Reference the specific universe deeply — characters, locations, lore
+- Make it feel earned and connected to studying/working hard
+- {"MILESTONE: End with a cliffhanger that changes EVERYTHING" if is_milestone else "End with a micro-cliffhanger"}
+- Raw text only, no titles, no formatting
+
+Write the chapter now:"""
+        msg = client.messages.create(
+            model="claude-sonnet-4-5", max_tokens=200,
+            messages=[{"role":"user","content":prompt}]
+        )
+        return msg.content[0].text.strip()
+    except:
+        return f"Chapter {chapter}: The {theme} universe trembles. Something ancient stirs in the shadows. Your power grows — but so does the threat."
+
+def generate_universe_achievements(theme, client):
+    """Generate universe-specific achievements via AI."""
+    try:
+        prompt = f"""Generate 5 achievements specific to the universe "{theme}" AND studying/working hard.
+Each achievement has: name (with emoji, max 4 words), desc (one punchy sentence, how it's earned).
+Return ONLY raw JSON array, no markdown:
+[{{"name":"...","desc":"..."}},{{"name":"...","desc":"..."}}]"""
+        msg = client.messages.create(
+            model="claude-sonnet-4-5", max_tokens=400,
+            messages=[{"role":"user","content":prompt}]
+        )
+        raw = msg.content[0].text.strip()
+        raw = re.sub(r"```(?:json)?", "", raw).strip().rstrip("`")
+        data = json.loads(raw)
+        return data[:5]
+    except:
+        return []
 
 # ─────────────────────────────────────────────────────────────────────────────
 # MONSTER DATABASE (per battle style)
@@ -323,6 +402,14 @@ if "gold" not in st.session_state:
         "battle_state": None, "current_battle": None, "egg_warmth": {},
         "secret_queue": [],
         "show_secret": None,
+        "spinner_available": False,
+        "spinner_wins": 0,
+        "spinner_result": None,
+        "story_chapter": 0,
+        "story_log": [],
+        "story_twist_pending": False,
+        "universe_achievements": [],
+        "universe_ach_loaded": False,
     })
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -455,7 +542,7 @@ if st.session_state.user_name is None:
     _, col, _ = st.columns([1, 2, 1])
     with col:
         # HOW IT WORKS toggle button
-        if st.button("⚡ WAIT... HOW DOES THIS WORK??", key="how_toggle"):
+        if st.button("⚡ HOW DOES THIS WORK?", key="how_toggle"):
             st.session_state.how_open = not st.session_state.how_open
 
         if st.session_state.how_open:
@@ -463,23 +550,18 @@ if st.session_state.user_name is None:
             <div class="how-expand">
                 <div class="how-step">
                     <span class="how-step-icon">🌌</span>
-                    <div class="how-step-title">STEP 1 — PICK YOUR UNIVERSE</div>
-                    <div class="how-step-desc">MINECRAFT. NARUTO. NIKE. YOUR WEIRD CUSTOM WORLD NOBODY ELSE GETS. THE AI BUILDS IT. INSTANTLY. 🔥 COLORS. CURRENCY. ABILITIES. ALL OF IT.</div>
+                    <div class="how-step-title">1 — PICK YOUR UNIVERSE</div>
+                    <div class="how-step-desc">ANY universe. AI builds it instantly. Colors, currency, abilities, storyline — all yours.</div>
                 </div>
                 <div class="how-step">
                     <span class="how-step-icon">⏱</span>
-                    <div class="how-step-title">STEP 2 — DO 30 SECONDS OF WORK</div>
-                    <div class="how-step-desc">LITERALLY 30 SECONDS. STUDY. READ. DO ONE THING. THAT'S IT. YOU GET PAID IN YOUR UNIVERSE'S CURRENCY. 💰 YES. FOR REAL.</div>
+                    <div class="how-step-title">2 — STUDY FOR 30 SECONDS</div>
+                    <div class="how-step-desc">Work. Study. Do anything productive. Get paid in universe currency. Real rewards.</div>
                 </div>
                 <div class="how-step">
                     <span class="how-step-icon">📸</span>
-                    <div class="how-step-title">STEP 3 — PROVE IT</div>
-                    <div class="how-step-desc">SCREENSHOT. PHOTO. NOTES. ANYTHING. UPLOAD IT TO THE TRIBUNAL ⚖️ AND COLLECT YOUR COINS. NO PROOF = NO COINS. SIMPLE.</div>
-                </div>
-                <div class="how-step">
-                    <span class="how-step-icon">🏆</span>
-                    <div class="how-step-title">STEP 4 — GO CRAZY</div>
-                    <div class="how-step-desc">BUY ABILITIES. WIN BATTLES. HATCH MONSTERS. UNLOCK ACHIEVEMENTS. DISCOVER SECRETS ABOUT THE UNIVERSE THAT WILL BREAK YOUR BRAIN. 🤯 ALL FROM STUDYING.</div>
+                    <div class="how-step-title">3 — PROVE IT. COLLECT IT.</div>
+                    <div class="how-step-desc">Upload proof. No proof = no coins. Simple. Then spin the wheel. Battle. Hatch eggs. Go insane.</div>
                 </div>
             </div>
             """, unsafe_allow_html=True)
@@ -687,11 +769,13 @@ with st.sidebar:
 
     st.write("---")
     # NAV TABS based on mode
-    if st.button("🚀 MISSION HUB",  key="nav_hub"):      st.session_state.view = "main";     st.rerun()
-    if st.button("⚔️ BATTLE",       key="nav_battle"):   st.session_state.view = "battle";   st.rerun()
-    if st.button("🛒 ARSENAL",      key="nav_shop"):     st.session_state.view = "shop";     st.rerun()
-    if st.button("🔮 SECRETS",      key="nav_secrets"):  st.session_state.view = "secrets";  st.rerun()
-    if st.button("💬 FEEDBACK",     key="nav_feedback"): st.session_state.view = "feedback"; st.rerun()
+    if st.button("🚀 MISSION HUB",  key="nav_hub"):      st.session_state.view = "main";       st.rerun()
+    if st.button("⚔️ BATTLE",       key="nav_battle"):   st.session_state.view = "battle";     st.rerun()
+    if st.button("🎰 SPINNER",      key="nav_spin"):     st.session_state.view = "spinner";    st.rerun()
+    if st.button("📖 STORYLINE",    key="nav_story"):    st.session_state.view = "storyline";  st.rerun()
+    if st.button("🛒 ARSENAL",      key="nav_shop"):     st.session_state.view = "shop";       st.rerun()
+    if st.button("🔮 SECRETS",      key="nav_secrets"):  st.session_state.view = "secrets";    st.rerun()
+    if st.button("💬 FEEDBACK",     key="nav_feedback"): st.session_state.view = "feedback";   st.rerun()
 
     if MODE in ("grinder","obsessed"):
         if st.button("🏆 ACHIEVEMENTS", key="nav_ach"):  st.session_state.view = "achievements"; st.rerun()
@@ -1247,7 +1331,183 @@ elif view == "plans":
         </div>
     </div>""", unsafe_allow_html=True)
 
-# ── FEEDBACK ──────────────────────────────────────────────────────────────────
+# ── SPINNER ───────────────────────────────────────────────────────────────────
+elif view == "spinner":
+    st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>🎰 LUCKY SPINNER</h2>", unsafe_allow_html=True)
+    available = st.session_state.spinner_available
+    if not available:
+        st.markdown(f"<p style='text-align:center;color:#ffffff;font-family:Space Mono,monospace'>Complete a mission to unlock your spin! 🎰</p>", unsafe_allow_html=True)
+    else:
+        st.markdown(f"<p style='text-align:center;color:#ffffff;font-family:Space Mono,monospace;font-size:13px'>You earned a spin! Hit the button and see what you get. 🔥</p>", unsafe_allow_html=True)
+
+    # Animated JS spinner wheel embedded
+    prize_labels = [p["label"] for p in SPINNER_PRIZES]
+    prize_colors = [p["color"] for p in SPINNER_PRIZES]
+    labels_js = str(prize_labels).replace("'",'"')
+    colors_js = str(prize_colors).replace("'",'"')
+    import streamlit.components.v1 as components
+    components.html(f"""
+    <style>
+        body{{margin:0;background:transparent;display:flex;flex-direction:column;align-items:center;font-family:'Space Mono',monospace;}}
+        canvas{{border-radius:50%;box-shadow:0 0 40px rgba(255,215,0,0.5);}}
+        #spinBtn{{margin-top:20px;padding:16px 48px;font-size:22px;font-family:'Space Mono',monospace;font-weight:bold;background:linear-gradient(135deg,#FFD700,#FF8C00);border:none;border-radius:12px;cursor:pointer;color:#000;letter-spacing:2px;box-shadow:0 0 30px rgba(255,215,0,0.5);}}
+        #spinBtn:disabled{{opacity:0.4;cursor:not-allowed;}}
+        #result{{margin-top:16px;font-size:20px;color:#FFD700;font-family:Space Mono,monospace;letter-spacing:2px;text-align:center;min-height:30px;}}
+    </style>
+    <canvas id="wheel" width="320" height="320"></canvas>
+    <button id="spinBtn" {"disabled" if not available else ""}>{"🔒 COMPLETE A MISSION" if not available else "🎰 SPIN IT"}</button>
+    <div id="result"></div>
+    <script>
+    const labels = {labels_js};
+    const colors = {colors_js};
+    const canvas = document.getElementById('wheel');
+    const ctx = canvas.getContext('2d');
+    const n = labels.length;
+    const arc = 2 * Math.PI / n;
+    let currentAngle = 0;
+    let spinning = false;
+
+    function drawWheel(angle) {{
+        ctx.clearRect(0,0,320,320);
+        for(let i=0;i<n;i++) {{
+            ctx.beginPath();
+            ctx.moveTo(160,160);
+            ctx.arc(160,160,150,angle+i*arc,angle+(i+1)*arc);
+            ctx.fillStyle = colors[i];
+            ctx.fill();
+            ctx.strokeStyle='#111';ctx.lineWidth=2;ctx.stroke();
+            ctx.save();
+            ctx.translate(160,160);
+            ctx.rotate(angle+(i+0.5)*arc);
+            ctx.textAlign='right';
+            ctx.fillStyle='#fff';
+            ctx.font='bold 11px Space Mono,monospace';
+            ctx.shadowColor='#000';ctx.shadowBlur=4;
+            ctx.fillText(labels[i],140,5);
+            ctx.restore();
+        }}
+        // Center circle
+        ctx.beginPath();
+        ctx.arc(160,160,22,0,2*Math.PI);
+        ctx.fillStyle='#111';ctx.fill();
+        ctx.strokeStyle='#FFD700';ctx.lineWidth=3;ctx.stroke();
+        // Pointer
+        ctx.beginPath();
+        ctx.moveTo(300,150);ctx.lineTo(320,160);ctx.lineTo(300,170);
+        ctx.fillStyle='#FFD700';ctx.fill();
+    }}
+
+    drawWheel(0);
+
+    document.getElementById('spinBtn').onclick = function() {{
+        if(spinning) return;
+        spinning = true;
+        this.disabled = true;
+        document.getElementById('result').textContent = '';
+        const extraSpins = (5 + Math.random()*5) * 2 * Math.PI;
+        const duration = 4000 + Math.random()*2000;
+        const start = performance.now();
+        const startAngle = currentAngle;
+        function animate(now) {{
+            const elapsed = now - start;
+            const progress = Math.min(elapsed/duration,1);
+            const ease = 1 - Math.pow(1-progress,4);
+            currentAngle = startAngle + extraSpins * ease;
+            drawWheel(currentAngle);
+            if(progress < 1) {{
+                requestAnimationFrame(animate);
+            }} else {{
+                spinning = false;
+                // Find winning segment
+                const normalized = ((2*Math.PI) - (currentAngle % (2*Math.PI))) % (2*Math.PI);
+                const idx = Math.floor(normalized / arc) % n;
+                document.getElementById('result').textContent = '🎉 ' + labels[idx] + '!';
+                // Send result to Streamlit
+                window.parent.postMessage({{type:'spinResult',prize:labels[idx]}}, '*');
+            }}
+        }}
+        requestAnimationFrame(animate);
+    }};
+    </script>
+    """, height=460)
+
+    # Spin button in Streamlit (actual prize logic)
+    if available:
+        _, sc, _ = st.columns([1,2,1])
+        with sc:
+            if st.button("🎰 CLAIM YOUR SPIN PRIZE", key="claim_spin"):
+                prize = spin_wheel()
+                st.session_state.spinner_available = False
+                st.session_state.spinner_wins += 1
+
+                if prize["type"] == "gold_mult":
+                    bonus = st.session_state.pending_gold * prize["value"] if st.session_state.pending_gold else prize["value"] * 2
+                    st.session_state.gold += bonus
+                    msg = f"💰 {prize['label']}! +{bonus:.1f} {currency}!"
+                elif prize["type"] == "gold_flat":
+                    st.session_state.gold += prize["value"]
+                    msg = f"⚡ +{prize['value']} {currency}!"
+                elif prize["type"] == "egg_rare":
+                    st.session_state.incubator_eggs += 1
+                    msg = f"🥚 RARE EGG added to incubator!"
+                elif prize["type"] == "egg_epic":
+                    st.session_state.incubator_eggs += 1
+                    msg = f"✨ EPIC EGG added to incubator!"
+                elif prize["type"] == "ability":
+                    if prize["value"] == "shield":
+                        st.session_state.shield_bought = True
+                        msg = f"🛡️ {wd.get('shield_name','SHIELD')} activated FREE!"
+                    else:
+                        st.session_state.booster_bought = True
+                        st.session_state.sub_multiplier = max(st.session_state.sub_multiplier, 2)
+                        msg = f"🚀 {wd.get('booster_name','BOOSTER')} activated FREE!"
+                elif prize["type"] == "story_twist":
+                    st.session_state.story_twist_pending = True
+                    msg = "📖 STORY TWIST UNLOCKED! Check your Storyline tab!"
+                else:
+                    msg = "💨 Nothing this time... spin again next mission!"
+
+                st.session_state.spinner_result = {"prize": prize, "msg": msg}
+                st.balloons()
+                st.success(f"🎰 {msg}")
+                time.sleep(1); st.rerun()
+
+    if st.session_state.spinner_result:
+        p = st.session_state.spinner_result
+        st.markdown(f"""<div class='secret-card'>
+            <div style='font-size:40px'>{p['prize']['emoji']}</div>
+            <div style='font-family:Bebas Neue,sans-serif;font-size:24px;color:{C};letter-spacing:3px'>{p['prize']['label']}</div>
+            <div style='font-size:13px;color:#ffffff;margin-top:8px'>{p['msg']}</div>
+        </div>""", unsafe_allow_html=True)
+
+# ── STORYLINE ─────────────────────────────────────────────────────────────────
+elif view == "storyline":
+    st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>📖 YOUR STORYLINE</h2>", unsafe_allow_html=True)
+    chapter = st.session_state.story_chapter
+    st.markdown(f"<p style='text-align:center;font-family:Space Mono,monospace;color:#ffffff;font-size:12px'>Chapter {chapter} · Universe: {st.session_state.user_theme}</p>", unsafe_allow_html=True)
+
+    if not st.session_state.story_log:
+        st.markdown(f"<p style='text-align:center;color:#ffffff;font-family:Space Mono,monospace'>Complete your first mission to begin your story. 📖</p>", unsafe_allow_html=True)
+    else:
+        # Show story twist badge if pending
+        if st.session_state.story_twist_pending:
+            st.markdown(f"""<div class='secret-card'>
+                <div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FF44AA;letter-spacing:3px'>🌀 STORY TWIST INCOMING</div>
+                <div style='color:#ffffff;font-size:13px;margin-top:8px'>The spinner unlocked a surprise twist in your universe. Complete one more mission to reveal it.</div>
+            </div>""", unsafe_allow_html=True)
+
+        # Show all chapters in reverse
+        for i, chapter_text in enumerate(reversed(st.session_state.story_log)):
+            ch_num = len(st.session_state.story_log) - i
+            is_milestone = (ch_num % 5 == 0)
+            border = "#FFD700" if is_milestone else C
+            badge = "⭐ MILESTONE CHAPTER" if is_milestone else f"Chapter {ch_num}"
+            st.markdown(f"""<div class='ach-card' style='border-color:{border};{"border-width:3px;" if is_milestone else ""}'>
+                <div style='font-family:Bebas Neue,sans-serif;font-size:14px;color:{border};letter-spacing:2px;margin-bottom:6px'>{badge}</div>
+                <div style='font-family:Space Mono,monospace;font-size:13px;color:#ffffff;line-height:1.8'>{chapter_text}</div>
+            </div>""", unsafe_allow_html=True)
+
+
 elif view == "feedback":
     st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>💬 FEEDBACK PORTAL</h2>", unsafe_allow_html=True)
     _, col, _ = st.columns([1,2,1])
@@ -1375,6 +1635,20 @@ if st.session_state.needs_verification:
             st.session_state.secrets_seen = len(st.session_state.secret_queue)
             st.session_state.show_secret = secret
 
+            # Unlock spinner
+            st.session_state.spinner_available = True
+
+            # Advance storyline
+            client = get_claude_client()
+            prev = " ".join(st.session_state.story_log[-2:]) if st.session_state.story_log else ""
+            st.session_state.story_chapter += 1
+            new_chapter = generate_story_chapter(
+                st.session_state.user_theme,
+                st.session_state.story_chapter,
+                prev, client
+            )
+            st.session_state.story_log.append(new_chapter)
+
             # Queue battle if GRINDER or OBSESSED
             if MODE in ("grinder","obsessed"):
                 st.session_state.battle_state = "ready"
@@ -1383,5 +1657,5 @@ if st.session_state.needs_verification:
             st.session_state.incubator_eggs += 1
 
             st.balloons()
-            st.success(f"✅ VERIFIED. +{earned:.1f} {currency} added. 🔮 Secret unlocked!")
+            st.success(f"✅ VERIFIED! +{earned:.1f} {currency} · 🎰 Spinner unlocked · 📖 New story chapter!")
             time.sleep(1); st.rerun()
