@@ -1068,7 +1068,7 @@ if st.session_state.get("battle_state") == "ready" or st.session_state.view == "
     rarity_val  = mon["rarity"]
 
     godot_url = (
-        f"https://danantro32.itch.io/titan-omniverse-battle"
+        f"https://celebrated-genie-79733a.netlify.app"
         f"?universe={theme_enc}&currency={currency_enc}&color={color_hex}"
         f"&shield={shield_enc}&booster={booster_enc}"
         f"&sflavor={sflavor_enc}&bflavor={bflavor_enc}"
