@@ -1056,8 +1056,6 @@ with st.sidebar:
     if st.button("🎰 SPINNER",      key="nav_spin"):     st.session_state.view = "spinner";    st.rerun()
     if st.button("🛒 SHOP",          key="nav_shop"):     st.session_state.view = "shop";       st.rerun()
     if st.button("📖 STORY",         key="nav_story"):    st.session_state.view = "story";      st.rerun()
-    if st.button("📖 STORYLINE",    key="nav_story"):    st.session_state.view = "storyline";  st.rerun()
-    if st.button("🛒 ARSENAL",      key="nav_shop"):     st.session_state.view = "shop";       st.rerun()
     if st.button("🔮 SECRETS",      key="nav_secrets"):  st.session_state.view = "secrets";    st.rerun()
     if st.button("💬 FEEDBACK",     key="nav_feedback"): st.session_state.view = "feedback";   st.rerun()
 
@@ -1861,4 +1859,3 @@ if st.session_state.needs_verification:
             st.balloons()
             st.success(f"✅ {rarity_label}! +{earned:.1f} {currency} · 🔥 {new_streak}-day streak · +{spins} spins · Loot box incoming!")
             time.sleep(1); st.rerun()
-
