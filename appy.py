@@ -99,6 +99,98 @@ def spin_wheel():
             return prize
     return SPINNER_PRIZES[-1]
 
+
+import datetime as _dt
+
+def variable_reward(base: float) -> tuple:
+    """Slot-machine style reward. Unpredictability = dopamine."""
+    roll = random.random()
+    if roll < 0.04:   # 4% — JACKPOT
+        mult = random.randint(8, 20)
+        return base * mult, "💥 JACKPOT", f"{mult}× MULTIPLIER — THE UNIVERSE REWARDS YOU"
+    elif roll < 0.12: # 8% — EPIC
+        mult = random.randint(4, 7)
+        return base * mult, "🌟 EPIC REWARD", f"{mult}× — An extraordinary surge of power!"
+    elif roll < 0.28: # 16% — GREAT
+        mult = random.randint(2, 3)
+        return base * mult, "⚡ GREAT PULL", f"{mult}× — You felt it in your soul."
+    elif roll < 0.55: # 27% — NORMAL
+        return base * 1, "✅ SOLID", "Standard reward. The grind continues."
+    else:             # 45% — LOW (keeps them hungry)
+        mult = round(random.uniform(0.3, 0.7), 1)
+        return base * mult, "😤 LOW ROLL", f"Only {mult}×... but the NEXT one could be 20×."
+
+def get_spins_for_tier(tier: str) -> int:
+    if tier == "Elite":   return random.randint(4, 7)
+    if tier == "Premium": return random.randint(2, 4)
+    return 1
+
+def rig_xp_bar(xp: int, level: int) -> float:
+    """Always show XP bar at 85-95% so they're always 'almost there'."""
+    needed = level * 100
+    real_pct = (xp % needed) / needed if needed > 0 else 0
+    # If below 85%, fake it up to 85-92%
+    if real_pct < 0.85:
+        return random.uniform(0.85, 0.92)
+    return min(real_pct, 0.98)
+
+def update_streak() -> tuple:
+    """Update daily streak. Returns (new_streak, message, is_new_day)."""
+    today = _dt.date.today().isoformat()
+    last  = st.session_state.get("last_active_date")
+    streak = st.session_state.get("study_streak", 0)
+    if last is None:
+        st.session_state.study_streak = 1
+        st.session_state.last_active_date = today
+        return 1, "🔥 Streak started! Don't break it!", True
+    if last == today:
+        return streak, "", False   # already active today
+    yesterday = (_dt.date.today() - _dt.timedelta(days=1)).isoformat()
+    if last == yesterday:
+        streak += 1
+        st.session_state.study_streak = streak
+        st.session_state.last_active_date = today
+        msg = f"🔥 {streak}-DAY STREAK! You're unstoppable!"
+        if streak % 7 == 0:
+            msg = f"🏆 {streak} DAYS — WEEK COMPLETE! Bonus spins unlocked!"
+            st.session_state.spins_left += 3
+        return streak, msg, True
+    else:
+        # Streak broken
+        old = streak
+        st.session_state.study_streak = 1
+        st.session_state.last_active_date = today
+        return 1, f"💔 {old}-day streak LOST. Today is a fresh start.", True
+
+def loot_box_html(item_name: str, rarity: str, color: str) -> str:
+    rarity_colors = {"JACKPOT":"#FFD700","EPIC":"#AA44FF","GREAT":"#4488FF","SOLID":"#44FF88","LOW":"#888888"}
+    rc = rarity_colors.get(rarity.upper().split()[0], "#FFD700")
+    return f"""
+    <div style='text-align:center;padding:32px;background:linear-gradient(135deg,#0a0a1a,#1a0a2e);
+        border:3px solid {rc};border-radius:20px;animation:lootpulse 0.6s ease-in-out 3;
+        box-shadow:0 0 40px {rc}88;'>
+        <div style='font-size:64px;animation:lootbounce 0.4s ease-in-out infinite alternate'>🎁</div>
+        <div style='font-size:28px;font-family:Bebas Neue,sans-serif;color:{rc};
+            letter-spacing:6px;margin:12px 0'>{rarity}</div>
+        <div style='font-size:20px;color:#ffffff;font-family:Space Mono,monospace'>{item_name}</div>
+    </div>
+    <style>
+    @keyframes lootpulse{{0%{{box-shadow:0 0 20px {rc}44}}50%{{box-shadow:0 0 60px {rc}cc}}100%{{box-shadow:0 0 20px {rc}44}}}}
+    @keyframes lootbounce{{from{{transform:scale(1) rotate(-5deg)}}to{{transform:scale(1.2) rotate(5deg)}}}}
+    </style>"""
+
+def streak_danger_html(streak: int, color: str) -> str:
+    if streak < 2: return ""
+    return f"""<div style='background:linear-gradient(90deg,#3a0000,#1a0000);border:2px solid #FF2222;
+        border-radius:12px;padding:12px 20px;text-align:center;margin:8px 0;
+        animation:streakpulse 1.5s ease-in-out infinite;'>
+        <span style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FF4444;letter-spacing:3px'>
+        🔥 {streak}-DAY STREAK AT RISK</span>
+        <span style='display:block;font-family:Space Mono,monospace;font-size:11px;color:#FF8888;margin-top:4px'>
+        Complete a mission TODAY or lose it forever.</span></div>
+    <style>@keyframes streakpulse{{0%,100%{{border-color:#FF2222}}50%{{border-color:#FF8888}}}}</style>"""
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # AI STORYLINE + ACHIEVEMENT GENERATION
 # ─────────────────────────────────────────────────────────────────────────────
@@ -408,6 +500,13 @@ if "gold" not in st.session_state:
         "story_chapter": 0,
         "story_log": [],
         "story_twist_pending": False,
+        "study_streak": 0,
+        "last_active_date": None,
+        "streak_shield": False,
+        "spins_left": 0,
+        "loot_pending": False,
+        "loot_item": None,
+        "total_xp_real": 0,
         "universe_achievements": [],
         "universe_ach_loaded": False,
     })
@@ -955,6 +1054,8 @@ with st.sidebar:
     if st.button("🚀 MISSION HUB",  key="nav_hub"):      st.session_state.view = "main";       st.rerun()
     if st.button("⚔️ BATTLE",       key="nav_battle"):   st.session_state.view = "battle";     st.rerun()
     if st.button("🎰 SPINNER",      key="nav_spin"):     st.session_state.view = "spinner";    st.rerun()
+    if st.button("🛒 SHOP",          key="nav_shop"):     st.session_state.view = "shop";       st.rerun()
+    if st.button("📖 STORY",         key="nav_story"):    st.session_state.view = "story";      st.rerun()
     if st.button("📖 STORYLINE",    key="nav_story"):    st.session_state.view = "storyline";  st.rerun()
     if st.button("🛒 ARSENAL",      key="nav_shop"):     st.session_state.view = "shop";       st.rerun()
     if st.button("🔮 SECRETS",      key="nav_secrets"):  st.session_state.view = "secrets";    st.rerun()
@@ -1136,8 +1237,95 @@ if st.session_state.get("battle_state") == "ready" or st.session_state.view == "
 # ─────────────────────────────────────────────────────────────────────────────
 view = st.session_state.view
 
+
+# ── STREAK DANGER WARNING (shown on all views) ────────────────────
+if st.session_state.get("study_streak", 0) >= 2:
+    today_str = _dt.date.today().isoformat()
+    last_str  = st.session_state.get("last_active_date")
+    if last_str and last_str != today_str:
+        yesterday = (_dt.date.today() - _dt.timedelta(days=1)).isoformat()
+        if last_str == yesterday:
+            st.markdown(streak_danger_html(st.session_state.study_streak, C), unsafe_allow_html=True)
+
+# ── LOOT BOX REVEAL ───────────────────────────────────────────────
+if st.session_state.get("loot_pending") and st.session_state.get("loot_item"):
+    item = st.session_state.loot_item
+    st.markdown(loot_box_html(item["name"], item["rarity"], item.get("color","#FFD700")), unsafe_allow_html=True)
+    time.sleep(0.1)
+    col_l, col_c, col_r = st.columns([1,2,1])
+    with col_c:
+        if st.button("⚡ CLAIM IT", key="claim_loot"):
+            st.session_state.loot_pending = False
+            st.session_state.loot_item = None
+            st.rerun()
+    st.stop()
+
+# ── SCHOOL SHOP ───────────────────────────────────────────────────────────────
+if view == "shop":
+    st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>🛒 TITAN SUPPLY SHOP</h2>", unsafe_allow_html=True)
+    st.markdown(f"<p style='text-align:center;color:#ffffff;font-size:14px;font-family:Space Mono,monospace'>Spend your {currency} on real school supplies. Study harder → earn more → buy the tools that make you unstoppable.</p>", unsafe_allow_html=True)
+
+    gold_now = st.session_state.gold
+    st.markdown(f"<p style='text-align:center;color:{C};font-size:20px;font-family:Bebas Neue,sans-serif'>Your Balance: {gold_now:.1f} {currency}</p>", unsafe_allow_html=True)
+
+    shop_items = [
+        {"name":"📓 Notebook",        "desc":"College-ruled. Your future notes. Your future power.",   "price":50,  "real":"~$3 Amazon gift card"},
+        {"name":"✏️ Pencil Pack",      "desc":"12 pencils. The weapon of every champion.",               "price":30,  "real":"~$2 Amazon gift card"},
+        {"name":"📐 Calculator",       "desc":"Scientific calculator. Math becomes your superpower.",   "price":200, "real":"~$12 Amazon gift card"},
+        {"name":"📚 Textbook Voucher", "desc":"Any textbook up to $25. Knowledge is the ultimate boss.", "price":500, "real":"$25 Amazon gift card"},
+        {"name":"🖊️ Highlighters",    "desc":"5-color set. Color-code your way to genius.",             "price":40,  "real":"~$3 Amazon gift card"},
+        {"name":"📋 Planner",          "desc":"Weekly planner. The organized mind conquers all.",        "price":80,  "real":"~$5 Amazon gift card"},
+        {"name":"🎒 Backpack",         "desc":"The legendary carry. For the ultimate grinder.",          "price":800, "real":"$50 Amazon gift card"},
+        {"name":"💻 Study Headphones", "desc":"Block out the world. Enter flow state.",                 "price":600, "real":"$40 Amazon gift card"},
+    ]
+
+    cols = st.columns(2)
+    for i, item in enumerate(shop_items):
+        with cols[i % 2]:
+            can_buy = gold_now >= item["price"]
+            border_col = C if can_buy else "#444444"
+            st.markdown(f"""<div style='border:2px solid {border_col};border-radius:14px;padding:16px;
+                background:linear-gradient(135deg,#0a0a1a,#1a0a2e);margin:8px 0;'>
+                <div style='font-size:22px;font-family:Bebas Neue,sans-serif;color:{C if can_buy else "#888"};letter-spacing:2px'>{item['name']}</div>
+                <div style='font-size:12px;color:#cccccc;font-family:Space Mono,monospace;margin:6px 0'>{item['desc']}</div>
+                <div style='font-size:14px;color:{C};font-family:Bebas Neue,sans-serif'>{item['price']} {currency}</div>
+                <div style='font-size:10px;color:#888;font-family:Space Mono,monospace'>Real value: {item['real']}</div>
+                </div>""", unsafe_allow_html=True)
+            if can_buy:
+                if st.button(f"BUY {item['name']}", key=f"buy_{i}"):
+                    st.session_state.gold -= item["price"]
+                    st.balloons()
+                    st.success(f"✅ {item['name']} purchased! Redeem = email us your username. We'll send the gift card within 24h.")
+                    st.info("📧 Redemption coming soon — will be automated. For now DM on Discord.")
+                    st.rerun()
+            else:
+                st.markdown(f"<p style='color:#666;font-size:11px;font-family:Space Mono'>Need {item['price']-gold_now:.0f} more {currency}</p>", unsafe_allow_html=True)
+
+# ── STORY VIEW ────────────────────────────────────────────────────────────────
+elif view == "story":
+    st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>📖 YOUR UNIVERSE STORYLINE</h2>", unsafe_allow_html=True)
+    theme_display = st.session_state.user_theme or "Unknown Universe"
+    st.markdown(f"<p style='text-align:center;color:#ffffff;font-family:Space Mono,monospace;font-size:13px'>Universe: <b style='color:{C}'>{theme_display}</b> · Chapter {st.session_state.story_chapter}</p>", unsafe_allow_html=True)
+
+    if not st.session_state.story_log:
+        st.markdown(f"<div style='text-align:center;padding:40px;color:#888;font-family:Space Mono,monospace'>Complete your first mission to begin the story...</div>", unsafe_allow_html=True)
+    else:
+        for i, chapter_text in enumerate(st.session_state.story_log):
+            is_last = (i == len(st.session_state.story_log) - 1)
+            is_twist = (i > 0 and (i+1) % 5 == 0)
+            bg = f"linear-gradient(135deg,#1a0a2e,#0a1a0e)" if not is_twist else f"linear-gradient(135deg,#2e0a0a,#1a0a2e)"
+            border = C if is_last else ("#FF2244" if is_twist else "#333")
+            label = f"⚡ CHAPTER {i+1}" + (" — 🌀 PLOT TWIST" if is_twist else "")
+            st.markdown(f"""<div style='border:2px solid {border};border-radius:14px;padding:20px;
+                background:{bg};margin:10px 0;{"box-shadow:0 0 20px "+C+"44;" if is_last else ""}'>
+                <div style='font-size:13px;font-family:Bebas Neue,sans-serif;color:{C if is_last else "#888"};
+                    letter-spacing:3px;margin-bottom:10px'>{label}</div>
+                <div style='font-size:15px;color:#ffffff;font-family:Space Mono,monospace;line-height:1.7'>{chapter_text}</div>
+                {"<div style=\"margin-top:12px;color:#FF4488;font-size:11px;font-family:Space Mono\">⚠️ To be continued... complete another mission.</div>" if is_last else ""}
+                </div>""", unsafe_allow_html=True)
+
 # ── SECRETS ───────────────────────────────────────────────────────────────────
-if view == "secrets":
+elif view == "secrets":
     st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>🔮 UNIVERSE SECRETS</h2>", unsafe_allow_html=True)
     st.markdown(f"<p style='text-align:center;color:#ffffff;font-family:Space Mono,monospace'>Every mission unlocks a secret. These are truths that will break your brain.</p>", unsafe_allow_html=True)
     seen = st.session_state.get("secret_queue",[])
@@ -1314,7 +1502,8 @@ elif view == "plans":
 # ── SPINNER ───────────────────────────────────────────────────────────────────
 elif view == "spinner":
     st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>🎰 LUCKY SPINNER</h2>", unsafe_allow_html=True)
-    available = st.session_state.spinner_available
+    available = st.session_state.get('spins_left', 0) > 0 or st.session_state.spinner_available
+    spins_remaining = st.session_state.get('spins_left', 1 if st.session_state.spinner_available else 0)
     if not available:
         st.markdown(f"<p style='text-align:center;color:#ffffff;font-family:Space Mono,monospace'>Complete a mission to unlock your spin! 🎰</p>", unsafe_allow_html=True)
     else:
@@ -1603,13 +1792,41 @@ if st.session_state.needs_verification:
         st.info(f"Upload proof of work to claim **{st.session_state.pending_gold:.1f} {currency}**")
         uploaded = st.file_uploader("PROOF OF LABOR:", key="proof_upload")
         if uploaded and st.button("⚡ SUBMIT FOR JUDGMENT", key="submit_proof"):
-            earned = st.session_state.pending_gold
+            base_gold = st.session_state.pending_gold
+            # ── VARIABLE REWARD (slot machine) ──
+            earned, rarity_label, rarity_msg = variable_reward(base_gold)
+            earned = round(earned, 1)
+
+            # ── STREAK ──
+            new_streak, streak_msg, is_new_day = update_streak()
+
+            # ── SPINS BY TIER ──
+            spins = get_spins_for_tier(st.session_state.get("sub_tier","Free"))
+            st.session_state.spins_left = st.session_state.get("spins_left",0) + spins
+
             st.session_state.gold  += earned
             st.session_state.xp   += int(earned * 10)
+            st.session_state.total_xp_real = st.session_state.get("total_xp_real",0) + int(earned*10)
             st.session_state.level  = 1 + st.session_state.xp // 100
             st.session_state.total_missions += 1
             st.session_state.needs_verification = False
             st.session_state.pending_gold = 0.0
+
+            # ── LOOT BOX ──
+            loot_pool = [
+                {"name": f"+{spins} Spinner Spins", "rarity": rarity_label, "color": "#FFD700"},
+                {"name": "RARE INCUBATOR EGG", "rarity": "GREAT", "color": "#4488FF"},
+                {"name": "STREAK SHIELD (protects 1 day)", "rarity": "EPIC", "color": "#AA44FF"},
+                {"name": f"+{int(earned*2)} Bonus {currency}", "rarity": rarity_label, "color": "#00FF88"},
+                {"name": "STORY CHAPTER UNLOCKED", "rarity": "GREAT", "color": "#FF44AA"},
+            ]
+            loot = random.choice(loot_pool)
+            # Apply loot effect
+            if "Streak Shield" in loot["name"]: st.session_state.streak_shield = True
+            if "Egg" in loot["name"]: st.session_state.incubator_eggs += 2
+            if "Bonus" in loot["name"]: st.session_state.gold += int(earned*2)
+            st.session_state.loot_pending = True
+            st.session_state.loot_item = loot
 
             # Unlock a secret
             secret = random.choice(UNIVERSE_SECRETS)
@@ -1621,6 +1838,7 @@ if st.session_state.needs_verification:
 
             # Unlock spinner
             st.session_state.spinner_available = True
+            st.session_state.spinner_wins = st.session_state.get("spinner_wins",0)
 
             # Advance storyline
             client = get_claude_client()
@@ -1641,5 +1859,6 @@ if st.session_state.needs_verification:
             st.session_state.incubator_eggs += 1
 
             st.balloons()
-            st.success(f"✅ VERIFIED! +{earned:.1f} {currency} · 🎰 Spinner unlocked · 📖 New story chapter!")
+            st.success(f"✅ {rarity_label}! +{earned:.1f} {currency} · 🔥 {new_streak}-day streak · +{spins} spins · Loot box incoming!")
             time.sleep(1); st.rerun()
+
