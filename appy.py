@@ -496,10 +496,12 @@ if "gold" not in st.session_state:
         "show_secret": None,
         "spinner_available": False,
         "spinner_wins": 0,
+        "first_session": True,
         "spinner_result": None,
         "story_chapter": 0,
         "story_log": [],
         "story_twist_pending": False,
+        "opening_story_shown": False,
         "study_streak": 0,
         "last_active_date": None,
         "streak_shield": False,
@@ -709,200 +711,10 @@ if st.session_state.user_name is None:
         name_input  = st.text_input("⚡ Champion Name", placeholder="What are you called?", key="gw_name")
         theme_input = st.text_input("🌌 Your Universe", placeholder="Leave empty for INFINITE POWER · or type anything: Naruto, F1, Nike, Medieval Space War...", key="gw_theme")
 
-        # FIDGET SPINNERS — multiple personalities
+        # FIDGET SPINNERS — ULTRA HYPER MEGA EDITION
         import streamlit.components.v1 as components
-        components.html("""
-<style>
-body{margin:0;background:transparent;font-family:'Space Mono',monospace;}
-.spinner-rack{display:flex;gap:24px;justify-content:center;align-items:flex-end;flex-wrap:wrap;padding:8px 0;}
-.spinner-slot{display:flex;flex-direction:column;align-items:center;gap:4px;}
-.spinner-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.5);}
-.spinner-rpm{font-size:10px;letter-spacing:1px;min-height:16px;text-align:center;}
-.nuke-btn{padding:6px 14px;font-size:10px;font-family:'Space Mono',monospace;border:1px solid;border-radius:6px;cursor:pointer;letter-spacing:1px;margin-top:2px;transition:all 0.2s;}
-.nuke-btn:hover{transform:scale(1.05);}
-</style>
-<div class="spinner-rack" id="rack"></div>
-<script>
-const SPINNERS = [
-  {id:'s0', size:90,  blades:3, colors:['#FFD700','#FF8C00','#FF3C3C'], friction:0.9995, label:'ETERNAL',   nuke:false, nukeVel:0},
-  {id:'s1', size:70,  blades:4, colors:['#00C8FF','#0044FF','#8800FF'], friction:0.9998, label:'FOREVER',   nuke:false, nukeVel:0},
-  {id:'s2', size:80,  blades:5, colors:['#00FF88','#00FFCC','#00CC44'], friction:0.9997, label:'INFINITE',  nuke:false, nukeVel:0},
-  {id:'s3', size:75,  blades:3, colors:['#FF44AA','#FF0066','#CC0044'], friction:0.9996, label:'HYPER 🔥',  nuke:true,  nukeVel:2.8},
-  {id:'s4', size:65,  blades:6, colors:['#FFFFFF','#AAAAAA','#FFD700'], friction:0.9994, label:'NUKE 💀',   nuke:true,  nukeVel:4.5},
-];
-
-const rack = document.getElementById('rack');
-const states = {};
-
-SPINNERS.forEach((sp, idx) => {
-  states[sp.id] = {angle:0, vel: 0.008 + idx*0.003, dragging:false, lastA:0, lastT:0};
-  // Eternal spinners get a permanent base velocity
-  if(!sp.nuke) states[sp.id].baseVel = 0.006 + idx*0.002;
-
-  const slot = document.createElement('div');
-  slot.className = 'spinner-slot';
-
-  const canvas = document.createElement('canvas');
-  canvas.id = 'c_'+sp.id;
-  canvas.width = sp.size*2;
-  canvas.height = sp.size*2;
-  canvas.style.cursor = 'grab';
-  canvas.style.borderRadius = '50%';
-
-  const label = document.createElement('div');
-  label.className = 'spinner-label';
-  label.textContent = sp.label;
-
-  const rpm = document.createElement('div');
-  rpm.id = 'rpm_'+sp.id;
-  rpm.className = 'spinner-rpm';
-  rpm.style.color = sp.colors[0];
-
-  slot.appendChild(canvas);
-  slot.appendChild(label);
-  slot.appendChild(rpm);
-
-  if(sp.nuke) {
-    const btn = document.createElement('button');
-    btn.className = 'nuke-btn';
-    btn.textContent = sp.label === 'NUKE 💀' ? '☢️ NUKE' : '⚡ HYPER';
-    btn.style.borderColor = sp.colors[0];
-    btn.style.color = sp.colors[0];
-    btn.style.background = 'rgba(0,0,0,0.5)';
-    btn.onclick = () => {
-      states[sp.id].vel = sp.nukeVel;
-    };
-    slot.appendChild(btn);
-  }
-
-  rack.appendChild(slot);
-
-  // Drag interaction
-  function getAngle(e, c) {
-    const r = c.getBoundingClientRect();
-    const cx2 = r.left + r.width/2, cy2 = r.top + r.height/2;
-    const ex = (e.clientX || (e.touches && e.touches[0].clientX)) - cx2;
-    const ey = (e.clientY || (e.touches && e.touches[0].clientY)) - cy2;
-    return Math.atan2(ey, ex);
-  }
-  canvas.addEventListener('mousedown', e => {
-    states[sp.id].dragging = true;
-    states[sp.id].lastA = getAngle(e, canvas);
-    states[sp.id].lastT = performance.now();
-    canvas.style.cursor = 'grabbing';
-  });
-  window.addEventListener('mousemove', e => {
-    if(!states[sp.id].dragging) return;
-    const now = performance.now();
-    const a = getAngle(e, canvas);
-    let d = a - states[sp.id].lastA;
-    if(d > Math.PI) d -= 2*Math.PI;
-    if(d < -Math.PI) d += 2*Math.PI;
-    states[sp.id].vel = d / Math.max(now - states[sp.id].lastT, 1) * 16;
-    states[sp.id].angle += d;
-    states[sp.id].lastA = a;
-    states[sp.id].lastT = now;
-  });
-  window.addEventListener('mouseup', () => { states[sp.id].dragging = false; canvas.style.cursor='grab'; });
-  canvas.addEventListener('touchstart', e => {
-    states[sp.id].dragging = true;
-    states[sp.id].lastA = getAngle(e, canvas);
-    states[sp.id].lastT = performance.now();
-    e.preventDefault();
-  }, {passive:false});
-  window.addEventListener('touchmove', e => {
-    if(!states[sp.id].dragging) return;
-    const now = performance.now();
-    const a = getAngle(e, canvas);
-    let d = a - states[sp.id].lastA;
-    if(d > Math.PI) d -= 2*Math.PI;
-    if(d < -Math.PI) d += 2*Math.PI;
-    states[sp.id].vel = d / Math.max(now - states[sp.id].lastT, 1) * 16;
-    states[sp.id].angle += d;
-    states[sp.id].lastA = a;
-    states[sp.id].lastT = now;
-    e.preventDefault();
-  }, {passive:false});
-  window.addEventListener('touchend', () => { states[sp.id].dragging = false; });
-});
-
-function drawSpinner(sp, angle, vel) {
-  const canvas = document.getElementById('c_'+sp.id);
-  const ctx = canvas.getContext('2d');
-  const cx = sp.size, cy = sp.size, r = sp.size - 6;
-  ctx.clearRect(0,0,sp.size*2,sp.size*2);
-  const speed = Math.abs(vel);
-
-  for(let i=0;i<sp.blades;i++) {
-    const ba = angle + (i * 2 * Math.PI / sp.blades);
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.rotate(ba);
-    ctx.beginPath();
-    ctx.ellipse(r*0.42, 0, r*0.42, r*0.22, 0, 0, 2*Math.PI);
-    const g = ctx.createRadialGradient(r*0.2, 0, 2, r*0.42, 0, r*0.42);
-    g.addColorStop(0, sp.colors[0]);
-    g.addColorStop(0.5, sp.colors[1 % sp.colors.length]);
-    g.addColorStop(1, sp.colors[2 % sp.colors.length]+'44');
-    ctx.fillStyle = g;
-    ctx.fill();
-    if(speed > 0.08) {
-      ctx.globalAlpha = Math.min(speed * 0.15, 0.35);
-      ctx.fillStyle = sp.colors[0];
-      ctx.fill();
-      ctx.globalAlpha = 1;
-    }
-    ctx.restore();
-  }
-  // Hub
-  ctx.beginPath();
-  ctx.arc(cx, cy, r*0.18, 0, 2*Math.PI);
-  const hg = ctx.createRadialGradient(cx-2, cy-2, 1, cx, cy, r*0.18);
-  hg.addColorStop(0, '#ffffff');
-  hg.addColorStop(0.5, sp.colors[0]);
-  hg.addColorStop(1, sp.colors[1 % sp.colors.length]);
-  ctx.fillStyle = hg;
-  ctx.fill();
-  ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
-  ctx.beginPath(); ctx.arc(cx, cy, r*0.06, 0, 2*Math.PI);
-  ctx.fillStyle = '#111'; ctx.fill();
-  // Outer glow ring
-  if(speed > 0.05) {
-    ctx.beginPath();
-    ctx.arc(cx, cy, r+2, 0, 2*Math.PI);
-    ctx.strokeStyle = sp.colors[0] + Math.floor(Math.min(speed*80,200)).toString(16).padStart(2,'0');
-    ctx.lineWidth = 2; ctx.stroke();
-  }
-}
-
-function loop() {
-  SPINNERS.forEach(sp => {
-    const st = states[sp.id];
-    if(!st.dragging) {
-      if(sp.nuke) {
-        st.vel *= sp.friction;
-      } else {
-        // Eternal: never go below base velocity
-        st.vel = Math.max(st.vel * sp.friction, st.baseVel);
-      }
-      st.angle += st.vel;
-    }
-    drawSpinner(sp, st.angle, st.vel);
-    const rpmEl = document.getElementById('rpm_'+sp.id);
-    const rpmVal = Math.abs(st.vel * 60 / (2*Math.PI) * 60);
-    if(rpmVal > 5) {
-      rpmEl.textContent = Math.round(rpmVal) + ' RPM';
-      rpmEl.style.color = rpmVal > 2000 ? '#FF0000' : rpmVal > 500 ? '#FF8C00' : sp.colors[0];
-    } else {
-      rpmEl.textContent = sp.nuke ? 'TAP TO NUKE' : '∞';
-      rpmEl.style.color = 'rgba(255,255,255,0.3)';
-    }
-  });
-  requestAnimationFrame(loop);
-}
-loop();
-</script>
-        """, height=260)
+        _SPINNER_HTML = '<style>\n@import url(\'https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap\');\n*{box-sizing:border-box;margin:0;padding:0;}\nbody{background:transparent;}\n#universe{width:100%;height:330px;background:radial-gradient(ellipse at 50% 60%,#0a0020 0%,#000008 70%,#000000 100%);border-radius:16px;border:1px solid rgba(255,255,255,0.07);position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;}\n#rack{display:flex;gap:14px;justify-content:center;align-items:center;z-index:2;position:relative;padding:10px 0;}\n.slot{display:flex;flex-direction:column;align-items:center;gap:4px;}\n.slbl{font-family:Orbitron,monospace;font-size:7px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.4);}\n.srpm{font-family:Orbitron,monospace;font-size:8px;letter-spacing:1px;min-height:13px;text-align:center;}\n.nbtn{padding:4px 10px;font-size:7px;font-family:Orbitron,monospace;border-radius:6px;cursor:pointer;letter-spacing:2px;border:1.5px solid;background:rgba(0,0,0,0.6);transition:all 0.15s;margin-top:2px;}\n.nbtn:hover{transform:scale(1.09);filter:brightness(1.5);}\n#fl{position:absolute;bottom:0;left:0;width:100%;height:2px;z-index:1;animation:fla 2s linear infinite;}\n@keyframes fla{0%{filter:hue-rotate(0deg);background:linear-gradient(90deg,transparent,#FFD700,#FF4400,#FF00FF,#00FFFF,transparent);}100%{filter:hue-rotate(360deg);background:linear-gradient(90deg,transparent,#FFD700,#FF4400,#FF00FF,#00FFFF,transparent);}}\n</style>\n<div id="universe">\n<canvas id="stars" style="position:absolute;top:0;left:0;pointer-events:none;z-index:0" width="900" height="330"></canvas>\n<div id="rack"></div>\n<div id="fl"></div>\n</div>\n<script>\nvar sc=document.getElementById(\'stars\'),sctx=sc.getContext(\'2d\');\nvar STARS=[];for(var i=0;i<100;i++)STARS.push({x:Math.random()*900,y:Math.random()*330,r:Math.random()*1.3+0.3,a:Math.random(),da:Math.random()*0.007+0.002,col:\'hsl(\'+(180+Math.random()*80)+\',80%,90%)\'});\nfunction dS(){sctx.clearRect(0,0,900,330);STARS.forEach(function(s){s.a+=s.da;if(s.a>1||s.a<0)s.da*=-1;sctx.globalAlpha=s.a*0.75;sctx.beginPath();sctx.arc(s.x,s.y,s.r,0,Math.PI*2);sctx.fillStyle=s.col;sctx.fill();});sctx.globalAlpha=1;}\nvar DF=[\n  {id:\'s0\',sz:72,lbl:\'SOLAR FLARE\',nuke:false,bv:0.34,bl:4,sh:\'drop\',p:[\'#FF6600\',\'#FF2200\',\'#FFD700\',\'#FF8800\'],gw:\'#FF4400\',rm:\'#FFD700\',hb:\'#FFF\',tr:12,pt:true},\n  {id:\'s1\',sz:62,lbl:\'VOID STORM\', nuke:false,bv:0.44,bl:6,sh:\'wing\',p:[\'#8800FF\',\'#4400CC\',\'#CC00FF\',\'#FF44FF\'],gw:\'#AA00FF\',rm:\'#FF88FF\',hb:\'#FFF\',tr:16,pt:true},\n  {id:\'s2\',sz:66,lbl:\'MATRIX\',     nuke:false,bv:0.38,bl:3,sh:\'crys\',p:[\'#00FF44\',\'#00CC33\',\'#00FF88\',\'#AAFFCC\'],gw:\'#00FF44\',rm:\'#88FFBB\',hb:\'#111\',tr:10,pt:false},\n  {id:\'s3\',sz:60,lbl:\'NOVA PULSE\', nuke:false,bv:0.58,bl:5,sh:\'blad\',p:[\'#00CCFF\',\'#0088FF\',\'#00FFEE\',\'#88DDFF\'],gw:\'#00CCFF\',rm:\'#AAEEFF\',hb:\'#003\',tr:14,pt:true},\n  {id:\'s4\',sz:70,lbl:\'TITAN WARP\', nuke:false,bv:0.30,bl:7,sh:\'fan\', p:[\'#FFD700\',\'#FF4400\',\'#FF8800\',\'#FFEEAA\'],gw:\'#FFD700\',rm:\'#FF4400\',hb:\'#210\',tr:18,pt:true},\n  {id:\'s5\',sz:65,lbl:\'HYPER NUKE\', nuke:true, nv:3.8, bv:0.14,bl:4,sh:\'drop\',p:[\'#FF0044\',\'#FF4400\',\'#FF0088\',\'#FF8800\'],gw:\'#FF0044\',rm:\'#F8A\',hb:\'#FFF\',tr:20,pt:true},\n  {id:\'s6\',sz:76,lbl:\'OMEGA NUKE\', nuke:true, nv:7.0, bv:0.08,bl:8,sh:\'fan\', p:[\'#FFF\',\'#FFD700\',\'#FF2200\',\'#FA0\'],gw:\'#FFF\',rm:\'#FFD700\',hb:\'#000\',tr:30,pt:true}\n];\nvar ST={},TR={};\nvar rack=document.getElementById(\'rack\');\nDF.forEach(function(sp){\n  ST[sp.id]={a:Math.random()*6.28,v:sp.bv+Math.random()*0.06,dg:false,lA:0,lT:0};\n  TR[sp.id]=[];\n  var slot=document.createElement(\'div\');slot.className=\'slot\';\n  var cv=document.createElement(\'canvas\');cv.id=\'c_\'+sp.id;cv.width=sp.sz*2;cv.height=sp.sz*2;cv.style.cssText=\'cursor:grab;border-radius:50%;display:block;\';\n  var lb=document.createElement(\'div\');lb.className=\'slbl\';lb.textContent=sp.lbl;\n  var rm=document.createElement(\'div\');rm.id=\'r_\'+sp.id;rm.className=\'srpm\';rm.style.color=sp.gw;\n  slot.appendChild(cv);slot.appendChild(lb);slot.appendChild(rm);\n  if(sp.nuke){var btn=document.createElement(\'button\');btn.className=\'nbtn\';btn.textContent=sp.id===\'s6\'?\'DETONATE\':\'IGNITE\';btn.style.borderColor=sp.gw;btn.style.color=sp.gw;btn.onclick=(function(sid,nv){return function(){ST[sid].v=nv;shk();};})(sp.id,sp.nv);slot.appendChild(btn);}\n  rack.appendChild(slot);\n  function ga(e,c){var r=c.getBoundingClientRect();var x=(e.clientX||(e.touches&&e.touches[0].clientX)||0)-r.left-r.width/2;var y=(e.clientY||(e.touches&&e.touches[0].clientY)||0)-r.top-r.height/2;return Math.atan2(y,x);}\n  cv.addEventListener(\'mousedown\',function(e){var s=ST[sp.id];s.dg=true;s.lA=ga(e,cv);s.lT=performance.now();cv.style.cursor=\'grabbing\';});\n  window.addEventListener(\'mousemove\',(function(sid){return function(e){var s=ST[sid];if(!s.dg)return;var now=performance.now();var cv2=document.getElementById(\'c_\'+sid);var a=ga(e,cv2);var d=a-s.lA;if(d>Math.PI)d-=6.28;if(d<-Math.PI)d+=6.28;s.v=d/Math.max(now-s.lT,1)*20;s.a+=d;s.lA=a;s.lT=now;};})(sp.id));\n  window.addEventListener(\'mouseup\',(function(sid){return function(){ST[sid].dg=false;document.getElementById(\'c_\'+sid).style.cursor=\'grab\';};})(sp.id));\n  cv.addEventListener(\'touchstart\',function(e){var s=ST[sp.id];s.dg=true;s.lA=ga(e,cv);s.lT=performance.now();e.preventDefault();},{passive:false});\n  window.addEventListener(\'touchmove\',(function(sid){return function(e){var s=ST[sid];if(!s.dg)return;var now=performance.now();var cv2=document.getElementById(\'c_\'+sid);var a=ga(e,cv2);var d=a-s.lA;if(d>Math.PI)d-=6.28;if(d<-Math.PI)d+=6.28;s.v=d/Math.max(now-s.lT,1)*20;s.a+=d;s.lA=a;s.lT=now;e.preventDefault();};})(sp.id),{passive:false});\n  window.addEventListener(\'touchend\',(function(sid){return function(){ST[sid].dg=false;};})(sp.id));\n});\nvar shakeN=0;\nfunction shk(){shakeN=16;var u=document.getElementById(\'universe\');(function f(){if(shakeN<=0){u.style.transform=\'\';return;}u.style.transform=\'translate(\'+(Math.random()-.5)*shakeN*.7+\'px,\'+(Math.random()-.5)*shakeN*.4+\'px)\';shakeN--;requestAnimationFrame(f);})();}\nfunction draw(sp,angle,vel){\n  var cv=document.getElementById(\'c_\'+sp.id);if(!cv)return;\n  var ctx=cv.getContext(\'2d\'),sz=sp.sz,cx=sz,cy=sz,r=sz-5,spd=Math.abs(vel);\n  ctx.clearRect(0,0,sz*2,sz*2);\n  if(spd>0.04){var gg=ctx.createRadialGradient(cx,cy,r,cx,cy,r+5+spd*4);gg.addColorStop(0,sp.gw+\'77\');gg.addColorStop(1,sp.gw+\'00\');ctx.beginPath();ctx.arc(cx,cy,r+5+spd*4,0,Math.PI*2);ctx.fillStyle=gg;ctx.fill();}\n  var tr=TR[sp.id];tr.push(angle);if(tr.length>sp.tr)tr.shift();\n  if(spd>0.1&&tr.length>2){for(var ti=0;ti<tr.length-1;ti++){var ta=tr[ti],frac=ti/tr.length;for(var bi=0;bi<sp.bl;bi++){var ba2=ta+(bi*6.28/sp.bl);ctx.save();ctx.translate(cx,cy);ctx.rotate(ba2);ctx.globalAlpha=frac*0.18*Math.min(spd*1.5,1);ctx.beginPath();ctx.ellipse(r*.38,0,r*.36,r*.15,0,0,Math.PI*2);ctx.fillStyle=sp.p[0];ctx.fill();ctx.restore();}}ctx.globalAlpha=1;}\n  for(var i=0;i<sp.bl;i++){\n    var ba=angle+(i*6.28/sp.bl);\n    ctx.save();ctx.translate(cx,cy);ctx.rotate(ba);\n    var g=ctx.createLinearGradient(0,-r*.08,r*.82,r*.08);\n    g.addColorStop(0,sp.p[0]);g.addColorStop(.45,sp.p[1%sp.p.length]);g.addColorStop(.75,sp.p[2%sp.p.length]);g.addColorStop(1,sp.p[3%sp.p.length]+\'22\');\n    ctx.fillStyle=g;ctx.beginPath();\n    if(sp.sh===\'drop\'){ctx.ellipse(r*.42,0,r*.42,r*.19,0,0,Math.PI*2);}\n    else if(sp.sh===\'wing\'){ctx.moveTo(0,0);ctx.bezierCurveTo(r*.2,-r*.28,r*.7,-r*.22,r*.82,0);ctx.bezierCurveTo(r*.7,r*.22,r*.2,r*.28,0,0);ctx.closePath();}\n    else if(sp.sh===\'crys\'){ctx.moveTo(r*.08,0);ctx.lineTo(r*.38,-r*.22);ctx.lineTo(r*.82,0);ctx.lineTo(r*.38,r*.22);ctx.closePath();}\n    else if(sp.sh===\'blad\'){ctx.moveTo(0,-r*.05);ctx.lineTo(r*.78,-r*.12);ctx.lineTo(r*.82,0);ctx.lineTo(r*.78,r*.12);ctx.lineTo(0,r*.05);ctx.closePath();}\n    else{ctx.ellipse(r*.40,0,r*.40,r*.22,0,0,Math.PI*2);}\n    ctx.fill();ctx.strokeStyle=sp.p[0]+\'99\';ctx.lineWidth=1.2;ctx.stroke();\n    if(spd>0.2){ctx.globalAlpha=Math.min((spd-.2)*.4,.45);ctx.fillStyle=sp.rm;ctx.fill();ctx.globalAlpha=1;}\n    ctx.restore();\n  }\n  ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.strokeStyle=sp.rm+(spd>.25?\'BB\':\'33\');ctx.lineWidth=spd>.4?2.5:1.5;ctx.stroke();\n  if(sp.pt&&spd>0.3){var pc=Math.floor(spd*5);for(var pi=0;pi<pc;pi++){var pa=angle*3.5+pi*2.0+performance.now()*.0015;var pr=r*(.65+Math.random()*.28);var px=cx+Math.cos(pa)*pr,py=cy+Math.sin(pa)*pr;ctx.beginPath();ctx.arc(px,py,1+Math.random()*1.5,0,Math.PI*2);ctx.fillStyle=sp.p[pi%sp.p.length];ctx.globalAlpha=.65+Math.random()*.3;ctx.fill();ctx.globalAlpha=1;}}\n  var hg=ctx.createRadialGradient(cx-r*.04,cy-r*.04,1,cx,cy,r*.20);hg.addColorStop(0,\'#fff\');hg.addColorStop(.4,sp.p[0]);hg.addColorStop(1,sp.hb);ctx.beginPath();ctx.arc(cx,cy,r*.19,0,Math.PI*2);ctx.fillStyle=hg;ctx.fill();ctx.beginPath();ctx.arc(cx,cy,r*.07,0,Math.PI*2);ctx.fillStyle=\'#fff6\';ctx.fill();\n  var re=document.getElementById(\'r_\'+sp.id);if(re){var rv=Math.abs(vel*60/(Math.PI*2)*60);if(rv>8){re.textContent=Math.round(rv).toLocaleString()+\' RPM\';re.style.color=rv>9000?\'#F00\':rv>4000?\'#F80\':rv>1200?\'#FFD700\':sp.gw;}else{re.textContent=sp.nuke?\'TAP TO IGNITE\':\'\\u221e ETERNAL\';re.style.color=\'rgba(255,255,255,0.25)\';}}}\nvar AF=0.999992,NF=0.9985;\nfunction loop(){\n  dS();\n  DF.forEach(function(sp){var s=ST[sp.id];if(!s.dg){s.v*=sp.nuke?NF:AF;if(Math.abs(s.v)<sp.bv)s.v=sp.bv;s.a+=s.v;}draw(sp,s.a,s.v);});\n  requestAnimationFrame(loop);\n}\nloop();\n</script>'
+        components.html(_SPINNER_HTML, height=345)
 
 
         st.markdown("<br>", unsafe_allow_html=True)
@@ -936,6 +748,13 @@ C      = readable_color(RAW_C, BG)
 TEXT   = text_on(BG)
 MUTED  = "#444444" if is_light(BG) else "#cccccc"
 currency = wd.get("currency","Credits")
+
+# ── FREE SPIN ON FIRST LOAD ───────────────────────────────────────────────────
+if st.session_state.get("first_session", False):
+    st.session_state.first_session = False
+    st.session_state.spins_left = max(st.session_state.get("spins_left",0), 1)
+    st.session_state.spinner_available = True
+
 
 # Card background: solid dark on light page, solid light on dark page
 CARDBG   = "#1a1a1a" if is_light(BG) else "#f0f0f0"
@@ -1235,6 +1054,54 @@ if st.session_state.get("battle_state") == "ready" or st.session_state.view == "
 # ─────────────────────────────────────────────────────────────────────────────
 view = st.session_state.view
 
+
+
+# ── OPENING STORY (shown once, immediately on first login) ────────────────────
+if not st.session_state.get("opening_story_shown", True):
+    theme_now = st.session_state.user_theme or "Infinite Power"
+    client_os = get_claude_client()
+    if client_os:
+        try:
+            resp_os = client_os.messages.create(
+                model="claude-sonnet-4-5", max_tokens=220,
+                messages=[{"role":"user","content":f'''You are the most gripping storyteller alive. Write the OPENING of an epic story set in the universe of: "{theme_now}". This is chapter 0 — the very beginning.
+
+Rules:
+- 3 sentences MAX. Short. Punchy. Cinematic.
+- Reference the specific universe (characters, world, lore)
+- End on a CLIFFHANGER that makes them physically unable to stop reading
+- No titles, no formatting. Raw story text only.'''}]
+            )
+            opening_txt = resp_os.content[0].text.strip()
+        except:
+            opening_txt = f"The {theme_now} universe shudders. Something ancient has awakened — something that was never meant to be found. And somehow... it knows your name."
+    else:
+        opening_txt = f"The {theme_now} universe shudders. Something ancient has awakened — something that was never meant to be found. And somehow... it knows your name."
+
+    st.session_state.opening_story_shown = True
+    if "story_log" not in st.session_state or not st.session_state.story_log:
+        if "story_log" not in st.session_state:
+            st.session_state.story_log = []
+        st.session_state.story_log.insert(0, opening_txt)
+
+    st.markdown(f"""
+    <div style='border:2px solid {C};border-radius:18px;padding:28px 32px;
+        background:linear-gradient(135deg,#0a001a,#001a0a,#0a001a);
+        text-align:center;margin:16px 0;animation:storyappear 0.8s ease-out;
+        box-shadow:0 0 40px {C}55;'>
+        <div style='font-family:Bebas Neue,sans-serif;font-size:13px;letter-spacing:5px;
+            color:{C};margin-bottom:14px'>⚡ CHAPTER 0 — THE BEGINNING ⚡</div>
+        <div style='font-family:Space Mono,monospace;font-size:16px;color:#ffffff;
+            line-height:1.9;font-style:italic'>{opening_txt}</div>
+        <div style='margin-top:16px;font-family:Orbitron,monospace;font-size:10px;
+            color:#FF4488;letter-spacing:3px;animation:blink 1.2s ease-in-out infinite'>
+            ▼ TO BE CONTINUED... COMPLETE A MISSION ▼</div>
+    </div>
+    <style>
+    @keyframes storyappear{{from{{opacity:0;transform:translateY(20px)}}to{{opacity:1;transform:translateY(0)}}}}
+    @keyframes blink{{0%,100%{{opacity:0.3}}50%{{opacity:1}}}}
+    </style>
+    """, unsafe_allow_html=True)
 
 # ── STREAK DANGER WARNING (shown on all views) ────────────────────
 if st.session_state.get("study_streak", 0) >= 2:
