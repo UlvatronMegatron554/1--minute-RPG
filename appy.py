@@ -3,10 +3,10 @@ import anthropic
 import time, json, re, random
 
 # ─────────────────────────────────────────────────────────────────────────────
-# TITAN OMNIVERSE v8.0 — INFINITE OBSESSION EDITION
+# 30 SECOND INFINITEVERSE v9.0 — INFINITE OBSESSION EDITION
 # ─────────────────────────────────────────────────────────────────────────────
 
-st.set_page_config(page_title="TITAN OMNIVERSE", page_icon="⚡", layout="wide")
+st.set_page_config(page_title="30 Second Infiniteverse", page_icon="🌌", layout="wide")
 
 SHIELD_EFFECT  = "Negates any debt that was earned."
 BOOSTER_EFFECT = "Grants a 3× multiplier on all mission rewards."
@@ -101,6 +101,485 @@ def spin_wheel():
 
 
 import datetime as _dt
+
+import datetime as _dt2
+
+
+def _build_game_html(cfg: dict, color: str) -> str:
+    """Build complete HTML5 Canvas battle game for any universe."""
+    import json as _json
+    cfg_json = _json.dumps(cfg)
+    col = color if color.startswith('#') else '#FFD700'
+    mode = cfg.get('mode','AUTO')
+    bg0 = cfg.get('arena_colors',['#0a0020','#001030','#000a18'])[0]
+    bg1 = cfg.get('arena_colors',['#0a0020','#001030','#000a18'])[1] if len(cfg.get('arena_colors',[])) > 1 else '#001030'
+    return f"""<!DOCTYPE html><html><head><meta charset="utf-8">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Mono:wght@400;700&display=swap');
+*{{margin:0;padding:0;box-sizing:border-box;}}
+body{{background:#000;overflow:hidden;font-family:'Space Mono',monospace;}}
+#wrap{{position:relative;width:820px;height:480px;margin:0 auto;}}
+#gc{{display:block;}}
+#questions{{position:absolute;bottom:0;left:0;width:820px;pointer-events:all;display:none;}}
+.qbox{{background:rgba(0,0,0,0.96);border-top:2px solid {col};padding:10px 14px;}}
+.qtxt{{font-family:Orbitron,monospace;font-size:12px;color:#fff;margin-bottom:8px;line-height:1.5;}}
+.choices{{display:grid;grid-template-columns:1fr 1fr;gap:5px;}}
+.ch{{padding:7px 10px;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.18);
+  border-radius:7px;cursor:pointer;font-size:11px;color:#fff;font-family:'Space Mono',monospace;
+  transition:all 0.12s;text-align:left;}}
+.ch:hover{{background:{col}33;border-color:{col};transform:scale(1.02);}}
+.ch.ok{{background:#00FF4422;border-color:#00FF44;}}
+.ch.no{{background:#FF222222;border-color:#FF2222;}}
+.tbar{{height:3px;background:{col};border-radius:3px;margin-bottom:7px;transition:width 0.08s linear;}}
+.qhdr{{display:flex;justify-content:space-between;margin-bottom:5px;}}
+.qlbl{{font-size:8px;letter-spacing:3px;color:{col};font-family:Orbitron,monospace;}}
+#result{{position:absolute;top:0;left:0;width:820px;height:480px;display:none;pointer-events:all;
+  background:rgba(0,0,0,0.93);flex-direction:column;align-items:center;justify-content:center;
+  font-family:Orbitron,monospace;text-align:center;}}
+#ss{{position:absolute;top:0;left:0;width:820px;height:480px;pointer-events:all;
+  background:linear-gradient(135deg,{bg0},{bg1});
+  display:flex;flex-direction:column;align-items:center;justify-content:center;}}
+.sst{{font-family:Orbitron,monospace;font-size:26px;color:{col};letter-spacing:4px;margin-bottom:6px;}}
+.ssb{{font-size:11px;color:rgba(255,255,255,0.45);letter-spacing:2px;margin-bottom:22px;}}
+.ssg{{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:680px;}}
+.ssn{{padding:10px 6px;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.18);
+  border-radius:9px;cursor:pointer;font-size:10px;color:#fff;font-family:'Space Mono',monospace;
+  transition:all 0.18s;text-align:center;}}
+.ssn:hover{{background:{col}33;border-color:{col};transform:scale(1.04);}}
+</style></head><body>
+<div id="wrap">
+  <canvas id="gc" width="820" height="480"></canvas>
+  <div id="questions"></div>
+  <div id="result"></div>
+  <div id="ss">
+    <div class="sst">⚡ {cfg.get('arena_name','BATTLE').upper()}</div>
+    <div class="ssb">CHOOSE YOUR SUBJECT — CORRECT ANSWERS = POWER ATTACKS</div>
+    <div class="ssg">
+      <div class="ssn" onclick="go('Mathematics')">📐 Math</div>
+      <div class="ssn" onclick="go('Science')">🔬 Science</div>
+      <div class="ssn" onclick="go('History')">📜 History</div>
+      <div class="ssn" onclick="go('English')">📖 English</div>
+      <div class="ssn" onclick="go('Geography')">🌍 Geography</div>
+      <div class="ssn" onclick="go('Biology')">🧬 Biology</div>
+      <div class="ssn" onclick="go('Chemistry')">⚗️ Chemistry</div>
+      <div class="ssn" onclick="go('Physics')">⚡ Physics</div>
+      <div class="ssn" onclick="go('Economics')">💰 Economics</div>
+      <div class="ssn" onclick="go('Computer Science')">💻 Comp Sci</div>
+      <div class="ssn" onclick="go('Psychology')">🧠 Psychology</div>
+      <div class="ssn" onclick="go('Art & Music')">🎨 Art & Music</div>
+    </div>
+    <div style="margin-top:14px;font-size:9px;color:rgba(255,255,255,0.25);letter-spacing:2px">
+      ENEMY: {cfg.get('enemy_name','?').upper()} · 3 WRONG ANSWERS = DEFEAT
+    </div>
+  </div>
+</div>
+<script>
+'use strict';
+const CFG={cfg_json};
+const COL='{col}';
+const W=820,H=480;
+const cv=document.getElementById('gc');
+const ctx=cv.getContext('2d');
+let FC=0,STATE='SS',stT=0,evolveT=0;
+let subject='';
+let questions=[],qI=0,lives=3,wrongs=0,qTimer=0,qMax=18,aLocked=false;
+let lastOk=false;
+let parts=[],beams=[],dmgNums=[];
+const P={{hp:100,maxHp:100,power:0,evo:0,streak:0,total:0,x:160,y:270,shake:0,hit:false,color:COL}};
+const E={{hp:100,maxHp:100,phase:0,x:620,y:270,shake:0,hit:false,color:CFG.enemy_color||'#CC2222'}};
+function lh(hex,a){{const c=parseInt(hex.replace('#',''),16),r=Math.min(255,((c>>16)&255)+a*255),g=Math.min(255,((c>>8)&255)+a*255),b=Math.min(255,(c&255)+a*255);return '#'+[r,g,b].map(v=>Math.floor(v).toString(16).padStart(2,'0')).join('');}}
+function dk(hex,a){{const c=parseInt(hex.replace('#',''),16),r=Math.max(0,((c>>16)&255)-a*255),g=Math.max(0,((c>>8)&255)-a*255),b=Math.max(0,(c&255)-a*255);return '#'+[r,g,b].map(v=>Math.floor(v).toString(16).padStart(2,'0')).join('');}}
+function ap(x,y,col,n,spd,r,life){{for(let i=0;i<n;i++){{const a=Math.random()*6.28,s=spd*(0.4+Math.random()*0.8);parts.push({{x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,col,r:r*(0.5+Math.random()),life,ml:life}});}}}}
+function ab(x1,y1,x2,y2,col,w,life){{beams.push({{x1,y1,x2,y2,col,w,life,ml:life}});}}
+function dn(x,y,v,col,big){{dmgNums.push({{x,y,v,col,big,life:50,ml:50}});}}
+function upParts(){{parts=parts.filter(p=>{{p.x+=p.vx;p.y+=p.vy;p.vy+=0.18;p.life--;return p.life>0;}});beams=beams.filter(b=>{{b.life--;return b.life>0;}});}}
+function drParts(){{parts.forEach(p=>{{const a=p.life/p.ml;ctx.globalAlpha=a;ctx.beginPath();ctx.arc(p.x,p.y,p.r*a,0,6.28);ctx.fillStyle=p.col;ctx.fill();}});beams.forEach(b=>{{const a=b.life/b.ml;ctx.globalAlpha=a*0.9;ctx.beginPath();ctx.moveTo(b.x1,b.y1);ctx.lineTo(b.x2,b.y2);ctx.strokeStyle=b.col;ctx.lineWidth=b.w*a;ctx.lineCap='round';ctx.stroke();ctx.globalAlpha=a*0.4;ctx.lineWidth=b.w*a*0.35;ctx.strokeStyle='#fff';ctx.stroke();}});ctx.globalAlpha=1;}}
+function drDmgNums(){{dmgNums=dmgNums.filter(d=>{{d.y-=1.5;d.life--;const a=d.life/d.ml;ctx.globalAlpha=a;ctx.font=(d.big?'bold 20px':'bold 14px')+' Orbitron,monospace';ctx.fillStyle=d.col;ctx.textAlign='center';ctx.fillText(d.v,d.x,d.y);ctx.globalAlpha=1;ctx.textAlign='left';return d.life>0;}});}}
+const MODE=CFG.mode||'AUTO';
+const BGC=CFG.arena_colors||['{bg0}','{bg1}','#000'];
+function drBG(){{
+  const t=FC*0.008;
+  if(MODE==='FIGHTER'){{
+    const sk=ctx.createLinearGradient(0,0,0,H*0.65);sk.addColorStop(0,'#0a0008');sk.addColorStop(0.5,'#220033');sk.addColorStop(1,'#440022');ctx.fillStyle=sk;ctx.fillRect(0,0,W,H*0.65);
+    const gd=ctx.createLinearGradient(0,H*0.65,0,H);gd.addColorStop(0,'#221100');gd.addColorStop(1,'#110800');ctx.fillStyle=gd;ctx.fillRect(0,H*0.65,W,H*0.35);
+    ctx.strokeStyle=COL+'33';ctx.lineWidth=1;for(let i=0;i<6;i++){{ctx.beginPath();ctx.moveTo(50+i*130,H*0.65);ctx.lineTo(30+i*130+Math.random()*40,H);ctx.stroke();}}
+    for(let i=0;i<3;i++){{const px=W*[0.15,0.5,0.85][i];const eg=ctx.createLinearGradient(px-3,0,px+3,0);eg.addColorStop(0,'transparent');eg.addColorStop(0.5,COL+(20+Math.floor(Math.sin(t+i)*15)).toString(16).padStart(2,'0'));eg.addColorStop(1,'transparent');ctx.fillStyle=eg;ctx.fillRect(px-3,0,6,H);}}
+  }} else if(MODE==='RPG'){{
+    const tg=ctx.createLinearGradient(0,0,0,H*0.5);tg.addColorStop(0,'#1a2a4a');tg.addColorStop(1,'#2a3a5a');ctx.fillStyle=tg;ctx.fillRect(0,0,W,H*0.5);
+    const bg2=ctx.createLinearGradient(0,H*0.5,0,H);bg2.addColorStop(0,'#1a3a1a');bg2.addColorStop(1,'#0a1a0a');ctx.fillStyle=bg2;ctx.fillRect(0,H*0.5,W,H*0.5);
+    ctx.strokeStyle='#00AA44';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,H*0.5);for(let x=0;x<W;x+=4)ctx.lineTo(x,H*0.5+Math.sin(x*0.04+t)*3);ctx.stroke();
+    for(let i=0;i<40;i++){{const sx=(i*137+100)%W,sy=(i*79)%(H*0.45),sa=0.3+Math.sin(t*2+i)*0.25;ctx.globalAlpha=sa;ctx.fillStyle='#fff';ctx.fillRect(sx,sy,1.5,1.5);}}ctx.globalAlpha=1;
+  }} else if(MODE==='PLATFORM'){{
+    ctx.fillStyle='#87CEEB';ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='rgba(255,255,255,0.85)';for(let i=0;i<4;i++){{const cx=(i*200+FC*0.3)%W,cy=60+i*30;for(let j=0;j<3;j++){{ctx.beginPath();ctx.arc(cx+j*22,cy,18+j*5,0,6.28);ctx.fill();}}}}
+    ctx.fillStyle='#228B22';ctx.fillRect(0,H*0.72,W,8);ctx.fillStyle='#8B4513';ctx.fillRect(0,H*0.72+8,W,H);
+    for(let i=0;i<10;i++){{ctx.fillStyle='#CD853F';ctx.fillRect(i*82+40,H*0.45,72,24);ctx.strokeStyle='#8B4513';ctx.lineWidth=2;ctx.strokeRect(i*82+40,H*0.45,72,24);}}
+  }} else if(MODE==='SHOOTER'){{
+    ctx.fillStyle='#0a0a0f';ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle='rgba(255,255,255,0.04)';ctx.lineWidth=1;for(let x=0;x<W;x+=40){{ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}}for(let y=0;y<H;y+=40){{ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}}
+    [[100,150,60,40],[300,80,40,60],[500,200,60,40],[650,120,50,50],[200,350,70,30]].forEach(([cx,cy,cw,ch])=>{{ctx.fillStyle='#1a2a3a';ctx.fillRect(cx,cy,cw,ch);ctx.strokeStyle='#2a3a4a';ctx.lineWidth=2;ctx.strokeRect(cx,cy,cw,ch);}});
+  }} else if(MODE==='MAGIC'){{
+    const mg=ctx.createRadialGradient(W/2,H/2,50,W/2,H/2,400);mg.addColorStop(0,'#1a0a2e');mg.addColorStop(0.5,'#0a0018');mg.addColorStop(1,'#050008');ctx.fillStyle=mg;ctx.fillRect(0,0,W,H);
+    const mcx=W/2,mcy=H*0.75,mcr=120+Math.sin(t)*5;ctx.strokeStyle=COL+'33';ctx.lineWidth=2;for(let r=1;r<=3;r++){{ctx.beginPath();ctx.arc(mcx,mcy,mcr*r/3,0,6.28);ctx.stroke();}}
+    for(let i=0;i<8;i++){{const a=i*Math.PI/4+t*0.2;ctx.beginPath();ctx.moveTo(mcx,mcy);ctx.lineTo(mcx+Math.cos(a)*mcr,mcy+Math.sin(a)*mcr*0.4);ctx.stroke();}}
+  }} else if(MODE==='COSMIC'){{
+    ctx.fillStyle='#000005';ctx.fillRect(0,0,W,H);
+    for(let i=0;i<120;i++){{const sx=(i*173)%W,sy=(i*97)%H,sa=0.2+((i*31)%10)/10*0.8;ctx.globalAlpha=sa;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(sx,sy,(i%3)*0.5+0.5,0,6.28);ctx.fill();}}ctx.globalAlpha=1;
+    const ng=ctx.createRadialGradient(W*0.3,H*0.3,0,W*0.3,H*0.3,200);ng.addColorStop(0,COL+'22');ng.addColorStop(1,'transparent');ctx.fillStyle=ng;ctx.fillRect(0,0,W,H);
+  }} else if(MODE==='SPORTS'){{
+    ctx.fillStyle='#2d5a1b';ctx.fillRect(0,0,W,H);ctx.strokeStyle='rgba(255,255,255,0.15)';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(W/2,0);ctx.lineTo(W/2,H);ctx.stroke();ctx.beginPath();ctx.arc(W/2,H/2,80,0,6.28);ctx.stroke();ctx.fillStyle='rgba(0,0,0,0.3)';ctx.fillRect(0,0,W,H);
+  }} else {{
+    const bg3=ctx.createLinearGradient(0,0,0,H);bg3.addColorStop(0,BGC[0]);bg3.addColorStop(0.5,BGC[1]||'#111');bg3.addColorStop(1,BGC[2]||'#000');ctx.fillStyle=bg3;ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#ffffff08';ctx.fillRect(0,H*0.72,W,H*0.28);
+    for(let i=0;i<3;i++){{const slx=W*[0.2,0.5,0.8][i];const sg=ctx.createRadialGradient(slx,0,0,slx,H*0.4,H*0.4);sg.addColorStop(0,COL+'14');sg.addColorStop(1,'transparent');ctx.fillStyle=sg;ctx.fillRect(0,0,W,H);}}
+  }}
+}}
+function drChar(x,y,col,evo,isEnemy,hit,shake){{
+  const ox=x+(shake?(Math.random()-0.5)*shake:0);
+  const oy=y+(shake?(Math.random()-0.5)*shake*0.3:0);
+  const t=FC*0.06,idle=Math.sin(t+(isEnemy?1.5:0))*3;
+  ctx.save();ctx.translate(ox,oy+idle);
+  if(isEnemy)ctx.scale(-1,1);
+  const s=0.9+evo*0.07;
+  // Aura
+  if(evo>0){{const ar=28+evo*11;const ag=ctx.createRadialGradient(0,0,4,0,0,ar);ag.addColorStop(0,col+'88');ag.addColorStop(1,'transparent');ctx.fillStyle=ag;ctx.beginPath();ctx.arc(0,0,ar,0,6.28);ctx.fill();}}
+  ctx.scale(s,s);
+  // Draw mode-specific character
+  if(MODE==='FIGHTER')drFighter(col,evo,t,isEnemy);
+  else if(MODE==='RPG')drRPG(col,evo,t);
+  else if(MODE==='PLATFORM')drPlatform(col,evo);
+  else if(MODE==='SHOOTER')drShooter(col,evo);
+  else if(MODE==='MAGIC')drMagic(col,evo,t);
+  else if(MODE==='COSMIC')drCosmic(col,evo,t);
+  else if(MODE==='SPORTS')drSports(col,evo);
+  else if(MODE==='BRAWL')drBrawl(col,evo,t);
+  else drDefault(col,evo,t);
+  if(hit){{ctx.fillStyle='rgba(255,50,50,0.45)';ctx.beginPath();ctx.arc(0,-20,38,0,6.28);ctx.fill();}}
+  ctx.restore();
+}}
+function drFighter(col,evo,t,isEnemy){{
+  const hc=evo>=1?'#FFD700':col;
+  ctx.fillStyle=col;ctx.fillRect(-16,10,14,36);ctx.fillRect(2,10,14,36);
+  ctx.fillStyle='#333';ctx.fillRect(-18,38,16,10);ctx.fillRect(0,38,16,10);
+  ctx.fillStyle=col;ctx.fillRect(-20,-15,40,28);ctx.fillStyle='#222';ctx.fillRect(-20,10,40,6);
+  ctx.fillStyle=col;ctx.fillRect(-36,-12,18,24);ctx.fillRect(18,-12,18,24);
+  ctx.fillStyle='#fff3';ctx.fillRect(-38,8,18,12);ctx.fillRect(20,8,18,12);
+  ctx.fillStyle=col;ctx.fillRect(-8,-22,16,10);ctx.fillRect(-22,-50,44,32);
+  ctx.fillStyle=evo>=2?'#00FFFF':'#fff';ctx.fillRect(-14,-38,10,8);ctx.fillRect(4,-38,10,8);
+  ctx.fillStyle='#000';ctx.fillRect(-10,-36,4,5);ctx.fillRect(7,-36,4,5);
+  ctx.fillStyle=hc;const sp=3+Math.min(evo,5);
+  for(let i=0;i<sp;i++){{const sx=-18+i*(36/(sp-1)),sh=14+i%2*8+evo*4;ctx.beginPath();ctx.moveTo(sx-6,-50);ctx.lineTo(sx,-(50+sh));ctx.lineTo(sx+6,-50);ctx.fill();}}
+  if(evo>=3){{ctx.fillStyle=hc+'44';ctx.beginPath();ctx.arc(0,-50,14+evo*3,0,6.28);ctx.fill();}}
+}}
+function drRPG(col,evo,t){{
+  const r=22+evo*3;const bg2=ctx.createRadialGradient(-r*0.3,-r*0.3,2,0,0,r);bg2.addColorStop(0,lh(col,0.4));bg2.addColorStop(1,col);ctx.fillStyle=bg2;ctx.beginPath();ctx.ellipse(0,0,r,r*0.85,0,0,6.28);ctx.fill();
+  const ec=evo>=2?'#FFD700':'#000';[[- r*.3,-r*.2,r*.25,r*.22],[r*.3,-r*.2,r*.25,r*.22]].forEach(([ex,ey,erx,ery])=>{{ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(ex,ey,erx,ery,0,0,6.28);ctx.fill();ctx.fillStyle=ec;ctx.beginPath();ctx.ellipse(ex,ey,erx*0.55,ery*0.55,0,0,6.28);ctx.fill();}});
+  ctx.fillStyle='rgba(255,255,255,0.4)';ctx.beginPath();ctx.ellipse(-r*0.25,-r*0.35,r*0.18,r*0.12,Math.PI/4,0,6.28);ctx.fill();
+  ctx.fillStyle=col;ctx.beginPath();ctx.ellipse(-r*0.9,-r*0.5,r*0.15,r*0.28,-0.3,0,6.28);ctx.fill();ctx.beginPath();ctx.ellipse(r*0.9,-r*0.5,r*0.15,r*0.28,0.3,0,6.28);ctx.fill();
+  if(evo>=2){{ctx.fillStyle=lh(col,0.3)+'88';ctx.beginPath();ctx.moveTo(-r*.8,0);ctx.quadraticCurveTo(-r*1.8,-r*.8,-r*.3,-r*.1);ctx.fill();ctx.beginPath();ctx.moveTo(r*.8,0);ctx.quadraticCurveTo(r*1.8,-r*.8,r*.3,-r*.1);ctx.fill();}}
+  if(evo>=5){{ctx.fillStyle='#FFD700';for(let i=0;i<5;i++){{ctx.fillRect(-r*.8+i*r*.4,-r-10+(i%2)*8,r*.18,r*.35);}}ctx.fillRect(-r*.9,-r,r*1.8,8);}}
+}}
+function drPlatform(col,evo){{
+  ctx.fillStyle='#2244CC';ctx.fillRect(-14,0,28,26);ctx.fillRect(-8,-4,16,6);
+  ctx.fillStyle=col;ctx.fillRect(-18,-14,36,20);ctx.fillRect(-14,-4,28,10);
+  ctx.fillStyle=col;ctx.fillRect(-30,-14,14,18);ctx.fillRect(16,-14,14,18);
+  ctx.fillStyle='#FFCC88';ctx.fillRect(-30,2,14,10);ctx.fillRect(16,2,14,10);
+  ctx.fillStyle='#2244CC';ctx.fillRect(-14,24,12,16);ctx.fillRect(2,24,12,16);
+  ctx.fillStyle='#884400';ctx.fillRect(-16,38,16,10);ctx.fillRect(0,38,16,10);
+  ctx.fillStyle='#FFCC88';ctx.fillRect(-18,-42,36,30);
+  ctx.fillStyle=col;ctx.fillRect(-20,-52,40,14);ctx.fillRect(-14,-60,32,10);
+  ctx.fillStyle='#000';ctx.fillRect(-20,-42,6,6);ctx.fillRect(-10,-32,7,6);ctx.fillRect(3,-32,7,6);
+  if(evo>=1){{ctx.fillStyle='#FFD700';ctx.beginPath();ctx.arc(0,-62,6,0,6.28);ctx.fill();}}
+}}
+function drShooter(col,evo){{
+  ctx.fillStyle='#334422';ctx.fillRect(-14,2,28,32);ctx.fillRect(-18,-12,36,16);
+  ctx.fillStyle='#334422';ctx.fillRect(-24,-10,8,20);ctx.fillRect(16,-10,8,20);
+  ctx.fillStyle='#333';ctx.fillRect(-12,32,10,16);ctx.fillRect(2,32,10,16);ctx.fillRect(-14,46,14,8);ctx.fillRect(0,46,14,8);
+  ctx.fillStyle='#222';ctx.fillRect(-18,-38,36,28);ctx.fillStyle='#00FF4444';ctx.fillRect(-14,-28,28,12);ctx.fillStyle='#00FF44';ctx.fillRect(-14,-28,28,3);
+  ctx.fillStyle='#111';ctx.fillRect(16,0,30,8);ctx.fillStyle='#333';ctx.fillRect(38,-4,8,16);
+  if(evo>=2){{ctx.fillStyle=col+'AA';ctx.fillRect(44,-2,14,12);}}
+  if(evo>=1){{ctx.fillStyle='#FFD700';ctx.fillRect(-18,-14,6,4);}}
+}}
+function drMagic(col,evo,t){{
+  ctx.fillStyle=col+'CC';ctx.beginPath();ctx.moveTo(-22,42);ctx.lineTo(-18,-10);ctx.lineTo(18,-10);ctx.lineTo(22,42);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#8B4513';ctx.fillRect(-18,10,36,6);
+  ctx.fillStyle=col+'AA';ctx.fillRect(-34,-8,18,22);ctx.fillRect(16,-8,18,22);
+  ctx.fillStyle='#FFCC88';ctx.fillRect(-36,12,16,10);ctx.fillRect(20,12,16,10);ctx.fillRect(-16,-36,32,28);
+  ctx.fillStyle='#000';ctx.fillRect(-10,-28,7,6);ctx.fillRect(3,-28,7,6);
+  ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(-22,-36);ctx.lineTo(0,-(78+evo*6));ctx.lineTo(22,-36);ctx.closePath();ctx.fill();
+  ctx.fillStyle=col+'88';ctx.fillRect(-24,-40,48,6);
+  ctx.fillStyle='#FFD700';ctx.font='10px Arial';for(let i=0;i<Math.min(evo+1,5);i++)ctx.fillText('✦',-8+i*4,-(56+i*6));
+  if(evo>=1){{ctx.fillStyle=lh(col,0.4)+'CC';ctx.beginPath();ctx.arc(-36,14,8+evo*2,0,6.28);ctx.fill();}}
+}}
+function drCosmic(col,evo,t){{
+  const r=22+evo*3;const hg=ctx.createLinearGradient(-r,-r/2,r,r/2);hg.addColorStop(0,lh(col,0.3));hg.addColorStop(1,col);ctx.fillStyle=hg;
+  ctx.beginPath();ctx.moveTo(-r,8);ctx.quadraticCurveTo(-r,-r/2,0,-r);ctx.quadraticCurveTo(r,-r/2,r,8);ctx.quadraticCurveTo(0,r*1.1,-r,8);ctx.fill();
+  ctx.fillStyle='rgba(0,200,255,0.3)';ctx.beginPath();ctx.ellipse(0,-r/2,r*0.5,r*0.4,0,0,6.28);ctx.fill();ctx.strokeStyle='rgba(0,200,255,0.6)';ctx.lineWidth=2;ctx.stroke();
+  ctx.fillStyle=col+'AA';ctx.fillRect(-r*1.5,-4,r,8);ctx.fillRect(r*0.5,-4,r,8);
+  for(let i=0;i<3;i++){{const ex=-r*0.6+i*r*0.6,ey=r*0.6;const eg=ctx.createRadialGradient(ex,ey,0,ex,ey,8+evo*3);eg.addColorStop(0,col+'FF');eg.addColorStop(1,'transparent');ctx.fillStyle=eg;ctx.beginPath();ctx.arc(ex,ey,8+evo*3,0,6.28);ctx.fill();}}
+}}
+function drSports(col,evo){{
+  ctx.fillStyle=col;ctx.fillRect(-18,-14,36,24);ctx.fillRect(-8,-22,16,10);
+  ctx.fillStyle=col;ctx.fillRect(-22,-14,6,20);ctx.fillRect(16,-14,6,20);
+  ctx.fillStyle='#FFCC88';ctx.fillRect(-22,4,6,12);ctx.fillRect(16,4,6,12);
+  ctx.fillStyle=lh(col,0.2);ctx.fillRect(-14,10,28,22);ctx.fillRect(-8,30,10,18);ctx.fillRect(4,30,10,18);
+  ctx.fillStyle='#333';ctx.fillRect(-10,46,10,8);ctx.fillRect(2,46,10,8);
+  ctx.fillStyle='#FFCC88';ctx.beginPath();ctx.ellipse(0,-30,14,18,0,0,6.28);ctx.fill();
+  ctx.fillStyle='#000';ctx.fillRect(-6,-32,5,5);ctx.fillRect(1,-32,5,5);
+  if(evo>=1){{ctx.fillStyle='#FFD700';ctx.font='bold 14px Arial';ctx.textAlign='center';ctx.fillText(evo+'★',0,-54);ctx.textAlign='left';}}
+}}
+function drBrawl(col,evo,t){{
+  ctx.fillStyle=col;ctx.fillRect(-20,-10,40,30);ctx.fillRect(-16,-24,32,16);
+  ctx.fillStyle=lh(col,0.2);ctx.beginPath();ctx.ellipse(0,-34,18,20,0,0,6.28);ctx.fill();
+  ctx.fillStyle='#000';ctx.fillRect(-8,-36,6,6);ctx.fillRect(2,-36,6,6);
+  ctx.fillStyle=col;ctx.fillRect(-38,-12,20,22);ctx.fillRect(18,-12,20,22);
+  ctx.fillStyle='#fff3';ctx.fillRect(-38,6,20,10);ctx.fillRect(18,6,20,10);
+  ctx.fillStyle=col;ctx.fillRect(-14,18,12,28);ctx.fillRect(2,18,12,28);
+  ctx.fillStyle='#333';ctx.fillRect(-16,44,14,10);ctx.fillRect(2,44,14,10);
+  if(evo>=2){{ctx.strokeStyle='#FFD700';ctx.lineWidth=2;ctx.strokeRect(-22,-12,44,42);}}
+}}
+function drDefault(col,evo,t){{
+  const s=0.9+evo*0.04;
+  ctx.fillStyle=dk(col,0.3);ctx.fillRect(-16*s,8*s,13*s,34*s);ctx.fillRect(3*s,8*s,13*s,34*s);
+  ctx.fillStyle=col;ctx.fillRect(-20*s,-14*s,40*s,24*s);
+  ctx.fillStyle=col;ctx.fillRect(-34*s,-12*s,16*s,26*s);ctx.fillRect(18*s,-12*s,16*s,26*s);
+  ctx.fillStyle=lh(col,0.3);ctx.fillRect(-36*s,10*s,14*s,10*s);ctx.fillRect(22*s,10*s,14*s,10*s);
+  ctx.fillStyle=lh(col,0.2);ctx.beginPath();ctx.ellipse(0,-32*s,20*s,22*s,0,0,6.28);ctx.fill();
+  const ec=evo>=3?'#FF4400':evo>=1?'#00FFFF':'#333';
+  [[-8,-32,6,6],[8,-32,6,6]].forEach(([ex,ey,r1,r2])=>{{ctx.fillStyle='rgba(255,255,255,0.9)';ctx.beginPath();ctx.ellipse(ex*s,ey*s,r1*s,r2*s,0,0,6.28);ctx.fill();ctx.fillStyle=ec;ctx.beginPath();ctx.ellipse(ex*s,ey*s,r1*s*0.5,r2*s*0.5,0,0,6.28);ctx.fill();}});
+  if(evo>=5){{ctx.strokeStyle='#FFD700';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(0,-58*s,22*s,8*s,0,0,6.28);ctx.stroke();}}
+}}
+function drHUD(){{
+  const php=Math.max(0,P.hp/P.maxHp);
+  const phc=php>0.5?'#00FF44':php>0.25?'#FF8800':'#FF2222';
+  ctx.fillStyle='rgba(0,0,0,0.6)';ctx.fillRect(12,12,200,18);
+  ctx.fillStyle=phc;ctx.fillRect(12,12,200*php,18);
+  ctx.strokeStyle='#fff4';ctx.lineWidth=1;ctx.strokeRect(12,12,200,18);
+  ctx.fillStyle='#fff';ctx.font='bold 10px "Space Mono",monospace';ctx.fillText('HP '+Math.ceil(P.hp)+'/'+P.maxHp,16,25);
+  ctx.fillStyle='rgba(0,0,0,0.6)';ctx.fillRect(12,34,200,10);
+  ctx.fillStyle=COL;ctx.fillRect(12,34,200*(P.power/100),10);
+  ctx.strokeStyle='#fff2';ctx.strokeRect(12,34,200,10);
+  const evos=CFG.evolutions||[];const en=evos[P.evo]||('Lv '+(P.evo+1));
+  ctx.fillStyle=COL;ctx.font='bold 9px Orbitron,monospace';ctx.fillText('⚡ '+en.toUpperCase(),12,58);
+  const ehp=Math.max(0,E.hp/E.maxHp);const ehc=ehp>0.5?'#FF4444':ehp>0.25?'#FF8800':'#FF0000';
+  ctx.fillStyle='rgba(0,0,0,0.6)';ctx.fillRect(W-212,12,200,18);
+  ctx.fillStyle=ehc;ctx.fillRect(W-212,12,200*ehp,18);
+  ctx.strokeStyle='#fff4';ctx.strokeRect(W-212,12,200,18);
+  ctx.fillStyle='#fff';ctx.font='bold 10px "Space Mono",monospace';ctx.fillText((CFG.enemy_name||'Enemy').substring(0,18),W-208,25);
+  const ep=CFG.enemy_phases?CFG.enemy_phases[E.phase]||'':'';ctx.fillStyle=E.color;ctx.font='8px "Space Mono",monospace';ctx.fillText(ep,W-208,36);
+  ctx.font='16px Arial';for(let i=0;i<3;i++)ctx.fillText(i<lives?'❤️':'🖤',12+i*22,H-16);
+  ctx.fillStyle='rgba(255,255,255,0.3)';ctx.font='9px "Space Mono",monospace';ctx.textAlign='center';ctx.fillText((CFG.arena_name||'').toUpperCase(),W/2,H-8);ctx.textAlign='left';
+  if(P.streak>=2){{ctx.fillStyle='#FFD700';ctx.font='bold 11px Orbitron,monospace';ctx.textAlign='center';ctx.fillText('🔥 '+P.streak+' STREAK',W/2,18);ctx.textAlign='left';}}
+}}
+function showQ(){{
+  if(qI>=questions.length){{win();return;}}
+  const q=questions[qI];
+  const d=document.getElementById('questions');d.style.display='block';
+  qTimer=qMax;aLocked=false;
+  d.innerHTML=`<div class="qbox"><div class="qhdr"><span class="qlbl">Q${{qI+1}}/${{questions.length}} · ${{subject}}</span><span style="font-size:13px">${{'❤️'.repeat(lives)+'🖤'.repeat(3-lives)}}</span></div><div class="tbar" id="tb"></div><div class="qtxt">${{q.q}}</div><div class="choices">${{q.choices.map((c2,i)=>`<button class="ch" onclick="ans(${{i}},'${{String.fromCharCode(65+i)}}')">${{c2}}</button>`).join('')}}</div></div>`;
+}}
+function ans(idx,letter){{
+  if(aLocked)return;aLocked=true;
+  const q=questions[qI];const ok=(letter===q.answer);
+  document.querySelectorAll('.ch')[idx].classList.add(ok?'ok':'no');
+  if(!ok){{const ci=['A','B','C','D'].indexOf(q.answer);if(ci>=0)document.querySelectorAll('.ch')[ci].classList.add('ok');}}
+  setTimeout(()=>{{document.getElementById('questions').style.display='none';ok?onOk():onNo();qI++;if(STATE==='B')setTimeout(()=>{{if(STATE==='B')showQ();}},1100);}},650);
+}}
+function onOk(){{
+  P.streak++;P.total++;P.power=Math.min(100,P.power+22);
+  const dmg=15+P.evo*5+Math.floor(Math.random()*10)+(P.streak>=3?15:0);
+  E.hp=Math.max(0,E.hp-dmg);E.hit=true;E.shake=12;setTimeout(()=>E.hit=false,380);
+  ab(P.x,P.y-30,E.x,E.y-30,COL,6+P.evo*2,24);ap(E.x,E.y-30,COL,20+P.evo*4,4,6,28);ap(E.x,E.y-30,'#FFD700',8,3,4,18);
+  dn(E.x,E.y-60,'-'+dmg,COL,true);
+  const nt=P.evo+1;const evos=CFG.evolutions||[];
+  if(nt<evos.length&&P.total>0&&P.total%3===0&&Math.floor(P.total/3)===nt){{evolve(nt);}}
+  if(E.hp/E.maxHp<0.33&&E.phase===0){{E.phase=1;ap(E.x,E.y,E.color,40,6,8,50);dn(E.x,E.y-80,(CFG.enemy_phases||['Phase 2'])[1]||'ENRAGED',E.color,true);}}
+  else if(E.hp/E.maxHp<0.1&&E.phase===1){{E.phase=2;ap(E.x,E.y,E.color,60,8,10,60);dn(E.x,E.y-80,(CFG.enemy_phases||['','','FINAL'])[2]||'FINAL',E.color,true);}}
+  if(E.hp<=0)setTimeout(win,700);
+}}
+function onNo(){{
+  P.streak=0;wrongs++;
+  const dmg=10+E.phase*8+Math.floor(Math.random()*8);
+  P.hp=Math.max(0,P.hp-dmg);P.hit=true;P.shake=14;setTimeout(()=>P.hit=false,380);
+  if(wrongs>=3){{lives--;wrongs=0;}}
+  ab(E.x,E.y-30,P.x,P.y-30,E.color,5,20);ap(P.x,P.y-30,'#FF2222',15,3,5,26);dn(P.x,P.y-60,'-'+dmg,'#FF2222',false);
+  if(lives<=0)setTimeout(lose,700);
+}}
+function evolve(idx){{
+  STATE='EV';evolveT=0;P.evo=idx;
+  ap(P.x,P.y,COL,60,8,10,60);ap(P.x,P.y,'#FFD700',30,6,7,48);
+  setTimeout(()=>{{STATE='B';showQ();}},1800);
+}}
+function win(){{
+  STATE='WIN';document.getElementById('questions').style.display='none';
+  for(let i=0;i<8;i++)setTimeout(()=>ap(Math.random()*W,Math.random()*H,COL,20,5,8,50),i*100);
+  const xp=50+P.evo*20+P.total*10,gold=20+P.evo*8+P.total*4;
+  const res=document.getElementById('result');res.style.display='flex';
+  res.innerHTML=`<div style="font-size:50px;margin-bottom:10px">🏆</div><div style="font-family:Orbitron,monospace;font-size:34px;color:${{COL}};letter-spacing:4px;margin-bottom:6px">VICTORY!</div><div style="color:#FFD700;font-family:'Space Mono',monospace;font-size:13px;margin-bottom:8px">${{CFG.win_quote||'You prevailed!'}}</div><div style="color:#fff;font-size:12px;margin:14px 0;line-height:2.2">⚡ <b style="color:${{COL}}">+${{xp}} XP</b> &nbsp; 💰 <b style="color:#FFD700">+${{gold}} Shards</b> &nbsp; 🎁 <b style="color:#AA44FF">BATTLE BOX!</b><br>Form: <b style="color:${{COL}}">${{(CFG.evolutions||[])[P.evo]||'Level '+(P.evo+1)}}</b></div><div style="font-size:10px;color:rgba(255,255,255,0.4);font-family:'Space Mono',monospace">Return to app to claim →</div>`;
+  window.parent.postMessage({{type:'battleWin',xp,gold,evolution:P.evo,correct:P.total}},'*');
+}}
+function lose(){{
+  STATE='LOSE';document.getElementById('questions').style.display='none';
+  ap(P.x,P.y,'#FF2222',50,6,8,60);
+  const res=document.getElementById('result');res.style.display='flex';
+  res.innerHTML=`<div style="font-size:50px;margin-bottom:10px">💀</div><div style="font-family:Orbitron,monospace;font-size:34px;color:#FF2222;letter-spacing:4px;margin-bottom:6px">DEFEATED</div><div style="color:#FF8888;font-family:'Space Mono',monospace;font-size:13px;margin-bottom:10px">${{CFG.lose_quote||'Train harder.'}}</div><div style="color:rgba(255,255,255,0.5);font-size:11px">Study more, grow stronger.</div>`;
+  window.parent.postMessage({{type:'battleLose'}},'*');
+}}
+function go(sub){{
+  subject=sub;document.getElementById('ss').style.display='none';
+  const allQ=CFG.questions||[];questions=allQ.slice().sort(()=>Math.random()-0.5).slice(0,Math.min(10,allQ.length));
+  if(!questions.length)questions=[{{q:'What is 2+2?',choices:['A: 3','B: 4','C: 5','D: 6'],answer:'B',hint:'math'}}];
+  STATE='IN';stT=0;setTimeout(()=>{{STATE='B';showQ();}},2800);
+}}
+function drIntro(){{
+  const pct=Math.min(1,stT/55);ctx.globalAlpha=pct;
+  ctx.fillStyle='rgba(0,0,0,0.72)';ctx.fillRect(0,H/2-68,W,136);
+  ctx.fillStyle=COL;ctx.font='bold 30px Orbitron,monospace';ctx.textAlign='center';ctx.fillText(CFG.arena_name||'BATTLE START',W/2,H/2-18);
+  ctx.fillStyle='#fff8';ctx.font='12px "Space Mono",monospace';ctx.fillText((CFG.arena_desc||'').substring(0,65),W/2,H/2+10);
+  ctx.fillStyle=E.color;ctx.font='13px "Space Mono",monospace';ctx.fillText('ENEMY: '+(CFG.enemy_name||'?').toUpperCase(),W/2,H/2+38);
+  ctx.textAlign='left';ctx.globalAlpha=1;
+}}
+function drEvolve(){{
+  const pct=evolveT/88;const en=(CFG.evolutions||[])[P.evo]||'EVOLVED';
+  ctx.globalAlpha=Math.sin(pct*Math.PI)*0.82;ctx.fillStyle=COL;ctx.fillRect(0,0,W,H);ctx.globalAlpha=1;
+  ctx.font='bold 40px Orbitron,monospace';ctx.textAlign='center';
+  ctx.fillStyle='#000';ctx.fillText(en.toUpperCase(),W/2+2,H/2+2);ctx.fillStyle='#FFD700';ctx.fillText(en.toUpperCase(),W/2,H/2);
+  ctx.fillStyle='#fff';ctx.font='13px "Space Mono",monospace';ctx.fillText('FORM UNLOCKED!',W/2,H/2+34);ctx.textAlign='left';
+}}
+function upTimer(){{
+  const tb=document.getElementById('tb');if(!tb)return;
+  qTimer-=1/60;
+  if(qTimer<=0&&!aLocked){{onNo();aLocked=true;document.getElementById('questions').style.display='none';qI++;if(STATE!=='WIN'&&STATE!=='LOSE')setTimeout(()=>{{if(STATE==='B')showQ();}},1100);}}
+  else{{const pct=Math.max(0,qTimer/qMax)*100;tb.style.width=pct+'%';tb.style.background=pct>40?'linear-gradient(90deg,'+COL+','+COL+'88)':'linear-gradient(90deg,#FF2222,#FF4400)';}}
+}}
+function loop(){{
+  FC++;ctx.clearRect(0,0,W,H);
+  drBG();
+  if(STATE!=='SS'){{drChar(P.x,P.y,P.color,P.evo,false,P.hit,P.shake);drChar(E.x,E.y,E.color,E.phase*2,true,E.hit,E.shake);drParts();drHUD();drDmgNums();if(P.shake>0)P.shake=Math.max(0,P.shake-0.5);if(E.shake>0)E.shake=Math.max(0,E.shake-0.5);}}
+  if(STATE==='IN'){{stT++;drIntro();}}
+  else if(STATE==='B')upTimer();
+  else if(STATE==='EV'){{evolveT++;drEvolve();}}
+  upParts();requestAnimationFrame(loop);
+}}
+loop();
+</script></body></html>"""
+
+# ─────────────────────────────────────────────────────────────────────────────
+# UNIVERSAL GAME ENGINE — detects ANY universe, generates HTML5 battle game
+# ─────────────────────────────────────────────────────────────────────────────
+def detect_game_mode(universe: str) -> str:
+    l = universe.lower()
+    if any(k in l for k in ['dragon ball','dbz','saiyan','naruto','bleach','demon slayer','one piece','attack on titan','jujutsu','fairy tail','hunter x hunter','fullmetal','my hero','chainsaw man','black clover','sword art','tokyo ghoul','berserk','vinland','mob psycho','one punch','seven deadly','fire force','dragon ball z','dbs']):
+        return 'FIGHTER'
+    if any(k in l for k in ['pokemon','genshin','zelda','final fantasy','fire emblem','undertale','persona','elden ring','dark souls','skyrim','witcher','stardew','animal crossing','xenoblade','tales of','dragon quest','chrono','octopath','ff7','ff14','wow','world of warcraft','runescape','league of','dota','diablo','baldur','pathfinder','dungeons and dragons','d&d']):
+        return 'RPG'
+    if any(k in l for k in ['mario','sonic','kirby','donkey kong','crash bandicoot','rayman','celeste','hollow knight','cuphead','megaman','castlevania','metroid','contra','spyro','banjo','yoshi','pikmin','super mario','little big planet','shovel knight']):
+        return 'PLATFORM'
+    if any(k in l for k in ['call of duty','cod','halo','fortnite','valorant','overwatch','apex','pubg','counter strike','battlefield','doom','quake','borderlands','destiny','titanfall','warzone','rainbow six','ghost recon','splinter cell','metal gear','resident evil','bioshock','far cry','crysis','killzone']):
+        return 'SHOOTER'
+    if any(k in l for k in ['harry potter','hogwarts','wizard','witchcraft','lord of the rings','tolkien','dungeons','magic the gathering','hearthstone','fantasy','narnia','eragon','inheritance','mage','sorcerer','enchanted','merlin','fable','wheel of time','mistborn','stormlight','sanderson']):
+        return 'MAGIC'
+    if any(k in l for k in ['star wars','nasa','astronaut','space','galaxy','cosmos','marvel','avengers','dc comics','superman','batman','guardians','thor','iron man','captain america','black panther','spider man','x-men','transformers','gundam','evangelion','macross','star trek','mass effect','halo universe','interstellar']):
+        return 'COSMIC'
+    if any(k in l for k in ['football','basketball','soccer','baseball','tennis','golf','nba','nfl','mlb','nhl','fifa','cricket','rugby','boxing','mma','ufc','wrestling','olympics','lacrosse','volleyball','swimming','track','esport','formula 1','f1','nascar','racing']):
+        return 'SPORTS'
+    if any(k in l for k in ['mortal kombat','street fighter','tekken','smash bros','king of fighters','guilty gear','blazblue','injustice','fighting game','brawl']):
+        return 'BRAWL'
+    if any(k in l for k in ['minecraft','roblox','terraria','starcraft','civilization','age of empires','sim','tycoon','factory','build','craft','sandbox','cities','prison architect','factorio']):
+        return 'BUILDER'
+    # Broad cultural categories
+    if any(k in l for k in ['music','band','rock','hip hop','rap','jazz','classical','kpop','pop','artist','singer','beethoven','mozart','album']):
+        return 'COSMIC'
+    if any(k in l for k in ['cooking','chef','food','recipe','kitchen','baking','culinary','masterchef','anime food']):
+        return 'RPG'
+    if any(k in l for k in ['history','ancient','rome','egypt','medieval','war','world war','napoleon','viking','samurai','pirate','renaissance','greek mythology']):
+        return 'BRAWL'
+    if any(k in l for k in ['science','biology','chemistry','physics','math','coding','programming','engineering','medicine','robot','ai','machine learning']):
+        return 'COSMIC'
+    return 'AUTO'
+
+
+def _fallback_config(universe: str, mode: str, subject: str, q_count: int) -> dict:
+    questions = [
+        {"q":f"In the {universe} world: What is 15 × 8?","choices":["A: 100","B: 112","C: 120","D: 130"],"answer":"C","hint":"15×8"},
+        {"q":f"A hero runs 5km in 25 min. Speed in km/h?","choices":["A: 10","B: 12","C: 15","D: 8"],"answer":"B","hint":"d/t×60"},
+        {"q":"What is the square root of 144?","choices":["A: 11","B: 12","C: 13","D: 14"],"answer":"B","hint":"12×12"},
+        {"q":"Solve: 3x + 6 = 21. What is x?","choices":["A: 3","B: 4","C: 5","D: 6"],"answer":"C","hint":"subtract 6, divide by 3"},
+        {"q":"What is 20% of 350?","choices":["A: 60","B: 70","C: 80","D: 90"],"answer":"B","hint":"350÷5"},
+        {"q":"What is 7² + 5²?","choices":["A: 74","B: 70","C: 84","D: 64"],"answer":"A","hint":"49+25"},
+        {"q":"A triangle has angles 90° and 45°. Third angle?","choices":["A: 30°","B: 45°","C: 60°","D: 55°"],"answer":"B","hint":"sum=180"},
+        {"q":"What is 2³ × 3²?","choices":["A: 48","B: 54","C: 64","D: 72"],"answer":"D","hint":"8×9"},
+    ]
+    return {
+        "mode": mode,
+        "arena_name": f"The {universe} Arena",
+        "arena_desc": "A legendary battlefield forged from pure determination.",
+        "arena_colors": ["#111122","#222244","#333366"],
+        "player_title": "Champion",
+        "player_attacks": ["Power Blast","Energy Wave","Ultimate Strike","Final Form Attack","Infinite Force"],
+        "enemy_name": f"{universe} Boss",
+        "enemy_title": "The Final Obstacle",
+        "enemy_color": "#CC2222",
+        "enemy_attacks": ["Dark Blast","Shadow Strike","Void Wave"],
+        "enemy_phases": ["Phase 1","Phase 2 — ENRAGED","Final Phase — ULTIMATE"],
+        "win_quote": "Victory belongs to those who never stop learning!",
+        "lose_quote": "The enemy grows stronger. Study more and return.",
+        "questions": questions[:q_count],
+    }
+
+
+def generate_battle_config(universe: str, subject: str, tier: str, client, difficulty: int = 1) -> dict:
+    mode = detect_game_mode(universe)
+    tier_q = 8 if tier == "Elite" else (6 if tier == "Premium" else 4)
+    q_count = min(tier_q + difficulty, 12)
+    evolutions_by_mode = {
+        "FIGHTER": ["Base Form","Awakened","Powered Up","Super Form","Hyper Mode","Transcendent","Legendary","Absolute","INFINITE POWER"],
+        "RPG":     ["Novice","Apprentice","Adept","Expert","Master","Grand Master","Champion","Legend","MYTHIC"],
+        "PLATFORM":["Small","Powered","Fire Mode","Cape Mode","Tanooki","Metal","Wing Cap","Rainbow Star","INVINCIBLE"],
+        "SHOOTER": ["Recruit","Soldier","Specialist","Veteran","Elite","Special Ops","Ghost","Shadow","OMEGA OPERATIVE"],
+        "MAGIC":   ["Apprentice","Witch/Wizard","Prefect","Auror","Master Wizard","Archmage","High Mage","Grand Archmage","OMNIMANCER"],
+        "COSMIC":  ["Cadet","Pilot","Ace","Captain","Commander","Admiral","Warlord","Cosmic Force","UNIVERSAL"],
+        "SPORTS":  ["Rookie","Starter","Varsity","All-Star","MVP","Hall of Fame","Legend","GOAT","UNDISPUTED"],
+        "BRAWL":   ["White Belt","Yellow","Orange","Green","Blue","Purple","Brown","Black Belt","GRANDMASTER"],
+        "BUILDER": ["Novice","Builder","Engineer","Architect","Master Builder","City Planner","Overlord","God Mode","OMNIPOTENT"],
+        "AUTO":    ["Level 1","Level 2","Level 3","Level 4","Level 5","Level 6","Level 7","Level 8","MAXED"],
+    }
+    prompt = f"""You are a game designer for an educational RPG called "30 Second Infiniteverse".
+
+Universe: "{universe}"
+Game Mode: {mode}
+Subject: {subject}
+Player tier: {tier}
+
+Return ONLY valid JSON (no markdown) with this EXACT structure:
+{{"mode":"{mode}","arena_name":"short dramatic name","arena_desc":"1 sentence","arena_colors":["#hex1","#hex2","#hex3"],"player_title":"title","player_attacks":["A1","A2","A3","A4","A5"],"enemy_name":"enemy name","enemy_title":"enemy rank","enemy_color":"#hex","enemy_attacks":["E1","E2","E3"],"enemy_phases":["P1","P2","P3"],"win_quote":"short quote","lose_quote":"short quote","questions":[{{"q":"question","choices":["A: opt","B: opt","C: opt","D: opt"],"answer":"B","hint":"tiny hint"}}]}}
+
+Generate {q_count} questions. Each must:
+- Test real {subject} knowledge
+- Be flavored with {universe} lore in the question text
+- Have 4 choices labeled A, B, C, D
+- Have correct "answer" field matching one of A B C D"""
+
+    try:
+        resp = client.messages.create(
+            model="claude-sonnet-4-5",
+            max_tokens=2400 if tier == "Elite" else 1800,
+            messages=[{"role":"user","content":prompt}]
+        )
+        raw = resp.content[0].text.strip().replace("```json","").replace("```","").strip()
+        cfg = json.loads(raw)
+    except Exception:
+        cfg = _fallback_config(universe, mode, subject, q_count)
+
+    max_evo = 9 if tier == "Elite" else (6 if tier == "Premium" else 3)
+    all_evos = evolutions_by_mode.get(mode, evolutions_by_mode["AUTO"])
+    cfg["evolutions"] = all_evos[:max_evo]
+    cfg["subject"] = subject
+    cfg["universe"] = universe
+    cfg["tier"] = tier
+    cfg["mode"] = mode
+    return cfg
+
 
 def variable_reward(base: float) -> tuple:
     """Slot-machine style reward. Unpredictability = dopamine."""
@@ -492,6 +971,8 @@ if "gold" not in st.session_state:
         "secrets_seen": 0,
         "shield_bought": False, "booster_bought": False,
         "battle_state": None, "current_battle": None, "egg_warmth": {},
+        "battle_config": None, "battle_box_pending": False, "battle_box_item": None,
+        "battle_wins": 0, "opening_loot_claimed": False,
         "secret_queue": [],
         "show_secret": None,
         "spinner_available": False,
@@ -845,7 +1326,7 @@ div.stButton>button:hover{{transform:scale(1.02);}}
 # SIDEBAR
 # ─────────────────────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.markdown(f"<h1 style='font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:3px;margin:0'>⚡ TITAN HUB</h1>", unsafe_allow_html=True)
+    st.markdown(f"<h1 style='font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:3px;margin:0'>🌌 INFINITEVERSE HUB</h1>", unsafe_allow_html=True)
     st.markdown(f"<p style='color:#ffffff;margin:3px 0'><b>CHAMPION:</b> {st.session_state.user_name.upper()}</p>", unsafe_allow_html=True)
     st.markdown(f"<p style='color:#ffffff;margin:3px 0'><b>UNIVERSE:</b> {st.session_state.user_theme}</p>", unsafe_allow_html=True)
     mode_badge = {"chill":"⚡ CHILL","grinder":"🔥 GRINDER","obsessed":"💀 OBSESSED"}.get(MODE,"⚡ CHILL")
@@ -871,6 +1352,7 @@ with st.sidebar:
     st.write("---")
     # NAV TABS based on mode
     if st.button("🚀 MISSION HUB",  key="nav_hub"):      st.session_state.view = "main";       st.rerun()
+    if st.button("⚔️ BATTLE",       key="nav_battle"):   st.session_state.view = "battle";     st.rerun()
     if st.button("⚔️ BATTLE",       key="nav_battle"):   st.session_state.view = "battle";     st.rerun()
     if st.button("🎰 SPINNER",      key="nav_spin"):     st.session_state.view = "spinner";    st.rerun()
     if st.button("🛒 SHOP",          key="nav_shop"):     st.session_state.view = "shop";       st.rerun()
@@ -948,103 +1430,144 @@ st.markdown("---")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# BATTLE SCREEN — Godot WebGL embedded + fallback turn-based
+# ─────────────────────────────────────────────────────────────────────────────
+# BATTLE SCREEN — Universal HTML5 Game Engine
 # ─────────────────────────────────────────────────────────────────────────────
 if st.session_state.get("battle_state") == "ready" or st.session_state.view == "battle":
+    st.session_state.view = "battle"
 
-    # Freeze monster at battle start
-    if "current_battle" not in st.session_state or st.session_state.current_battle is None:
-        monster_roll = random.randint(1,100)
-        if monster_roll > 90:
-            mon = {"name":f"Legendary {st.session_state.user_theme} Titan","hp":7,"reward":20,"rarity":"Legendary"}
-        elif monster_roll > 70:
-            mon = {"name":f"Epic {st.session_state.user_theme} Warlord",  "hp":5,"reward":12,"rarity":"Epic"}
-        elif monster_roll > 40:
-            mon = {"name":f"Rare {st.session_state.user_theme} Hunter",   "hp":4,"reward":8, "rarity":"Rare"}
-        else:
-            mon = {"name":f"{st.session_state.user_theme} Scout",         "hp":3,"reward":5, "rarity":"Common"}
-        st.session_state.current_battle = {
-            "monster": mon, "reward_paid": False,
-            "hp_remaining": mon["hp"], "player_hp": 5, "turn": 0,
+    theme    = st.session_state.user_theme or "Infinite Power"
+    tier_now = st.session_state.get("sub_tier","Free")
+
+    # ── Battle box claim (after winning) ──────────────────────────
+    if st.session_state.get("battle_box_pending") and st.session_state.get("battle_box_item"):
+        item = st.session_state.battle_box_item
+        rc2  = {"Common":"#888888","Rare":"#4488FF","Epic":"#AA44FF","Legendary":"#FFD700"}.get(item["rarity"],"#FFD700")
+        st.markdown(f"""<div style='border:3px solid {rc2};border-radius:20px;padding:32px;
+            background:linear-gradient(135deg,#0a0a1a,#1a0a2e);text-align:center;margin:16px 0;
+            box-shadow:0 0 50px {rc2}66;animation:lootpulse 0.5s ease 4;'>
+            <div style='font-size:72px;animation:lootbounce 0.4s infinite alternate'>🎁</div>
+            <div style='font-family:Bebas Neue,sans-serif;font-size:36px;color:{rc2};letter-spacing:6px;margin:12px 0'>
+                {item["rarity"].upper()} BATTLE BOX</div>
+            <div style='font-size:20px;color:#ffffff;font-family:Space Mono,monospace'>{item["name"]}</div>
+        </div>
+        <style>
+        @keyframes lootpulse{{0%{{box-shadow:0 0 20px {rc2}44}}50%{{box-shadow:0 0 70px {rc2}cc}}100%{{box-shadow:0 0 20px {rc2}44}}}}
+        @keyframes lootbounce{{from{{transform:scale(1) rotate(-5deg)}}to{{transform:scale(1.2) rotate(5deg)}}}}
+        </style>""", unsafe_allow_html=True)
+        if st.button("⚡ CLAIM BATTLE BOX", key="claim_battle_box"):
+            st.session_state.battle_box_pending = False
+            st.session_state.battle_box_item    = None
+            st.session_state.battle_state       = None
+            st.session_state.view               = "main"
+            st.rerun()
+        st.stop()
+
+    # ── Listen for postMessage win/lose from JS ────────────────────
+    js_result = st.session_state.get("js_battle_result")
+    if js_result == "win":
+        st.session_state.js_battle_result = None
+        st.session_state.battle_wins = st.session_state.get("battle_wins",0) + 1
+        st.session_state.battles_fought = st.session_state.get("battles_fought",0) + 1
+        xp_earn  = 60 + st.session_state.get("battle_config",{}).get("tier_xp",0)
+        gold_earn = 25
+        st.session_state.xp   = st.session_state.get("xp",0) + xp_earn
+        st.session_state.gold = st.session_state.get("gold",0) + gold_earn
+        # Battle box
+        box_pool = {
+            "Free":    [("Common",  "#888888", "+5 Shards",        "Common"),
+                        ("Rare",    "#4488FF", "+15 Shards",       "Rare"),
+                        ("Epic",    "#AA44FF", "+30 Shards + Egg", "Epic")],
+            "Premium": [("Rare",    "#4488FF", "+25 Shards + Egg", "Rare"),
+                        ("Epic",    "#AA44FF", "+50 Shards",       "Epic"),
+                        ("Legendary","#FFD700","JACKPOT: +100 Shards + 3 Eggs","Legendary")],
+            "Elite":   [("Epic",    "#AA44FF", "+75 Shards + 2 Eggs","Epic"),
+                        ("Legendary","#FFD700","+150 Shards + Streak Shield","Legendary"),
+                        ("Legendary","#FFD700","ULTRA JACKPOT: +300 Shards","Legendary")],
         }
+        pool  = box_pool.get(tier_now, box_pool["Free"])
+        pick  = random.choice(pool)
+        bitem = {"rarity": pick[0], "color": pick[1], "name": pick[2]}
+        # Apply bonus
+        if "Egg" in pick[2]:
+            st.session_state.incubator_eggs = st.session_state.get("incubator_eggs",0) + (3 if "3 Eggs" in pick[2] else 2 if "2 Eggs" in pick[2] else 1)
+        if "Shield" in pick[2]:
+            st.session_state.streak_shield = True
+        bonus_gold = 5 if "5" in pick[2] else 15 if "15" in pick[2] else 25 if "25" in pick[2] else 50 if "50" in pick[2] else 75 if "75" in pick[2] else 100 if "100" in pick[2] else 150 if "150" in pick[2] else 300 if "300" in pick[2] else 30
+        st.session_state.gold += bonus_gold
+        st.session_state.battle_box_pending = True
+        st.session_state.battle_box_item    = bitem
+        st.session_state.spinner_available  = True
+        st.session_state.spins_left         = st.session_state.get("spins_left",0) + (1 if tier_now=="Free" else 3 if tier_now=="Premium" else 6)
+        st.rerun()
 
-    cb  = st.session_state.current_battle
-    mon = cb["monster"]
-    rarity_colors = {"Common":"#aaaaaa","Rare":"#4488ff","Epic":"#aa44ff","Legendary":"#FFD700"}
-    rc  = rarity_colors.get(mon["rarity"],"#ffffff")
+    # ── Generate or load battle config ────────────────────────────
+    cfg = st.session_state.get("battle_config")
+    if cfg is None or cfg.get("universe") != theme:
+        client2 = get_claude_client()
+        with st.spinner(f"⚔️ Generating {theme} battle..."):
+            cfg = generate_battle_config(theme, "Mathematics", tier_now, client2)
+        st.session_state.battle_config = cfg
 
-    # Build Godot URL with universe params
-    theme_enc   = st.session_state.user_theme.replace(" ","%20")
-    currency_enc= currency.replace(" ","%20")
-    color_hex   = C.lstrip("#")
-    shield_enc  = wd.get("shield_name","Shield").replace(" ","%20")
-    booster_enc = wd.get("booster_name","Boost").replace(" ","%20")
-    sflavor_enc = wd.get("shield_flavor","").replace(" ","%20")
-    bflavor_enc = wd.get("booster_flavor","").replace(" ","%20")
-    bstyle      = wd.get("battle_style","turnbased")
-    reward_val  = mon["reward"]
-    rarity_val  = mon["rarity"]
+    # ── Subject picker (shown before game launches) ────────────────
+    if not st.session_state.get("battle_subject_chosen"):
+        st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:4px;text-align:center'>⚔️ {theme.upper()} BATTLE</h2>", unsafe_allow_html=True)
+        st.markdown(f"<p style='text-align:center;color:#aaa;font-family:Space Mono,monospace;font-size:12px'>Universe: <b style='color:{C}'>{theme}</b> · Mode: <b style='color:{C}'>{cfg.get('mode','?')}</b> · Arena: <b>{cfg.get('arena_name','?')}</b></p>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align:center;color:#fff;font-size:14px;font-family:Space Mono,monospace'>Pick your subject — correct answers = power attacks. Wrong = the enemy hits back.</p>", unsafe_allow_html=True)
 
-    godot_url = (
-        f"https://celebrated-genie-79733a.netlify.app"
-        f"?universe={theme_enc}&currency={currency_enc}&color={color_hex}"
-        f"&shield={shield_enc}&booster={booster_enc}"
-        f"&sflavor={sflavor_enc}&bflavor={bflavor_enc}"
-        f"&style={bstyle}&reward={reward_val}&rarity={rarity_val}"
-    )
+        subjects = ["Mathematics","Science","History","English","Geography","Biology","Chemistry","Physics","Economics","Computer Science","Psychology","Art & Music"]
+        cols2 = st.columns(4)
+        for i, sub in enumerate(subjects):
+            with cols2[i % 4]:
+                if st.button(sub, key=f"subj_{i}"):
+                    with st.spinner(f"⚔️ Generating {sub} questions..."):
+                        cfg = generate_battle_config(theme, sub, tier_now, get_claude_client())
+                    st.session_state.battle_config       = cfg
+                    st.session_state.battle_subject_chosen = True
+                    st.rerun()
 
-    st.markdown(f"""<div class='monster-card'>
-        <div style='font-size:11px;color:{rc};letter-spacing:3px;font-family:Space Mono,monospace'>{mon["rarity"].upper()} ENCOUNTER</div>
-        <div style='font-family:Bebas Neue,sans-serif;font-size:32px;color:{C};margin:6px 0'>{mon["name"].upper()}</div>
-        <div style='font-size:12px;color:#ffffff'>Defeat to earn <span style='color:{C};font-weight:bold'>{mon["reward"]} {currency}</span>{"  · <span style='color:#aaaaaa;font-size:11px'>Reward claimed ✓</span>" if cb["reward_paid"] else ""}</div>
-    </div>""", unsafe_allow_html=True)
-
-    # Embed Godot game
-    import streamlit.components.v1 as components
-    components.html(f"""
-    <style>
-    body{{margin:0;background:#000;display:flex;flex-direction:column;align-items:center;}}
-    #game-frame{{width:100%;max-width:800px;height:480px;border:2px solid {C};border-radius:12px;background:#000;}}
-    #loading{{font-family:Space Mono,monospace;color:{C};font-size:13px;text-align:center;padding:16px;}}
-    </style>
-    <div id="loading">⚔️ LOADING BATTLE... ONE MOMENT</div>
-    <iframe id="game-frame"
-        src="{godot_url}"
-        frameborder="0"
-        allowfullscreen
-        allow="autoplay; fullscreen *; monetization; xr-spatial-tracking"
-        style="display:none"
-        onload="document.getElementById('loading').style.display='none';this.style.display='block'">
-    </iframe>
-    <script>
-    // Listen for battle result from Godot
-    window.addEventListener('message', function(e) {{
-        if(e.data && e.data.type === 'battleResult') {{
-            window.parent.postMessage(e.data, '*');
-        }}
-    }});
-    </script>
-    """, height=520)
-
-    col1, col2 = st.columns(2)
-    with col1:
-        if not cb["reward_paid"]:
-            if st.button("✅ I WON — CLAIM REWARD", key="claim_win"):
-                st.session_state.gold += mon["reward"]
-                st.session_state.battles_won += 1
-                cb["reward_paid"] = True
-                st.session_state.incubator_eggs += 1
-                st.session_state.battles_fought += 1
-                st.session_state.spinner_available = True
-                st.success(f"🏆 +{mon['reward']} {currency} claimed!")
-                time.sleep(0.5); st.rerun()
-        else:
-            st.success("✅ Reward already claimed!")
-    with col2:
-        if st.button("⏩ SKIP BATTLE", key="skip_battle"):
-            st.session_state.current_battle = None
-            st.session_state.battle_state = None
+        st.markdown("---")
+        if st.button("⬅ Back", key="battle_back"):
             st.session_state.view = "main"
+            st.session_state.battle_state = None
+            st.rerun()
+        st.stop()
+
+    # ── Build & embed game ─────────────────────────────────────────
+    cfg_clean = {k: v for k,v in cfg.items() if k != "client"}
+    cfg_json  = json.dumps(cfg_clean)
+
+    import streamlit.components.v1 as components
+
+    # Build game HTML inline (avoids file I/O)
+    game_html = _build_game_html(cfg_clean, C)
+
+    st.markdown(f"""<div style='border:2px solid {C}33;border-radius:12px;overflow:hidden;margin:8px 0;'>
+        <div style='background:rgba(0,0,0,0.8);padding:6px 16px;font-family:Bebas Neue,sans-serif;
+            font-size:13px;color:{C};letter-spacing:3px;display:flex;justify-content:space-between;'>
+            <span>⚔️ {(cfg.get("arena_name","BATTLE")).upper()}</span>
+            <span style='color:#888;font-size:10px'>ANSWER CORRECTLY TO ATTACK · 3 WRONG = DEFEAT</span>
+        </div></div>""", unsafe_allow_html=True)
+
+    components.html(game_html, height=520, scrolling=False)
+
+    # 3D coming soon banner
+    st.markdown(f"""<div style='background:linear-gradient(90deg,#0a0020,#1a0040,#0a0020);
+        border:1px solid {C}44;border-radius:10px;padding:10px 20px;text-align:center;margin:8px 0;'>
+        <span style='font-family:Bebas Neue,sans-serif;font-size:16px;color:{C};letter-spacing:3px'>
+        🚀 3D UNIVERSE MODE COMING SOON — The full immersive infinite experience</span></div>""", unsafe_allow_html=True)
+
+    col_r, col_l = st.columns(2)
+    with col_r:
+        if st.button("🔄 New Battle", key="new_battle"):
+            st.session_state.battle_config        = None
+            st.session_state.battle_subject_chosen = False
+            st.rerun()
+    with col_l:
+        if st.button("⬅ Back to Hub", key="back_hub"):
+            st.session_state.view                  = "main"
+            st.session_state.battle_state          = None
+            st.session_state.battle_subject_chosen = False
             st.rerun()
 
     st.stop()
@@ -1559,94 +2082,6 @@ elif view == "feedback":
             st.markdown("---")
             for fb in reversed(st.session_state.feedback_list):
                 st.markdown(f"<div class='ach-card'><span style='color:{C}'>{fb['type']}</span> · <span style='color:#ffffff;font-size:11px'>{fb['time']} · {fb['name']}</span><br><span style='color:{TEXT}'>{fb['message']}</span></div>", unsafe_allow_html=True)
-
-# ── SHOP ──────────────────────────────────────────────────────────────────────
-elif view == "shop":
-    st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>🛒 ARSENAL</h2>", unsafe_allow_html=True)
-    col1, col2 = st.columns(2)
-    with col1:
-        st.markdown(f"""<div class='shop-card'>
-            <div style='font-size:10px;color:#ffffff;letter-spacing:2px;margin-bottom:6px'>⚔️ DEFENSE ABILITY</div>
-            <h3 style='font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:2px;margin:0 0 6px'>{wd.get('shield_name','Shield').upper()}</h3>
-            <div style='font-size:12px;color:#ffffff;font-style:italic;margin-bottom:12px'>{wd.get('shield_flavor','An ability forged in the heart of this universe.')}</div>
-            <div style='background:#111111;border-left:3px solid {C};padding:10px 14px;border-radius:0 8px 8px 0;margin-bottom:14px'>
-                <div style='font-size:10px;color:#ffffff;letter-spacing:2px'>EFFECT</div>
-                <div style='font-size:13px;color:{TEXT};margin-top:4px'>{SHIELD_EFFECT}</div>
-            </div>
-            <div style='font-size:12px;color:#ffffff'>Cost: <span style='color:{C};font-weight:bold'>15 {currency}</span></div>
-        </div>""", unsafe_allow_html=True)
-        if st.button(f"⚔️ ACQUIRE · 15 {currency}", key="buy_shield"):
-            if st.session_state.gold >= 15:
-                st.session_state.gold -= 15; st.session_state.shield_bought = True
-                st.success(f"⚔️ {wd.get('shield_name')} activated!")
-            else: st.error("Not enough currency.")
-    with col2:
-        st.markdown(f"""<div class='shop-card'>
-            <div style='font-size:10px;color:#ffffff;letter-spacing:2px;margin-bottom:6px'>⚡ SPEED ABILITY</div>
-            <h3 style='font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:2px;margin:0 0 6px'>{wd.get('booster_name','Booster').upper()}</h3>
-            <div style='font-size:12px;color:#ffffff;font-style:italic;margin-bottom:12px'>{wd.get('booster_flavor','Speed that defies every known law of physics.')}</div>
-            <div style='background:#111111;border-left:3px solid {C};padding:10px 14px;border-radius:0 8px 8px 0;margin-bottom:14px'>
-                <div style='font-size:10px;color:#ffffff;letter-spacing:2px'>EFFECT</div>
-                <div style='font-size:13px;color:{TEXT};margin-top:4px'>{BOOSTER_EFFECT}</div>
-            </div>
-            <div style='font-size:12px;color:#ffffff'>Cost: <span style='color:{C};font-weight:bold'>25 {currency}</span></div>
-        </div>""", unsafe_allow_html=True)
-        if st.button(f"⚡ ACQUIRE · 25 {currency}", key="buy_booster"):
-            if st.session_state.gold >= 25:
-                st.session_state.gold -= 25; st.session_state.sub_multiplier = 3
-                st.session_state.booster_bought = True
-                st.success(f"⚡ {wd.get('booster_name')} engaged!")
-            else: st.error("Not enough currency.")
-
-# ── MISSION HUB ───────────────────────────────────────────────────────────────
-else:
-    _, col, _ = st.columns([1,2,1])
-    with col:
-        reward   = 1.0 * st.session_state.sub_multiplier
-        mult_tag = f" ×{st.session_state.sub_multiplier}" if st.session_state.sub_multiplier > 1 else ""
-        st.markdown(f"""<div style='text-align:center;background:#111111;border:1px solid rgba({CR},{CG},{CB},0.12);border-radius:16px;padding:24px;margin-bottom:20px'>
-            <div style='font-size:11px;color:#ffffff;letter-spacing:2px'>MISSION REWARD</div>
-            <div style='font-family:Bebas Neue,sans-serif;font-size:52px;color:{C};margin:6px 0'>{reward:.1f} {currency}{mult_tag}</div>
-            <div style='font-size:11px;color:#ffffff'>per completed mission</div>
-        </div>""", unsafe_allow_html=True)
-
-        st.markdown(f"""<div style='background:#111111;border:1px solid rgba({CR},{CG},{CB},0.08);border-radius:16px;padding:20px;margin-bottom:16px;text-align:center'>
-            <div style='font-size:10px;color:#ffffff;letter-spacing:2px;margin-bottom:8px'>⏱ MICRO TIMER</div>
-            <div style='font-family:Bebas Neue,sans-serif;font-size:48px;color:{C}'>{st.session_state.micro_timer_seconds}s</div>
-            <div style='font-size:11px;color:#ffffff'>+30s per tap · max 6 minutes</div>
-        </div>""", unsafe_allow_html=True)
-
-        tc1, tc2, tc3, tc4 = st.columns(4)
-        with tc1:
-            if st.button("➖ MINUS 30s", key="sub_30"):
-                if st.session_state.micro_timer_seconds > 30: st.session_state.micro_timer_seconds -= 30; st.rerun()
-                else: st.warning("Minimum 30 seconds!")
-        with tc2:
-            if st.button("➕ ADD 30s", key="add_30"):
-                if st.session_state.micro_timer_seconds < 360: st.session_state.micro_timer_seconds += 30; st.rerun()
-                else: st.warning("Max 6 minutes!")
-        with tc3:
-            if st.button("▶ START", key="start_micro"):
-                secs = st.session_state.micro_timer_seconds
-                bar = st.progress(0); status = st.empty()
-                for i in range(secs):
-                    time.sleep(1); bar.progress((i+1)/secs)
-                    status.markdown(f"<p style='text-align:center;font-family:Space Mono,monospace;color:{C};font-size:20px'>{secs-i-1}s remaining</p>", unsafe_allow_html=True)
-                st.session_state.micro_timer_seconds = 30
-                st.success("✅ Micro session done!"); time.sleep(1); st.rerun()
-        with tc4:
-            if st.button("🔄 RESET", key="reset_micro"):
-                st.session_state.micro_timer_seconds = 30; st.rerun()
-
-        st.markdown("<br>", unsafe_allow_html=True)
-        if st.button("▶  START 1-MINUTE MISSION", key="start_mission"):
-            bar = st.progress(0); status = st.empty()
-            for i in range(60):
-                time.sleep(1); bar.progress((i+1)/60)
-                status.markdown(f"<p style='text-align:center;font-family:Space Mono,monospace;color:#ffffff'>SYNCHRONIZING: {i+1}s / 60s</p>", unsafe_allow_html=True)
-            st.session_state.pending_gold = reward
-            st.session_state.needs_verification = True
-            st.rerun()
 
 # ── TRIBUNAL ──────────────────────────────────────────────────────────────────
 if st.session_state.needs_verification:
