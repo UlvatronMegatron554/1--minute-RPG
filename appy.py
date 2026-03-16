@@ -1766,6 +1766,21 @@ elif view == "spinner":
     prize_colors = json.dumps([p["color"] for p in SPINNER_PRIZES])
     components.html(f"""<style>body{{margin:0;background:transparent;display:flex;flex-direction:column;align-items:center;font-family:monospace;}}canvas{{border-radius:50%;box-shadow:0 0 40px rgba(255,215,0,0.5);}}#spinBtn{{margin-top:20px;padding:16px 48px;font-size:22px;font-weight:bold;background:linear-gradient(135deg,#FFD700,#FF8C00);border:none;border-radius:12px;cursor:pointer;color:#000;letter-spacing:2px;box-shadow:0 0 30px rgba(255,215,0,0.5);}}#spinBtn:disabled{{opacity:0.4;cursor:not-allowed;}}#result{{margin-top:16px;font-size:20px;color:#FFD700;letter-spacing:2px;text-align:center;min-height:30px;}}</style><canvas id="wheel" width="320" height="320"></canvas><button id="spinBtn" {"disabled" if not available else ""}>{"⏰ COOLDOWN — " + cooldown_remaining if cooldown_active and spins_left > 0 else "🔒 EARN SPINS FIRST" if not available else "🎰 SPIN IT"}</button><div id="result"></div><script>const labels={prize_labels};const colors={prize_colors};const cv=document.getElementById('wheel'),ctx=cv.getContext('2d'),n=labels.length,arc=2*Math.PI/n;let currentAngle=0,spinning=false;function drawWheel(a){{ctx.clearRect(0,0,320,320);for(let i=0;i<n;i++){{ctx.beginPath();ctx.moveTo(160,160);ctx.arc(160,160,150,a+i*arc,a+(i+1)*arc);ctx.fillStyle=colors[i];ctx.fill();ctx.strokeStyle='#111';ctx.lineWidth=2;ctx.stroke();ctx.save();ctx.translate(160,160);ctx.rotate(a+(i+0.5)*arc);ctx.textAlign='right';ctx.fillStyle='#fff';ctx.font='bold 11px monospace';ctx.shadowColor='#000';ctx.shadowBlur=4;ctx.fillText(labels[i],140,5);ctx.restore();}}ctx.beginPath();ctx.arc(160,160,22,0,2*Math.PI);ctx.fillStyle='#111';ctx.fill();ctx.strokeStyle='#FFD700';ctx.lineWidth=3;ctx.stroke();ctx.beginPath();ctx.moveTo(300,150);ctx.lineTo(320,160);ctx.lineTo(300,170);ctx.fillStyle='#FFD700';ctx.fill();}}drawWheel(0);document.getElementById('spinBtn').onclick=function(){{if(spinning)return;spinning=true;this.disabled=true;document.getElementById('result').textContent='';const extra=(5+Math.random()*5)*2*Math.PI,dur=4000+Math.random()*2000,start=performance.now(),sa=currentAngle;function anim(now){{const el=now-start,p=Math.min(el/dur,1),ease=1-Math.pow(1-p,4);currentAngle=sa+extra*ease;drawWheel(currentAngle);if(p<1)requestAnimationFrame(anim);else{{spinning=false;const norm=((2*Math.PI)-(currentAngle%(2*Math.PI)))%(2*Math.PI);const idx=Math.floor(norm/arc)%n;document.getElementById('result').textContent='🎉 '+labels[idx]+'!';}}}}requestAnimationFrame(anim);}};</script>""", height=460)
 
+    # ── 6-HOUR RESET TIMER — ALWAYS VISIBLE ──
+    if cooldown_active:
+        timer_color = "#FF8800"
+        timer_text = f"⏰ NEXT SPIN IN: {cooldown_remaining}"
+    elif spins_left > 0:
+        timer_color = "#00FF44"
+        timer_text = "✅ SPIN READY NOW"
+    else:
+        timer_color = "#888888"
+        timer_text = "🔒 EARN SPINS FROM MISSIONS"
+    st.markdown(f"""<div style='text-align:center;padding:14px;background:#111;border:2px solid {timer_color};border-radius:12px;margin:12px 0'>
+        <div style='font-family:Bebas Neue,sans-serif;font-size:24px;color:{timer_color};letter-spacing:3px'>{timer_text}</div>
+        <div style='font-family:Space Mono,monospace;font-size:11px;color:#888;margin-top:6px'>Spins: {spins_left} · Resets every 6 hours after each spin</div>
+    </div>""", unsafe_allow_html=True)
+
     # ── AUTO-AWARD: consume 1 spin and award prize when entering with spins available ──
     if available and not st.session_state.get("spin_awarded_this_view", False):
         prize = spin_wheel()
