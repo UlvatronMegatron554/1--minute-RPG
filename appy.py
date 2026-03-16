@@ -1515,7 +1515,7 @@ if view == "main":
     # Timer adjust + Start button
     _, btn_minus, btn_start, btn_plus, _ = st.columns([1, 1, 3, 1, 1])
     with btn_minus:
-        if st.button("30-", key="timer_minus"):
+        if st.button("30- decrease", key="timer_minus"):
             new_t = max(30, st.session_state.micro_timer_seconds - 30)
             st.session_state.micro_timer_seconds = new_t; st.rerun()
     with btn_start:
@@ -1534,7 +1534,7 @@ if view == "main":
             timer_placeholder.markdown(f"""<div style='text-align:center;font-family:Bebas Neue,sans-serif;font-size:60px;color:{C};text-shadow:0 0 50px {C};animation:titan-pulse 1s infinite'>⚡ TIME'S UP ⚡</div><div style='text-align:center;font-family:Space Mono,monospace;font-size:14px;color:#ffffff;margin-top:12px'>Upload your proof below to claim your reward.</div>""", unsafe_allow_html=True)
             progress_bar.progress(1.0); time.sleep(0.5); st.rerun()
     with btn_plus:
-        if st.button("30+", key="timer_plus"):
+        if st.button("30+ increase", key="timer_plus"):
             new_t = min(300, st.session_state.micro_timer_seconds + 30)
             st.session_state.micro_timer_seconds = new_t; st.rerun()
 
