@@ -1112,7 +1112,7 @@ input,textarea{{background:#ffffff!important;color:#000000!important;caret-color
 input::placeholder,textarea::placeholder{{color:#666666!important;}}
 label,.stTextInput label{{color:{TEXT}!important;font-family:'Space Mono',monospace!important;font-size:11px!important;letter-spacing:2px!important;}}
 @keyframes titan-pulse{{0%{{box-shadow:0 0 20px {C},inset 0 0 10px {C};border-color:{C};}}50%{{box-shadow:0 0 80px {C},inset 0 0 40px {C};border-color:#ffffff;}}100%{{box-shadow:0 0 20px {C},inset 0 0 10px {C};border-color:{C};}}}}
-div.stButton>button{{border:2px solid {C}!important;background:#000000!important;color:#ffffff!important;font-family:'Bebas Neue',sans-serif!important;font-size:13px!important;letter-spacing:2px!important;padding:4px 12px!important;border-radius:10px!important;animation:titan-pulse 2.5s infinite ease-in-out!important;width:auto!important;min-width:0!important;text-transform:uppercase;transition:transform 0.3s;margin-bottom:6px;}}
+div.stButton>button{{border:2px solid {C}!important;background:#000000!important;color:#ffffff!important;font-family:'Bebas Neue',sans-serif!important;font-size:13px!important;letter-spacing:2px!important;padding:4px 12px!important;border-radius:10px!important;animation:titan-pulse 2.5s infinite ease-in-out!important;width:100%!important;text-transform:uppercase;transition:transform 0.3s;margin-bottom:6px;}}
 div.stButton>button:hover{{transform:scale(1.02);}}
 .metric-card,.shop-card,.ach-card,.monster-card,.secret-card{{background:#111111!important;border:2px solid {C}!important;border-radius:14px!important;padding:18px!important;margin-bottom:12px!important;color:#ffffff!important;}}
 .metric-card *,.shop-card *,.ach-card *,.monster-card *,.secret-card *{{color:#ffffff!important;}}
