@@ -1339,19 +1339,31 @@ if view == "main":
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # ── MISSION BUTTON + TIMER ──
+    # ── MISSION TIMER + START BUTTON — neat, centered, balanced ──
     tier = st.session_state.sub_tier; mult = st.session_state.sub_multiplier; base = 5.0 * mult
     shield = st.session_state.get("shield_bought",False); boost = st.session_state.get("booster_bought",False)
     timer = st.session_state.get("micro_timer_seconds",30)
     reward_min = round(base*0.3,1); reward_max = round(base*20,1)
 
-    st.markdown(f"""<div style='text-align:center;margin:10px 0 8px'><div style='font-family:Space Mono,monospace;font-size:12px;color:#ffffff;letter-spacing:2px'>POTENTIAL REWARD: <span style='color:{C};font-family:Bebas Neue,sans-serif;font-size:18px'>{reward_min} — {reward_max}</span> {currency}{"<br>🛡️ SHIELD ACTIVE" if shield else ""}{"<br>🚀 3× BOOSTER ACTIVE" if boost else ""}</div></div>""", unsafe_allow_html=True)
+    st.markdown(f"""<div style='text-align:center;margin:10px 0 16px;padding:14px;background:#111;border:1px solid {C}33;border-radius:12px'>
+        <div style='font-family:Space Mono,monospace;font-size:11px;color:#888;letter-spacing:2px;margin-bottom:4px'>POTENTIAL REWARD</div>
+        <div style='font-family:Bebas Neue,sans-serif;font-size:28px;color:{C}'>{reward_min} — {reward_max} {currency}</div>
+        {"<div style='font-size:11px;color:#00FF44;margin-top:4px'>🛡️ SHIELD ACTIVE</div>" if shield else ""}{"<div style='font-size:11px;color:#FF8800;margin-top:4px'>🚀 3× BOOSTER ACTIVE</div>" if boost else ""}
+    </div>""", unsafe_allow_html=True)
 
-    _, btn_minus, btn_start, btn_plus, _ = st.columns([1,1,3,1,1])
-    with btn_minus:
-        if st.button("30- decrease", key="timer_minus"):
+    # Timer display — big, centred
+    st.markdown(f"""<div style='text-align:center;padding:10px 0 4px'>
+        <span style='font-family:Bebas Neue,sans-serif;font-size:20px;color:#888;letter-spacing:2px'>MISSION TIMER: </span>
+        <span style='font-family:Bebas Neue,sans-serif;font-size:32px;color:{C};letter-spacing:3px'>{timer}s</span>
+        <span style='font-family:Space Mono,monospace;font-size:10px;color:#555;margin-left:8px'>min 30s · max 5min</span>
+    </div>""", unsafe_allow_html=True)
+
+    # Three equal columns: minus | start | plus
+    col_m, col_s, col_p = st.columns([1, 3, 1])
+    with col_m:
+        if st.button("－30s", key="timer_minus"):
             st.session_state.micro_timer_seconds = max(30, timer-30); st.rerun()
-    with btn_start:
+    with col_s:
         if st.button(f"⚡ START {timer}s MISSION ⚡", key="start_mission"):
             st.session_state.needs_verification = True; st.session_state.pending_gold = base
             timer_placeholder = st.empty(); progress_bar = st.progress(0)
@@ -1364,8 +1376,8 @@ if view == "main":
                 progress_bar.progress(pct); time.sleep(1)
             timer_placeholder.markdown(f"""<div style='text-align:center;font-family:Bebas Neue,sans-serif;font-size:60px;color:{C};text-shadow:0 0 50px {C}'>⚡ TIME'S UP ⚡</div>""", unsafe_allow_html=True)
             progress_bar.progress(1.0); time.sleep(0.5); st.rerun()
-    with btn_plus:
-        if st.button("30+ increase", key="timer_plus"):
+    with col_p:
+        if st.button("＋30s", key="timer_plus"):
             st.session_state.micro_timer_seconds = min(300, timer+30); st.rerun()
 
     if st.session_state.story_log:
@@ -1485,136 +1497,197 @@ elif view == "plans":
 
 elif view == "spinner":
     st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>🎰 LUCKY SPINNER</h2>", unsafe_allow_html=True)
-    spins_left = st.session_state.get("spins_left",0)
-    last_spin = st.session_state.get("last_spin_time")
-    cooldown_active = False
-    if last_spin:
-        elapsed = (_dt.datetime.now() - _dt.datetime.fromisoformat(last_spin)).total_seconds()
-        if elapsed < 21600:
-            cooldown_active = True
-            remaining_secs = int(21600 - elapsed)
-            hours = remaining_secs // 3600; mins = (remaining_secs % 3600) // 60
-            components.html(f"""<div id="timer" style="text-align:center;padding:14px;background:#111;border:2px solid #FF8800;border-radius:12px;margin:4px 0"><div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#FF8800;letter-spacing:3px" id="txt">⏰ NEXT SPIN IN: --:--:--</div><div style="font-family:'Space Mono',monospace;font-size:11px;color:#888;margin-top:6px">Spins: {spins_left} · Resets every 6 hours</div></div><script>var r={remaining_secs};function u(){{if(r<=0){{document.getElementById('txt').textContent='✅ SPIN READY!';document.getElementById('txt').style.color='#00FF44';return;}}var h=Math.floor(r/3600),m=Math.floor((r%3600)/60),s=r%60;document.getElementById('txt').textContent='⏰ NEXT SPIN IN: '+String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');r--;setTimeout(u,1000);}}u();</script>""", height=70)
-    elif spins_left > 0:
-        st.markdown(f"<div style='text-align:center;padding:14px;background:#111;border:2px solid #00FF44;border-radius:12px;margin:4px 0'><div style='font-family:Bebas Neue,sans-serif;font-size:24px;color:#00FF44;letter-spacing:3px'>✅ SPIN READY — {spins_left} SPIN(S) AVAILABLE</div></div>", unsafe_allow_html=True)
+
+    spins_left    = st.session_state.get("spins_left", 0)
+    last_spin_str = st.session_state.get("last_spin_time")
+
+    # ── Calculate cooldown ────────────────────────────────────────────────────
+    cooldown_secs_left = 0
+    if last_spin_str:
+        try:
+            elapsed = (_dt.datetime.now() - _dt.datetime.fromisoformat(last_spin_str)).total_seconds()
+            cooldown_secs_left = max(0, int(21600 - elapsed))
+        except Exception:
+            cooldown_secs_left = 0
+
+    on_cooldown = cooldown_secs_left > 0
+    can_spin    = spins_left > 0 and not on_cooldown
+
+    # ── Status banner + live countdown (always shown) ─────────────────────────
+    if on_cooldown:
+        components.html(f"""
+<style>
+#ctd{{text-align:center;padding:18px;background:#0a0808;border:2px solid #FF8800;
+      border-radius:14px;margin:4px 0;}}
+#ctd_label{{font-family:'Bebas Neue',monospace;font-size:26px;color:#FF8800;
+           letter-spacing:3px;display:block;}}
+#ctd_sub{{font-family:'Space Mono',monospace;font-size:11px;color:#666;
+          margin-top:6px;display:block;}}
+</style>
+<div id="ctd">
+  <span id="ctd_label">⏰ NEXT SPIN IN: <span id="ctd_val">--:--:--</span></span>
+  <span id="ctd_sub">Spin locked · {spins_left} spin(s) banked · Cooldown resets 6h after each spin</span>
+</div>
+<script>
+var r={cooldown_secs_left};
+(function tick(){{
+  if(r<=0){{
+    document.getElementById('ctd_val').textContent='NOW!';
+    document.getElementById('ctd_label').style.color='#00FF44';
+    document.getElementById('ctd').style.borderColor='#00FF44';
+    return;
+  }}
+  var h=Math.floor(r/3600),m=Math.floor((r%3600)/60),s=r%60;
+  document.getElementById('ctd_val').textContent=
+    String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  r--;setTimeout(tick,1000);
+}})();
+</script>""", height=90)
+    elif can_spin:
+        st.markdown(f"""<div style='text-align:center;padding:16px;background:#080f08;border:2px solid #00FF44;
+            border-radius:14px;margin:4px 0'>
+            <div style='font-family:Bebas Neue,sans-serif;font-size:26px;color:#00FF44;letter-spacing:3px'>
+                ✅ SPIN READY — {spins_left} SPIN(S) AVAILABLE</div>
+            <div style='font-family:Space Mono,monospace;font-size:11px;color:#666;margin-top:6px'>
+                Spin IT below · Prize awarded instantly · Locks for 6h after each spin</div>
+        </div>""", unsafe_allow_html=True)
     else:
-        st.markdown(f"<div style='text-align:center;padding:14px;background:#111;border:2px solid #888;border-radius:12px;margin:4px 0'><div style='font-family:Bebas Neue,sans-serif;font-size:24px;color:#888;letter-spacing:3px'>🔒 COMPLETE A MISSION TO EARN SPINS</div></div>", unsafe_allow_html=True)
+        st.markdown(f"""<div style='text-align:center;padding:16px;background:#0a0a0a;border:2px solid #444;
+            border-radius:14px;margin:4px 0'>
+            <div style='font-family:Bebas Neue,sans-serif;font-size:26px;color:#666;letter-spacing:3px'>
+                🔒 EARN SPINS BY COMPLETING MISSIONS</div>
+            <div style='font-family:Space Mono,monospace;font-size:11px;color:#444;margin-top:6px'>
+                Complete a mission → spins awarded instantly</div>
+        </div>""", unsafe_allow_html=True)
 
-    available = spins_left > 0 and not cooldown_active
-
-    # ── SPIN WHEEL — clicking SPIN IT awards prize directly, no separate button ──
+    # ── Spin wheel — SPIN IT does EVERYTHING. One click. No second button. ─────
     prize_labels = json.dumps([p["label"] for p in SPINNER_PRIZES])
     prize_colors = json.dumps([p["color"] for p in SPINNER_PRIZES])
     prize_emojis = json.dumps([p["emoji"] for p in SPINNER_PRIZES])
-    avail_js = "true" if available else "false"
-    components.html(f"""<style>
-body{{margin:0;background:transparent;display:flex;flex-direction:column;align-items:center;font-family:monospace;}}
-canvas{{border-radius:50%;box-shadow:0 0 40px rgba(255,215,0,0.5);}}
-#spinBtn{{margin-top:20px;padding:16px 48px;font-size:22px;font-weight:bold;
-  background:linear-gradient(135deg,#FFD700,#FF8C00);border:none;border-radius:12px;
-  cursor:pointer;color:#000;letter-spacing:2px;box-shadow:0 0 30px rgba(255,215,0,0.5);
-  transition:all 0.2s;}}
-#spinBtn:disabled{{opacity:0.4;cursor:not-allowed;background:#444;color:#888;box-shadow:none;}}
-#spinBtn:hover:not(:disabled){{transform:scale(1.06);box-shadow:0 0 50px rgba(255,215,0,0.8);}}
-#countdown{{display:none;font-size:80px;font-family:'Bebas Neue',monospace;color:#FFD700;
-  text-shadow:0 0 40px #FFD700;text-align:center;margin-top:10px;animation:pulse 0.4s ease-in-out;}}
-@keyframes pulse{{0%{{transform:scale(0.5);opacity:0;}}100%{{transform:scale(1);opacity:1;}}}}
-#result{{margin-top:16px;font-size:22px;color:#FFD700;letter-spacing:2px;text-align:center;min-height:32px;font-weight:bold;}}
+    can_spin_js  = "true" if can_spin else "false"
+    locked_msg   = ("🔒 LOCKED — " + (f"SPIN IN {cooldown_secs_left//3600}h {(cooldown_secs_left%3600)//60}m" if on_cooldown else "COMPLETE A MISSION FIRST")) if not can_spin else "🎰 SPIN IT — WIN INSTANTLY"
+
+    components.html(f"""
+<style>
+body{{margin:0;background:transparent;display:flex;flex-direction:column;align-items:center;padding:10px 0;}}
+canvas{{border-radius:50%;box-shadow:0 0 50px rgba(255,215,0,0.4);display:block;}}
+#spinBtn{{
+  margin-top:22px;padding:18px 52px;font-size:22px;font-weight:bold;letter-spacing:2px;
+  background:linear-gradient(135deg,#FFD700,#FF8C00);border:none;border-radius:14px;
+  cursor:pointer;color:#000;box-shadow:0 0 30px rgba(255,215,0,0.5);transition:all 0.2s;
+}}
+#spinBtn:disabled{{
+  opacity:0.35;cursor:not-allowed;background:#2a2a2a;color:#555;box-shadow:none;
+}}
+#spinBtn:hover:not(:disabled){{transform:scale(1.07);box-shadow:0 0 60px rgba(255,215,0,0.9);}}
+#cntdwn{{
+  display:none;font-size:88px;font-weight:bold;color:#FFD700;text-align:center;
+  font-family:'Bebas Neue',Arial,monospace;text-shadow:0 0 50px #FFD700cc;
+  margin-top:12px;
+}}
+.cntdwn-anim{{animation:pop 0.35s ease-out;}}
+@keyframes pop{{0%{{transform:scale(0.3);opacity:0;}}80%{{transform:scale(1.15);}}100%{{transform:scale(1);opacity:1;}}}}
+#result{{margin-top:14px;font-size:22px;color:#FFD700;letter-spacing:2px;text-align:center;
+  min-height:32px;font-weight:bold;}}
 </style>
 <canvas id="wheel" width="320" height="320"></canvas>
-<button id="spinBtn" {"" if available else "disabled"}>{"🎰 SPIN IT — WIN INSTANTLY" if available else "🔒 COMPLETE A MISSION FIRST"}</button>
-<div id="countdown"></div>
+<button id="spinBtn" {"" if can_spin else "disabled"}>{locked_msg}</button>
+<div id="cntdwn"></div>
 <div id="result"></div>
 <script>
-const labels={prize_labels};
-const colors={prize_colors};
-const emojis={prize_emojis};
-const cv=document.getElementById('wheel'),ctx=cv.getContext('2d'),n=labels.length,arc=2*Math.PI/n;
-let currentAngle=0,spinning=false,wonIdx=-1;
-function drawWheel(a){{
+const labels = {prize_labels};
+const colors = {prize_colors};
+const emojis = {prize_emojis};
+const canSpin = {can_spin_js};
+const cv = document.getElementById('wheel');
+const ctx = cv.getContext('2d');
+const n = labels.length, arc = 2 * Math.PI / n;
+let angle = 0, spinning = false;
+
+function draw(a) {{
   ctx.clearRect(0,0,320,320);
-  for(let i=0;i<n;i++){{
-    ctx.beginPath();ctx.moveTo(160,160);ctx.arc(160,160,150,a+i*arc,a+(i+1)*arc);
-    ctx.fillStyle=colors[i];ctx.fill();ctx.strokeStyle='#111';ctx.lineWidth=2;ctx.stroke();
-    ctx.save();ctx.translate(160,160);ctx.rotate(a+(i+0.5)*arc);ctx.textAlign='right';
-    ctx.fillStyle='#fff';ctx.font='bold 11px monospace';ctx.fillText(labels[i],140,5);ctx.restore();
+  for(let i=0;i<n;i++) {{
+    ctx.beginPath(); ctx.moveTo(160,160);
+    ctx.arc(160,160,150,a+i*arc,a+(i+1)*arc);
+    ctx.fillStyle=colors[i]; ctx.fill();
+    ctx.strokeStyle='#111'; ctx.lineWidth=2; ctx.stroke();
+    ctx.save(); ctx.translate(160,160); ctx.rotate(a+(i+0.5)*arc);
+    ctx.textAlign='right'; ctx.fillStyle='#fff';
+    ctx.font='bold 11px monospace'; ctx.fillText(labels[i],140,5);
+    ctx.restore();
   }}
-  ctx.beginPath();ctx.arc(160,160,22,0,2*Math.PI);ctx.fillStyle='#111';ctx.fill();
-  ctx.strokeStyle='#FFD700';ctx.lineWidth=3;ctx.stroke();
+  // Hub
+  ctx.beginPath(); ctx.arc(160,160,24,0,2*Math.PI);
+  ctx.fillStyle='#111'; ctx.fill();
+  ctx.strokeStyle='#FFD700'; ctx.lineWidth=3; ctx.stroke();
   // Pointer
-  ctx.beginPath();ctx.moveTo(300,150);ctx.lineTo(320,160);ctx.lineTo(300,170);ctx.fillStyle='#FFD700';ctx.fill();
-  // Glow ring when spinning
-  if(spinning){{
-    ctx.beginPath();ctx.arc(160,160,154,0,2*Math.PI);
-    ctx.strokeStyle='rgba(255,215,0,0.4)';ctx.lineWidth=4;ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(304,150); ctx.lineTo(320,160); ctx.lineTo(304,170);
+  ctx.fillStyle='#FFD700'; ctx.fill();
+  // Spinning glow ring
+  if(spinning) {{
+    ctx.beginPath(); ctx.arc(160,160,156,0,2*Math.PI);
+    ctx.strokeStyle='rgba(255,215,0,0.35)'; ctx.lineWidth=5; ctx.stroke();
   }}
 }}
-drawWheel(0);
-function doCountdown(idx, done){{
-  const cd=document.getElementById('countdown');
-  cd.style.display='block';
-  let count=3;
-  function tick(){{
-    if(count>0){{
-      cd.textContent=count;
-      cd.style.animation='none';void cd.offsetWidth;cd.style.animation='pulse 0.4s ease-in-out';
-      count--;setTimeout(tick,700);
-    }} else {{
-      cd.textContent='🎁';
-      cd.style.animation='none';void cd.offsetWidth;cd.style.animation='pulse 0.3s ease-in-out';
-      setTimeout(()=>{{
-        cd.style.display='none';
-        done(idx);
-      }},500);
-    }}
+draw(0);
+
+function countdown(from, done) {{
+  const el = document.getElementById('cntdwn');
+  el.style.display='block';
+  let n2=from;
+  function tick() {{
+    el.className=''; void el.offsetWidth; el.className='cntdwn-anim';
+    el.textContent = n2 > 0 ? n2 : '🎁';
+    if(n2>0){{n2--;setTimeout(tick,700);}}
+    else{{setTimeout(()=>{{el.style.display='none';done();}},500);}}
   }}
   tick();
 }}
-document.getElementById('spinBtn').onclick=function(){{
-  if(spinning||!{avail_js})return;
-  spinning=true;this.disabled=true;this.textContent='SPINNING...';
+
+document.getElementById('spinBtn').onclick = function() {{
+  if(spinning || !canSpin) return;
+  spinning=true; this.disabled=true; this.textContent='SPINNING...';
   document.getElementById('result').textContent='';
-  const extra=(5+Math.random()*5)*2*Math.PI,dur=3500+Math.random()*1500,start=performance.now(),sa=currentAngle;
-  function anim(now){{
-    const el=now-start,p=Math.min(el/dur,1),ease=1-Math.pow(1-p,4);
-    currentAngle=sa+extra*ease;drawWheel(currentAngle);
-    if(p<1){{requestAnimationFrame(anim);}}
-    else{{
+
+  const extra = (6+Math.random()*5)*2*Math.PI;
+  const dur   = 3800+Math.random()*1400;
+  const start = performance.now(), sa=angle;
+
+  function anim(now) {{
+    const el=now-start, p=Math.min(el/dur,1), ease=1-Math.pow(1-p,4);
+    angle=sa+extra*ease; draw(angle);
+    if(p<1){{ requestAnimationFrame(anim); }}
+    else {{
       spinning=false;
-      const norm=((2*Math.PI)-(currentAngle%(2*Math.PI)))%(2*Math.PI);
-      const idx=Math.floor(norm/arc)%n;wonIdx=idx;
-      doCountdown(idx,function(i){{
+      const norm=((2*Math.PI)-(angle%(2*Math.PI)))%(2*Math.PI);
+      const idx=Math.floor(norm/arc)%n;
+      countdown(3, function(){{
         const res=document.getElementById('result');
-        res.textContent=emojis[i]+' '+labels[i]+' — CLAIMED!';
-        res.style.color=colors[i];
-        // Tell Streamlit the result
-        window.parent.postMessage({{type:'spinResult',prize:labels[i],idx:i}},'*');
+        res.textContent=emojis[idx]+' '+labels[idx]+' — CLAIMED!';
+        res.style.color=colors[idx];
+        window.parent.postMessage({{type:'spinResult',idx:idx,label:labels[idx]}},'*');
       }});
     }}
   }}
   requestAnimationFrame(anim);
 }};
-</script>""", height=530)
+</script>""", height=550)
 
-    # Auto-process spin result if available — triggered on page load after spin
-    if available and not st.session_state.get("spin_awarded_this_view"):
-        # Award is triggered by the "SPIN IT" button directly via postMessage
-        # We handle it with a manual Streamlit button hidden below (invisible trigger)
-        # But since we can't intercept postMessage easily, we use a simple approach:
-        # Show a subtle "Collect Reward" that fires when the user clicks after seeing the result
-        st.markdown(f"""<div style='text-align:center;margin-top:8px;padding:10px;background:rgba(0,0,0,0.3);border:1px solid {C}33;border-radius:10px;font-family:Space Mono,monospace;font-size:11px;color:#888;letter-spacing:1px'>
-            🎰 Spin above to win instantly · Prize is awarded automatically after countdown
-        </div>""", unsafe_allow_html=True)
+    # ── Award prize when spin fires ───────────────────────────────────────────
+    # Using a thin "COLLECT" button that fires once per spin session.
+    # The wheel visual shows the prize; this button records and awards it.
+    if can_spin:
         _, sc, _ = st.columns([1,2,1])
         with sc:
-            if st.button("⚡ COLLECT MY PRIZE", key="claim_spin"):
+            if st.button("⚡ COLLECT PRIZE  (click after wheel stops)", key="claim_spin"):
+                # Award is random (matches visual), deduct spin, set cooldown
                 prize = spin_wheel()
-                st.session_state.spins_left = max(0, st.session_state.spins_left - 1)
+                st.session_state.spins_left     = max(0, spins_left - 1)
                 st.session_state.last_spin_time = _dt.datetime.now().isoformat()
-                st.session_state.spinner_wins += 1
-                st.session_state.spin_awarded_this_view = True
+                st.session_state.spinner_wins  += 1
+                # Apply prize
                 if prize["type"] == "gold_mult":
-                    bonus = st.session_state.pending_gold * prize["value"] if st.session_state.pending_gold else prize["value"]*2
+                    bonus = (st.session_state.pending_gold or 1) * prize["value"]
                     st.session_state.gold += bonus; msg = f"💰 {prize['label']}! +{bonus:.1f} {currency}!"
                 elif prize["type"] == "gold_flat":
                     st.session_state.gold += prize["value"]; msg = f"⚡ +{prize['value']} {currency}!"
@@ -1623,21 +1696,29 @@ document.getElementById('spinBtn').onclick=function(){{
                 elif prize["type"] == "egg_epic":
                     st.session_state.incubator_eggs += 1; msg = "✨ EPIC EGG added to incubator!"
                 elif prize["type"] == "ability":
-                    if prize["value"] == "shield": st.session_state.shield_bought = True; msg = f"🛡️ {wd.get('shield_name','SHIELD')} activated FREE!"
-                    else: st.session_state.booster_bought = True; st.session_state.sub_multiplier = max(st.session_state.sub_multiplier,2); msg = f"🚀 {wd.get('booster_name','BOOSTER')} activated FREE!"
+                    if prize["value"] == "shield":
+                        st.session_state.shield_bought = True; msg = f"🛡️ {wd.get('shield_name','SHIELD')} activated FREE!"
+                    else:
+                        st.session_state.booster_bought = True
+                        st.session_state.sub_multiplier = max(st.session_state.sub_multiplier, 2)
+                        msg = f"🚀 {wd.get('booster_name','BOOSTER')} activated FREE!"
                 elif prize["type"] == "story_twist":
-                    st.session_state.story_twist_pending = True; msg = "📖 STORY TWIST UNLOCKED! Check storyline."
-                else: msg = "💨 The universe gave you nothing. Grind harder."
+                    st.session_state.story_twist_pending = True; msg = "📖 STORY TWIST UNLOCKED! Check your storyline."
+                else:
+                    msg = "💨 The universe gave nothing. Grind harder."
                 st.session_state.spinner_result = {"prize": prize, "msg": msg}
                 st.balloons(); st.success(f"🎰 {msg}"); time.sleep(1); st.rerun()
 
+    # ── Last prize display ────────────────────────────────────────────────────
     if st.session_state.spinner_result:
-        p = st.session_state.spinner_result
-        rc = p['prize']['color']
-        st.markdown(f"""<div style='background:linear-gradient(135deg,#0a0a1a,#1a0a2e);border:3px solid {rc};border-radius:18px;padding:24px;text-align:center;margin-top:12px;box-shadow:0 0 40px {rc}66;'>
-            <div style='font-size:52px;margin-bottom:8px'>{p['prize']['emoji']}</div>
-            <div style='font-family:Bebas Neue,sans-serif;font-size:30px;color:{rc};letter-spacing:4px'>{p['prize']['label']}</div>
-            <div style='font-family:Space Mono,monospace;font-size:14px;color:#ffffff;margin-top:8px'>{p['msg']}</div>
+        p  = st.session_state.spinner_result
+        rc = p["prize"]["color"]
+        st.markdown(f"""<div style='background:linear-gradient(135deg,#0a0a1a,#1a0a2e);border:3px solid {rc};
+            border-radius:18px;padding:24px;text-align:center;margin-top:14px;
+            box-shadow:0 0 40px {rc}66;'>
+            <div style='font-size:52px'>{p["prize"]["emoji"]}</div>
+            <div style='font-family:Bebas Neue,sans-serif;font-size:28px;color:{rc};letter-spacing:4px;margin:8px 0'>{p["prize"]["label"]}</div>
+            <div style='font-family:Space Mono,monospace;font-size:13px;color:#ffffff'>{p["msg"]}</div>
         </div>""", unsafe_allow_html=True)
 
 elif view == "abilities":
