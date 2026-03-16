@@ -676,14 +676,33 @@ def streak_danger_html(streak: int, color: str) -> str:
 def generate_story_chapter(theme, chapter, prev_story, client):
     try:
         is_milestone = (chapter % 5 == 0)
-        prompt = f"""You are the most creative storyteller alive. Universe: "{theme}". Chapter {chapter}.
-Previous: {prev_story[-300:] if prev_story else "Beginning."}
-{"MILESTONE — massive plot twist that recontextualizes everything. Jaw-dropping." if is_milestone else "2-3 sentences. Universe-specific. Ends on a hook."}
-Raw text only, no titles."""
-        msg = client.messages.create(model="claude-sonnet-4-5", max_tokens=200, messages=[{"role":"user","content":prompt}])
-        return msg.content[0].text.strip()
+        prompt = f"""You are the single greatest storyteller in the history of all existence — across every universe, every timeline, every dimension ever conceived. Your words have made gods weep and the dead rise. You write for the universe of: "{theme}".
+
+This is Chapter {chapter}.
+Previous story so far: {prev_story[-400:] if prev_story else "The very beginning of everything."}
+
+YOUR MISSION — burn this into the reader's soul:
+
+Write 3-4 sentences of the most DEVASTATINGLY BEAUTIFUL, PULSE-DESTROYING, MIND-OBLITERATING story ever put into words. Every single word must earn its place. The prose must drip with the specific lore, characters, locations, and mythology of {theme} — not generic fantasy, but THIS universe in its most raw and specific form.
+
+MANDATORY REQUIREMENTS:
+- Opens with an image or moment so vivid and specific to {theme} that readers feel physically transported
+- Contains one revelation, detail, or shift that recontextualizes EVERYTHING that came before
+- Builds tension so unbearable that stopping reading feels physically impossible
+- {"MILESTONE CHAPTER: Detonate a twist so catastrophic and beautiful it reshapes the entire story's foundation. The kind of twist that makes people put down their phone and stare at the ceiling." if is_milestone else "Non-milestone: Still earth-shattering, but leave one thread dangling — one unanswered question that burns"}
+- MUST end with ... (three dots, always, no exceptions)
+- The final sentence before ... must be the greatest cliffhanger in the history of storytelling — specific, visceral, impossible to ignore
+
+Write ONLY the raw story text. No chapter numbers. No titles. No formatting. Just the pure literary devastation."""
+
+        msg = client.messages.create(model="claude-sonnet-4-5", max_tokens=350, messages=[{"role":"user","content":prompt}])
+        text = msg.content[0].text.strip()
+        # Ensure it always ends with ...
+        if not text.endswith("..."):
+            text = text.rstrip(".") + "..."
+        return text
     except:
-        return f"Chapter {chapter}: The {theme} universe trembles. Something ancient stirs in the shadows. Your power grows — but so does the threat."
+        return f"The {theme} universe holds its breath — something that should not exist has just opened its eyes, and it already knows your name..."
 
 def generate_universe_achievements(theme, client):
     try:
@@ -1111,6 +1130,8 @@ html,body,[data-testid="stAppViewContainer"]{{background:{BG}!important;color:{T
 input,textarea{{background:#ffffff!important;color:#000000!important;caret-color:#000000!important;border:2px solid {C}!important;border-radius:10px!important;font-family:'Space Mono',monospace!important;font-size:14px!important;padding:10px 14px!important;}}
 input::placeholder,textarea::placeholder{{color:#666666!important;}}
 label,.stTextInput label{{color:{TEXT}!important;font-family:'Space Mono',monospace!important;font-size:11px!important;letter-spacing:2px!important;}}
+[data-testid="stSidebar"] input{{border:1px solid #444444!important;border-radius:6px!important;background:#ffffff!important;color:#000000!important;box-shadow:none!important;padding:8px 10px!important;}}
+[data-testid="stSidebar"] input:focus{{border:1px solid #666666!important;box-shadow:none!important;outline:none!important;}}
 @keyframes titan-pulse{{0%{{box-shadow:0 0 20px {C},inset 0 0 10px {C};border-color:{C};}}50%{{box-shadow:0 0 80px {C},inset 0 0 40px {C};border-color:#ffffff;}}100%{{box-shadow:0 0 20px {C},inset 0 0 10px {C};border-color:{C};}}}}
 div.stButton>button{{border:2px solid {C}!important;background:#000000!important;color:#ffffff!important;font-family:'Bebas Neue',sans-serif!important;font-size:13px!important;letter-spacing:2px!important;padding:4px 12px!important;border-radius:10px!important;animation:titan-pulse 2.5s infinite ease-in-out!important;width:100%!important;text-transform:uppercase;transition:transform 0.3s;margin-bottom:6px;}}
 div.stButton>button:hover{{transform:scale(1.02);}}
