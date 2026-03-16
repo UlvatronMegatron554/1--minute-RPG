@@ -240,7 +240,7 @@ body{{background:#000;overflow:hidden;font-family:'Space Mono',monospace;}}
 const CFG={cfg_json};const COL='{col}';const W=820,H=480;
 const cv=document.getElementById('gc');const ctx=cv.getContext('2d');
 let FC=0,STATE='SS',stT=0,evolveT=0;let subject='';
-let questions=[],qI=0,lives=3,wrongs=0,qTimer=0,qMax=18,aLocked=false;let lastOk=false;
+let questions=[],qI=0,lives=3,wrongs=0,qTimer=0,qMax=25,aLocked=false;let lastOk=false;
 let parts=[],beams=[],dmgNums=[];
 const P={{hp:100,maxHp:100,power:0,evo:0,streak:0,total:0,x:160,y:270,shake:0,hit:false,color:COL}};
 const E={{hp:100,maxHp:100,phase:0,x:620,y:270,shake:0,hit:false,color:CFG.enemy_color||'#CC2222'}};
@@ -297,7 +297,10 @@ function drChar(x,y,col,evo,isEnemy,hit,shake){{
   ctx.save();ctx.translate(ox,oy+idle);if(isEnemy)ctx.scale(-1,1);const s=0.9+evo*0.07;
   if(evo>0){{const ar=28+evo*11;const ag=ctx.createRadialGradient(0,0,4,0,0,ar);ag.addColorStop(0,col+'88');ag.addColorStop(1,'transparent');ctx.fillStyle=ag;ctx.beginPath();ctx.arc(0,0,ar,0,6.28);ctx.fill();}}
   ctx.scale(s,s);
-  if(MODE==='FIGHTER')drFighter(col,evo,t,isEnemy);
+  // Use AI-generated visuals if available, otherwise fall back to mode-specific
+  const vis = isEnemy ? (CFG.enemy_visual||{{}}) : (CFG.player_visual||{{}});
+  if(vis && vis.hair_color){{ drCustom(col,evo,t,vis); }}
+  else if(MODE==='FIGHTER')drFighter(col,evo,t,isEnemy);
   else if(MODE==='RPG')drRPG(col,evo,t);
   else if(MODE==='PLATFORM')drPlatform(col,evo);
   else if(MODE==='SHOOTER')drShooter(col,evo);
@@ -308,6 +311,52 @@ function drChar(x,y,col,evo,isEnemy,hit,shake){{
   else drDefault(col,evo,t);
   if(hit){{ctx.fillStyle='rgba(255,50,50,0.45)';ctx.beginPath();ctx.arc(0,-20,38,0,6.28);ctx.fill();}}
   ctx.restore();
+}}
+function drCustom(col,evo,t,vis){{
+  const hc=vis.hair_color||col;const sc2=vis.skin_color||'#FFCC88';const oc=vis.outfit_color||col;
+  const wc=vis.weapon_color||'#C0C0C0';const ec2=vis.eye_color||'#000';const ac=vis.aura_color||col;
+  const bb=vis.body_build||'average';const hs=vis.hair_style||'short';const wp=vis.weapon||'fists';
+  const bw=bb==='muscular'?1.3:bb==='large'?1.4:bb==='slim'?0.85:bb==='tiny'?0.7:1.0;
+  // Legs
+  ctx.fillStyle=dk(oc,0.3);ctx.fillRect(-14*bw,10,12*bw,32);ctx.fillRect(2*bw,10,12*bw,32);
+  // Boots
+  ctx.fillStyle='#333';ctx.fillRect(-16*bw,38,14*bw,10);ctx.fillRect(0,38,14*bw,10);
+  // Body
+  ctx.fillStyle=oc;ctx.fillRect(-18*bw,-14,36*bw,26);
+  // Arms
+  ctx.fillStyle=oc;ctx.fillRect(-32*bw,-12,16*bw,24);ctx.fillRect(16*bw,-12,16*bw,24);
+  // Hands
+  ctx.fillStyle=sc2;ctx.fillRect(-34*bw,8,14*bw,10);ctx.fillRect(20*bw,8,14*bw,10);
+  // Head
+  ctx.fillStyle=sc2;ctx.beginPath();ctx.ellipse(0,-32,18*bw,20,0,0,6.28);ctx.fill();
+  // Eyes
+  ctx.fillStyle='#fff';ctx.fillRect(-10*bw,-34,8,7);ctx.fillRect(2*bw,-34,8,7);
+  ctx.fillStyle=ec2;ctx.fillRect(-8*bw,-33,4,5);ctx.fillRect(4*bw,-33,4,5);
+  // Hair
+  ctx.fillStyle=hc;
+  if(hs==='spiky'){{for(let i=0;i<5+evo;i++){{const hx=-16+i*(32/(4+evo));ctx.beginPath();ctx.moveTo(hx-5,-48);ctx.lineTo(hx,-(60+evo*4+i%2*8));ctx.lineTo(hx+5,-48);ctx.fill();}}}}
+  else if(hs==='long'||hs==='flowing'){{ctx.fillRect(-20,-50,40,14);ctx.fillRect(-22,-48,6,36);ctx.fillRect(16,-48,6,36);}}
+  else if(hs==='ponytail'){{ctx.fillRect(-18,-50,36,12);ctx.fillRect(10,-50,6,30);}}
+  else if(hs==='mohawk'){{ctx.fillRect(-4,-50,8,14);for(let i=0;i<3;i++){{ctx.beginPath();ctx.moveTo(-4,-50-i*8);ctx.lineTo(0,-62-i*8);ctx.lineTo(4,-50-i*8);ctx.fill();}}}}
+  else if(hs==='afro'){{ctx.beginPath();ctx.arc(0,-46,22+evo*2,0,6.28);ctx.fill();}}
+  else if(hs==='twin_tails'){{ctx.fillRect(-18,-50,36,12);ctx.fillRect(-24,-48,6,24);ctx.fillRect(18,-48,6,24);}}
+  else if(hs==='bald'){{ctx.fillStyle=sc2;ctx.beginPath();ctx.ellipse(0,-42,16,8,0,Math.PI,0);ctx.fill();}}
+  else if(hs==='messy'){{ctx.fillRect(-20,-50,40,14);for(let i=0;i<4;i++){{ctx.fillRect(-18+i*10,-54-i%2*6,8,8);}}}}
+  else{{ctx.fillRect(-18,-50,36,12);}} // short default
+  // Weapon
+  if(wp==='sword'){{ctx.fillStyle=wc;ctx.fillRect(22*bw,-6,4,36);ctx.fillStyle='#FFD700';ctx.fillRect(20*bw,-6,8,4);}}
+  else if(wp==='dual_sword'){{ctx.fillStyle=wc;ctx.fillRect(-36*bw,-4,3,30);ctx.fillRect(33*bw,-4,3,30);ctx.fillStyle='#FFD700';ctx.fillRect(-38*bw,-4,7,3);ctx.fillRect(31*bw,-4,7,3);}}
+  else if(wp==='triple_sword'){{ctx.fillStyle=wc;ctx.fillRect(-36*bw,-4,3,30);ctx.fillRect(33*bw,-4,3,30);ctx.fillRect(-2,-(32+evo*2),3,20);ctx.fillStyle='#FFD700';ctx.fillRect(-38*bw,-4,7,3);ctx.fillRect(31*bw,-4,7,3);ctx.fillRect(-4,-(32+evo*2),7,3);}}
+  else if(wp==='gun'){{ctx.fillStyle='#444';ctx.fillRect(20*bw,2,28,6);ctx.fillStyle='#222';ctx.fillRect(42*bw,-2,8,14);}}
+  else if(wp==='staff'||wp==='wand'){{ctx.fillStyle='#8B4513';ctx.fillRect(22*bw,-20,4,44);ctx.fillStyle=ac;ctx.beginPath();ctx.arc(24*bw,-22,6+evo,0,6.28);ctx.fill();}}
+  else if(wp==='bow'){{ctx.strokeStyle=wc;ctx.lineWidth=3;ctx.beginPath();ctx.arc(28*bw,-4,20,Math.PI*0.7,Math.PI*1.3);ctx.stroke();ctx.strokeStyle='#FFD700';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(28*bw,-22);ctx.lineTo(28*bw,14);ctx.stroke();}}
+  else if(wp==='scythe'){{ctx.fillStyle='#444';ctx.fillRect(18*bw,-16,4,40);ctx.fillStyle=wc;ctx.beginPath();ctx.moveTo(18*bw,-16);ctx.quadraticCurveTo(40*bw,-30,32*bw,-4);ctx.lineTo(18*bw,-10);ctx.fill();}}
+  else if(wp==='ball'){{ctx.fillStyle='#FF6600';ctx.beginPath();ctx.arc(30*bw,12,8,0,6.28);ctx.fill();ctx.strokeStyle='#000';ctx.lineWidth=1.5;ctx.stroke();}}
+  // Cape
+  if(vis.cape){{ctx.fillStyle=(vis.cape_color||ac)+'88';ctx.beginPath();ctx.moveTo(-16*bw,-10);ctx.lineTo(-20*bw,30);ctx.lineTo(20*bw,30);ctx.lineTo(16*bw,-10);ctx.fill();}}
+  // Evolution aura enhancement
+  if(evo>=2){{ctx.fillStyle=ac+'44';ctx.beginPath();ctx.arc(0,-10,30+evo*5,0,6.28);ctx.fill();}}
+  if(evo>=4){{ctx.strokeStyle=ac;ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,-10,35+evo*5,0,6.28);ctx.stroke();}}
 }}
 function drFighter(col,evo,t,isEnemy){{
   const hc=evo>=1?'#FFD700':col;
@@ -571,6 +620,16 @@ def generate_battle_config(universe: str, subject: str, tier: str, client, diffi
         "BUILDER": ["Novice","Builder","Engineer","Architect","Master Builder","City Planner","Overlord","God Mode","OMNIPOTENT"],
         "AUTO":    ["Level 1","Level 2","Level 3","Level 4","Level 5","Level 6","Level 7","Level 8","MAXED"],
     }
+    # Get character visuals from world data if available
+    player_vis = {}
+    enemy_vis = {}
+    try:
+        wd_stored = st.session_state.get("world_data", {})
+        player_vis = wd_stored.get("player_visual", {})
+        enemy_vis = wd_stored.get("enemy_visual", {})
+    except:
+        pass
+
     prompt = f"""You are a game designer for an educational RPG called "30 Second Infiniteverse".
 Universe: "{universe}"
 Game Mode: {mode}
@@ -578,7 +637,9 @@ Subject: {subject}
 Player tier: {tier}
 
 Return ONLY valid JSON (no markdown) with this EXACT structure:
-{{"mode":"{mode}","arena_name":"short dramatic name","arena_desc":"1 sentence","arena_colors":["#hex1","#hex2","#hex3"],"player_title":"title","player_attacks":["A1","A2","A3","A4","A5"],"enemy_name":"enemy name","enemy_title":"enemy rank","enemy_color":"#hex","enemy_attacks":["E1","E2","E3"],"enemy_phases":["P1","P2","P3"],"win_quote":"short quote","lose_quote":"short quote","questions":[{{"q":"question","choices":["A: opt","B: opt","C: opt","D: opt"],"answer":"B","hint":"tiny hint"}}]}}
+{{"mode":"{mode}","arena_name":"short dramatic name","arena_desc":"1 sentence","arena_colors":["#hex1","#hex2","#hex3"],"player_title":"title","player_attacks":["A1","A2","A3","A4","A5"],"enemy_name":"universe-specific enemy name","enemy_title":"enemy rank","enemy_color":"#hex","enemy_attacks":["E1","E2","E3"],"enemy_phases":["P1","P2","P3"],"win_quote":"short quote","lose_quote":"short quote","player_visual":{{"hair_color":"#hex","hair_style":"spiky/long/short/bald/mohawk/ponytail/flowing/messy","skin_color":"#hex","outfit_color":"#hex","weapon":"sword/dual_sword/triple_sword/gun/staff/fists/bow/scythe/wand/ball/none","weapon_color":"#hex","eye_color":"#hex","cape":false,"aura_color":"#hex","body_build":"slim/average/muscular/large"}},"enemy_visual":{{"hair_color":"#hex","hair_style":"...","skin_color":"#hex","outfit_color":"#hex","weapon":"...","weapon_color":"#hex","eye_color":"#hex","cape":false,"aura_color":"#hex","body_build":"..."}},"questions":[{{"q":"question","choices":["A: opt","B: opt","C: opt","D: opt"],"answer":"B","hint":"tiny hint"}}]}}
+
+CRITICAL for visuals: The player_visual should look like the PROTAGONIST or main character of this universe. The enemy should look like a VILLAIN or BOSS. Use the EXACT iconic colors and weapons. For Zoro: green hair, triple_sword, muscular. For Naruto: yellow hair, fists, orange outfit. For Mario: red outfit, short hair, average build. Be SPECIFIC.
 
 Generate {q_count} questions. Each must:
 - Test real {subject} knowledge
@@ -780,31 +841,35 @@ def extract_json(raw_text):
 # ─────────────────────────────────────────────────────────────────────────────
 # LORE PROMPT — ATOMIC SPECIFICITY (ORIGINAL — PRESERVED)
 # ─────────────────────────────────────────────────────────────────────────────
-LORE_PROMPT = """You are the world's most encyclopedic expert on every game, anime, manga, sport, team, brand, movie, show, book, music genre, artist, fashion brand, historical era, cultural phenomenon, character, sub-group, weapon, location, and concept that has ever existed.
+LORE_PROMPT = """You are the ULTIMATE authority on every game, anime, manga, sport, team, brand, movie, show, book, music genre, artist, fashion brand, historical era, cultural phenomenon, character, sub-group, weapon, location, and concept in human history. Your knowledge is PERFECT and ENCYCLOPEDIC.
 
 A user has chosen the universe: "{theme}"
 
-CRITICAL RULE: Go to the most ATOMIC level of specificity possible.
-- If given a specific CHARACTER (e.g. "Vinsmoke Ichiji", "Roronoa Zoro", "Kobe Bryant") — use THAT character's exact moves, weapons, signature moments. NOT the parent franchise.
-- If given a specific TEAM (e.g. "Chicago Bulls 1996", "Germa 66 Stealth Black") — use THAT team's exact identity, colors, and tactics.
-- If given a specific WEAPON, LOCATION, ERA, SONG, ALBUM — zoom all the way in on THAT specific thing.
-- If given a MERGED universe (e.g. "Germa 66 meets Halo") — blend both intelligently.
-- NEVER give generic answers when something specific is provided.
+CRITICAL RULES:
+1. ATOMIC SPECIFICITY: If given a CHARACTER (e.g. "Roronoa Zoro", "Kobe Bryant", "Tanjiro") — use THAT character's EXACT moves, weapons, colors, signature moments, catchphrases. NOT the parent franchise. Zoro = green hair, 3 swords, Santoryu. Tanjiro = water breathing, scar, checkered haori. Kobe = fadeaway, Mamba Mentality, #24.
+2. If given a TEAM (e.g. "Chicago Bulls 1996", "Germa 66") — use THAT team's exact identity, colors, members, tactics.
+3. If given a MERGED universe (e.g. "Naruto meets Star Wars") — blend both with creative fusion.
+4. NEVER be generic. EVERY field must drip with universe-specific detail.
+5. Your descriptions should feel like they were written by the biggest superfan of this exact thing.
+6. CURRENCY RULE: If the character/group belongs to a parent universe with established currency, ALWAYS use that currency (One Piece = Berries, Naruto = Ryo, Dragon Ball = Zeni, Harry Potter = Galleons, Star Wars = Galactic Credits, Pokémon = PokéDollars, Minecraft = Emeralds).
 
 Return ONLY a single raw JSON object. No explanation, no markdown, no code fences.
 
 Fields:
-- "currency": The EXACT in-universe currency. CRITICAL CURRENCY RULE: If the theme is ANY character, sub-group, or faction that belongs to a parent universe with an established currency, ALWAYS use the parent universe currency. Examples: ANY One Piece character/group = Berries. ANY Naruto character = Ryo. ANY Dragon Ball character = Zeni. ANY Harry Potter character/house = Galleons. ANY Star Wars faction = Galactic Credits. Only use a custom sub-currency if the sub-group has a completely independent economy with NO connection to the parent universe.
-- "color": The single most ICONIC hex color. For specific characters use THEIR color not the franchise color. Reference colors: Super Smash Bros=#E4000F, Mario=#E52521, Sonic=#0057A8, Minecraft=#5D9E35, Fortnite=#BEFF00, Roblox=#E8272A, Pokemon=#FFCB05, Valorant=#FF4655, One Piece=#E8372B, Naruto=#FF6600, Dragon Ball=#FF8C00, Demon Slayer=#22AA44, JJK=#6600CC, F1=#FF1801, NBA=#EE6730, NFL=#013369, Star Wars=#FFE81F, Marvel=#ED1D24, DC=#0476F2, Harry Potter=#740001, Skyrim=#C0C0C0, Elden Ring=#C8A951, GTA=#F4B000, Halo=#00B4D8, Dead by Daylight=#8B0000, Nike=#111111, Spotify=#1DB954, Netflix=#E50914. For anything else use the dominant iconic color of that exact thing.
-- "shield_name": The most iconic DEFENSIVE ability, armor, or technique specific to THIS exact universe/character. Never generic.
-- "booster_name": The most iconic SPEED or MOVEMENT ability specific to THIS exact universe/character. Never generic.
-- "shield_flavor": ONE fun hype sentence describing what this defense ability does. Universe-flavored. Max 12 words.
-- "booster_flavor": ONE fun hype sentence describing what this speed ability does. Universe-flavored. Max 12 words.
-- "description": One punchy sentence (max 12 words) capturing the soul of this universe/character/concept.
-- "battle_style": One of: "shooter", "turnbased", "reaction", "rpgclick", "survival", "rhythm", "racing", "trivia" — pick the ONE that fits the universe's actual combat/gameplay style.
+- "currency": The EXACT in-universe currency. See currency rule above.
+- "color": The single most ICONIC hex color for THIS EXACT thing. For specific characters use THEIR personal color, not the franchise. Reference: Mario=#E52521, Sonic=#0057A8, Minecraft=#5D9E35, Fortnite=#BEFF00, Roblox=#E8272A, Pokemon=#FFCB05, Valorant=#FF4655, One Piece=#E8372B, Naruto=#FF6600, Dragon Ball=#FF8C00, Demon Slayer=#22AA44, JJK=#6600CC, F1=#FF1801, NBA=#EE6730, NFL=#013369, Star Wars=#FFE81F, Marvel=#ED1D24, Harry Potter=#740001, Halo=#00B4D8, Nike=#111111, Spotify=#1DB954.
+- "shield_name": The EXACT most iconic defensive ability/armor for THIS character/universe. Must be a real named technique/item from the source. Never generic.
+- "booster_name": The EXACT most iconic speed/movement ability. Real named technique. Never generic.
+- "shield_flavor": ONE electrifying sentence (max 12 words) describing the defense. Written like a superfan.
+- "booster_flavor": ONE electrifying sentence (max 12 words) describing the speed. Written like a superfan.
+- "description": One legendary sentence (max 12 words) capturing the SOUL of this. Not generic. Must reference specific lore.
+- "battle_style": One of "shooter","turnbased","reaction","rpgclick","survival","rhythm","racing","trivia".
+- "player_visual": Object describing the PLAYER character's appearance for 2D pixel art rendering. Include: "hair_color" (hex), "hair_style" (one of: "spiky","long","short","bald","mohawk","ponytail","afro","flowing","twin_tails","messy"), "skin_color" (hex), "outfit_color" (hex), "outfit_secondary" (hex), "weapon" (one of: "sword","dual_sword","triple_sword","gun","staff","fists","bow","scythe","shield_weapon","none","ball","racket","wand"), "weapon_color" (hex), "eye_color" (hex), "cape" (true/false), "cape_color" (hex or ""), "aura_color" (hex), "body_build" (one of: "slim","average","muscular","large","tiny")
+- "enemy_visual": Same format as player_visual but for the enemy boss.
+- "lore_achievements": Array of 3 objects, each with "name" (emoji + 2-4 words, universe-specific) and "desc" (one sentence connecting universe lore to studying). Example for Naruto: {{"name":"🍥 Shadow Clone Scholar","desc":"Complete 10 missions — one for each shadow clone."}}
 
 Return exactly:
-{{"currency":"...","color":"#RRGGBB","shield_name":"...","booster_name":"...","description":"...","shield_flavor":"...","booster_flavor":"...","battle_style":"..."}}"""
+{{"currency":"...","color":"#RRGGBB","shield_name":"...","booster_name":"...","description":"...","shield_flavor":"...","booster_flavor":"...","battle_style":"...","player_visual":{{...}},"enemy_visual":{{...}},"lore_achievements":[{{"name":"...","desc":"..."}},{{"name":"...","desc":"..."}},{{"name":"...","desc":"..."}}]}}"""
 
 # ─────────────────────────────────────────────────────────────────────────────
 # HARD FALLBACKS — ALL 30+ UNIVERSES (ORIGINAL — PRESERVED)
@@ -894,6 +959,9 @@ def resolve_universe(theme):
                 data.setdefault("shield_flavor", "An ability forged in the heart of this universe.")
                 data.setdefault("booster_flavor", "Speed that defies every known law of physics.")
                 data.setdefault("battle_style", "random")
+                data.setdefault("player_visual", {})
+                data.setdefault("enemy_visual", {})
+                data.setdefault("lore_achievements", [])
                 data["shield_effect"] = SHIELD_EFFECT; data["booster_effect"] = BOOSTER_EFFECT
                 return {"safe": True, "data": data}
         except Exception: pass
@@ -969,6 +1037,7 @@ if "gold" not in st.session_state:
         "total_xp_real": 0,
         "universe_achievements": [], "universe_ach_loaded": False,
         "welcome_bonus_applied": False, "battle_subject_chosen": False,
+        "last_spin_time": None,
     })
 
 
@@ -976,8 +1045,9 @@ if "gold" not in st.session_state:
 # GATEWAY SCREEN — WITH 7 FIDGET SPINNERS (ORIGINAL — PRESERVED)
 # ─────────────────────────────────────────────────────────────────────────────
 if st.session_state.user_name is None:
-    st.markdown("""
-    <style>
+    _gw_css_file = "/tmp/infiniteverse_gateway.html"
+    with open(_gw_css_file, "w") as _gcf:
+        _gcf.write("""<style><style>
     @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Orbitron:wght@400;700;900&display=swap');
     html,body,[data-testid="stAppViewContainer"],[data-testid="stApp"]{background:#000008!important;color:white!important;}
     [data-testid="stHeader"],[data-testid="stToolbar"],[data-testid="stDecoration"],#MainMenu,footer{display:none!important;}
@@ -1042,7 +1112,9 @@ if st.session_state.user_name is None:
         <div class="stat-item"><div class="stat-num">0</div><div class="stat-label">Excuses</div></div>
     </div>
     <div class="gw-divider"></div>
-    """, unsafe_allow_html=True)
+""")
+    with open(_gw_css_file, "r") as _gcf:
+        st.markdown(_gcf.read(), unsafe_allow_html=True)
 
     _, col, _ = st.columns([1, 2, 1])
     with col:
@@ -1076,8 +1148,99 @@ if st.session_state.user_name is None:
         theme_input = st.text_input("🌌 Your Universe", placeholder="Leave empty for INFINITE POWER · or type anything: Naruto, F1, Nike, Medieval Space War...", key="gw_theme")
 
         # ── FIDGET SPINNERS — 7 SPINNERS (4 AUTO + 3 IGNITE) ──
-        _SPINNER_HTML = '<style>\n@import url(\'https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap\');\n*{box-sizing:border-box;margin:0;padding:0;}\nbody{background:transparent;}\n#universe{width:100%;height:330px;background:radial-gradient(ellipse at 50% 60%,#0a0020 0%,#000008 70%,#000000 100%);border-radius:16px;border:1px solid rgba(255,255,255,0.07);position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;}\n#rack{display:flex;gap:14px;justify-content:center;align-items:center;z-index:2;position:relative;padding:10px 0;}\n.slot{display:flex;flex-direction:column;align-items:center;gap:4px;}\n.slbl{font-family:Orbitron,monospace;font-size:7px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.4);}\n.srpm{font-family:Orbitron,monospace;font-size:8px;letter-spacing:1px;min-height:13px;text-align:center;}\n.nbtn{padding:4px 10px;font-size:7px;font-family:Orbitron,monospace;border-radius:6px;cursor:pointer;letter-spacing:2px;border:1.5px solid;background:rgba(0,0,0,0.6);transition:all 0.15s;margin-top:2px;}\n.nbtn:hover{transform:scale(1.09);filter:brightness(1.5);}\n#fl{position:absolute;bottom:0;left:0;width:100%;height:2px;z-index:1;animation:fla 2s linear infinite;}\n@keyframes fla{0%{filter:hue-rotate(0deg);background:linear-gradient(90deg,transparent,#FFD700,#FF4400,#FF00FF,#00FFFF,transparent);}100%{filter:hue-rotate(360deg);background:linear-gradient(90deg,transparent,#FFD700,#FF4400,#FF00FF,#00FFFF,transparent);}}\n</style>\n<div id="universe">\n<canvas id="stars" style="position:absolute;top:0;left:0;pointer-events:none;z-index:0" width="900" height="330"></canvas>\n<div id="rack"></div>\n<div id="fl"></div>\n</div>\n<script>\nvar sc=document.getElementById(\'stars\'),sctx=sc.getContext(\'2d\');\nvar STARS=[];for(var i=0;i<100;i++)STARS.push({x:Math.random()*900,y:Math.random()*330,r:Math.random()*1.3+0.3,a:Math.random(),da:Math.random()*0.007+0.002,col:\'hsl(\'+(180+Math.random()*80)+\',80%,90%)\'});\nfunction dS(){sctx.clearRect(0,0,900,330);STARS.forEach(function(s){s.a+=s.da;if(s.a>1||s.a<0)s.da*=-1;sctx.globalAlpha=s.a*0.75;sctx.beginPath();sctx.arc(s.x,s.y,s.r,0,Math.PI*2);sctx.fillStyle=s.col;sctx.fill();});sctx.globalAlpha=1;}\nvar DF=[\n  {id:\'s0\',sz:72,lbl:\'SOLAR FLARE\',nuke:false,bv:0.34,bl:4,sh:\'drop\',p:[\'#FF6600\',\'#FF2200\',\'#FFD700\',\'#FF8800\'],gw:\'#FF4400\',rm:\'#FFD700\',hb:\'#FFF\',tr:12,pt:true},\n  {id:\'s1\',sz:62,lbl:\'VOID STORM\', nuke:false,bv:0.44,bl:6,sh:\'wing\',p:[\'#8800FF\',\'#4400CC\',\'#CC00FF\',\'#FF44FF\'],gw:\'#AA00FF\',rm:\'#FF88FF\',hb:\'#FFF\',tr:16,pt:true},\n  {id:\'s2\',sz:66,lbl:\'MATRIX\',     nuke:false,bv:0.38,bl:3,sh:\'crys\',p:[\'#00FF44\',\'#00CC33\',\'#00FF88\',\'#AAFFCC\'],gw:\'#00FF44\',rm:\'#88FFBB\',hb:\'#111\',tr:10,pt:false},\n  {id:\'s3\',sz:60,lbl:\'NOVA PULSE\', nuke:false,bv:0.58,bl:5,sh:\'blad\',p:[\'#00CCFF\',\'#0088FF\',\'#00FFEE\',\'#88DDFF\'],gw:\'#00CCFF\',rm:\'#AAEEFF\',hb:\'#003\',tr:14,pt:true},\n  {id:\'s4\',sz:70,lbl:\'TITAN WARP\', nuke:false,bv:0.30,bl:7,sh:\'fan\', p:[\'#FFD700\',\'#FF4400\',\'#FF8800\',\'#FFEEAA\'],gw:\'#FFD700\',rm:\'#FF4400\',hb:\'#210\',tr:18,pt:true},\n  {id:\'s5\',sz:65,lbl:\'HYPER NUKE\', nuke:true, nv:3.8, bv:0.14,bl:4,sh:\'drop\',p:[\'#FF0044\',\'#FF4400\',\'#FF0088\',\'#FF8800\'],gw:\'#FF0044\',rm:\'#F8A\',hb:\'#FFF\',tr:20,pt:true},\n  {id:\'s6\',sz:76,lbl:\'OMEGA NUKE\', nuke:true, nv:7.0, bv:0.08,bl:8,sh:\'fan\', p:[\'#FFF\',\'#FFD700\',\'#FF2200\',\'#FA0\'],gw:\'#FFF\',rm:\'#FFD700\',hb:\'#000\',tr:30,pt:true}\n];\nvar ST={},TR={};\nvar rack=document.getElementById(\'rack\');\nDF.forEach(function(sp){\n  ST[sp.id]={a:Math.random()*6.28,v:sp.bv+Math.random()*0.06,dg:false,lA:0,lT:0};\n  TR[sp.id]=[];\n  var slot=document.createElement(\'div\');slot.className=\'slot\';\n  var cv=document.createElement(\'canvas\');cv.id=\'c_\'+sp.id;cv.width=sp.sz*2;cv.height=sp.sz*2;cv.style.cssText=\'cursor:grab;border-radius:50%;display:block;\';\n  var lb=document.createElement(\'div\');lb.className=\'slbl\';lb.textContent=sp.lbl;\n  var rm=document.createElement(\'div\');rm.id=\'r_\'+sp.id;rm.className=\'srpm\';rm.style.color=sp.gw;\n  slot.appendChild(cv);slot.appendChild(lb);slot.appendChild(rm);\n  if(sp.nuke){var btn=document.createElement(\'button\');btn.className=\'nbtn\';btn.textContent=sp.id===\'s6\'?\'DETONATE\':\'IGNITE\';btn.style.borderColor=sp.gw;btn.style.color=sp.gw;btn.onclick=(function(sid,nv){return function(){ST[sid].v=nv;shk();};})(sp.id,sp.nv);slot.appendChild(btn);}\n  rack.appendChild(slot);\n  function ga(e,c){var r=c.getBoundingClientRect();var x=(e.clientX||(e.touches&&e.touches[0].clientX)||0)-r.left-r.width/2;var y=(e.clientY||(e.touches&&e.touches[0].clientY)||0)-r.top-r.height/2;return Math.atan2(y,x);}\n  cv.addEventListener(\'mousedown\',function(e){var s=ST[sp.id];s.dg=true;s.lA=ga(e,cv);s.lT=performance.now();cv.style.cursor=\'grabbing\';});\n  window.addEventListener(\'mousemove\',(function(sid){return function(e){var s=ST[sid];if(!s.dg)return;var now=performance.now();var cv2=document.getElementById(\'c_\'+sid);var a=ga(e,cv2);var d=a-s.lA;if(d>Math.PI)d-=6.28;if(d<-Math.PI)d+=6.28;s.v=d/Math.max(now-s.lT,1)*20;s.a+=d;s.lA=a;s.lT=now;};})(sp.id));\n  window.addEventListener(\'mouseup\',(function(sid){return function(){ST[sid].dg=false;document.getElementById(\'c_\'+sid).style.cursor=\'grab\';};})(sp.id));\n  cv.addEventListener(\'touchstart\',function(e){var s=ST[sp.id];s.dg=true;s.lA=ga(e,cv);s.lT=performance.now();e.preventDefault();},{passive:false});\n  window.addEventListener(\'touchmove\',(function(sid){return function(e){var s=ST[sid];if(!s.dg)return;var now=performance.now();var cv2=document.getElementById(\'c_\'+sid);var a=ga(e,cv2);var d=a-s.lA;if(d>Math.PI)d-=6.28;if(d<-Math.PI)d+=6.28;s.v=d/Math.max(now-s.lT,1)*20;s.a+=d;s.lA=a;s.lT=now;e.preventDefault();};})(sp.id),{passive:false});\n  window.addEventListener(\'touchend\',(function(sid){return function(){ST[sid].dg=false;};})(sp.id));\n});\nvar shakeN=0;\nfunction shk(){shakeN=16;var u=document.getElementById(\'universe\');(function f(){if(shakeN<=0){u.style.transform=\'\';return;}u.style.transform=\'translate(\'+(Math.random()-.5)*shakeN*.7+\'px,\'+(Math.random()-.5)*shakeN*.4+\'px)\';shakeN--;requestAnimationFrame(f);})();}\nfunction draw(sp,angle,vel){\n  var cv=document.getElementById(\'c_\'+sp.id);if(!cv)return;\n  var ctx=cv.getContext(\'2d\'),sz=sp.sz,cx=sz,cy=sz,r=sz-5,spd=Math.abs(vel);\n  ctx.clearRect(0,0,sz*2,sz*2);\n  if(spd>0.04){var gg=ctx.createRadialGradient(cx,cy,r,cx,cy,r+5+spd*4);gg.addColorStop(0,sp.gw+\'77\');gg.addColorStop(1,sp.gw+\'00\');ctx.beginPath();ctx.arc(cx,cy,r+5+spd*4,0,Math.PI*2);ctx.fillStyle=gg;ctx.fill();}\n  var tr=TR[sp.id];tr.push(angle);if(tr.length>sp.tr)tr.shift();\n  if(spd>0.1&&tr.length>2){for(var ti=0;ti<tr.length-1;ti++){var ta=tr[ti],frac=ti/tr.length;for(var bi=0;bi<sp.bl;bi++){var ba2=ta+(bi*6.28/sp.bl);ctx.save();ctx.translate(cx,cy);ctx.rotate(ba2);ctx.globalAlpha=frac*0.18*Math.min(spd*1.5,1);ctx.beginPath();ctx.ellipse(r*.38,0,r*.36,r*.15,0,0,Math.PI*2);ctx.fillStyle=sp.p[0];ctx.fill();ctx.restore();}}ctx.globalAlpha=1;}\n  for(var i=0;i<sp.bl;i++){\n    var ba=angle+(i*6.28/sp.bl);\n    ctx.save();ctx.translate(cx,cy);ctx.rotate(ba);\n    var g=ctx.createLinearGradient(0,-r*.08,r*.82,r*.08);\n    g.addColorStop(0,sp.p[0]);g.addColorStop(.45,sp.p[1%sp.p.length]);g.addColorStop(.75,sp.p[2%sp.p.length]);g.addColorStop(1,sp.p[3%sp.p.length]+\'22\');\n    ctx.fillStyle=g;ctx.beginPath();\n    if(sp.sh===\'drop\'){ctx.ellipse(r*.42,0,r*.42,r*.19,0,0,Math.PI*2);}\n    else if(sp.sh===\'wing\'){ctx.moveTo(0,0);ctx.bezierCurveTo(r*.2,-r*.28,r*.7,-r*.22,r*.82,0);ctx.bezierCurveTo(r*.7,r*.22,r*.2,r*.28,0,0);ctx.closePath();}\n    else if(sp.sh===\'crys\'){ctx.moveTo(r*.08,0);ctx.lineTo(r*.38,-r*.22);ctx.lineTo(r*.82,0);ctx.lineTo(r*.38,r*.22);ctx.closePath();}\n    else if(sp.sh===\'blad\'){ctx.moveTo(0,-r*.05);ctx.lineTo(r*.78,-r*.12);ctx.lineTo(r*.82,0);ctx.lineTo(r*.78,r*.12);ctx.lineTo(0,r*.05);ctx.closePath();}\n    else{ctx.ellipse(r*.40,0,r*.40,r*.22,0,0,Math.PI*2);}\n    ctx.fill();ctx.strokeStyle=sp.p[0]+\'99\';ctx.lineWidth=1.2;ctx.stroke();\n    if(spd>0.2){ctx.globalAlpha=Math.min((spd-.2)*.4,.45);ctx.fillStyle=sp.rm;ctx.fill();ctx.globalAlpha=1;}\n    ctx.restore();\n  }\n  ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.strokeStyle=sp.rm+(spd>.25?\'BB\':\'33\');ctx.lineWidth=spd>.4?2.5:1.5;ctx.stroke();\n  if(sp.pt&&spd>0.3){var pc=Math.floor(spd*5);for(var pi=0;pi<pc;pi++){var pa=angle*3.5+pi*2.0+performance.now()*.0015;var pr=r*(.65+Math.random()*.28);var px=cx+Math.cos(pa)*pr,py=cy+Math.sin(pa)*pr;ctx.beginPath();ctx.arc(px,py,1+Math.random()*1.5,0,Math.PI*2);ctx.fillStyle=sp.p[pi%sp.p.length];ctx.globalAlpha=.65+Math.random()*.3;ctx.fill();ctx.globalAlpha=1;}}\n  var hg=ctx.createRadialGradient(cx-r*.04,cy-r*.04,1,cx,cy,r*.20);hg.addColorStop(0,\'#fff\');hg.addColorStop(.4,sp.p[0]);hg.addColorStop(1,sp.hb);ctx.beginPath();ctx.arc(cx,cy,r*.19,0,Math.PI*2);ctx.fillStyle=hg;ctx.fill();ctx.beginPath();ctx.arc(cx,cy,r*.07,0,Math.PI*2);ctx.fillStyle=\'#fff6\';ctx.fill();\n  var re=document.getElementById(\'r_\'+sp.id);if(re){var rv=Math.abs(vel*60/(Math.PI*2)*60);if(rv>8){re.textContent=Math.round(rv).toLocaleString()+\' RPM\';re.style.color=rv>9000?\'#F00\':rv>4000?\'#F80\':rv>1200?\'#FFD700\':sp.gw;}else{re.textContent=sp.nuke?\'TAP TO IGNITE\':\'\\u221e ETERNAL\';re.style.color=\'rgba(255,255,255,0.25)\';}}}\nvar AF=0.999992,NF=0.9985;\nfunction loop(){\n  dS();\n  DF.forEach(function(sp){var s=ST[sp.id];if(!s.dg){s.v*=sp.nuke?NF:AF;if(Math.abs(s.v)<sp.bv)s.v=sp.bv;s.a+=s.v;}draw(sp,s.a,s.v);});\n  requestAnimationFrame(loop);\n}\nloop();\n</script>'
-        components.html(_SPINNER_HTML, height=345)
+        # Fidget Spinners — 4 auto-infinite + 3 IGNITE/DETONATE
+        _spinner_html_file = "/tmp/infiniteverse_spinners.html"
+        with open(_spinner_html_file, "w") as _shf:
+            _shf.write("""<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:transparent;}
+#universe{width:100%;height:330px;background:radial-gradient(ellipse at 50% 60%,#0a0020 0%,#000008 70%,#000000 100%);border-radius:16px;border:1px solid rgba(255,255,255,0.07);position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+#rack{display:flex;gap:14px;justify-content:center;align-items:center;z-index:2;position:relative;padding:10px 0;}
+.slot{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.slbl{font-family:Orbitron,monospace;font-size:7px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.4);}
+.srpm{font-family:Orbitron,monospace;font-size:8px;letter-spacing:1px;min-height:13px;text-align:center;}
+.nbtn{padding:4px 10px;font-size:7px;font-family:Orbitron,monospace;border-radius:6px;cursor:pointer;letter-spacing:2px;border:1.5px solid;background:rgba(0,0,0,0.6);transition:all 0.15s;margin-top:2px;}
+.nbtn:hover{transform:scale(1.09);filter:brightness(1.5);}
+#fl{position:absolute;bottom:0;left:0;width:100%;height:2px;z-index:1;animation:fla 2s linear infinite;}
+@keyframes fla{0%{filter:hue-rotate(0deg);background:linear-gradient(90deg,transparent,#FFD700,#FF4400,#FF00FF,#00FFFF,transparent);}100%{filter:hue-rotate(360deg);background:linear-gradient(90deg,transparent,#FFD700,#FF4400,#FF00FF,#00FFFF,transparent);}}
+</style>
+<div id="universe">
+<canvas id="stars" style="position:absolute;top:0;left:0;pointer-events:none;z-index:0" width="900" height="330"></canvas>
+<div id="rack"></div>
+<div id="fl"></div>
+</div>
+<script>
+var sc=document.getElementById('stars'),sctx=sc.getContext('2d');
+var STARS=[];for(var i=0;i<100;i++)STARS.push({x:Math.random()*900,y:Math.random()*330,r:Math.random()*1.3+0.3,a:Math.random(),da:Math.random()*0.007+0.002,col:'hsl('+(180+Math.random()*80)+',80%,90%)'});
+function dS(){sctx.clearRect(0,0,900,330);STARS.forEach(function(s){s.a+=s.da;if(s.a>1||s.a<0)s.da*=-1;sctx.globalAlpha=s.a*0.75;sctx.beginPath();sctx.arc(s.x,s.y,s.r,0,Math.PI*2);sctx.fillStyle=s.col;sctx.fill();});sctx.globalAlpha=1;}
+var DF=[
+  {id:'s0',sz:72,lbl:'SOLAR FLARE',nuke:false,bv:0.34,bl:4,sh:'drop',p:['#FF6600','#FF2200','#FFD700','#FF8800'],gw:'#FF4400',rm:'#FFD700',hb:'#FFF',tr:12,pt:true},
+  {id:'s1',sz:62,lbl:'VOID STORM', nuke:false,bv:0.44,bl:6,sh:'wing',p:['#8800FF','#4400CC','#CC00FF','#FF44FF'],gw:'#AA00FF',rm:'#FF88FF',hb:'#FFF',tr:16,pt:true},
+  {id:'s2',sz:66,lbl:'MATRIX',     nuke:false,bv:0.38,bl:3,sh:'crys',p:['#00FF44','#00CC33','#00FF88','#AAFFCC'],gw:'#00FF44',rm:'#88FFBB',hb:'#111',tr:10,pt:false},
+  {id:'s3',sz:60,lbl:'NOVA PULSE', nuke:false,bv:0.58,bl:5,sh:'blad',p:['#00CCFF','#0088FF','#00FFEE','#88DDFF'],gw:'#00CCFF',rm:'#AAEEFF',hb:'#003',tr:14,pt:true},
+  {id:'s4',sz:70,lbl:'TITAN WARP', nuke:false,bv:0.30,bl:7,sh:'fan', p:['#FFD700','#FF4400','#FF8800','#FFEEAA'],gw:'#FFD700',rm:'#FF4400',hb:'#210',tr:18,pt:true},
+  {id:'s5',sz:65,lbl:'HYPER NUKE', nuke:true, nv:3.8, bv:0.14,bl:4,sh:'drop',p:['#FF0044','#FF4400','#FF0088','#FF8800'],gw:'#FF0044',rm:'#F8A',hb:'#FFF',tr:20,pt:true},
+  {id:'s6',sz:76,lbl:'OMEGA NUKE', nuke:true, nv:7.0, bv:0.08,bl:8,sh:'fan', p:['#FFF','#FFD700','#FF2200','#FA0'],gw:'#FFF',rm:'#FFD700',hb:'#000',tr:30,pt:true}
+];
+var ST={},TR={};
+var rack=document.getElementById('rack');
+DF.forEach(function(sp){
+  ST[sp.id]={a:Math.random()*6.28,v:sp.bv+Math.random()*0.06,dg:false,lA:0,lT:0};
+  TR[sp.id]=[];
+  var slot=document.createElement('div');slot.className='slot';
+  var cv=document.createElement('canvas');cv.id='c_'+sp.id;cv.width=sp.sz*2;cv.height=sp.sz*2;cv.style.cssText='cursor:grab;border-radius:50%;display:block;';
+  var lb=document.createElement('div');lb.className='slbl';lb.textContent=sp.lbl;
+  var rm=document.createElement('div');rm.id='r_'+sp.id;rm.className='srpm';rm.style.color=sp.gw;
+  slot.appendChild(cv);slot.appendChild(lb);slot.appendChild(rm);
+  if(sp.nuke){var btn=document.createElement('button');btn.className='nbtn';btn.textContent=sp.id==='s6'?'DETONATE':'IGNITE';btn.style.borderColor=sp.gw;btn.style.color=sp.gw;btn.onclick=(function(sid,nv){return function(){ST[sid].v=nv;shk();};})(sp.id,sp.nv);slot.appendChild(btn);}
+  rack.appendChild(slot);
+  function ga(e,c){var r=c.getBoundingClientRect();var x=(e.clientX||(e.touches&&e.touches[0].clientX)||0)-r.left-r.width/2;var y=(e.clientY||(e.touches&&e.touches[0].clientY)||0)-r.top-r.height/2;return Math.atan2(y,x);}
+  cv.addEventListener('mousedown',function(e){var s=ST[sp.id];s.dg=true;s.lA=ga(e,cv);s.lT=performance.now();cv.style.cursor='grabbing';});
+  window.addEventListener('mousemove',(function(sid){return function(e){var s=ST[sid];if(!s.dg)return;var now=performance.now();var cv2=document.getElementById('c_'+sid);var a=ga(e,cv2);var d=a-s.lA;if(d>Math.PI)d-=6.28;if(d<-Math.PI)d+=6.28;s.v=d/Math.max(now-s.lT,1)*20;s.a+=d;s.lA=a;s.lT=now;};})(sp.id));
+  window.addEventListener('mouseup',(function(sid){return function(){ST[sid].dg=false;document.getElementById('c_'+sid).style.cursor='grab';};})(sp.id));
+  cv.addEventListener('touchstart',function(e){var s=ST[sp.id];s.dg=true;s.lA=ga(e,cv);s.lT=performance.now();e.preventDefault();},{passive:false});
+  window.addEventListener('touchmove',(function(sid){return function(e){var s=ST[sid];if(!s.dg)return;var now=performance.now();var cv2=document.getElementById('c_'+sid);var a=ga(e,cv2);var d=a-s.lA;if(d>Math.PI)d-=6.28;if(d<-Math.PI)d+=6.28;s.v=d/Math.max(now-s.lT,1)*20;s.a+=d;s.lA=a;s.lT=now;e.preventDefault();};})(sp.id),{passive:false});
+  window.addEventListener('touchend',(function(sid){return function(){ST[sid].dg=false;};})(sp.id));
+});
+var shakeN=0;
+function shk(){shakeN=16;var u=document.getElementById('universe');(function f(){if(shakeN<=0){u.style.transform='';return;}u.style.transform='translate('+(Math.random()-.5)*shakeN*.7+'px,'+(Math.random()-.5)*shakeN*.4+'px)';shakeN--;requestAnimationFrame(f);})();}
+function draw(sp,angle,vel){
+  var cv=document.getElementById('c_'+sp.id);if(!cv)return;
+  var ctx=cv.getContext('2d'),sz=sp.sz,cx=sz,cy=sz,r=sz-5,spd=Math.abs(vel);
+  ctx.clearRect(0,0,sz*2,sz*2);
+  if(spd>0.04){var gg=ctx.createRadialGradient(cx,cy,r,cx,cy,r+5+spd*4);gg.addColorStop(0,sp.gw+'77');gg.addColorStop(1,sp.gw+'00');ctx.beginPath();ctx.arc(cx,cy,r+5+spd*4,0,Math.PI*2);ctx.fillStyle=gg;ctx.fill();}
+  var tr=TR[sp.id];tr.push(angle);if(tr.length>sp.tr)tr.shift();
+  if(spd>0.1&&tr.length>2){for(var ti=0;ti<tr.length-1;ti++){var ta=tr[ti],frac=ti/tr.length;for(var bi=0;bi<sp.bl;bi++){var ba2=ta+(bi*6.28/sp.bl);ctx.save();ctx.translate(cx,cy);ctx.rotate(ba2);ctx.globalAlpha=frac*0.18*Math.min(spd*1.5,1);ctx.beginPath();ctx.ellipse(r*.38,0,r*.36,r*.15,0,0,Math.PI*2);ctx.fillStyle=sp.p[0];ctx.fill();ctx.restore();}}ctx.globalAlpha=1;}
+  for(var i=0;i<sp.bl;i++){
+    var ba=angle+(i*6.28/sp.bl);
+    ctx.save();ctx.translate(cx,cy);ctx.rotate(ba);
+    var g=ctx.createLinearGradient(0,-r*.08,r*.82,r*.08);
+    g.addColorStop(0,sp.p[0]);g.addColorStop(.45,sp.p[1%sp.p.length]);g.addColorStop(.75,sp.p[2%sp.p.length]);g.addColorStop(1,sp.p[3%sp.p.length]+'22');
+    ctx.fillStyle=g;ctx.beginPath();
+    if(sp.sh==='drop'){ctx.ellipse(r*.42,0,r*.42,r*.19,0,0,Math.PI*2);}
+    else if(sp.sh==='wing'){ctx.moveTo(0,0);ctx.bezierCurveTo(r*.2,-r*.28,r*.7,-r*.22,r*.82,0);ctx.bezierCurveTo(r*.7,r*.22,r*.2,r*.28,0,0);ctx.closePath();}
+    else if(sp.sh==='crys'){ctx.moveTo(r*.08,0);ctx.lineTo(r*.38,-r*.22);ctx.lineTo(r*.82,0);ctx.lineTo(r*.38,r*.22);ctx.closePath();}
+    else if(sp.sh==='blad'){ctx.moveTo(0,-r*.05);ctx.lineTo(r*.78,-r*.12);ctx.lineTo(r*.82,0);ctx.lineTo(r*.78,r*.12);ctx.lineTo(0,r*.05);ctx.closePath();}
+    else{ctx.ellipse(r*.40,0,r*.40,r*.22,0,0,Math.PI*2);}
+    ctx.fill();ctx.strokeStyle=sp.p[0]+'99';ctx.lineWidth=1.2;ctx.stroke();
+    if(spd>0.2){ctx.globalAlpha=Math.min((spd-.2)*.4,.45);ctx.fillStyle=sp.rm;ctx.fill();ctx.globalAlpha=1;}
+    ctx.restore();
+  }
+  ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.strokeStyle=sp.rm+(spd>.25?'BB':'33');ctx.lineWidth=spd>.4?2.5:1.5;ctx.stroke();
+  if(sp.pt&&spd>0.3){var pc=Math.floor(spd*5);for(var pi=0;pi<pc;pi++){var pa=angle*3.5+pi*2.0+performance.now()*.0015;var pr=r*(.65+Math.random()*.28);var px=cx+Math.cos(pa)*pr,py=cy+Math.sin(pa)*pr;ctx.beginPath();ctx.arc(px,py,1+Math.random()*1.5,0,Math.PI*2);ctx.fillStyle=sp.p[pi%sp.p.length];ctx.globalAlpha=.65+Math.random()*.3;ctx.fill();ctx.globalAlpha=1;}}
+  var hg=ctx.createRadialGradient(cx-r*.04,cy-r*.04,1,cx,cy,r*.20);hg.addColorStop(0,'#fff');hg.addColorStop(.4,sp.p[0]);hg.addColorStop(1,sp.hb);ctx.beginPath();ctx.arc(cx,cy,r*.19,0,Math.PI*2);ctx.fillStyle=hg;ctx.fill();ctx.beginPath();ctx.arc(cx,cy,r*.07,0,Math.PI*2);ctx.fillStyle='#fff6';ctx.fill();
+  var re=document.getElementById('r_'+sp.id);if(re){var rv=Math.abs(vel*60/(Math.PI*2)*60);if(rv>8){re.textContent=Math.round(rv).toLocaleString()+' RPM';re.style.color=rv>9000?'#F00':rv>4000?'#F80':rv>1200?'#FFD700':sp.gw;}else{re.textContent=sp.nuke?'TAP TO IGNITE':'\u221e ETERNAL';re.style.color='rgba(255,255,255,0.25)';}}}
+var AF=0.999992,NF=0.9985;
+function loop(){
+  dS();
+  DF.forEach(function(sp){var s=ST[sp.id];if(!s.dg){s.v*=sp.nuke?NF:AF;if(Math.abs(s.v)<sp.bv)s.v=sp.bv;s.a+=s.v;}draw(sp,s.a,s.v);});
+  requestAnimationFrame(loop);
+}
+loop();
+</script>""")
+        with open(_spinner_html_file, "r") as _shf:
+            components.html(_shf.read(), height=345)
 
         st.markdown("<br>", unsafe_allow_html=True)
 
@@ -1320,6 +1483,22 @@ if st.session_state.get("battle_state") == "ready" or view == "battle":
         st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>⚔️ {theme.upper()} BATTLE</h2>", unsafe_allow_html=True)
         st.markdown(f"<p style='text-align:center;color:#aaa;font-family:Space Mono,monospace;font-size:12px'>Universe: <b style='color:{C}'>{theme}</b> · Mode: <b style='color:{C}'>{cfg.get('mode','?')}</b> · Arena: <b>{cfg.get('arena_name','?')}</b></p>", unsafe_allow_html=True)
         st.markdown("<p style='text-align:center;color:#fff;font-size:14px;font-family:Space Mono,monospace'>Pick your subject — correct answers = power attacks. Wrong = the enemy hits back.</p>", unsafe_allow_html=True)
+
+        # Premium/Elite: free text subject input
+        if tier_now in ("Premium", "Elite"):
+            st.markdown(f"<p style='text-align:center;color:{C};font-family:Bebas Neue,sans-serif;font-size:16px;letter-spacing:3px'>👑 {tier_now.upper()} PERK: TYPE ANY SUBJECT</p>", unsafe_allow_html=True)
+            _, custom_col, _ = st.columns([1, 2, 1])
+            with custom_col:
+                custom_subject = st.text_input("Type your subject:", placeholder="e.g. Calculus 1 Honors, AP Biology, Organic Chemistry...", key="custom_subject_input")
+                if st.button("⚔️ START BATTLE WITH CUSTOM SUBJECT", key="custom_subj_go"):
+                    if custom_subject.strip():
+                        with st.spinner(f"⚔️ Generating {custom_subject.strip()} questions..."):
+                            cfg = generate_battle_config(theme, custom_subject.strip(), tier_now, get_claude_client())
+                        st.session_state.battle_config = cfg; st.session_state.battle_subject_chosen = True; st.rerun()
+                    else:
+                        st.error("Type a subject first!")
+            st.markdown("<p style='text-align:center;color:#888;font-size:11px;margin:12px 0'>— or pick from presets below —</p>", unsafe_allow_html=True)
+
         subjects = ["Mathematics","Science","History","English","Geography","Biology","Chemistry","Physics","Economics","Computer Science","Psychology","Art & Music"]
         cols2 = st.columns(4)
         for i, sub in enumerate(subjects):
@@ -1521,6 +1700,17 @@ elif view == "secrets":
 # ── ACHIEVEMENTS ──
 elif view == "achievements":
     st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>🏆 ACHIEVEMENTS</h2>", unsafe_allow_html=True)
+
+    # ── UNIVERSE-SPECIFIC LORE ACHIEVEMENTS ──
+    lore_achs = wd.get("lore_achievements", [])
+    if lore_achs:
+        st.markdown(f"<h3 style='font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:3px;margin-bottom:12px'>🌌 {st.session_state.user_theme.upper()} LORE ACHIEVEMENTS</h3>", unsafe_allow_html=True)
+        for la in lore_achs:
+            st.markdown(f"""<div class='ach-card' style='border-color:{C};opacity:0.7'><span style='font-family:Bebas Neue,sans-serif;font-size:18px;color:{C}'>{la.get("name","🌌 Lore Achievement")}</span><br><span style='font-family:Space Mono,monospace;font-size:11px;color:{TEXT}'>{la.get("desc","Complete missions to unlock.")}</span></div>""", unsafe_allow_html=True)
+        st.markdown("---")
+
+    # ── STANDARD ACHIEVEMENTS ──
+    st.markdown(f"<h3 style='font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:3px;margin-bottom:12px'>⚡ UNIVERSAL ACHIEVEMENTS</h3>", unsafe_allow_html=True)
     unlocked = st.session_state.get("unlocked_achievements", set())
     for ach in ACHIEVEMENTS:
         is_done = ach["id"] in unlocked
@@ -1596,26 +1786,54 @@ elif view == "plans":
         st.markdown(f"""<div class='shop-card' style='border-color:#FFD700'><div style='text-align:center;margin-bottom:16px'><div style='font-family:Bebas Neue,sans-serif;font-size:36px;color:#FFD700'>💀 ELITE</div><div style='font-family:Bebas Neue,sans-serif;font-size:56px;color:#ffffff;line-height:1'>$10<span style='font-size:20px;color:#aaaaaa'>/mo</span></div></div><div style='font-family:Space Mono,monospace;font-size:12px;color:#ffffff;line-height:2.2;margin-bottom:20px'>✅ 3× XP on every mission<br>✅ ALL ability tiers unlocked<br>✅ Full maximum customization<br>✅ Legendary egg rate doubled<br>✅ Exclusive 💀 Elite badge</div><div style='background:#1a1a1a;border:1px solid #FFD700;border-radius:10px;padding:12px;text-align:center;margin-bottom:12px'><div style='font-family:Space Mono,monospace;font-size:10px;color:#aaaaaa;letter-spacing:2px;margin-bottom:4px'>AFTER PAYING — ENTER CODE IN SIDEBAR</div><div style='font-family:Bebas Neue,sans-serif;font-size:20px;color:#FFD700;letter-spacing:4px'>4RJ1TV51Z</div></div></div>""", unsafe_allow_html=True)
         st.link_button("💀 SUBSCRIBE — ELITE $10/mo", "https://buy.stripe.com/14A9AM83O0YE0KYgVRdQQ03", use_container_width=True)
 
-# ── SPINNER ──
+# ── SPINNER (FIXED: no exploit, 6-hour cooldown) ──
 elif view == "spinner":
     st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>🎰 LUCKY SPINNER</h2>", unsafe_allow_html=True)
-    available = st.session_state.get('spins_left', 0) > 0 or st.session_state.spinner_available
-    spins_remaining = st.session_state.get('spins_left', 1 if st.session_state.spinner_available else 0)
-    if not available:
-        st.markdown("<p style='text-align:center;color:#ffffff;font-family:Space Mono,monospace'>Complete a mission to unlock your spin! 🎰</p>", unsafe_allow_html=True)
+
+    # ── 6-HOUR COOLDOWN CHECK ──
+    spins_left = st.session_state.get('spins_left', 0)
+    last_spin = st.session_state.get("last_spin_time")
+    cooldown_active = False
+    cooldown_remaining = ""
+    if last_spin:
+        elapsed = (_dt.datetime.now() - _dt.datetime.fromisoformat(last_spin)).total_seconds()
+        if elapsed < 21600:  # 6 hours = 21600 seconds
+            cooldown_active = True
+            remaining_secs = int(21600 - elapsed)
+            hours = remaining_secs // 3600
+            mins = (remaining_secs % 3600) // 60
+            cooldown_remaining = f"{hours}h {mins}m"
+
+    available = spins_left > 0 and not cooldown_active
+
+    if cooldown_active and spins_left > 0:
+        st.markdown(f"""<div style='text-align:center;padding:20px;background:#111;border:2px solid #FF8800;border-radius:14px;margin:12px 0'>
+            <div style='font-family:Bebas Neue,sans-serif;font-size:28px;color:#FF8800;letter-spacing:3px'>⏰ COOLDOWN ACTIVE</div>
+            <div style='font-family:Space Mono,monospace;font-size:14px;color:#ffffff;margin-top:8px'>Next spin available in: <b style='color:{C}'>{cooldown_remaining}</b></div>
+            <div style='font-family:Space Mono,monospace;font-size:11px;color:#888;margin-top:4px'>You have {spins_left} spin{"s" if spins_left != 1 else ""} waiting</div>
+        </div>""", unsafe_allow_html=True)
+    elif not available:
+        st.markdown("<p style='text-align:center;color:#ffffff;font-family:Space Mono,monospace'>Complete a mission to earn spins! 🎰</p>", unsafe_allow_html=True)
     else:
-        st.markdown("<p style='text-align:center;color:#ffffff;font-family:Space Mono,monospace;font-size:13px'>You earned a spin! Hit the button and see what you get. 🔥</p>", unsafe_allow_html=True)
+        st.markdown(f"<p style='text-align:center;color:#ffffff;font-family:Space Mono,monospace;font-size:13px'>You have <b style='color:{C}'>{spins_left}</b> spin{'s' if spins_left != 1 else ''} available! 🔥</p>", unsafe_allow_html=True)
 
     prize_labels = json.dumps([p["label"] for p in SPINNER_PRIZES])
     prize_colors = json.dumps([p["color"] for p in SPINNER_PRIZES])
-    components.html(f"""<style>body{{margin:0;background:transparent;display:flex;flex-direction:column;align-items:center;font-family:monospace;}}canvas{{border-radius:50%;box-shadow:0 0 40px rgba(255,215,0,0.5);}}#spinBtn{{margin-top:20px;padding:16px 48px;font-size:22px;font-weight:bold;background:linear-gradient(135deg,#FFD700,#FF8C00);border:none;border-radius:12px;cursor:pointer;color:#000;letter-spacing:2px;box-shadow:0 0 30px rgba(255,215,0,0.5);}}#spinBtn:disabled{{opacity:0.4;cursor:not-allowed;}}#result{{margin-top:16px;font-size:20px;color:#FFD700;letter-spacing:2px;text-align:center;min-height:30px;}}</style><canvas id="wheel" width="320" height="320"></canvas><button id="spinBtn" {"disabled" if not available else ""}>{"🔒 COMPLETE A MISSION" if not available else "🎰 SPIN IT"}</button><div id="result"></div><script>const labels={prize_labels};const colors={prize_colors};const cv=document.getElementById('wheel'),ctx=cv.getContext('2d'),n=labels.length,arc=2*Math.PI/n;let currentAngle=0,spinning=false;function drawWheel(a){{ctx.clearRect(0,0,320,320);for(let i=0;i<n;i++){{ctx.beginPath();ctx.moveTo(160,160);ctx.arc(160,160,150,a+i*arc,a+(i+1)*arc);ctx.fillStyle=colors[i];ctx.fill();ctx.strokeStyle='#111';ctx.lineWidth=2;ctx.stroke();ctx.save();ctx.translate(160,160);ctx.rotate(a+(i+0.5)*arc);ctx.textAlign='right';ctx.fillStyle='#fff';ctx.font='bold 11px monospace';ctx.shadowColor='#000';ctx.shadowBlur=4;ctx.fillText(labels[i],140,5);ctx.restore();}}ctx.beginPath();ctx.arc(160,160,22,0,2*Math.PI);ctx.fillStyle='#111';ctx.fill();ctx.strokeStyle='#FFD700';ctx.lineWidth=3;ctx.stroke();ctx.beginPath();ctx.moveTo(300,150);ctx.lineTo(320,160);ctx.lineTo(300,170);ctx.fillStyle='#FFD700';ctx.fill();}}drawWheel(0);document.getElementById('spinBtn').onclick=function(){{if(spinning)return;spinning=true;this.disabled=true;document.getElementById('result').textContent='';const extra=(5+Math.random()*5)*2*Math.PI,dur=4000+Math.random()*2000,start=performance.now(),sa=currentAngle;function anim(now){{const el=now-start,p=Math.min(el/dur,1),ease=1-Math.pow(1-p,4);currentAngle=sa+extra*ease;drawWheel(currentAngle);if(p<1)requestAnimationFrame(anim);else{{spinning=false;const norm=((2*Math.PI)-(currentAngle%(2*Math.PI)))%(2*Math.PI);const idx=Math.floor(norm/arc)%n;document.getElementById('result').textContent='🎉 '+labels[idx]+'!';window.parent.postMessage({{type:'spinResult',prize:labels[idx]}},'*');}}}}requestAnimationFrame(anim);}};</script>""", height=460)
+    components.html(f"""<style>body{{margin:0;background:transparent;display:flex;flex-direction:column;align-items:center;font-family:monospace;}}canvas{{border-radius:50%;box-shadow:0 0 40px rgba(255,215,0,0.5);}}#spinBtn{{margin-top:20px;padding:16px 48px;font-size:22px;font-weight:bold;background:linear-gradient(135deg,#FFD700,#FF8C00);border:none;border-radius:12px;cursor:pointer;color:#000;letter-spacing:2px;box-shadow:0 0 30px rgba(255,215,0,0.5);}}#spinBtn:disabled{{opacity:0.4;cursor:not-allowed;}}#result{{margin-top:16px;font-size:20px;color:#FFD700;letter-spacing:2px;text-align:center;min-height:30px;}}</style><canvas id="wheel" width="320" height="320"></canvas><button id="spinBtn" {"disabled" if not available else ""}>{"⏰ COOLDOWN — " + cooldown_remaining if cooldown_active and spins_left > 0 else "🔒 EARN SPINS FIRST" if not available else "🎰 SPIN IT"}</button><div id="result"></div><script>const labels={prize_labels};const colors={prize_colors};const cv=document.getElementById('wheel'),ctx=cv.getContext('2d'),n=labels.length,arc=2*Math.PI/n;let currentAngle=0,spinning=false;function drawWheel(a){{ctx.clearRect(0,0,320,320);for(let i=0;i<n;i++){{ctx.beginPath();ctx.moveTo(160,160);ctx.arc(160,160,150,a+i*arc,a+(i+1)*arc);ctx.fillStyle=colors[i];ctx.fill();ctx.strokeStyle='#111';ctx.lineWidth=2;ctx.stroke();ctx.save();ctx.translate(160,160);ctx.rotate(a+(i+0.5)*arc);ctx.textAlign='right';ctx.fillStyle='#fff';ctx.font='bold 11px monospace';ctx.shadowColor='#000';ctx.shadowBlur=4;ctx.fillText(labels[i],140,5);ctx.restore();}}ctx.beginPath();ctx.arc(160,160,22,0,2*Math.PI);ctx.fillStyle='#111';ctx.fill();ctx.strokeStyle='#FFD700';ctx.lineWidth=3;ctx.stroke();ctx.beginPath();ctx.moveTo(300,150);ctx.lineTo(320,160);ctx.lineTo(300,170);ctx.fillStyle='#FFD700';ctx.fill();}}drawWheel(0);document.getElementById('spinBtn').onclick=function(){{if(spinning)return;spinning=true;this.disabled=true;document.getElementById('result').textContent='';const extra=(5+Math.random()*5)*2*Math.PI,dur=4000+Math.random()*2000,start=performance.now(),sa=currentAngle;function anim(now){{const el=now-start,p=Math.min(el/dur,1),ease=1-Math.pow(1-p,4);currentAngle=sa+extra*ease;drawWheel(currentAngle);if(p<1)requestAnimationFrame(anim);else{{spinning=false;const norm=((2*Math.PI)-(currentAngle%(2*Math.PI)))%(2*Math.PI);const idx=Math.floor(norm/arc)%n;document.getElementById('result').textContent='🎉 '+labels[idx]+'!';}}}}requestAnimationFrame(anim);}};</script>""", height=460)
 
+    # ── CLAIM BUTTON: only shows when available, consumes 1 spin, sets cooldown ──
     if available:
         _, sc, _ = st.columns([1,2,1])
         with sc:
-            if st.button("🎰 CLAIM YOUR SPIN PRIZE", key="claim_spin"):
+            if st.button(f"🎰 USE 1 SPIN ({spins_left} remaining)", key="claim_spin"):
                 prize = spin_wheel()
-                st.session_state.spinner_available = False; st.session_state.spinner_wins += 1
+                # Consume the spin
+                st.session_state.spins_left = max(0, st.session_state.get("spins_left", 0) - 1)
+                st.session_state.spinner_available = False
+                st.session_state.spinner_wins = st.session_state.get("spinner_wins", 0) + 1
+                # Set 6-hour cooldown
+                st.session_state.last_spin_time = _dt.datetime.now().isoformat()
+                # Apply prize
                 if prize["type"] == "gold_mult":
                     bonus = st.session_state.pending_gold * prize["value"] if st.session_state.pending_gold else prize["value"] * 2
                     st.session_state.gold += bonus; msg = f"💰 {prize['label']}! +{bonus:.1f} {currency}!"
@@ -1631,9 +1849,9 @@ elif view == "spinner":
                     else:
                         st.session_state.booster_bought = True; st.session_state.sub_multiplier = max(st.session_state.sub_multiplier, 2); msg = f"🚀 {wd.get('booster_name','BOOSTER')} activated FREE!"
                 elif prize["type"] == "story_twist":
-                    st.session_state.story_twist_pending = True; msg = "📖 STORY TWIST UNLOCKED! Check your Storyline tab!"
+                    st.session_state.story_twist_pending = True; msg = "📖 STORY TWIST UNLOCKED!"
                 else:
-                    msg = "💨 Nothing this time... spin again next mission!"
+                    msg = "💨 Nothing this time... earn more spins from missions!"
                 st.session_state.spinner_result = {"prize": prize, "msg": msg}
                 st.balloons(); st.success(f"🎰 {msg}"); time.sleep(1); st.rerun()
 
