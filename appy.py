@@ -1066,7 +1066,7 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
 
     # ── 7 FIDGET SPINNERS (base64 embedded) ──
     import base64 as _b64
-    _SPINNER_B64 = "PCFET0NUWVBFIGh0bWw+PGh0bWw+PGhlYWQ+PG1ldGEgY2hhcnNldD0idXRmLTgiPgo8c3R5bGU+CkBpbXBvcnQgdXJsKCdodHRwczovL2ZvbnRzLmdvb2dsZWFwaXMuY29tL2NzczI/ZmFtaWx5PU9yYml0cm9uOndnaHRAOTAwJmRpc3BsYXk9c3dhcCcpOwoqe2JveC1zaXppbmc6Ym9yZGVyLWJveDttYXJnaW46MDtwYWRkaW5nOjA7fQpib2R5e2JhY2tncm91bmQ6dHJhbnNwYXJlbnQ7bWFyZ2luOjA7b3ZlcmZsb3c6aGlkZGVuO2ZvbnQtZmFtaWx5Ok9yYml0cm9uLG1vbm9zcGFjZTt9CiN3cmFwcGVye3dpZHRoOjgyMHB4O3BhZGRpbmc6MTZweCA4cHg7fQovKiBST1cgMTogMyBhdXRvIHNwaW5uZXJzIOKAlCBsZWZ0IC8gY2VudGVyIC8gcmlnaHQgKi8KI3JvdzF7ZGlzcGxheTpmbGV4O2p1c3RpZnktY29udGVudDpzcGFjZS1iZXR3ZWVuO2FsaWduLWl0ZW1zOmZsZXgtZW5kO3dpZHRoOjEwMCU7bWFyZ2luLWJvdHRvbToxNHB4O30KLyogUk9XIDI6IDQgaWduaXRlIHNwaW5uZXJzIOKAlCBldmVubHkgc3BhY2VkICovCiNyb3cye2Rpc3BsYXk6ZmxleDtqdXN0aWZ5LWNvbnRlbnQ6c3BhY2UtZXZlbmx5O2FsaWduLWl0ZW1zOmZsZXgtZW5kO3dpZHRoOjEwMCU7fQouc2xvdHtkaXNwbGF5OmZsZXg7ZmxleC1kaXJlY3Rpb246Y29sdW1uO2FsaWduLWl0ZW1zOmNlbnRlcjtnYXA6NXB4O30KLnNsYmx7Zm9udC1mYW1pbHk6T3JiaXRyb24sbW9ub3NwYWNlO2ZvbnQtc2l6ZTo5cHg7bGV0dGVyLXNwYWNpbmc6MnB4O3RleHQtdHJhbnNmb3JtOnVwcGVyY2FzZTtjb2xvcjpyZ2JhKDI1NSwyNTUsMjU1LDAuNCk7dGV4dC1hbGlnbjpjZW50ZXI7fQouc3JwbXtmb250LWZhbWlseTpPcmJpdHJvbixtb25vc3BhY2U7Zm9udC1zaXplOjlweDtsZXR0ZXItc3BhY2luZzoxcHg7bWluLWhlaWdodDoxNHB4O3RleHQtYWxpZ246Y2VudGVyO30KLm5idG57cGFkZGluZzo3cHggMTRweDtmb250LXNpemU6OXB4O2ZvbnQtZmFtaWx5Ok9yYml0cm9uLG1vbm9zcGFjZTtib3JkZXItcmFkaXVzOjdweDtjdXJzb3I6cG9pbnRlcjtsZXR0ZXItc3BhY2luZzoycHg7Ym9yZGVyOjEuNXB4IHNvbGlkO2JhY2tncm91bmQ6cmdiYSgwLDAsMCwwLjY1KTt0cmFuc2l0aW9uOmFsbCAwLjEyczttYXJnaW4tdG9wOjNweDt0ZXh0LXRyYW5zZm9ybTp1cHBlcmNhc2U7d2hpdGUtc3BhY2U6bm93cmFwO30KLm5idG46aG92ZXJ7dHJhbnNmb3JtOnNjYWxlKDEuMSk7ZmlsdGVyOmJyaWdodG5lc3MoMS42KTt9Ci5uYnRuOmFjdGl2ZXt0cmFuc2Zvcm06c2NhbGUoMC45Myk7fQouYXV0by1sYWJlbHtmb250LXNpemU6OHB4O2xldHRlci1zcGFjaW5nOjFweDtjb2xvcjpyZ2JhKDI1NSwyNTUsMjU1LDAuMik7Zm9udC1mYW1pbHk6T3JiaXRyb24sbW9ub3NwYWNlO3RleHQtYWxpZ246Y2VudGVyO21hcmdpbi10b3A6MnB4O30KPC9zdHlsZT48L2hlYWQ+PGJvZHk+CjxkaXYgaWQ9IndyYXBwZXIiPgogIDxkaXYgaWQ9InJvdzEiPjwvZGl2PgogIDxkaXYgaWQ9InJvdzIiPjwvZGl2Pgo8L2Rpdj4KPHNjcmlwdD4KLy8gMyBBVVRPIChldGVybmFsKSArIDQgSUdOSVRFCnZhciBERj1bCiAgLy8gUk9XIDEg4oCUIGF1dG8gZXRlcm5hbAogIHtpZDonYTAnLHN6Ojc2LGxibDonU09MQVIgRkxBUkUnLCBhdXRvOnRydWUsIGJ2OjAuNDAsYmw6NCxzaDonZHJvcCcscDpbJyNGRjY2MDAnLCcjRkYyMjAwJywnI0ZGRDcwMCcsJyNGRjg4MDAnXSxndzonI0ZGNDQwMCcscm06JyNGRkQ3MDAnLGhiOicjRkZGJyx0cjoxMn0sCiAge2lkOidhMScsc3o6ODIsbGJsOidWT0lEIFNUT1JNJywgIGF1dG86dHJ1ZSwgYnY6MC41MixibDo2LHNoOid3aW5nJyxwOlsnIzg4MDBGRicsJyM0NDAwQ0MnLCcjQ0MwMEZGJywnI0ZGNDRGRiddLGd3OicjQUEwMEZGJyxybTonI0ZGODhGRicsaGI6JyNGRkYnLHRyOjE2fSwKICB7aWQ6J2EyJyxzejo3MCxsYmw6J01BVFJJWCBDT1JFJywgYXV0bzp0cnVlLCBidjowLjQ1LGJsOjMsc2g6J2NyeXMnLHA6WycjMDBGRjQ0JywnIzAwQ0MzMycsJyMwMEZGODgnLCcjQUFGRkNDJ10sZ3c6JyMwMEZGNDQnLHJtOicjODhGRkJCJyxoYjonIzExMScsdHI6MTB9LAogIC8vIFJPVyAyIOKAlCBpZ25pdGUgbWFudWFsCiAge2lkOiduMCcsc3o6NjQsbGJsOidOT1ZBIFBVTFNFJywgIGF1dG86ZmFsc2UsYnY6MCxudjo0LjAsYmw6NSxzaDonYmxhZCcscDpbJyMwMENDRkYnLCcjMDA4OEZGJywnIzAwRkZFRScsJyM4OERERkYnXSxndzonIzAwQ0NGRicscm06JyNBQUVFRkYnLGhiOicjMDAzJyx0cjoxNCwgYnRuOidJR05JVEUnfSwKICB7aWQ6J24xJyxzejo2OCxsYmw6J1RJVEFOIFdBUlAnLCAgYXV0bzpmYWxzZSxidjowLG52OjUuMixibDo3LHNoOidmYW4nLCBwOlsnI0ZGRDcwMCcsJyNGRjQ0MDAnLCcjRkY4ODAwJywnI0ZGRUVBQSddLGd3OicjRkZENzAwJyxybTonI0ZGNDQwMCcsaGI6JyMyMTAnLHRyOjE4LCBidG46J1dBUlAgRFJJVkUnfSwKICB7aWQ6J24yJyxzejo2NCxsYmw6J0NIQU9TIEZMVVgnLCAgYXV0bzpmYWxzZSxidjowLG52OjYuNSxibDo0LHNoOidkcm9wJyxwOlsnI0ZGMDA0NCcsJyNGRjQ0MDAnLCcjRkYwMDg4JywnI0ZGODgwMCddLGd3OicjRkYwMDQ0JyxybTonI0Y4QScsICBoYjonI0ZGRicsdHI6MjAsIGJ0bjonRElTQ0hBUkdFJ30sCiAge2lkOiduMycsc3o6NzIsbGJsOidTSU5HVUxBUklUWScsIGF1dG86ZmFsc2UsYnY6MCxudjo5LjAsYmw6OCxzaDonZmFuJywgcDpbJyNGRkYnLCcjRkZENzAwJywnI0ZGMjIwMCcsJyNGQTAnXSwgICBndzonI0ZGRicsICBybTonI0ZGRDcwMCcsaGI6JyMwMDAnLHRyOjMwLCBidG46J09CTElURVJBVEUnfSwKXTsKdmFyIFNUPXt9LFRSPXt9Owp2YXIgcm93MT1kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgncm93MScpOwp2YXIgcm93Mj1kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgncm93MicpOwoKREYuZm9yRWFjaChmdW5jdGlvbihzcCl7CiAgU1Rbc3AuaWRdPXthOk1hdGgucmFuZG9tKCkqNi4yOCx2OnNwLmF1dG8/c3AuYnYrTWF0aC5yYW5kb20oKSowLjA2OjAsZGc6ZmFsc2UsbEE6MCxsVDowfTsKICBUUltzcC5pZF09W107CiAgdmFyIHNsb3Q9ZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgnZGl2Jyk7c2xvdC5jbGFzc05hbWU9J3Nsb3QnOwogIHZhciBjdj1kb2N1bWVudC5jcmVhdGVFbGVtZW50KCdjYW52YXMnKTtjdi5pZD0nY18nK3NwLmlkO2N2LndpZHRoPXNwLnN6KjI7Y3YuaGVpZ2h0PXNwLnN6KjI7CiAgY3Yuc3R5bGUuY3NzVGV4dD0nY3Vyc29yOmdyYWI7Ym9yZGVyLXJhZGl1czo1MCU7ZGlzcGxheTpibG9jazsnOwogIHZhciBsYj1kb2N1bWVudC5jcmVhdGVFbGVtZW50KCdkaXYnKTtsYi5jbGFzc05hbWU9J3NsYmwnO2xiLnRleHRDb250ZW50PXNwLmxibDsKICB2YXIgcm09ZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgnZGl2Jyk7cm0uaWQ9J3JfJytzcC5pZDtybS5jbGFzc05hbWU9J3NycG0nO3JtLnN0eWxlLmNvbG9yPXNwLmd3OwogIHNsb3QuYXBwZW5kQ2hpbGQoY3YpO3Nsb3QuYXBwZW5kQ2hpbGQobGIpO3Nsb3QuYXBwZW5kQ2hpbGQocm0pOwogIGlmKHNwLmF1dG8pewogICAgdmFyIGFsPWRvY3VtZW50LmNyZWF0ZUVsZW1lbnQoJ2RpdicpO2FsLmNsYXNzTmFtZT0nYXV0by1sYWJlbCc7YWwudGV4dENvbnRlbnQ9J+KIniBFVEVSTkFMJzthbC5zdHlsZS5jb2xvcj1zcC5ndysnODgnOwogICAgc2xvdC5hcHBlbmRDaGlsZChhbCk7CiAgfSBlbHNlIHsKICAgIHZhciBidG49ZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgnYnV0dG9uJyk7YnRuLmNsYXNzTmFtZT0nbmJ0bic7YnRuLnRleHRDb250ZW50PXNwLmJ0bjsKICAgIGJ0bi5zdHlsZS5ib3JkZXJDb2xvcj1zcC5ndztidG4uc3R5bGUuY29sb3I9c3AuZ3c7CiAgICBidG4ub25jbGljaz0oZnVuY3Rpb24oc2lkLG52KXtyZXR1cm4gZnVuY3Rpb24oKXtTVFtzaWRdLnY9bnY7c2hrKCk7fTt9KShzcC5pZCxzcC5udik7CiAgICBzbG90LmFwcGVuZENoaWxkKGJ0bik7CiAgfQogIChzcC5hdXRvP3JvdzE6cm93MikuYXBwZW5kQ2hpbGQoc2xvdCk7CgogIGZ1bmN0aW9uIGdhKGUsYyl7dmFyIHI9Yy5nZXRCb3VuZGluZ0NsaWVudFJlY3QoKTtyZXR1cm4gTWF0aC5hdGFuMigoZS5jbGllbnRZfHwoZS50b3VjaGVzJiZlLnRvdWNoZXNbMF0uY2xpZW50WSl8fDApLXIudG9wLXIuaGVpZ2h0LzIsKGUuY2xpZW50WHx8KGUudG91Y2hlcyYmZS50b3VjaGVzWzBdLmNsaWVudFgpfHwwKS1yLmxlZnQtci53aWR0aC8yKTt9CiAgY3YuYWRkRXZlbnRMaXN0ZW5lcignbW91c2Vkb3duJyxmdW5jdGlvbihlKXt2YXIgcz1TVFtzcC5pZF07cy5kZz10cnVlO3MubEE9Z2EoZSxjdik7cy5sVD1wZXJmb3JtYW5jZS5ub3coKTtjdi5zdHlsZS5jdXJzb3I9J2dyYWJiaW5nJzt9KTsKICB3aW5kb3cuYWRkRXZlbnRMaXN0ZW5lcignbW91c2Vtb3ZlJywoZnVuY3Rpb24oc2lkKXtyZXR1cm4gZnVuY3Rpb24oZSl7dmFyIHM9U1Rbc2lkXTtpZighcy5kZylyZXR1cm47dmFyIG5vdz1wZXJmb3JtYW5jZS5ub3coKTt2YXIgYzI9ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2NfJytzaWQpO3ZhciBhPWdhKGUsYzIpO3ZhciBkPWEtcy5sQTtpZihkPk1hdGguUEkpZC09Ni4yODtpZihkPC1NYXRoLlBJKWQrPTYuMjg7cy52PWQvTWF0aC5tYXgobm93LXMubFQsMSkqMjA7cy5hKz1kO3MubEE9YTtzLmxUPW5vdzt9O30pKHNwLmlkKSk7CiAgd2luZG93LmFkZEV2ZW50TGlzdGVuZXIoJ21vdXNldXAnLChmdW5jdGlvbihzaWQpe3JldHVybiBmdW5jdGlvbigpe1NUW3NpZF0uZGc9ZmFsc2U7ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2NfJytzaWQpLnN0eWxlLmN1cnNvcj0nZ3JhYic7fTt9KShzcC5pZCkpOwogIGN2LmFkZEV2ZW50TGlzdGVuZXIoJ3RvdWNoc3RhcnQnLGZ1bmN0aW9uKGUpe3ZhciBzPVNUW3NwLmlkXTtzLmRnPXRydWU7cy5sQT1nYShlLGN2KTtzLmxUPXBlcmZvcm1hbmNlLm5vdygpO2UucHJldmVudERlZmF1bHQoKTt9LHtwYXNzaXZlOmZhbHNlfSk7CiAgd2luZG93LmFkZEV2ZW50TGlzdGVuZXIoJ3RvdWNobW92ZScsKGZ1bmN0aW9uKHNpZCl7cmV0dXJuIGZ1bmN0aW9uKGUpe3ZhciBzPVNUW3NpZF07aWYoIXMuZGcpcmV0dXJuO3ZhciBub3c9cGVyZm9ybWFuY2Uubm93KCk7dmFyIGMyPWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdjXycrc2lkKTt2YXIgYT1nYShlLGMyKTt2YXIgZD1hLXMubEE7aWYoZD5NYXRoLlBJKWQtPTYuMjg7aWYoZDwtTWF0aC5QSSlkKz02LjI4O3Mudj1kL01hdGgubWF4KG5vdy1zLmxULDEpKjIwO3MuYSs9ZDtzLmxBPWE7cy5sVD1ub3c7ZS5wcmV2ZW50RGVmYXVsdCgpO307fSkoc3AuaWQpLHtwYXNzaXZlOmZhbHNlfSk7CiAgd2luZG93LmFkZEV2ZW50TGlzdGVuZXIoJ3RvdWNoZW5kJywoZnVuY3Rpb24oc2lkKXtyZXR1cm4gZnVuY3Rpb24oKXtTVFtzaWRdLmRnPWZhbHNlO307fSkoc3AuaWQpKTsKfSk7Cgp2YXIgc2hha2VOPTA7CmZ1bmN0aW9uIHNoaygpe3NoYWtlTj0xNDt2YXIgdT1kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnd3JhcHBlcicpOyhmdW5jdGlvbiBmKCl7aWYoc2hha2VOPD0wKXt1LnN0eWxlLnRyYW5zZm9ybT0nJztyZXR1cm47fXUuc3R5bGUudHJhbnNmb3JtPSd0cmFuc2xhdGUoJysoTWF0aC5yYW5kb20oKS0uNSkqc2hha2VOKi43KydweCwnKyhNYXRoLnJhbmRvbSgpLS41KSpzaGFrZU4qLjM1KydweCknO3NoYWtlTi0tO3JlcXVlc3RBbmltYXRpb25GcmFtZShmKTt9KSgpO30KCmZ1bmN0aW9uIGRyYXcoc3AsYW5nbGUsdmVsKXsKICB2YXIgY3Y9ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2NfJytzcC5pZCk7aWYoIWN2KXJldHVybjsKICB2YXIgY3R4PWN2LmdldENvbnRleHQoJzJkJyksc3o9c3Auc3osY3g9c3osY3k9c3oscj1zei01LHNwZD1NYXRoLmFicyh2ZWwpOwogIGN0eC5jbGVhclJlY3QoMCwwLHN6KjIsc3oqMik7CiAgaWYoc3BkPjAuMDQpe3ZhciBnZz1jdHguY3JlYXRlUmFkaWFsR3JhZGllbnQoY3gsY3kscixjeCxjeSxyKzUrc3BkKjQpO2dnLmFkZENvbG9yU3RvcCgwLHNwLmd3Kyc3NycpO2dnLmFkZENvbG9yU3RvcCgxLHNwLmd3KycwMCcpO2N0eC5iZWdpblBhdGgoKTtjdHguYXJjKGN4LGN5LHIrNStzcGQqNCwwLE1hdGguUEkqMik7Y3R4LmZpbGxTdHlsZT1nZztjdHguZmlsbCgpO30KICB2YXIgdHI9VFJbc3AuaWRdO3RyLnB1c2goYW5nbGUpO2lmKHRyLmxlbmd0aD5zcC50cil0ci5zaGlmdCgpOwogIGlmKHNwZD4wLjEmJnRyLmxlbmd0aD4yKXtmb3IodmFyIHRpPTA7dGk8dHIubGVuZ3RoLTE7dGkrKyl7dmFyIGZyYWM9dGkvdHIubGVuZ3RoO2Zvcih2YXIgYmk9MDtiaTxzcC5ibDtiaSsrKXt2YXIgYmEyPXRyW3RpXSsoYmkqNi4yOC9zcC5ibCk7Y3R4LnNhdmUoKTtjdHgudHJhbnNsYXRlKGN4LGN5KTtjdHgucm90YXRlKGJhMik7Y3R4Lmdsb2JhbEFscGhhPWZyYWMqMC4xOCpNYXRoLm1pbihzcGQqMS41LDEpO2N0eC5iZWdpblBhdGgoKTtjdHguZWxsaXBzZShyKi4zOCwwLHIqLjM2LHIqLjE1LDAsMCxNYXRoLlBJKjIpO2N0eC5maWxsU3R5bGU9c3AucFswXTtjdHguZmlsbCgpO2N0eC5yZXN0b3JlKCk7fX1jdHguZ2xvYmFsQWxwaGE9MTt9CiAgZm9yKHZhciBpPTA7aTxzcC5ibDtpKyspewogICAgdmFyIGJhPWFuZ2xlKyhpKjYuMjgvc3AuYmwpO2N0eC5zYXZlKCk7Y3R4LnRyYW5zbGF0ZShjeCxjeSk7Y3R4LnJvdGF0ZShiYSk7CiAgICB2YXIgZz1jdHguY3JlYXRlTGluZWFyR3JhZGllbnQoMCwtciouMDgsciouODIsciouMDgpOwogICAgZy5hZGRDb2xvclN0b3AoMCxzcC5wWzBdKTtnLmFkZENvbG9yU3RvcCguNDUsc3AucFsxJXNwLnAubGVuZ3RoXSk7Zy5hZGRDb2xvclN0b3AoLjc1LHNwLnBbMiVzcC5wLmxlbmd0aF0pO2cuYWRkQ29sb3JTdG9wKDEsc3AucFszJXNwLnAubGVuZ3RoXSsnMjInKTsKICAgIGN0eC5maWxsU3R5bGU9ZztjdHguYmVnaW5QYXRoKCk7CiAgICBpZihzcC5zaD09PSdkcm9wJyl7Y3R4LmVsbGlwc2UociouNDIsMCxyKi40MixyKi4xOSwwLDAsTWF0aC5QSSoyKTt9CiAgICBlbHNlIGlmKHNwLnNoPT09J3dpbmcnKXtjdHgubW92ZVRvKDAsMCk7Y3R4LmJlemllckN1cnZlVG8ociouMiwtciouMjgsciouNywtciouMjIsciouODIsMCk7Y3R4LmJlemllckN1cnZlVG8ociouNyxyKi4yMixyKi4yLHIqLjI4LDAsMCk7Y3R4LmNsb3NlUGF0aCgpO30KICAgIGVsc2UgaWYoc3Auc2g9PT0nY3J5cycpe2N0eC5tb3ZlVG8ociouMDgsMCk7Y3R4LmxpbmVUbyhyKi4zOCwtciouMjIpO2N0eC5saW5lVG8ociouODIsMCk7Y3R4LmxpbmVUbyhyKi4zOCxyKi4yMik7Y3R4LmNsb3NlUGF0aCgpO30KICAgIGVsc2UgaWYoc3Auc2g9PT0nYmxhZCcpe2N0eC5tb3ZlVG8oMCwtciouMDUpO2N0eC5saW5lVG8ociouNzgsLXIqLjEyKTtjdHgubGluZVRvKHIqLjgyLDApO2N0eC5saW5lVG8ociouNzgsciouMTIpO2N0eC5saW5lVG8oMCxyKi4wNSk7Y3R4LmNsb3NlUGF0aCgpO30KICAgIGVsc2V7Y3R4LmVsbGlwc2UociouNDAsMCxyKi40MCxyKi4yMiwwLDAsTWF0aC5QSSoyKTt9CiAgICBjdHguZmlsbCgpO2N0eC5zdHJva2VTdHlsZT1zcC5wWzBdKyc4OCc7Y3R4LmxpbmVXaWR0aD0xLjI7Y3R4LnN0cm9rZSgpOwogICAgaWYoc3BkPjAuMil7Y3R4Lmdsb2JhbEFscGhhPU1hdGgubWluKChzcGQtLjIpKi40NSwuNDUpO2N0eC5maWxsU3R5bGU9c3Aucm07Y3R4LmZpbGwoKTtjdHguZ2xvYmFsQWxwaGE9MTt9CiAgICBjdHgucmVzdG9yZSgpOwogIH0KICBjdHguYmVnaW5QYXRoKCk7Y3R4LmFyYyhjeCxjeSxyLDAsTWF0aC5QSSoyKTtjdHguc3Ryb2tlU3R5bGU9c3Aucm0rKHNwZD4uMjU/J0JCJzonMzMnKTtjdHgubGluZVdpZHRoPXNwZD4uND8yLjU6MS41O2N0eC5zdHJva2UoKTsKICBpZihzcGQ+MC4zKXt2YXIgcGM9TWF0aC5taW4oTWF0aC5mbG9vcihzcGQqNSksMTQpO2Zvcih2YXIgcGk9MDtwaTxwYztwaSsrKXt2YXIgcGE9YW5nbGUqMy4yK3BpKjIuMCtwZXJmb3JtYW5jZS5ub3coKSouMDAxNTt2YXIgcHI9ciooLjYyK01hdGgucmFuZG9tKCkqLjMpO2N0eC5iZWdpblBhdGgoKTtjdHguYXJjKGN4K01hdGguY29zKHBhKSpwcixjeStNYXRoLnNpbihwYSkqcHIsMStNYXRoLnJhbmRvbSgpKjEuOCwwLE1hdGguUEkqMik7Y3R4LmZpbGxTdHlsZT1zcC5wW3BpJXNwLnAubGVuZ3RoXTtjdHguZ2xvYmFsQWxwaGE9LjU1K01hdGgucmFuZG9tKCkqLjM7Y3R4LmZpbGwoKTtjdHguZ2xvYmFsQWxwaGE9MTt9fQogIHZhciBoZz1jdHguY3JlYXRlUmFkaWFsR3JhZGllbnQoY3gtciouMDQsY3ktciouMDQsMSxjeCxjeSxyKi4yMCk7aGcuYWRkQ29sb3JTdG9wKDAsJyNmZmZmZmYnKTtoZy5hZGRDb2xvclN0b3AoLjQsc3AucFswXSk7aGcuYWRkQ29sb3JTdG9wKDEsc3AuaGIpO2N0eC5iZWdpblBhdGgoKTtjdHguYXJjKGN4LGN5LHIqLjE5LDAsTWF0aC5QSSoyKTtjdHguZmlsbFN0eWxlPWhnO2N0eC5maWxsKCk7Y3R4LmJlZ2luUGF0aCgpO2N0eC5hcmMoY3gsY3ksciouMDcsMCxNYXRoLlBJKjIpO2N0eC5maWxsU3R5bGU9J3JnYmEoMjU1LDI1NSwyNTUsMC40KSc7Y3R4LmZpbGwoKTsKICB2YXIgcmU9ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3JfJytzcC5pZCk7aWYocmUpe3ZhciBydj1NYXRoLmFicyh2ZWwqNjAvKE1hdGguUEkqMikqNjApO2lmKHJ2Pjgpe3JlLnRleHRDb250ZW50PU1hdGgucm91bmQocnYpLnRvTG9jYWxlU3RyaW5nKCkrJyBSUE0nO3JlLnN0eWxlLmNvbG9yPXJ2PjkwMDA/JyNGRjAwMDAnOnJ2PjQwMDA/JyNGRjg4MDAnOnJ2PjEyMDA/JyNGRkQ3MDAnOnNwLmd3O31lbHNle3JlLnRleHRDb250ZW50PXNwLmF1dG8/J+KIniBFVEVSTkFMJzonUkVBRFknO3JlLnN0eWxlLmNvbG9yPSdyZ2JhKDI1NSwyNTUsMjU1LDAuMiknO319Cn0KdmFyIEFGPTAuOTk5OTkyLE5GPTAuOTk4NTsKZnVuY3Rpb24gbG9vcCgpewogIERGLmZvckVhY2goZnVuY3Rpb24oc3Ape3ZhciBzPVNUW3NwLmlkXTtpZighcy5kZyl7cy52Kj1zcC5hdXRvP0FGOk5GO2lmKE1hdGguYWJzKHMudik8c3AuYnYpcy52PXNwLmF1dG8/c3AuYnY6MDt9cy5hKz1zLnY7ZHJhdyhzcCxzLmEscy52KTt9KTsKICByZXF1ZXN0QW5pbWF0aW9uRnJhbWUobG9vcCk7Cn0KbG9vcCgpOwo8L3NjcmlwdD4KPC9ib2R5PjwvaHRtbD4="
+    _SPINNER_B64 = "PCFET0NUWVBFIGh0bWw+PGh0bWw+PGhlYWQ+PG1ldGEgY2hhcnNldD0idXRmLTgiPgo8c3R5bGU+CkBpbXBvcnQgdXJsKCdodHRwczovL2ZvbnRzLmdvb2dsZWFwaXMuY29tL2NzczI/ZmFtaWx5PU9yYml0cm9uOndnaHRAOTAwJmRpc3BsYXk9c3dhcCcpOwoqe2JveC1zaXppbmc6Ym9yZGVyLWJveDttYXJnaW46MDtwYWRkaW5nOjA7fQpib2R5e2JhY2tncm91bmQ6dHJhbnNwYXJlbnQ7bWFyZ2luOjA7b3ZlcmZsb3c6aGlkZGVuO30KI3Jvd3tkaXNwbGF5OmZsZXg7ZmxleC1kaXJlY3Rpb246cm93O2p1c3RpZnktY29udGVudDpzcGFjZS1iZXR3ZWVuO2FsaWduLWl0ZW1zOmZsZXgtZW5kOwogICAgIHdpZHRoOjEwMCU7cGFkZGluZzoxNHB4IDEwcHggMTBweDtnYXA6MDt9Ci5zbG90e2Rpc3BsYXk6ZmxleDtmbGV4LWRpcmVjdGlvbjpjb2x1bW47YWxpZ24taXRlbXM6Y2VudGVyO2dhcDo0cHg7ZmxleDoxO30KLnNsYmx7Zm9udC1mYW1pbHk6T3JiaXRyb24sbW9ub3NwYWNlO2ZvbnQtc2l6ZTo4cHg7bGV0dGVyLXNwYWNpbmc6MS41cHg7dGV4dC10cmFuc2Zvcm06dXBwZXJjYXNlOwogICAgICBjb2xvcjpyZ2JhKDI1NSwyNTUsMjU1LDAuMzUpO3RleHQtYWxpZ246Y2VudGVyO2xpbmUtaGVpZ2h0OjEuMjt9Ci5zcnBte2ZvbnQtZmFtaWx5Ok9yYml0cm9uLG1vbm9zcGFjZTtmb250LXNpemU6OHB4O2xldHRlci1zcGFjaW5nOjFweDttaW4taGVpZ2h0OjEycHg7dGV4dC1hbGlnbjpjZW50ZXI7fQoubmJ0bntwYWRkaW5nOjZweCAxMHB4O2ZvbnQtc2l6ZTo4cHg7Zm9udC1mYW1pbHk6T3JiaXRyb24sbW9ub3NwYWNlO2JvcmRlci1yYWRpdXM6NnB4O2N1cnNvcjpwb2ludGVyOwogICAgICBsZXR0ZXItc3BhY2luZzoxLjVweDtib3JkZXI6MS41cHggc29saWQ7YmFja2dyb3VuZDpyZ2JhKDAsMCwwLDAuNyk7dHJhbnNpdGlvbjphbGwgMC4xMnM7CiAgICAgIG1hcmdpbi10b3A6M3B4O3RleHQtdHJhbnNmb3JtOnVwcGVyY2FzZTt3aGl0ZS1zcGFjZTpub3dyYXA7fQoubmJ0bjpob3Zlcnt0cmFuc2Zvcm06c2NhbGUoMS4xKTtmaWx0ZXI6YnJpZ2h0bmVzcygxLjcpO30KLm5idG46YWN0aXZle3RyYW5zZm9ybTpzY2FsZSgwLjkzKTt9Ci5ldGxibHtmb250LXNpemU6N3B4O2xldHRlci1zcGFjaW5nOjFweDtjb2xvcjpyZ2JhKDI1NSwyNTUsMjU1LDAuMTgpOwogICAgICAgZm9udC1mYW1pbHk6T3JiaXRyb24sbW9ub3NwYWNlO3RleHQtYWxpZ246Y2VudGVyO21hcmdpbi10b3A6MnB4O30KPC9zdHlsZT48L2hlYWQ+PGJvZHk+CjxkaXYgaWQ9InJvdyI+PC9kaXY+CjxzY3JpcHQ+Ci8vIDcgc3Bpbm5lcnMgaW4gT05FIHJvdy4gUG9zaXRpb25zIDAsMyw2ICgxc3QsNHRoLDd0aCkgaGF2ZSBpZ25pdGUgYnV0dG9ucy4KdmFyIERGPVsKICB7aWQ6J2YwJyxzejo1OCxsYmw6J1NPTEFSXG5GTEFSRScsIGlnbml0ZTp0cnVlLCBudjo1LjAsYnY6MCwgICBibDo0LHNoOidkcm9wJyxwOlsnI0ZGNjYwMCcsJyNGRjIyMDAnLCcjRkZENzAwJywnI0ZGODgwMCddLGd3OicjRkY0NDAwJyxybTonI0ZGRDcwMCcsaGI6JyNGRkYnLHRyOjEyLCBidG46J0lHTklURSd9LAogIHtpZDonZjEnLHN6OjUyLGxibDonVk9JRFxuU1RPUk0nLCAgaWduaXRlOmZhbHNlLCAgICAgYnY6MC40OCxibDo2LHNoOid3aW5nJyxwOlsnIzg4MDBGRicsJyM0NDAwQ0MnLCcjQ0MwMEZGJywnI0ZGNDRGRiddLGd3OicjQUEwMEZGJyxybTonI0ZGODhGRicsaGI6JyNGRkYnLHRyOjE0fSwKICB7aWQ6J2YyJyxzejo1NSxsYmw6J01BVFJJWFxuQ09SRScsIGlnbml0ZTpmYWxzZSwgICAgIGJ2OjAuNDIsYmw6MyxzaDonY3J5cycscDpbJyMwMEZGNDQnLCcjMDBDQzMzJywnIzAwRkY4OCcsJyNBQUZGQ0MnXSxndzonIzAwRkY0NCcscm06JyM4OEZGQkInLGhiOicjMTExJyx0cjoxMH0sCiAge2lkOidmMycsc3o6NjIsbGJsOidOT1ZBXG5QVUxTRScsICBpZ25pdGU6dHJ1ZSwgbnY6Ni41LGJ2OjAsICAgYmw6NSxzaDonYmxhZCcscDpbJyMwMENDRkYnLCcjMDA4OEZGJywnIzAwRkZFRScsJyM4OERERkYnXSxndzonIzAwQ0NGRicscm06JyNBQUVFRkYnLGhiOicjMDAzJyx0cjoxNiwgYnRuOidXQVJQIERSSVZFJ30sCiAge2lkOidmNCcsc3o6NTIsbGJsOidUSVRBTlxuV0FSUCcsICBpZ25pdGU6ZmFsc2UsICAgICBidjowLjU2LGJsOjcsc2g6J2ZhbicsIHA6WycjRkZENzAwJywnI0ZGNDQwMCcsJyNGRjg4MDAnLCcjRkZFRUFBJ10sZ3c6JyNGRkQ3MDAnLHJtOicjRkY0NDAwJyxoYjonIzIxMCcsdHI6MTh9LAogIHtpZDonZjUnLHN6OjU1LGxibDonQ0hBT1NcbkZMVVgnLCAgaWduaXRlOmZhbHNlLCAgICAgYnY6MC40NCxibDo0LHNoOidkcm9wJyxwOlsnI0ZGMDA0NCcsJyNGRjQ0MDAnLCcjRkYwMDg4JywnI0ZGODgwMCddLGd3OicjRkYwMDQ0JyxybTonI0Y4QScsICBoYjonI0ZGRicsdHI6MTJ9LAogIHtpZDonZjYnLHN6OjY2LGxibDonU0lOR1VMQVJJVFknLCBpZ25pdGU6dHJ1ZSwgbnY6OS4wLGJ2OjAsICAgYmw6OCxzaDonZmFuJywgcDpbJyNGRkYnLCcjRkZENzAwJywnI0ZGMjIwMCcsJyNGQTAnXSwgICBndzonI0ZGRicsICBybTonI0ZGRDcwMCcsaGI6JyMwMDAnLHRyOjI4LCBidG46J09CTElURVJBVEUnfSwKXTsKdmFyIFNUPXt9LFRSPXt9Owp2YXIgcm93PWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdyb3cnKTsKCkRGLmZvckVhY2goZnVuY3Rpb24oc3ApewogIFNUW3NwLmlkXT17YTpNYXRoLnJhbmRvbSgpKjYuMjgsdjpzcC5pZ25pdGU/MDpzcC5iditNYXRoLnJhbmRvbSgpKjAuMDUsZGc6ZmFsc2UsbEE6MCxsVDowfTsKICBUUltzcC5pZF09W107CiAgdmFyIHNsb3Q9ZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgnZGl2Jyk7c2xvdC5jbGFzc05hbWU9J3Nsb3QnOwogIHZhciBjdj1kb2N1bWVudC5jcmVhdGVFbGVtZW50KCdjYW52YXMnKTtjdi5pZD0nY18nK3NwLmlkOwogIGN2LndpZHRoPXNwLnN6KjI7Y3YuaGVpZ2h0PXNwLnN6KjI7CiAgY3Yuc3R5bGUuY3NzVGV4dD0nY3Vyc29yOmdyYWI7Ym9yZGVyLXJhZGl1czo1MCU7ZGlzcGxheTpibG9jazsnOwogIHZhciBsYlRleHQ9c3AubGJsLnJlcGxhY2UoJ1xuJywnICcpOwogIHZhciBsYj1kb2N1bWVudC5jcmVhdGVFbGVtZW50KCdkaXYnKTtsYi5jbGFzc05hbWU9J3NsYmwnO2xiLnRleHRDb250ZW50PWxiVGV4dDsKICB2YXIgcm09ZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgnZGl2Jyk7cm0uaWQ9J3JfJytzcC5pZDtybS5jbGFzc05hbWU9J3NycG0nO3JtLnN0eWxlLmNvbG9yPXNwLmd3OwogIHNsb3QuYXBwZW5kQ2hpbGQoY3YpO3Nsb3QuYXBwZW5kQ2hpbGQobGIpO3Nsb3QuYXBwZW5kQ2hpbGQocm0pOwogIGlmKHNwLmlnbml0ZSl7CiAgICB2YXIgYnRuPWRvY3VtZW50LmNyZWF0ZUVsZW1lbnQoJ2J1dHRvbicpO2J0bi5jbGFzc05hbWU9J25idG4nOwogICAgYnRuLnRleHRDb250ZW50PXNwLmJ0bjtidG4uc3R5bGUuYm9yZGVyQ29sb3I9c3AuZ3c7YnRuLnN0eWxlLmNvbG9yPXNwLmd3OwogICAgYnRuLm9uY2xpY2s9KGZ1bmN0aW9uKHNpZCxudil7cmV0dXJuIGZ1bmN0aW9uKCl7U1Rbc2lkXS52PW52O3NoaygpO307fSkoc3AuaWQsc3AubnYpOwogICAgc2xvdC5hcHBlbmRDaGlsZChidG4pOwogIH0gZWxzZSB7CiAgICB2YXIgZWw9ZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgnZGl2Jyk7ZWwuY2xhc3NOYW1lPSdldGxibCc7ZWwudGV4dENvbnRlbnQ9J+KInic7CiAgICBlbC5zdHlsZS5jb2xvcj1zcC5ndysnNTUnO3Nsb3QuYXBwZW5kQ2hpbGQoZWwpOwogIH0KICByb3cuYXBwZW5kQ2hpbGQoc2xvdCk7CgogIGZ1bmN0aW9uIGdhKGUsYyl7CiAgICB2YXIgcj1jLmdldEJvdW5kaW5nQ2xpZW50UmVjdCgpOwogICAgcmV0dXJuIE1hdGguYXRhbjIoCiAgICAgIChlLmNsaWVudFl8fChlLnRvdWNoZXMmJmUudG91Y2hlc1swXS5jbGllbnRZKXx8MCktci50b3Atci5oZWlnaHQvMiwKICAgICAgKGUuY2xpZW50WHx8KGUudG91Y2hlcyYmZS50b3VjaGVzWzBdLmNsaWVudFgpfHwwKS1yLmxlZnQtci53aWR0aC8yKTsKICB9CiAgY3YuYWRkRXZlbnRMaXN0ZW5lcignbW91c2Vkb3duJyxmdW5jdGlvbihlKXt2YXIgcz1TVFtzcC5pZF07cy5kZz10cnVlO3MubEE9Z2EoZSxjdik7cy5sVD1wZXJmb3JtYW5jZS5ub3coKTtjdi5zdHlsZS5jdXJzb3I9J2dyYWJiaW5nJzt9KTsKICB3aW5kb3cuYWRkRXZlbnRMaXN0ZW5lcignbW91c2Vtb3ZlJywoZnVuY3Rpb24oc2lkKXtyZXR1cm4gZnVuY3Rpb24oZSl7CiAgICB2YXIgcz1TVFtzaWRdO2lmKCFzLmRnKXJldHVybjt2YXIgbm93PXBlcmZvcm1hbmNlLm5vdygpOwogICAgdmFyIGMyPWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdjXycrc2lkKTt2YXIgYT1nYShlLGMyKTsKICAgIHZhciBkPWEtcy5sQTtpZihkPk1hdGguUEkpZC09Ni4yODtpZihkPC1NYXRoLlBJKWQrPTYuMjg7CiAgICBzLnY9ZC9NYXRoLm1heChub3ctcy5sVCwxKSoyMDtzLmErPWQ7cy5sQT1hO3MubFQ9bm93OwogIH07fSkoc3AuaWQpKTsKICB3aW5kb3cuYWRkRXZlbnRMaXN0ZW5lcignbW91c2V1cCcsKGZ1bmN0aW9uKHNpZCl7cmV0dXJuIGZ1bmN0aW9uKCl7CiAgICBTVFtzaWRdLmRnPWZhbHNlO2RvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdjXycrc2lkKS5zdHlsZS5jdXJzb3I9J2dyYWInOwogIH07fSkoc3AuaWQpKTsKICBjdi5hZGRFdmVudExpc3RlbmVyKCd0b3VjaHN0YXJ0JyxmdW5jdGlvbihlKXt2YXIgcz1TVFtzcC5pZF07cy5kZz10cnVlO3MubEE9Z2EoZSxjdik7cy5sVD1wZXJmb3JtYW5jZS5ub3coKTtlLnByZXZlbnREZWZhdWx0KCk7fSx7cGFzc2l2ZTpmYWxzZX0pOwogIHdpbmRvdy5hZGRFdmVudExpc3RlbmVyKCd0b3VjaG1vdmUnLChmdW5jdGlvbihzaWQpe3JldHVybiBmdW5jdGlvbihlKXsKICAgIHZhciBzPVNUW3NpZF07aWYoIXMuZGcpcmV0dXJuO3ZhciBub3c9cGVyZm9ybWFuY2Uubm93KCk7CiAgICB2YXIgYzI9ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2NfJytzaWQpO3ZhciBhPWdhKGUsYzIpOwogICAgdmFyIGQ9YS1zLmxBO2lmKGQ+TWF0aC5QSSlkLT02LjI4O2lmKGQ8LU1hdGguUEkpZCs9Ni4yODsKICAgIHMudj1kL01hdGgubWF4KG5vdy1zLmxULDEpKjIwO3MuYSs9ZDtzLmxBPWE7cy5sVD1ub3c7ZS5wcmV2ZW50RGVmYXVsdCgpOwogIH07fSkoc3AuaWQpLHtwYXNzaXZlOmZhbHNlfSk7CiAgd2luZG93LmFkZEV2ZW50TGlzdGVuZXIoJ3RvdWNoZW5kJywoZnVuY3Rpb24oc2lkKXtyZXR1cm4gZnVuY3Rpb24oKXtTVFtzaWRdLmRnPWZhbHNlO307fSkoc3AuaWQpKTsKfSk7Cgp2YXIgc2hha2VOPTA7CmZ1bmN0aW9uIHNoaygpewogIHNoYWtlTj0xNDt2YXIgdT1kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgncm93Jyk7CiAgKGZ1bmN0aW9uIGYoKXsKICAgIGlmKHNoYWtlTjw9MCl7dS5zdHlsZS50cmFuc2Zvcm09Jyc7cmV0dXJuO30KICAgIHUuc3R5bGUudHJhbnNmb3JtPSd0cmFuc2xhdGUoJysoTWF0aC5yYW5kb20oKS0uNSkqc2hha2VOKi43KydweCwnKyhNYXRoLnJhbmRvbSgpLS41KSpzaGFrZU4qLjM1KydweCknOwogICAgc2hha2VOLS07cmVxdWVzdEFuaW1hdGlvbkZyYW1lKGYpOwogIH0pKCk7Cn0KCmZ1bmN0aW9uIGRyYXcoc3AsYW5nbGUsdmVsKXsKICB2YXIgY3Y9ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2NfJytzcC5pZCk7aWYoIWN2KXJldHVybjsKICB2YXIgY3R4PWN2LmdldENvbnRleHQoJzJkJyksc3o9c3Auc3osY3g9c3osY3k9c3oscj1zei01LHNwZD1NYXRoLmFicyh2ZWwpOwogIGN0eC5jbGVhclJlY3QoMCwwLHN6KjIsc3oqMik7CiAgaWYoc3BkPjAuMDUpewogICAgdmFyIGdnPWN0eC5jcmVhdGVSYWRpYWxHcmFkaWVudChjeCxjeSxyLGN4LGN5LHIrNCtzcGQqMyk7CiAgICBnZy5hZGRDb2xvclN0b3AoMCxzcC5ndysnNjYnKTtnZy5hZGRDb2xvclN0b3AoMSxzcC5ndysnMDAnKTsKICAgIGN0eC5iZWdpblBhdGgoKTtjdHguYXJjKGN4LGN5LHIrNCtzcGQqMywwLE1hdGguUEkqMik7Y3R4LmZpbGxTdHlsZT1nZztjdHguZmlsbCgpOwogIH0KICB2YXIgdHI9VFJbc3AuaWRdO3RyLnB1c2goYW5nbGUpO2lmKHRyLmxlbmd0aD5zcC50cil0ci5zaGlmdCgpOwogIGlmKHNwZD4wLjEyJiZ0ci5sZW5ndGg+Mil7CiAgICBmb3IodmFyIHRpPTA7dGk8dHIubGVuZ3RoLTE7dGkrKyl7CiAgICAgIHZhciBmcmFjPXRpL3RyLmxlbmd0aDsKICAgICAgZm9yKHZhciBiaT0wO2JpPHNwLmJsO2JpKyspewogICAgICAgIHZhciBiYTI9dHJbdGldKyhiaSo2LjI4L3NwLmJsKTsKICAgICAgICBjdHguc2F2ZSgpO2N0eC50cmFuc2xhdGUoY3gsY3kpO2N0eC5yb3RhdGUoYmEyKTsKICAgICAgICBjdHguZ2xvYmFsQWxwaGE9ZnJhYyowLjE2Kk1hdGgubWluKHNwZCoxLjQsMSk7CiAgICAgICAgY3R4LmJlZ2luUGF0aCgpO2N0eC5lbGxpcHNlKHIqLjM4LDAsciouMzUsciouMTQsMCwwLE1hdGguUEkqMik7CiAgICAgICAgY3R4LmZpbGxTdHlsZT1zcC5wWzBdO2N0eC5maWxsKCk7Y3R4LnJlc3RvcmUoKTsKICAgICAgfQogICAgfQogICAgY3R4Lmdsb2JhbEFscGhhPTE7CiAgfQogIGZvcih2YXIgaT0wO2k8c3AuYmw7aSsrKXsKICAgIHZhciBiYT1hbmdsZSsoaSo2LjI4L3NwLmJsKTsKICAgIGN0eC5zYXZlKCk7Y3R4LnRyYW5zbGF0ZShjeCxjeSk7Y3R4LnJvdGF0ZShiYSk7CiAgICB2YXIgZz1jdHguY3JlYXRlTGluZWFyR3JhZGllbnQoMCwtciouMDgsciouODIsciouMDgpOwogICAgZy5hZGRDb2xvclN0b3AoMCxzcC5wWzBdKTtnLmFkZENvbG9yU3RvcCguNDUsc3AucFsxJXNwLnAubGVuZ3RoXSk7CiAgICBnLmFkZENvbG9yU3RvcCguNzUsc3AucFsyJXNwLnAubGVuZ3RoXSk7Zy5hZGRDb2xvclN0b3AoMSxzcC5wWzMlc3AucC5sZW5ndGhdKycyMicpOwogICAgY3R4LmZpbGxTdHlsZT1nO2N0eC5iZWdpblBhdGgoKTsKICAgIGlmKHNwLnNoPT09J2Ryb3AnKXtjdHguZWxsaXBzZShyKi40MiwwLHIqLjQyLHIqLjE5LDAsMCxNYXRoLlBJKjIpO30KICAgIGVsc2UgaWYoc3Auc2g9PT0nd2luZycpe2N0eC5tb3ZlVG8oMCwwKTtjdHguYmV6aWVyQ3VydmVUbyhyKi4yLC1yKi4yOCxyKi43LC1yKi4yMixyKi44MiwwKTtjdHguYmV6aWVyQ3VydmVUbyhyKi43LHIqLjIyLHIqLjIsciouMjgsMCwwKTtjdHguY2xvc2VQYXRoKCk7fQogICAgZWxzZSBpZihzcC5zaD09PSdjcnlzJyl7Y3R4Lm1vdmVUbyhyKi4wOCwwKTtjdHgubGluZVRvKHIqLjM4LC1yKi4yMik7Y3R4LmxpbmVUbyhyKi44MiwwKTtjdHgubGluZVRvKHIqLjM4LHIqLjIyKTtjdHguY2xvc2VQYXRoKCk7fQogICAgZWxzZSBpZihzcC5zaD09PSdibGFkJyl7Y3R4Lm1vdmVUbygwLC1yKi4wNSk7Y3R4LmxpbmVUbyhyKi43OCwtciouMTIpO2N0eC5saW5lVG8ociouODIsMCk7Y3R4LmxpbmVUbyhyKi43OCxyKi4xMik7Y3R4LmxpbmVUbygwLHIqLjA1KTtjdHguY2xvc2VQYXRoKCk7fQogICAgZWxzZXtjdHguZWxsaXBzZShyKi40MCwwLHIqLjQwLHIqLjIyLDAsMCxNYXRoLlBJKjIpO30KICAgIGN0eC5maWxsKCk7Y3R4LnN0cm9rZVN0eWxlPXNwLnBbMF0rJzg4JztjdHgubGluZVdpZHRoPTE7Y3R4LnN0cm9rZSgpOwogICAgaWYoc3BkPjAuMil7Y3R4Lmdsb2JhbEFscGhhPU1hdGgubWluKChzcGQtLjIpKi40LC40KTtjdHguZmlsbFN0eWxlPXNwLnJtO2N0eC5maWxsKCk7Y3R4Lmdsb2JhbEFscGhhPTE7fQogICAgY3R4LnJlc3RvcmUoKTsKICB9CiAgY3R4LmJlZ2luUGF0aCgpO2N0eC5hcmMoY3gsY3ksciwwLE1hdGguUEkqMik7CiAgY3R4LnN0cm9rZVN0eWxlPXNwLnJtKyhzcGQ+LjIyPydCQic6JzIyJyk7Y3R4LmxpbmVXaWR0aD1zcGQ+LjQ/MjoxLjI7Y3R4LnN0cm9rZSgpOwogIGlmKHNwZD4wLjMpewogICAgdmFyIHBjPU1hdGgubWluKE1hdGguZmxvb3Ioc3BkKjQpLDEyKTsKICAgIGZvcih2YXIgcGk9MDtwaTxwYztwaSsrKXsKICAgICAgdmFyIHBhPWFuZ2xlKjMuMitwaSoyLjArcGVyZm9ybWFuY2Uubm93KCkqLjAwMTU7CiAgICAgIHZhciBwcj1yKiguNitNYXRoLnJhbmRvbSgpKi4yOCk7CiAgICAgIGN0eC5iZWdpblBhdGgoKTtjdHguYXJjKGN4K01hdGguY29zKHBhKSpwcixjeStNYXRoLnNpbihwYSkqcHIsMStNYXRoLnJhbmRvbSgpKjEuNSwwLE1hdGguUEkqMik7CiAgICAgIGN0eC5maWxsU3R5bGU9c3AucFtwaSVzcC5wLmxlbmd0aF07Y3R4Lmdsb2JhbEFscGhhPS41K01hdGgucmFuZG9tKCkqLjM7Y3R4LmZpbGwoKTtjdHguZ2xvYmFsQWxwaGE9MTsKICAgIH0KICB9CiAgdmFyIGhnPWN0eC5jcmVhdGVSYWRpYWxHcmFkaWVudChjeC1yKi4wNCxjeS1yKi4wNCwxLGN4LGN5LHIqLjIwKTsKICBoZy5hZGRDb2xvclN0b3AoMCwnI2ZmZmZmZicpO2hnLmFkZENvbG9yU3RvcCguNCxzcC5wWzBdKTtoZy5hZGRDb2xvclN0b3AoMSxzcC5oYik7CiAgY3R4LmJlZ2luUGF0aCgpO2N0eC5hcmMoY3gsY3ksciouMTgsMCxNYXRoLlBJKjIpO2N0eC5maWxsU3R5bGU9aGc7Y3R4LmZpbGwoKTsKICBjdHguYmVnaW5QYXRoKCk7Y3R4LmFyYyhjeCxjeSxyKi4wNywwLE1hdGguUEkqMik7Y3R4LmZpbGxTdHlsZT0ncmdiYSgyNTUsMjU1LDI1NSwwLjQpJztjdHguZmlsbCgpOwogIHZhciByZT1kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgncl8nK3NwLmlkKTsKICBpZihyZSl7CiAgICB2YXIgcnY9TWF0aC5hYnModmVsKjYwLyhNYXRoLlBJKjIpKjYwKTsKICAgIGlmKHJ2PjgpewogICAgICByZS50ZXh0Q29udGVudD1NYXRoLnJvdW5kKHJ2KS50b0xvY2FsZVN0cmluZygpKycgUlBNJzsKICAgICAgcmUuc3R5bGUuY29sb3I9cnY+OTAwMD8nI0ZGMDAwMCc6cnY+NDAwMD8nI0ZGODgwMCc6cnY+MTIwMD8nI0ZGRDcwMCc6c3AuZ3c7CiAgICB9IGVsc2UgewogICAgICByZS50ZXh0Q29udGVudD1zcC5pZ25pdGU/J1JFQURZJzon4oieJzsKICAgICAgcmUuc3R5bGUuY29sb3I9J3JnYmEoMjU1LDI1NSwyNTUsMC4xOCknOwogICAgfQogIH0KfQoKdmFyIEFGPTAuOTk5OTkyLE5GPTAuOTk4ODsKZnVuY3Rpb24gbG9vcCgpewogIERGLmZvckVhY2goZnVuY3Rpb24oc3ApewogICAgdmFyIHM9U1Rbc3AuaWRdOwogICAgaWYoIXMuZGcpewogICAgICBzLnYqPXNwLmlnbml0ZT9ORjpBRjsKICAgICAgaWYoTWF0aC5hYnMocy52KTxzcC5idilzLnY9c3AuaWduaXRlPzA6c3AuYnY7CiAgICB9CiAgICBzLmErPXMudjtkcmF3KHNwLHMuYSxzLnYpOwogIH0pOwogIHJlcXVlc3RBbmltYXRpb25GcmFtZShsb29wKTsKfQpsb29wKCk7Cjwvc2NyaXB0PjwvYm9keT48L2h0bWw+"
     try:
         components.html(_b64.b64decode(_SPINNER_B64).decode("utf-8"), height=500)
     except:
@@ -1360,36 +1360,47 @@ if view == "main":
         <span style='font-family:Space Mono,monospace;font-size:10px;color:#555;margin-left:8px'>min 30s · max 5min</span>
     </div>""", unsafe_allow_html=True)
 
-    # Symmetric 3-column layout — minus left, start center, plus right
-    col_m, col_s, col_p = st.columns([1, 4, 1])
-    with col_m:
-        st.markdown("<div style='padding-top:40px'></div>", unsafe_allow_html=True)
-        if st.button("－ 30s", key="timer_minus"):
-            st.session_state.micro_timer_seconds = max(30, timer-30); st.rerun()
-    with col_s:
-        if st.button(f"⚡ START {timer}s MISSION ⚡", key="start_mission"):
-            st.session_state.needs_verification = True; st.session_state.pending_gold = base
-            # Compact mission countdown — small, clean, not page-dominating
-            progress_bar = st.progress(0)
-            timer_status = st.empty()
-            for sec in range(timer, 0, -1):
-                pct = (timer-sec)/timer
-                bar_color = "#FF2222" if sec <= 5 else C
+    # ── TRUE symmetric layout: custom CSS overrides giant button padding just here ──
+    st.markdown(f"""<style>
+    .timer-row div.stButton > button {{
+        padding: 14px 10px !important;
+        font-size: 18px !important;
+        letter-spacing: 2px !important;
+        border-radius: 12px !important;
+        border-width: 3px !important;
+        animation: none !important;
+        margin-bottom: 0 !important;
+    }}
+    </style>""", unsafe_allow_html=True)
+    with st.container():
+        st.markdown('<div class="timer-row">', unsafe_allow_html=True)
+        col_m, col_s, col_p = st.columns([1, 3, 1])
+        with col_m:
+            if st.button("－ 30s", key="timer_minus", use_container_width=True):
+                st.session_state.micro_timer_seconds = max(30, timer-30); st.rerun()
+        with col_s:
+            if st.button(f"⚡ START {timer}s MISSION ⚡", key="start_mission", use_container_width=True):
+                st.session_state.needs_verification = True; st.session_state.pending_gold = base
+                progress_bar = st.progress(0)
+                timer_status = st.empty()
+                for sec in range(timer, 0, -1):
+                    pct = (timer-sec)/timer
+                    bar_color = "#FF2222" if sec <= 5 else C
+                    timer_status.markdown(
+                        f"""<div style='text-align:center;background:#111;border:1px solid {bar_color}44;border-radius:10px;padding:8px;margin:4px 0'>
+                            <span style='font-family:Bebas Neue,sans-serif;font-size:32px;color:{bar_color}'>{sec}s</span>
+                            <span style='font-family:Space Mono,monospace;font-size:11px;color:#888;margin-left:10px'>STUDY NOW</span>
+                        </div>""", unsafe_allow_html=True)
+                    progress_bar.progress(pct); time.sleep(1)
                 timer_status.markdown(
-                    f"""<div style='text-align:center;background:#111;border:1px solid {bar_color}44;border-radius:10px;padding:10px;margin:4px 0'>
-                        <span style='font-family:Bebas Neue,sans-serif;font-size:36px;color:{bar_color}'>{sec}s</span>
-                        <span style='font-family:Space Mono,monospace;font-size:11px;color:#888;margin-left:12px'>STUDY NOW</span>
+                    f"""<div style='text-align:center;background:#111;border:2px solid {C};border-radius:10px;padding:10px;margin:4px 0'>
+                        <span style='font-family:Bebas Neue,sans-serif;font-size:24px;color:{C};letter-spacing:2px'>⚡ TIME'S UP — UPLOAD PROOF ⚡</span>
                     </div>""", unsafe_allow_html=True)
-                progress_bar.progress(pct); time.sleep(1)
-            timer_status.markdown(
-                f"""<div style='text-align:center;background:#111;border:2px solid {C};border-radius:10px;padding:12px;margin:4px 0'>
-                    <span style='font-family:Bebas Neue,sans-serif;font-size:28px;color:{C};letter-spacing:3px'>⚡ TIME'S UP — UPLOAD PROOF ⚡</span>
-                </div>""", unsafe_allow_html=True)
-            progress_bar.progress(1.0); time.sleep(0.5); st.rerun()
-    with col_p:
-        st.markdown("<div style='padding-top:40px'></div>", unsafe_allow_html=True)
-        if st.button("＋ 30s", key="timer_plus"):
-            st.session_state.micro_timer_seconds = min(300, timer+30); st.rerun()
+                progress_bar.progress(1.0); time.sleep(0.5); st.rerun()
+        with col_p:
+            if st.button("＋ 30s", key="timer_plus", use_container_width=True):
+                st.session_state.micro_timer_seconds = min(300, timer+30); st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
 
     if st.session_state.story_log:
         latest = st.session_state.story_log[-1]
@@ -1512,7 +1523,7 @@ elif view == "spinner":
     spins_left    = st.session_state.get("spins_left", 0)
     last_spin_str = st.session_state.get("last_spin_time")
 
-    # ── Calculate cooldown ────────────────────────────────────────────────────
+    # ── Cooldown calculation ──────────────────────────────────────────────────
     cooldown_secs_left = 0
     if last_spin_str:
         try:
@@ -1524,178 +1535,104 @@ elif view == "spinner":
     on_cooldown = cooldown_secs_left > 0
     can_spin    = spins_left > 0 and not on_cooldown
 
-    # ── Status banner + live countdown (always shown) ─────────────────────────
+    # ── Live 6-hour countdown (shows immediately, ticks every second) ─────────
     if on_cooldown:
-        components.html(f"""
-<style>
-#ctd{{text-align:center;padding:18px;background:#0a0808;border:2px solid #FF8800;
-      border-radius:14px;margin:4px 0;}}
-#ctd_label{{font-family:'Bebas Neue',monospace;font-size:26px;color:#FF8800;
-           letter-spacing:3px;display:block;}}
-#ctd_sub{{font-family:'Space Mono',monospace;font-size:11px;color:#666;
-          margin-top:6px;display:block;}}
-</style>
-<div id="ctd">
-  <span id="ctd_label">⏰ NEXT SPIN IN: <span id="ctd_val">--:--:--</span></span>
-  <span id="ctd_sub">Spin locked · {spins_left} spin(s) banked · Cooldown resets 6h after each spin</span>
-</div>
-<script>
-var r={cooldown_secs_left};
-(function tick(){{
-  if(r<=0){{
-    document.getElementById('ctd_val').textContent='NOW!';
-    document.getElementById('ctd_label').style.color='#00FF44';
-    document.getElementById('ctd').style.borderColor='#00FF44';
-    return;
-  }}
-  var h=Math.floor(r/3600),m=Math.floor((r%3600)/60),s=r%60;
-  document.getElementById('ctd_val').textContent=
-    String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
-  r--;setTimeout(tick,1000);
-}})();
-</script>""", height=90)
+        components.html(f"""<div style="text-align:center;padding:16px;background:#0a0808;
+                border:2px solid #FF8800;border-radius:14px;">
+            <div style="font-family:'Bebas Neue',monospace;font-size:28px;color:#FF8800;
+                        letter-spacing:3px" id="lbl">
+                ⏰ NEXT SPIN IN: <span id="val">--:--:--</span>
+            </div>
+            <div style="font-family:'Space Mono',monospace;font-size:11px;color:#666;margin-top:6px">
+                {spins_left} spin(s) banked · 6h cooldown after each spin
+            </div>
+        </div>
+        <script>
+        var r={cooldown_secs_left};
+        (function tick(){{
+            if(r<=0){{
+                document.getElementById('val').textContent='READY NOW!';
+                document.getElementById('lbl').style.color='#00FF44';
+                return;
+            }}
+            var h=Math.floor(r/3600),m=Math.floor((r%3600)/60),s=r%60;
+            document.getElementById('val').textContent=
+                String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+            r--; setTimeout(tick,1000);
+        }})();
+        </script>""", height=80)
     elif can_spin:
-        st.markdown(f"""<div style='text-align:center;padding:16px;background:#080f08;border:2px solid #00FF44;
-            border-radius:14px;margin:4px 0'>
+        st.markdown(f"""<div style='text-align:center;padding:14px;background:#080f08;
+            border:2px solid #00FF44;border-radius:14px;margin:4px 0'>
             <div style='font-family:Bebas Neue,sans-serif;font-size:26px;color:#00FF44;letter-spacing:3px'>
-                ✅ SPIN READY — {spins_left} SPIN(S) AVAILABLE</div>
-            <div style='font-family:Space Mono,monospace;font-size:11px;color:#666;margin-top:6px'>
-                Spin IT below · Prize awarded instantly · Locks for 6h after each spin</div>
+                ✅ {spins_left} SPIN(S) READY</div>
+            <div style='font-family:Space Mono,monospace;font-size:11px;color:#555;margin-top:5px'>
+                Locked for 6 hours after spinning</div>
         </div>""", unsafe_allow_html=True)
     else:
-        st.markdown(f"""<div style='text-align:center;padding:16px;background:#0a0a0a;border:2px solid #444;
-            border-radius:14px;margin:4px 0'>
-            <div style='font-family:Bebas Neue,sans-serif;font-size:26px;color:#666;letter-spacing:3px'>
-                🔒 EARN SPINS BY COMPLETING MISSIONS</div>
-            <div style='font-family:Space Mono,monospace;font-size:11px;color:#444;margin-top:6px'>
-                Complete a mission → spins awarded instantly</div>
+        st.markdown(f"""<div style='text-align:center;padding:14px;background:#0a0a0a;
+            border:2px solid #333;border-radius:14px;margin:4px 0'>
+            <div style='font-family:Bebas Neue,sans-serif;font-size:26px;color:#555;letter-spacing:3px'>
+                🔒 COMPLETE A MISSION TO EARN SPINS</div>
         </div>""", unsafe_allow_html=True)
 
-    # ── Spin wheel — SPIN IT does EVERYTHING. One click. No second button. ─────
+    # ── Decorative spinning wheel (visual only) ───────────────────────────────
     prize_labels = json.dumps([p["label"] for p in SPINNER_PRIZES])
     prize_colors = json.dumps([p["color"] for p in SPINNER_PRIZES])
-    prize_emojis = json.dumps([p["emoji"] for p in SPINNER_PRIZES])
-    can_spin_js  = "true" if can_spin else "false"
-    locked_msg   = ("🔒 LOCKED — " + (f"SPIN IN {cooldown_secs_left//3600}h {(cooldown_secs_left%3600)//60}m" if on_cooldown else "COMPLETE A MISSION FIRST")) if not can_spin else "🎰 SPIN IT — WIN INSTANTLY"
-
-    components.html(f"""
-<style>
-body{{margin:0;background:transparent;display:flex;flex-direction:column;align-items:center;padding:10px 0;}}
-canvas{{border-radius:50%;box-shadow:0 0 50px rgba(255,215,0,0.4);display:block;}}
-#spinBtn{{
-  margin-top:22px;padding:18px 52px;font-size:22px;font-weight:bold;letter-spacing:2px;
-  background:linear-gradient(135deg,#FFD700,#FF8C00);border:none;border-radius:14px;
-  cursor:pointer;color:#000;box-shadow:0 0 30px rgba(255,215,0,0.5);transition:all 0.2s;
-}}
-#spinBtn:disabled{{
-  opacity:0.35;cursor:not-allowed;background:#2a2a2a;color:#555;box-shadow:none;
-}}
-#spinBtn:hover:not(:disabled){{transform:scale(1.07);box-shadow:0 0 60px rgba(255,215,0,0.9);}}
-#cntdwn{{
-  display:none;font-size:88px;font-weight:bold;color:#FFD700;text-align:center;
-  font-family:'Bebas Neue',Arial,monospace;text-shadow:0 0 50px #FFD700cc;
-  margin-top:12px;
-}}
-.cntdwn-anim{{animation:pop 0.35s ease-out;}}
-@keyframes pop{{0%{{transform:scale(0.3);opacity:0;}}80%{{transform:scale(1.15);}}100%{{transform:scale(1);opacity:1;}}}}
-#result{{margin-top:14px;font-size:22px;color:#FFD700;letter-spacing:2px;text-align:center;
-  min-height:32px;font-weight:bold;}}
+    components.html(f"""<style>
+body{{margin:0;background:transparent;display:flex;justify-content:center;padding:10px 0;}}
+canvas{{border-radius:50%;box-shadow:0 0 50px rgba(255,215,0,0.35);display:block;}}
 </style>
-<canvas id="wheel" width="320" height="320"></canvas>
-<button id="spinBtn" {"" if can_spin else "disabled"}>{locked_msg}</button>
-<div id="cntdwn"></div>
-<div id="result"></div>
+<canvas id="wh" width="280" height="280"></canvas>
 <script>
-const labels = {prize_labels};
-const colors = {prize_colors};
-const emojis = {prize_emojis};
-const canSpin = {can_spin_js};
-const cv = document.getElementById('wheel');
-const ctx = cv.getContext('2d');
-const n = labels.length, arc = 2 * Math.PI / n;
-let angle = 0, spinning = false;
-
-function draw(a) {{
-  ctx.clearRect(0,0,320,320);
-  for(let i=0;i<n;i++) {{
-    ctx.beginPath(); ctx.moveTo(160,160);
-    ctx.arc(160,160,150,a+i*arc,a+(i+1)*arc);
-    ctx.fillStyle=colors[i]; ctx.fill();
-    ctx.strokeStyle='#111'; ctx.lineWidth=2; ctx.stroke();
-    ctx.save(); ctx.translate(160,160); ctx.rotate(a+(i+0.5)*arc);
-    ctx.textAlign='right'; ctx.fillStyle='#fff';
-    ctx.font='bold 11px monospace'; ctx.fillText(labels[i],140,5);
-    ctx.restore();
+const labels={prize_labels},colors={prize_colors};
+const cv=document.getElementById('wh'),ctx=cv.getContext('2d');
+const n=labels.length,arc=2*Math.PI/n;
+let a=0;
+function draw(){{
+  ctx.clearRect(0,0,280,280);
+  for(let i=0;i<n;i++){{
+    ctx.beginPath();ctx.moveTo(140,140);ctx.arc(140,140,130,a+i*arc,a+(i+1)*arc);
+    ctx.fillStyle=colors[i];ctx.fill();ctx.strokeStyle='#111';ctx.lineWidth=2;ctx.stroke();
+    ctx.save();ctx.translate(140,140);ctx.rotate(a+(i+0.5)*arc);
+    ctx.textAlign='right';ctx.fillStyle='#fff';ctx.font='bold 10px monospace';
+    ctx.fillText(labels[i],122,4);ctx.restore();
   }}
-  // Hub
-  ctx.beginPath(); ctx.arc(160,160,24,0,2*Math.PI);
-  ctx.fillStyle='#111'; ctx.fill();
-  ctx.strokeStyle='#FFD700'; ctx.lineWidth=3; ctx.stroke();
-  // Pointer
-  ctx.beginPath(); ctx.moveTo(304,150); ctx.lineTo(320,160); ctx.lineTo(304,170);
-  ctx.fillStyle='#FFD700'; ctx.fill();
-  // Spinning glow ring
-  if(spinning) {{
-    ctx.beginPath(); ctx.arc(160,160,156,0,2*Math.PI);
-    ctx.strokeStyle='rgba(255,215,0,0.35)'; ctx.lineWidth=5; ctx.stroke();
-  }}
+  ctx.beginPath();ctx.arc(140,140,20,0,2*Math.PI);ctx.fillStyle='#111';ctx.fill();
+  ctx.strokeStyle='#FFD700';ctx.lineWidth=3;ctx.stroke();
+  ctx.beginPath();ctx.moveTo(262,132);ctx.lineTo(278,140);ctx.lineTo(262,148);ctx.fillStyle='#FFD700';ctx.fill();
+  a+=0.008;requestAnimationFrame(draw);
 }}
-draw(0);
+draw();
+</script>""", height=300)
 
-function countdown(from, done) {{
-  const el = document.getElementById('cntdwn');
-  el.style.display='block';
-  let n2=from;
-  function tick() {{
-    el.className=''; void el.offsetWidth; el.className='cntdwn-anim';
-    el.textContent = n2 > 0 ? n2 : '🎁';
-    if(n2>0){{n2--;setTimeout(tick,700);}}
-    else{{setTimeout(()=>{{el.style.display='none';done();}},500);}}
-  }}
-  tick();
-}}
-
-document.getElementById('spinBtn').onclick = function() {{
-  if(spinning || !canSpin) return;
-  spinning=true; this.disabled=true; this.textContent='SPINNING...';
-  document.getElementById('result').textContent='';
-
-  const extra = (6+Math.random()*5)*2*Math.PI;
-  const dur   = 3800+Math.random()*1400;
-  const start = performance.now(), sa=angle;
-
-  function anim(now) {{
-    const el=now-start, p=Math.min(el/dur,1), ease=1-Math.pow(1-p,4);
-    angle=sa+extra*ease; draw(angle);
-    if(p<1){{ requestAnimationFrame(anim); }}
-    else {{
-      spinning=false;
-      const norm=((2*Math.PI)-(angle%(2*Math.PI)))%(2*Math.PI);
-      const idx=Math.floor(norm/arc)%n;
-      countdown(3, function(){{
-        const res=document.getElementById('result');
-        res.textContent=emojis[idx]+' '+labels[idx]+' — CLAIMED!';
-        res.style.color=colors[idx];
-        window.parent.postMessage({{type:'spinResult',idx:idx,label:labels[idx]}},'*');
-      }});
-    }}
-  }}
-  requestAnimationFrame(anim);
-}};
-</script>""", height=550)
-
-    # ── ONE button. Fires ONCE. Sets cooldown immediately. ───────────────────
+    # ── SPIN IT — the ONE and ONLY button ─────────────────────────────────────
+    # Clicking it: awards prize immediately, sets 6h lock, shows result
     if can_spin:
-        _, sc, _ = st.columns([1,2,1])
+        st.markdown(f"""<style>
+        div.stButton > button[kind="primary"],
+        div[data-testid="stVerticalBlock"] div.stButton > button {{
+            background: linear-gradient(135deg,#FFD700,#FF8C00) !important;
+            color: #000 !important;
+            font-size: 28px !important;
+            letter-spacing: 4px !important;
+            padding: 22px 40px !important;
+            border: none !important;
+            border-radius: 16px !important;
+            box-shadow: 0 0 40px rgba(255,215,0,0.6) !important;
+            animation: titan-pulse 2s infinite ease-in-out !important;
+        }}
+        </style>""", unsafe_allow_html=True)
+        _, sc, _ = st.columns([1, 2, 1])
         with sc:
-            if st.button("🎰 SPIN & CLAIM PRIZE", key="claim_spin"):
+            if st.button("🎰 SPIN IT", key="do_spin", use_container_width=True):
+                # Award immediately, lock immediately
                 prize = spin_wheel()
-                # Lock immediately — no second click possible
                 st.session_state.spins_left     = max(0, spins_left - 1)
                 st.session_state.last_spin_time = _dt.datetime.now().isoformat()
                 st.session_state.spinner_wins  += 1
                 if prize["type"] == "gold_mult":
-                    bonus = (st.session_state.pending_gold or 2) * prize["value"]
+                    bonus = max(2.0, (st.session_state.pending_gold or 2)) * prize["value"]
                     st.session_state.gold += bonus; msg = f"💰 {prize['label']}! +{bonus:.1f} {currency}!"
                 elif prize["type"] == "gold_flat":
                     st.session_state.gold += prize["value"]; msg = f"⚡ +{prize['value']} {currency}!"
@@ -1705,28 +1642,44 @@ document.getElementById('spinBtn').onclick = function() {{
                     st.session_state.incubator_eggs += 1; msg = "✨ EPIC EGG added to incubator!"
                 elif prize["type"] == "ability":
                     if prize["value"] == "shield":
-                        st.session_state.shield_bought = True; msg = f"🛡️ {wd.get('shield_name','SHIELD')} activated!"
+                        st.session_state.shield_bought = True; msg = f"🛡️ {wd.get('shield_name','SHIELD')} ACTIVATED!"
                     else:
                         st.session_state.booster_bought = True
                         st.session_state.sub_multiplier = max(st.session_state.sub_multiplier, 2)
-                        msg = f"🚀 {wd.get('booster_name','BOOSTER')} activated!"
+                        msg = f"🚀 {wd.get('booster_name','BOOSTER')} ACTIVATED!"
                 elif prize["type"] == "story_twist":
                     st.session_state.story_twist_pending = True; msg = "📖 STORY TWIST UNLOCKED!"
                 else:
-                    msg = "💨 The universe gave nothing. Keep grinding."
+                    msg = "💨 Nothing this time. Grind harder."
                 st.session_state.spinner_result = {"prize": prize, "msg": msg}
-                st.balloons(); st.success(f"🎰 {msg}"); time.sleep(1); st.rerun()
+                # Show countdown then result
+                countdown_ph = st.empty()
+                for n in [3, 2, 1, "🎁"]:
+                    countdown_ph.markdown(f"""<div style='text-align:center;font-family:Bebas Neue,sans-serif;
+                        font-size:80px;color:#FFD700;text-shadow:0 0 40px #FFD700;padding:10px'>{n}</div>""",
+                        unsafe_allow_html=True)
+                    time.sleep(0.6)
+                countdown_ph.empty()
+                st.balloons()
+                st.rerun()
+    else:
+        st.markdown(f"""<div style='text-align:center;margin:16px 0'>
+            <div style='display:inline-block;padding:20px 48px;background:#1a1a1a;border:3px solid #333;
+                border-radius:16px;font-family:Bebas Neue,sans-serif;font-size:24px;color:#444;letter-spacing:3px'>
+                🔒 SPIN IT (LOCKED)</div>
+        </div>""", unsafe_allow_html=True)
 
-    # ── Last prize display ────────────────────────────────────────────────────
+    # ── Last prize result display ─────────────────────────────────────────────
     if st.session_state.spinner_result:
         p  = st.session_state.spinner_result
         rc = p["prize"]["color"]
-        st.markdown(f"""<div style='background:linear-gradient(135deg,#0a0a1a,#1a0a2e);border:3px solid {rc};
-            border-radius:18px;padding:24px;text-align:center;margin-top:14px;
-            box-shadow:0 0 40px {rc}66;'>
-            <div style='font-size:52px'>{p["prize"]["emoji"]}</div>
-            <div style='font-family:Bebas Neue,sans-serif;font-size:28px;color:{rc};letter-spacing:4px;margin:8px 0'>{p["prize"]["label"]}</div>
-            <div style='font-family:Space Mono,monospace;font-size:13px;color:#ffffff'>{p["msg"]}</div>
+        st.markdown(f"""<div style='background:linear-gradient(135deg,#0a0a1a,#1a0a2e);
+            border:3px solid {rc};border-radius:18px;padding:28px;text-align:center;
+            margin-top:16px;box-shadow:0 0 50px {rc}55;'>
+            <div style='font-size:56px;margin-bottom:8px'>{p["prize"]["emoji"]}</div>
+            <div style='font-family:Bebas Neue,sans-serif;font-size:30px;color:{rc};
+                        letter-spacing:4px;margin-bottom:8px'>{p["prize"]["label"]}</div>
+            <div style='font-family:Space Mono,monospace;font-size:13px;color:#fff'>{p["msg"]}</div>
         </div>""", unsafe_allow_html=True)
 
 elif view == "abilities":
