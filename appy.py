@@ -1491,14 +1491,8 @@ if view == "main":
     </div>""", unsafe_allow_html=True)
 
     # ── STATS ROW ──
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.markdown(f"""<div class='metric-card' style='text-align:center'><div style='font-family:Bebas Neue,sans-serif;font-size:36px;color:{C}'>{gold_now:.1f}</div><div style='font-size:10px;letter-spacing:2px;color:#ffffff'>{currency.upper()}</div></div>""", unsafe_allow_html=True)
-    with col2:
-        st.markdown(f"""<div class='metric-card' style='text-align:center'><div style='font-family:Bebas Neue,sans-serif;font-size:36px;color:{C}'>LVL {level_now}</div><div style='font-size:10px;letter-spacing:2px;color:#ffffff'>CHAMPION</div></div>""", unsafe_allow_html=True)
-    with col3:
-        missions_done = st.session_state.get("total_missions", 0)
-        st.markdown(f"""<div class='metric-card' style='text-align:center'><div style='font-family:Bebas Neue,sans-serif;font-size:36px;color:{C}'>{missions_done}</div><div style='font-size:10px;letter-spacing:2px;color:#ffffff'>MISSIONS DONE</div></div>""", unsafe_allow_html=True)
+    missions_done = st.session_state.get("total_missions", 0)
+    st.markdown(f"""<div class='metric-card' style='text-align:center'><div style='font-family:Bebas Neue,sans-serif;font-size:36px;color:{C}'>{missions_done}</div><div style='font-size:10px;letter-spacing:2px;color:#ffffff'>MISSIONS DONE</div></div>""", unsafe_allow_html=True)
 
     # ── XP BAR ──
     xp_display = int(xp_pct * 100)
