@@ -1731,7 +1731,7 @@ elif view == "plans":
         st.markdown(f"""<div class='shop-card' style='border-color:#FFD700'><div style='text-align:center;margin-bottom:16px'><div style='font-family:Bebas Neue,sans-serif;font-size:36px;color:#FFD700'>💀 ELITE</div><div style='font-family:Bebas Neue,sans-serif;font-size:56px;color:#ffffff;line-height:1'>$10<span style='font-size:20px;color:#aaaaaa'>/mo</span></div></div><div style='font-family:Space Mono,monospace;font-size:12px;color:#ffffff;line-height:2.2;margin-bottom:20px'>✅ 3× XP on every mission<br>✅ ALL ability tiers unlocked<br>✅ Full maximum customization<br>✅ Legendary egg rate doubled<br>✅ Exclusive 💀 Elite badge</div><div style='background:#1a1a1a;border:1px solid #FFD700;border-radius:10px;padding:12px;text-align:center;margin-bottom:12px'><div style='font-family:Space Mono,monospace;font-size:10px;color:#aaaaaa;letter-spacing:2px;margin-bottom:4px'>AFTER PAYING — ENTER CODE IN SIDEBAR</div><div style='font-family:Bebas Neue,sans-serif;font-size:20px;color:#FFD700;letter-spacing:4px'>4RJ1TV51Z</div></div></div>""", unsafe_allow_html=True)
         st.link_button("💀 SUBSCRIBE — ELITE $10/mo", "https://buy.stripe.com/14A9AM83O0YE0KYgVRdQQ03", use_container_width=True)
 
-# ── SPINNER (FIXED: no exploit, 6-hour cooldown) ──
+# ── SPINNER (6-hour cooldown, no exploit) ──
 elif view == "spinner":
     st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>🎰 LUCKY SPINNER</h2>", unsafe_allow_html=True)
 
@@ -1742,7 +1742,7 @@ elif view == "spinner":
     cooldown_remaining = ""
     if last_spin:
         elapsed = (_dt.datetime.now() - _dt.datetime.fromisoformat(last_spin)).total_seconds()
-        if elapsed < 21600:  # 6 hours = 21600 seconds
+        if elapsed < 21600:
             cooldown_active = True
             remaining_secs = int(21600 - elapsed)
             hours = remaining_secs // 3600
@@ -1751,64 +1751,62 @@ elif view == "spinner":
 
     available = spins_left > 0 and not cooldown_active
 
-    if cooldown_active and spins_left > 0:
-        st.markdown(f"""<div style='text-align:center;padding:20px;background:#111;border:2px solid #FF8800;border-radius:14px;margin:12px 0'>
-            <div style='font-family:Bebas Neue,sans-serif;font-size:28px;color:#FF8800;letter-spacing:3px'>⏰ COOLDOWN ACTIVE</div>
-            <div style='font-family:Space Mono,monospace;font-size:14px;color:#ffffff;margin-top:8px'>Next spin available in: <b style='color:{C}'>{cooldown_remaining}</b></div>
-            <div style='font-family:Space Mono,monospace;font-size:11px;color:#888;margin-top:4px'>You have {spins_left} spin{"s" if spins_left != 1 else ""} waiting</div>
-        </div>""", unsafe_allow_html=True)
-    elif not available:
-        st.markdown("<p style='text-align:center;color:#ffffff;font-family:Space Mono,monospace'>Complete a mission to earn spins! 🎰</p>", unsafe_allow_html=True)
+    # ── 6-HOUR TIMER — LIVE COUNTDOWN, ALWAYS VISIBLE, RIGHT AT TOP ──
+    if cooldown_active:
+        remaining_secs = int(21600 - (_dt.datetime.now() - _dt.datetime.fromisoformat(last_spin)).total_seconds())
+        components.html(f"""<div id="timer" style="text-align:center;padding:14px;background:#111;border:2px solid #FF8800;border-radius:12px;margin:4px 0"><div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#FF8800;letter-spacing:3px" id="txt">⏰ NEXT SPIN IN: --:--:--</div><div style="font-family:'Space Mono',monospace;font-size:11px;color:#888;margin-top:6px">Spins: {spins_left} · Resets every 6 hours after each spin</div></div><script>var r={remaining_secs};function u(){{if(r<=0){{document.getElementById('txt').textContent='✅ SPIN READY NOW — HIT THE BUTTON!';document.getElementById('txt').style.color='#00FF44';document.getElementById('timer').style.borderColor='#00FF44';return;}}var h=Math.floor(r/3600),m=Math.floor((r%3600)/60),s=r%60;document.getElementById('txt').textContent='⏰ NEXT SPIN IN: '+String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');r--;setTimeout(u,1000);}}u();</script>""", height=70)
+    elif spins_left > 0:
+        st.markdown(f"<div style='text-align:center;padding:14px;background:#111;border:2px solid #00FF44;border-radius:12px;margin:4px 0'><div style='font-family:Bebas Neue,sans-serif;font-size:24px;color:#00FF44;letter-spacing:3px'>✅ SPIN READY NOW</div><div style='font-family:Space Mono,monospace;font-size:11px;color:#888;margin-top:6px'>Spins: {spins_left} · Resets every 6 hours after each spin</div></div>", unsafe_allow_html=True)
     else:
-        st.markdown(f"<p style='text-align:center;color:#ffffff;font-family:Space Mono,monospace;font-size:13px'>You have <b style='color:{C}'>{spins_left}</b> spin{'s' if spins_left != 1 else ''} available! 🔥</p>", unsafe_allow_html=True)
+        st.markdown(f"<div style='text-align:center;padding:14px;background:#111;border:2px solid #888888;border-radius:12px;margin:4px 0'><div style='font-family:Bebas Neue,sans-serif;font-size:24px;color:#888888;letter-spacing:3px'>🔒 EARN SPINS FROM MISSIONS</div><div style='font-family:Space Mono,monospace;font-size:11px;color:#888;margin-top:6px'>Spins: 0 · Resets every 6 hours after each spin</div></div>", unsafe_allow_html=True)
 
+    # ── SPINNER WHEEL (visual only — SPIN IT is decorative) ──
     prize_labels = json.dumps([p["label"] for p in SPINNER_PRIZES])
     prize_colors = json.dumps([p["color"] for p in SPINNER_PRIZES])
-    components.html(f"""<style>body{{margin:0;background:transparent;display:flex;flex-direction:column;align-items:center;font-family:monospace;}}canvas{{border-radius:50%;box-shadow:0 0 40px rgba(255,215,0,0.5);}}#spinBtn{{margin-top:20px;padding:16px 48px;font-size:22px;font-weight:bold;background:linear-gradient(135deg,#FFD700,#FF8C00);border:none;border-radius:12px;cursor:pointer;color:#000;letter-spacing:2px;box-shadow:0 0 30px rgba(255,215,0,0.5);}}#spinBtn:disabled{{opacity:0.4;cursor:not-allowed;}}#result{{margin-top:16px;font-size:20px;color:#FFD700;letter-spacing:2px;text-align:center;min-height:30px;}}</style><canvas id="wheel" width="320" height="320"></canvas><button id="spinBtn" {"disabled" if not available else ""}>{"⏰ COOLDOWN — " + cooldown_remaining if cooldown_active and spins_left > 0 else "🔒 EARN SPINS FIRST" if not available else "🎰 SPIN IT"}</button><div id="result"></div><script>const labels={prize_labels};const colors={prize_colors};const cv=document.getElementById('wheel'),ctx=cv.getContext('2d'),n=labels.length,arc=2*Math.PI/n;let currentAngle=0,spinning=false;function drawWheel(a){{ctx.clearRect(0,0,320,320);for(let i=0;i<n;i++){{ctx.beginPath();ctx.moveTo(160,160);ctx.arc(160,160,150,a+i*arc,a+(i+1)*arc);ctx.fillStyle=colors[i];ctx.fill();ctx.strokeStyle='#111';ctx.lineWidth=2;ctx.stroke();ctx.save();ctx.translate(160,160);ctx.rotate(a+(i+0.5)*arc);ctx.textAlign='right';ctx.fillStyle='#fff';ctx.font='bold 11px monospace';ctx.shadowColor='#000';ctx.shadowBlur=4;ctx.fillText(labels[i],140,5);ctx.restore();}}ctx.beginPath();ctx.arc(160,160,22,0,2*Math.PI);ctx.fillStyle='#111';ctx.fill();ctx.strokeStyle='#FFD700';ctx.lineWidth=3;ctx.stroke();ctx.beginPath();ctx.moveTo(300,150);ctx.lineTo(320,160);ctx.lineTo(300,170);ctx.fillStyle='#FFD700';ctx.fill();}}drawWheel(0);document.getElementById('spinBtn').onclick=function(){{if(spinning)return;spinning=true;this.disabled=true;document.getElementById('result').textContent='';const extra=(5+Math.random()*5)*2*Math.PI,dur=4000+Math.random()*2000,start=performance.now(),sa=currentAngle;function anim(now){{const el=now-start,p=Math.min(el/dur,1),ease=1-Math.pow(1-p,4);currentAngle=sa+extra*ease;drawWheel(currentAngle);if(p<1)requestAnimationFrame(anim);else{{spinning=false;const norm=((2*Math.PI)-(currentAngle%(2*Math.PI)))%(2*Math.PI);const idx=Math.floor(norm/arc)%n;document.getElementById('result').textContent='🎉 '+labels[idx]+'!';}}}}requestAnimationFrame(anim);}};</script>""", height=460)
+    components.html(f"""<style>body{{margin:0;background:transparent;display:flex;flex-direction:column;align-items:center;font-family:monospace;}}canvas{{border-radius:50%;box-shadow:0 0 40px rgba(255,215,0,0.5);}}#spinBtn{{margin-top:20px;padding:16px 48px;font-size:22px;font-weight:bold;background:linear-gradient(135deg,#FFD700,#FF8C00);border:none;border-radius:12px;cursor:pointer;color:#000;letter-spacing:2px;box-shadow:0 0 30px rgba(255,215,0,0.5);}}#spinBtn:disabled{{opacity:0.4;cursor:not-allowed;}}#result{{margin-top:16px;font-size:20px;color:#FFD700;letter-spacing:2px;text-align:center;min-height:30px;}}</style><canvas id="wheel" width="320" height="320"></canvas><button id="spinBtn" "">🎰 SPIN IT</button><div id="result"></div><script>const labels={prize_labels};const colors={prize_colors};const cv=document.getElementById('wheel'),ctx=cv.getContext('2d'),n=labels.length,arc=2*Math.PI/n;let currentAngle=0,spinning=false;function drawWheel(a){{ctx.clearRect(0,0,320,320);for(let i=0;i<n;i++){{ctx.beginPath();ctx.moveTo(160,160);ctx.arc(160,160,150,a+i*arc,a+(i+1)*arc);ctx.fillStyle=colors[i];ctx.fill();ctx.strokeStyle='#111';ctx.lineWidth=2;ctx.stroke();ctx.save();ctx.translate(160,160);ctx.rotate(a+(i+0.5)*arc);ctx.textAlign='right';ctx.fillStyle='#fff';ctx.font='bold 11px monospace';ctx.shadowColor='#000';ctx.shadowBlur=4;ctx.fillText(labels[i],140,5);ctx.restore();}}ctx.beginPath();ctx.arc(160,160,22,0,2*Math.PI);ctx.fillStyle='#111';ctx.fill();ctx.strokeStyle='#FFD700';ctx.lineWidth=3;ctx.stroke();ctx.beginPath();ctx.moveTo(300,150);ctx.lineTo(320,160);ctx.lineTo(300,170);ctx.fillStyle='#FFD700';ctx.fill();}}drawWheel(0);document.getElementById('spinBtn').onclick=function(){{if(spinning)return;spinning=true;this.disabled=true;document.getElementById('result').textContent='';const extra=(5+Math.random()*5)*2*Math.PI,dur=4000+Math.random()*2000,start=performance.now(),sa=currentAngle;function anim(now){{const el=now-start,p=Math.min(el/dur,1),ease=1-Math.pow(1-p,4);currentAngle=sa+extra*ease;drawWheel(currentAngle);if(p<1)requestAnimationFrame(anim);else{{spinning=false;const norm=((2*Math.PI)-(currentAngle%(2*Math.PI)))%(2*Math.PI);const idx=Math.floor(norm/arc)%n;document.getElementById('result').textContent='🎉 '+labels[idx]+'!';}}}}requestAnimationFrame(anim);}};</script>""", height=460)
 
-    # ── 6-HOUR RESET TIMER — ALWAYS VISIBLE ──
-    if cooldown_active:
-        timer_color = "#FF8800"
-        timer_text = f"⏰ NEXT SPIN IN: {cooldown_remaining}"
-    elif spins_left > 0:
-        timer_color = "#00FF44"
-        timer_text = "✅ SPIN READY NOW"
-    else:
-        timer_color = "#888888"
-        timer_text = "🔒 EARN SPINS FROM MISSIONS"
-    st.markdown(f"""<div style='text-align:center;padding:14px;background:#111;border:2px solid {timer_color};border-radius:12px;margin:12px 0'>
-        <div style='font-family:Bebas Neue,sans-serif;font-size:24px;color:{timer_color};letter-spacing:3px'>{timer_text}</div>
-        <div style='font-family:Space Mono,monospace;font-size:11px;color:#888;margin-top:6px'>Spins: {spins_left} · Resets every 6 hours after each spin</div>
-    </div>""", unsafe_allow_html=True)
+    # ── SPIN THE WHEEL — always visible, validates on click ──
+    if st.button("🎰 SPIN THE WHEEL", key="spin_award"):
+        # Re-check cooldown at click time (timer may have expired since page load)
+        _now = _dt.datetime.now()
+        _last = st.session_state.get("last_spin_time")
+        _still_cooling = False
+        if _last:
+            _elapsed = (_now - _dt.datetime.fromisoformat(_last)).total_seconds()
+            _still_cooling = _elapsed < 21600
+        _spins = st.session_state.get("spins_left", 0)
 
-    # ── AUTO-AWARD: consume 1 spin and award prize when entering with spins available ──
-    if available and not st.session_state.get("spin_awarded_this_view", False):
-        prize = spin_wheel()
-        st.session_state.spins_left = max(0, st.session_state.get("spins_left", 0) - 1)
-        st.session_state.spinner_available = False
-        st.session_state.spinner_wins = st.session_state.get("spinner_wins", 0) + 1
-        st.session_state.last_spin_time = _dt.datetime.now().isoformat()
-        if prize["type"] == "gold_mult":
-            bonus = st.session_state.pending_gold * prize["value"] if st.session_state.pending_gold else prize["value"] * 2
-            st.session_state.gold += bonus; msg = f"💰 {prize['label']}! +{bonus:.1f} {currency}!"
-        elif prize["type"] == "gold_flat":
-            st.session_state.gold += prize["value"]; msg = f"⚡ +{prize['value']} {currency}!"
-        elif prize["type"] == "egg_rare":
-            st.session_state.incubator_eggs += 1; msg = "🥚 RARE EGG added to incubator!"
-        elif prize["type"] == "egg_epic":
-            st.session_state.incubator_eggs += 1; msg = "✨ EPIC EGG added to incubator!"
-        elif prize["type"] == "ability":
-            if prize["value"] == "shield":
-                st.session_state.shield_bought = True; msg = f"🛡️ {wd.get('shield_name','SHIELD')} activated FREE!"
-            else:
-                st.session_state.booster_bought = True; st.session_state.sub_multiplier = max(st.session_state.sub_multiplier, 2); msg = f"🚀 {wd.get('booster_name','BOOSTER')} activated FREE!"
-        elif prize["type"] == "story_twist":
-            st.session_state.story_twist_pending = True; msg = "📖 STORY TWIST UNLOCKED!"
+        if _spins <= 0:
+            st.error("❌ No spins available. Complete a mission to earn spins!")
+        elif _still_cooling:
+            _rem = int(21600 - _elapsed)
+            st.error(f"⏰ Cooldown still active. {_rem // 3600}h {(_rem % 3600) // 60}m remaining.")
         else:
-            msg = "💨 Nothing this time... earn more spins from missions!"
-        st.session_state.spinner_result = {"prize": prize, "msg": msg}
-        st.session_state.spin_awarded_this_view = True
-        st.balloons(); st.success(f"🎰 {msg}")
+            prize = spin_wheel()
+            st.session_state.spins_left = max(0, _spins - 1)
+            st.session_state.spinner_available = False
+            st.session_state.spinner_wins = st.session_state.get("spinner_wins", 0) + 1
+            st.session_state.last_spin_time = _now.isoformat()
+            if prize["type"] == "gold_mult":
+                bonus = st.session_state.pending_gold * prize["value"] if st.session_state.pending_gold else prize["value"] * 2
+                st.session_state.gold += bonus; msg = f"💰 {prize['label']}! +{bonus:.1f} {currency}!"
+            elif prize["type"] == "gold_flat":
+                st.session_state.gold += prize["value"]; msg = f"⚡ +{prize['value']} {currency}!"
+            elif prize["type"] == "egg_rare":
+                st.session_state.incubator_eggs += 1; msg = "🥚 RARE EGG added to incubator!"
+            elif prize["type"] == "egg_epic":
+                st.session_state.incubator_eggs += 1; msg = "✨ EPIC EGG added to incubator!"
+            elif prize["type"] == "ability":
+                if prize["value"] == "shield":
+                    st.session_state.shield_bought = True; msg = f"🛡️ {wd.get('shield_name','SHIELD')} activated FREE!"
+                else:
+                    st.session_state.booster_bought = True; st.session_state.sub_multiplier = max(st.session_state.sub_multiplier, 2); msg = f"🚀 {wd.get('booster_name','BOOSTER')} activated FREE!"
+            elif prize["type"] == "story_twist":
+                st.session_state.story_twist_pending = True; msg = "📖 STORY TWIST UNLOCKED!"
+            else:
+                msg = "💨 Nothing this time... earn more spins from missions!"
+            st.session_state.spinner_result = {"prize": prize, "msg": msg}
+            st.balloons(); st.success(f"🎰 {msg}"); time.sleep(1); st.rerun()
 
     if st.session_state.spinner_result:
         p = st.session_state.spinner_result
