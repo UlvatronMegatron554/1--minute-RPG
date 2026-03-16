@@ -1577,11 +1577,11 @@ elif view == "spinner":
 <style>
 *{{box-sizing:border-box;margin:0;padding:0;}}
 body{{background:transparent;display:flex;flex-direction:column;align-items:center;padding:12px 0;font-family:'Space Mono',monospace;}}
-#wrap{{position:relative;width:300px;height:300px;}}
+#wrap{{position:relative;width:420px;height:420px;}}
 canvas{{border-radius:50%;box-shadow:0 0 50px rgba(255,215,0,0.4);display:block;}}
-#pointer{{position:absolute;right:-10px;top:50%;transform:translateY(-50%);
-  width:0;height:0;border-top:14px solid transparent;border-bottom:14px solid transparent;border-left:22px solid #FFD700;
-  filter:drop-shadow(0 0 6px #FFD700);}}
+#pointer{{position:absolute;right:-14px;top:50%;transform:translateY(-50%);
+  width:0;height:0;border-top:18px solid transparent;border-bottom:18px solid transparent;border-left:28px solid #FFD700;
+  filter:drop-shadow(0 0 8px #FFD700);}}
 #spinBtn{{margin-top:20px;padding:16px 56px;font-size:22px;font-weight:bold;letter-spacing:3px;
   background:linear-gradient(135deg,#FFD700,#FF8C00);border:none;border-radius:14px;
   cursor:pointer;color:#000;box-shadow:0 0 30px rgba(255,215,0,0.55);transition:all 0.15s;
@@ -1596,7 +1596,7 @@ canvas{{border-radius:50%;box-shadow:0 0 50px rgba(255,215,0,0.4);display:block;
   color:#FF8800;text-align:center;letter-spacing:3px;text-shadow:0 0 20px #FF880066;}}
 </style>
 <div id="wrap">
-  <canvas id="wh" width="300" height="300"></canvas>
+  <canvas id="wh" width="420" height="420"></canvas>
   <div id="pointer"></div>
 </div>
 <button id="spinBtn" {"disabled" if not can_spin else ""}>{("🎰 SPIN IT" if can_spin else "🔒 " + cooldown_label)}</button>
@@ -1611,23 +1611,23 @@ let angle=0, spinning=false, idleSpeed=0.006;
 const COOLDOWN=21600;
 
 function draw(a){{
-  ctx.clearRect(0,0,300,300);
+  ctx.clearRect(0,0,420,420);
   for(let i=0;i<n;i++){{
-    ctx.beginPath(); ctx.moveTo(150,150);
-    ctx.arc(150,150,138,a+i*arc,a+(i+1)*arc);
+    ctx.beginPath(); ctx.moveTo(210,210);
+    ctx.arc(210,210,193,a+i*arc,a+(i+1)*arc);
     ctx.fillStyle=colors[i]; ctx.fill();
     ctx.strokeStyle='#111'; ctx.lineWidth=2; ctx.stroke();
-    ctx.save(); ctx.translate(150,150); ctx.rotate(a+(i+0.5)*arc);
+    ctx.save(); ctx.translate(210,210); ctx.rotate(a+(i+0.5)*arc);
     ctx.textAlign='right'; ctx.fillStyle='#fff';
-    ctx.font='bold 11px monospace'; ctx.fillText(labels[i],130,4);
+    ctx.font='bold 13px monospace'; ctx.fillText(labels[i],182,5);
     ctx.restore();
   }}
   if(spinning){{
-    ctx.beginPath(); ctx.arc(150,150,142,0,2*Math.PI);
-    ctx.strokeStyle='rgba(255,215,0,0.5)'; ctx.lineWidth=5; ctx.stroke();
+    ctx.beginPath(); ctx.arc(210,210,198,0,2*Math.PI);
+    ctx.strokeStyle='rgba(255,215,0,0.5)'; ctx.lineWidth=6; ctx.stroke();
   }}
-  ctx.beginPath(); ctx.arc(150,150,22,0,2*Math.PI);
-  var hg=ctx.createRadialGradient(144,144,2,150,150,22);
+  ctx.beginPath(); ctx.arc(210,210,28,0,2*Math.PI);
+  var hg=ctx.createRadialGradient(202,202,3,210,210,28);
   hg.addColorStop(0,'#fff'); hg.addColorStop(1,'#111');
   ctx.fillStyle=hg; ctx.fill();
   ctx.strokeStyle='#FFD700'; ctx.lineWidth=3; ctx.stroke();
@@ -1676,7 +1676,7 @@ document.getElementById('spinBtn').onclick=function(){{
   }}
   requestAnimationFrame(anim);
 }};
-</script>""", height=480)
+</script>""", height=600)
 
 
 
