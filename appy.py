@@ -131,22 +131,22 @@ UNIVERSE_SECRETS = [
 # ACHIEVEMENTS DATABASE
 # ─────────────────────────────────────────────────────────────────────────────
 ACHIEVEMENTS = [
-    {"id": "first_mission",    "name": "⚡ FIRST BLOOD",          "desc": "Completed your very first mission. The journey begins NOW.",          "req": lambda s: s.get("total_missions",0) >= 1},
-    {"id": "five_missions",    "name": "🔥 ON A ROLL",             "desc": "5 missions done. You're already better than yesterday.",              "req": lambda s: s.get("total_missions",0) >= 5},
-    {"id": "ten_missions",     "name": "💪 GRIND MODE ACTIVATED",  "desc": "10 missions. This is becoming a habit. A powerful one.",              "req": lambda s: s.get("total_missions",0) >= 10},
-    {"id": "fifty_missions",   "name": "👑 UNSTOPPABLE",           "desc": "50 missions. You are literally built different at this point.",        "req": lambda s: s.get("total_missions",0) >= 50},
-    {"id": "first_gold",       "name": "💰 FIRST PAYDAY",          "desc": "Earned your first currency. The grind pays off.",                     "req": lambda s: s.get("gold",0) >= 5},
-    {"id": "rich",             "name": "🤑 LOADED",                "desc": "100 currency stacked. You are wealthy in this universe.",             "req": lambda s: s.get("gold",0) >= 100},
-    {"id": "elite_unlocked",   "name": "👁️ ELITE EYES ONLY",       "desc": "You found the code. Not everyone gets here.",                         "req": lambda s: s.get("sub_tier","") == "Elite"},
-    {"id": "first_battle",     "name": "⚔️ WARRIOR BORN",          "desc": "First battle fought. Win or lose — you showed up.",                   "req": lambda s: s.get("battles_fought",0) >= 1},
-    {"id": "battle_streak",    "name": "🏆 BATTLE HARDENED",       "desc": "10 battles completed. You fear nothing in this universe.",            "req": lambda s: s.get("battles_fought",0) >= 10},
-    {"id": "first_egg",        "name": "🥚 EGG COLLECTOR",         "desc": "First incubator egg earned. Something is growing in there...",        "req": lambda s: s.get("eggs_hatched",0) >= 1},
-    {"id": "legendary_hatch",  "name": "🐉 LEGENDARY TAMER",       "desc": "A LEGENDARY creature hatched. This almost never happens.",            "req": lambda s: s.get("legendary_hatched",False)},
-    {"id": "shield_bought",    "name": "🛡️ FORTIFIED",             "desc": "Defense ability acquired. Nothing can touch you now.",                "req": lambda s: s.get("shield_bought",False)},
-    {"id": "booster_bought",   "name": "🚀 SPEED DEMON",           "desc": "Speed ability acquired. You move at a different frequency.",          "req": lambda s: s.get("booster_bought",False)},
-    {"id": "secret_collector", "name": "🔮 TRUTH SEEKER",          "desc": "Collected 5 universe secrets. Your mind is expanding.",              "req": lambda s: s.get("secrets_seen",0) >= 5},
-    {"id": "spinner_winner",   "name": "🎰 LUCKY SPIN",            "desc": "Won your first prize on the spinner. Fortune favours the bold.",      "req": lambda s: s.get("spinner_wins",0) >= 1},
-    {"id": "storyline_deep",   "name": "📖 LORE KEEPER",           "desc": "Reached chapter 5 of your universe storyline. You are invested.",     "req": lambda s: s.get("story_chapter",0) >= 5},
+    {"id": "first_mission",    "name": "⚡🌟 FIRST BLOOD",              "desc": "Completed your very first mission. The journey begins NOW.",          "req": lambda s: s.get("total_missions",0) >= 1},
+    {"id": "five_missions",    "name": "🔥💪 ON A ROLL",                "desc": "5 missions done. You're already better than yesterday.",              "req": lambda s: s.get("total_missions",0) >= 5},
+    {"id": "ten_missions",     "name": "⚡⚡ GRIND MODE ACTIVATED",     "desc": "10 missions. This is becoming a habit. A powerful one.",              "req": lambda s: s.get("total_missions",0) >= 10},
+    {"id": "fifty_missions",   "name": "💀🔥👑 UNSTOPPABLE",           "desc": "50 missions. You are literally built different at this point.",        "req": lambda s: s.get("total_missions",0) >= 50},
+    {"id": "first_gold",       "name": "💰⚡ FIRST PAYDAY",            "desc": "Earned your first currency. The grind pays off.",                     "req": lambda s: s.get("gold",0) >= 5},
+    {"id": "rich",             "name": "💰💰💰 LOADED",               "desc": "100 currency stacked. You are wealthy in this universe.",             "req": lambda s: s.get("gold",0) >= 100},
+    {"id": "elite_unlocked",   "name": "👁️🔮💀 ELITE EYES ONLY",      "desc": "You found the code. Not everyone gets here.",                         "req": lambda s: s.get("sub_tier","") == "Elite"},
+    {"id": "first_battle",     "name": "⚔️🌀 WARRIOR BORN",           "desc": "First battle fought. Win or lose — you showed up.",                   "req": lambda s: s.get("battles_fought",0) >= 1},
+    {"id": "battle_streak",    "name": "⚔️💀🏆 BATTLE HARDENED",      "desc": "10 battles completed. You fear nothing in this universe.",            "req": lambda s: s.get("battles_fought",0) >= 10},
+    {"id": "first_egg",        "name": "🥚✨ EGG COLLECTOR",           "desc": "First incubator egg earned. Something is growing in there...",        "req": lambda s: s.get("eggs_hatched",0) >= 1},
+    {"id": "legendary_hatch",  "name": "🐉🌟💥 LEGENDARY TAMER",      "desc": "A LEGENDARY creature hatched. This almost never happens.",            "req": lambda s: s.get("legendary_hatched",False)},
+    {"id": "shield_bought",    "name": "🛡️⚡ FORTIFIED",              "desc": "Defense ability acquired. Nothing can touch you now.",                "req": lambda s: s.get("shield_bought",False)},
+    {"id": "booster_bought",   "name": "🚀💨⚡ SPEED DEMON",          "desc": "Speed ability acquired. You move at a different frequency.",          "req": lambda s: s.get("booster_bought",False)},
+    {"id": "secret_collector", "name": "🔮🌀👁️ TRUTH SEEKER",        "desc": "Collected 5 universe secrets. Your mind is expanding.",              "req": lambda s: s.get("secrets_seen",0) >= 5},
+    {"id": "spinner_winner",   "name": "🎰⚡💰 LUCKY SPIN",           "desc": "Won your first prize on the spinner. Fortune favours the bold.",      "req": lambda s: s.get("spinner_wins",0) >= 1},
+    {"id": "storyline_deep",   "name": "📖🌌✨ LORE KEEPER",          "desc": "Reached chapter 5 of your universe storyline. You are invested.",     "req": lambda s: s.get("story_chapter",0) >= 5},
 ]
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -276,23 +276,30 @@ function drCustom(col,evo,t,vis){{
   const oc2=vis.outfit_secondary||dk(oc,0.2);const wc=vis.weapon_color||'#C0C0C0';const ec2=vis.eye_color||'#000';const ac=vis.aura_color||col;
   const bb=vis.body_build||'average';const hs=vis.hair_style||'short';const wp=vis.weapon||'fists';
   const bw=bb==='muscular'?1.3:bb==='large'?1.4:bb==='slim'?0.85:bb==='tiny'?0.7:1.0;
-  ctx.fillStyle='rgba(0,0,0,0.25)';ctx.beginPath();ctx.ellipse(0,48,22*bw,6,0,0,6.28);ctx.fill();
+  const _tier=vis.tier||'free';
+  const _isFree=(_tier==='free');const _isPrem=(_tier==='premium');const _isElite=(_tier==='elite');
+  // Shadow — Premium/Elite only
+  if(!_isFree){{ctx.fillStyle='rgba(0,0,0,0.25)';ctx.beginPath();ctx.ellipse(0,48,22*bw,6,0,0,6.28);ctx.fill();}}
   ctx.fillStyle=dk(oc,0.3);ctx.fillRect(-14*bw,10,12*bw,32);ctx.fillRect(2*bw,10,12*bw,32);
-  ctx.fillStyle=dk(oc,0.15);ctx.fillRect(-12*bw,22,8*bw,4);ctx.fillRect(4*bw,22,8*bw,4);
+  if(!_isFree){{ctx.fillStyle=dk(oc,0.15);ctx.fillRect(-12*bw,22,8*bw,4);ctx.fillRect(4*bw,22,8*bw,4);}}
   ctx.fillStyle='#333';ctx.fillRect(-16*bw,38,14*bw,10);ctx.fillRect(0,38,14*bw,10);
-  ctx.fillStyle='#222';ctx.fillRect(-17*bw,46,16*bw,3);ctx.fillRect(-1,46,16*bw,3);
-  const bodyGrad=ctx.createLinearGradient(-18*bw,-14,18*bw,12);bodyGrad.addColorStop(0,lh(oc,0.1));bodyGrad.addColorStop(0.5,oc);bodyGrad.addColorStop(1,dk(oc,0.15));
-  ctx.fillStyle=bodyGrad;ctx.fillRect(-18*bw,-14,36*bw,26);
-  ctx.fillStyle=oc2;ctx.fillRect(-18*bw,8,36*bw,4);ctx.fillRect(-12*bw,-14,24*bw,4);
+  if(_isElite){{ctx.fillStyle='#222';ctx.fillRect(-17*bw,46,16*bw,3);ctx.fillRect(-1,46,16*bw,3);}}
+  // Body shading: Free=flat, Premium=linear gradient, Elite=full gradient+details
+  if(_isFree){{ctx.fillStyle=oc;ctx.fillRect(-18*bw,-14,36*bw,26);}}
+  else if(_isPrem){{const bg2=ctx.createLinearGradient(-18*bw,-14,18*bw,12);bg2.addColorStop(0,lh(oc,0.1));bg2.addColorStop(1,oc);ctx.fillStyle=bg2;ctx.fillRect(-18*bw,-14,36*bw,26);ctx.fillStyle=oc2;ctx.fillRect(-18*bw,8,36*bw,4);}}
+  else{{const bGrad=ctx.createLinearGradient(-18*bw,-14,18*bw,12);bGrad.addColorStop(0,lh(oc,0.1));bGrad.addColorStop(0.5,oc);bGrad.addColorStop(1,dk(oc,0.15));ctx.fillStyle=bGrad;ctx.fillRect(-18*bw,-14,36*bw,26);ctx.fillStyle=oc2;ctx.fillRect(-18*bw,8,36*bw,4);ctx.fillRect(-12*bw,-14,24*bw,4);}}
   ctx.fillStyle=oc;ctx.fillRect(-32*bw,-12,16*bw,24);ctx.fillRect(16*bw,-12,16*bw,24);
   ctx.fillStyle=sc2;ctx.fillRect(-34*bw,8,14*bw,10);ctx.fillRect(20*bw,8,14*bw,10);
-  const headGrad=ctx.createRadialGradient(-4,-34,2,0,-32,20);headGrad.addColorStop(0,lh(sc2,0.15));headGrad.addColorStop(1,sc2);
-  ctx.fillStyle=headGrad;ctx.beginPath();ctx.ellipse(0,-32,18*bw,20,0,0,6.28);ctx.fill();
-  ctx.fillStyle='#fff';ctx.fillRect(-10*bw,-34,8,7);ctx.fillRect(2*bw,-34,8,7);
-  ctx.fillStyle=ec2;ctx.fillRect(-8*bw,-33,5,5);ctx.fillRect(4*bw,-33,5,5);
-  ctx.fillStyle='#000';ctx.fillRect(-7*bw,-32,3,3);ctx.fillRect(5*bw,-32,3,3);
-  ctx.fillStyle='rgba(255,255,255,0.8)';ctx.fillRect(-7*bw,-33,2,2);ctx.fillRect(5*bw,-33,2,2);
-  ctx.fillStyle=dk(hc,0.3);ctx.fillRect(-11*bw,-37,9,2);ctx.fillRect(2*bw,-37,9,2);
+  if(!_isFree){{ctx.fillStyle=dk(sc2,0.1);ctx.fillRect(-34*bw,14,3,4);ctx.fillRect(-28*bw,14,3,4);ctx.fillRect(20*bw,14,3,4);ctx.fillRect(26*bw,14,3,4);}}
+  // Head: Free=flat, Premium=gradient, Elite=radial gradient+ears+nose
+  if(_isFree){{ctx.fillStyle=sc2;ctx.beginPath();ctx.ellipse(0,-32,18*bw,20,0,0,6.28);ctx.fill();}}
+  else if(_isPrem){{const hg2=ctx.createLinearGradient(0,-50,0,-14);hg2.addColorStop(0,lh(sc2,0.1));hg2.addColorStop(1,sc2);ctx.fillStyle=hg2;ctx.beginPath();ctx.ellipse(0,-32,18*bw,20,0,0,6.28);ctx.fill();}}
+  else{{const headGrad=ctx.createRadialGradient(-4,-34,2,0,-32,20);headGrad.addColorStop(0,lh(sc2,0.15));headGrad.addColorStop(1,sc2);ctx.fillStyle=headGrad;ctx.beginPath();ctx.ellipse(0,-32,18*bw,20,0,0,6.28);ctx.fill();ctx.fillStyle=sc2;ctx.fillRect(-20*bw,-34,4,8);ctx.fillRect(16*bw,-34,4,8);ctx.fillStyle=dk(sc2,0.08);ctx.fillRect(-1,-28,2,4);}}
+  // Eyes: Free=dark blocks, Premium=whites+iris, Elite=full detail+shine
+  if(_isFree){{ctx.fillStyle='#000';ctx.fillRect(-8*bw,-34,5,5);ctx.fillRect(3*bw,-34,5,5);}}
+  else{{ctx.fillStyle='#fff';ctx.fillRect(-10*bw,-34,8,7);ctx.fillRect(2*bw,-34,8,7);ctx.fillStyle=ec2;ctx.fillRect(-8*bw,-33,5,5);ctx.fillRect(4*bw,-33,5,5);ctx.fillStyle='#000';ctx.fillRect(-7*bw,-32,3,3);ctx.fillRect(5*bw,-32,3,3);if(_isElite){{ctx.fillStyle='rgba(255,255,255,0.8)';ctx.fillRect(-7*bw,-33,2,2);ctx.fillRect(5*bw,-33,2,2);}}}}
+  if(!_isFree){{ctx.fillStyle=dk(sc2,0.15);ctx.fillRect(-4,-22,8,2);}}// mouth
+  if(_isElite){{ctx.fillStyle=dk(hc,0.3);ctx.fillRect(-11*bw,-37,9,2);ctx.fillRect(2*bw,-37,9,2);}}// eyebrows
   ctx.fillStyle=hc;
   if(hs==='spiky'){{for(let i=0;i<5+evo;i++){{const hx=-16+i*(32/(4+evo));ctx.beginPath();ctx.moveTo(hx-5,-48);ctx.lineTo(hx,-(60+evo*4+i%2*8));ctx.lineTo(hx+5,-48);ctx.fill();}}}}
   else if(hs==='long'||hs==='flowing'){{ctx.fillRect(-20,-50,40,14);ctx.fillRect(-22,-48,6,36);ctx.fillRect(16,-48,6,36);}}
@@ -304,8 +311,11 @@ function drCustom(col,evo,t,vis){{
   else if(wp==='triple_sword'){{ctx.fillStyle=wc;ctx.fillRect(-36*bw,-4,3,30);ctx.fillRect(33*bw,-4,3,30);ctx.fillRect(-2,-(32+evo*2),3,20);}}
   else if(wp==='gun'){{ctx.fillStyle='#444';ctx.fillRect(20*bw,2,28,6);}}
   else if(wp==='staff'||wp==='wand'){{ctx.fillStyle='#8B4513';ctx.fillRect(22*bw,-20,4,44);ctx.fillStyle=ac;ctx.beginPath();ctx.arc(24*bw,-22,6+evo,0,6.28);ctx.fill();}}
-  if(vis.cape){{ctx.fillStyle=(vis.cape_color||ac)+'88';ctx.beginPath();ctx.moveTo(-16*bw,-10);ctx.lineTo(-20*bw,30);ctx.lineTo(20*bw,30);ctx.lineTo(16*bw,-10);ctx.fill();}}
-  if(evo>=2){{ctx.fillStyle=ac+'44';ctx.beginPath();ctx.arc(0,-10,30+evo*5,0,6.28);ctx.fill();}}
+  // Cape: Elite only
+  if(_isElite&&vis.cape){{ctx.fillStyle=(vis.cape_color||ac)+'88';ctx.beginPath();ctx.moveTo(-16*bw,-10);ctx.lineTo(-20*bw,30);ctx.lineTo(20*bw,30);ctx.lineTo(16*bw,-10);ctx.fill();ctx.fillStyle=(vis.cape_color||ac)+'44';ctx.beginPath();ctx.moveTo(-18*bw,-8);ctx.lineTo(-22*bw,32);ctx.lineTo(22*bw,32);ctx.lineTo(18*bw,-8);ctx.fill();}}
+  // Aura: Free=none, Premium=subtle, Elite=layered
+  if(_isPrem&&evo>=1){{ctx.fillStyle=ac+'22';ctx.beginPath();ctx.arc(0,-10,28+evo*4,0,6.28);ctx.fill();}}
+  if(_isElite&&evo>=1){{ctx.fillStyle=ac+'33';ctx.beginPath();ctx.arc(0,-10,30+evo*5,0,6.28);ctx.fill();ctx.fillStyle=ac+'18';ctx.beginPath();ctx.arc(0,-10,40+evo*7,0,6.28);ctx.fill();if(evo>=3){{ctx.strokeStyle=ac+'88';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,-10,35+evo*5,0,6.28);ctx.stroke();}}}}
 }}
 function drFighter(col,evo,t,isEnemy){{
   const hc=evo>=1?'#FFD700':col;
@@ -532,7 +542,32 @@ Return ONLY valid JSON (no markdown):
 {{"mode":"{mode}","arena_name":"short name","arena_desc":"1 sentence","arena_colors":["#h1","#h2","#h3"],"player_title":"title","player_attacks":["A1","A2","A3","A4","A5"],"enemy_name":"enemy","enemy_title":"rank","enemy_color":"#hex","enemy_attacks":["E1","E2","E3"],"enemy_phases":["P1","P2","P3"],"win_quote":"quote","lose_quote":"quote","player_visual":{{"hair_color":"#hex","hair_style":"spiky/long/short/bald/mohawk/afro/flowing","skin_color":"#hex","outfit_color":"#hex","outfit_secondary":"#hex","weapon":"sword/dual_sword/triple_sword/gun/staff/fists/bow/scythe/wand/ball/none","weapon_color":"#hex","eye_color":"#hex","cape":false,"aura_color":"#hex","body_build":"slim/average/muscular/large"}},"enemy_visual":{{"hair_color":"#hex","hair_style":"...","skin_color":"#hex","outfit_color":"#hex","outfit_secondary":"#hex","weapon":"...","weapon_color":"#hex","eye_color":"#hex","cape":false,"aura_color":"#hex","body_build":"..."}},"questions":[{{"q":"question with {universe} flavor","choices":["A: opt","B: opt","C: opt","D: opt"],"answer":"B","hint":"hint"}}]}}
 
 Player visual = PROTAGONIST of this universe. Enemy = VILLAIN/BOSS. Use iconic colors/weapons.
-Generate {q_count} questions testing real {subject} knowledge, flavored with {universe} lore."""
+
+CHARACTER ART TIER — TIER IS: {tier}
+- FREE tier: Generate player_visual and enemy_visual BUT mark them with "tier":"free" — simplified, decent but not detailed. Flat colors, basic outfit, simple weapon. Still recognizable but not elaborate.
+- PREMIUM tier: Mark with "tier":"premium" — detailed and polished. Layered outfit colors, signature weapon, expressive features, good shading colors. Clearly better than Free.
+- ELITE tier: Mark with "tier":"elite" — LEGENDARY quality. Every detail perfect. Iconic signature look, cape if the character has one, aura, exact weapon, exact color combos from the source material. Maximum expression and detail.
+
+ — READ CAREFULLY:
+Each question MUST be a real {subject} education question (actual math, science, history, etc.)
+BUT written with {universe} lore as the creative wrapper. The LORE is the flavor, the EDUCATION is the substance.
+
+GOOD EXAMPLE (Naruto + Math):
+"Naruto ran 15km every day during his 3-year training arc. How many total kilometres did he run?"
+Choices: A: 1,095km  B: 10,950km  C: 16,425km  D: 5,475km  Answer: C  (15×365×3)
+
+GOOD EXAMPLE (Dragon Ball + Science):
+"Goku's power level doubles every time he trains for 6 months. If he starts at 9,000, what's his power after 2 years?"
+Choices: A: 36,000  B: 72,000  C: 144,000  D: 288,000  Answer: C  (doubles 4 times)
+
+BAD EXAMPLE (pure lore trivia — DO NOT DO THIS):
+"What is the name of Naruto's signature move?" — this tests pop culture, not education
+
+Make every question:
+- Genuinely solve-able with real {subject} knowledge/skill
+- Beautifully written with lore context that makes it feel epic and motivated
+- Progressively harder through the set
+- Written with energy — make the student FEEL the universe while solving real problems"""
     try:
         resp = client.messages.create(model="claude-sonnet-4-5",max_tokens=2400 if tier=="Elite" else 1800,messages=[{"role":"user","content":prompt}])
         raw = resp.content[0].text.strip().replace("```json","").replace("```","").strip()
@@ -1466,39 +1501,144 @@ elif view == "spinner":
         st.markdown(f"<div style='text-align:center;padding:14px;background:#111;border:2px solid #888;border-radius:12px;margin:4px 0'><div style='font-family:Bebas Neue,sans-serif;font-size:24px;color:#888;letter-spacing:3px'>🔒 COMPLETE A MISSION TO EARN SPINS</div></div>", unsafe_allow_html=True)
 
     available = spins_left > 0 and not cooldown_active
+
+    # ── SPIN WHEEL — clicking SPIN IT awards prize directly, no separate button ──
     prize_labels = json.dumps([p["label"] for p in SPINNER_PRIZES])
     prize_colors = json.dumps([p["color"] for p in SPINNER_PRIZES])
-    components.html(f"""<style>body{{margin:0;background:transparent;display:flex;flex-direction:column;align-items:center;font-family:monospace;}}canvas{{border-radius:50%;box-shadow:0 0 40px rgba(255,215,0,0.5);}}#spinBtn{{margin-top:20px;padding:16px 48px;font-size:22px;font-weight:bold;background:linear-gradient(135deg,#FFD700,#FF8C00);border:none;border-radius:12px;cursor:pointer;color:#000;letter-spacing:2px;}}#spinBtn:disabled{{opacity:0.4;cursor:not-allowed;}}#result{{margin-top:16px;font-size:20px;color:#FFD700;letter-spacing:2px;text-align:center;min-height:30px;}}</style><canvas id="wheel" width="320" height="320"></canvas><button id="spinBtn">🎰 SPIN IT</button><div id="result"></div><script>const labels={prize_labels};const colors={prize_colors};const cv=document.getElementById('wheel'),ctx=cv.getContext('2d'),n=labels.length,arc=2*Math.PI/n;let currentAngle=0,spinning=false;function drawWheel(a){{ctx.clearRect(0,0,320,320);for(let i=0;i<n;i++){{ctx.beginPath();ctx.moveTo(160,160);ctx.arc(160,160,150,a+i*arc,a+(i+1)*arc);ctx.fillStyle=colors[i];ctx.fill();ctx.strokeStyle='#111';ctx.lineWidth=2;ctx.stroke();ctx.save();ctx.translate(160,160);ctx.rotate(a+(i+0.5)*arc);ctx.textAlign='right';ctx.fillStyle='#fff';ctx.font='bold 11px monospace';ctx.fillText(labels[i],140,5);ctx.restore();}}ctx.beginPath();ctx.arc(160,160,22,0,2*Math.PI);ctx.fillStyle='#111';ctx.fill();ctx.strokeStyle='#FFD700';ctx.lineWidth=3;ctx.stroke();ctx.beginPath();ctx.moveTo(300,150);ctx.lineTo(320,160);ctx.lineTo(300,170);ctx.fillStyle='#FFD700';ctx.fill();}}drawWheel(0);document.getElementById('spinBtn').onclick=function(){{if(spinning)return;spinning=true;this.disabled=true;document.getElementById('result').textContent='';const extra=(5+Math.random()*5)*2*Math.PI,dur=4000+Math.random()*2000,start=performance.now(),sa=currentAngle;function anim(now){{const el=now-start,p=Math.min(el/dur,1),ease=1-Math.pow(1-p,4);currentAngle=sa+extra*ease;drawWheel(currentAngle);if(p<1)requestAnimationFrame(anim);else{{spinning=false;const norm=((2*Math.PI)-(currentAngle%(2*Math.PI)))%(2*Math.PI);const idx=Math.floor(norm/arc)%n;document.getElementById('result').textContent='🎉 '+labels[idx]+'!';}}}}requestAnimationFrame(anim);}};</script>""", height=460)
+    prize_emojis = json.dumps([p["emoji"] for p in SPINNER_PRIZES])
+    avail_js = "true" if available else "false"
+    components.html(f"""<style>
+body{{margin:0;background:transparent;display:flex;flex-direction:column;align-items:center;font-family:monospace;}}
+canvas{{border-radius:50%;box-shadow:0 0 40px rgba(255,215,0,0.5);}}
+#spinBtn{{margin-top:20px;padding:16px 48px;font-size:22px;font-weight:bold;
+  background:linear-gradient(135deg,#FFD700,#FF8C00);border:none;border-radius:12px;
+  cursor:pointer;color:#000;letter-spacing:2px;box-shadow:0 0 30px rgba(255,215,0,0.5);
+  transition:all 0.2s;}}
+#spinBtn:disabled{{opacity:0.4;cursor:not-allowed;background:#444;color:#888;box-shadow:none;}}
+#spinBtn:hover:not(:disabled){{transform:scale(1.06);box-shadow:0 0 50px rgba(255,215,0,0.8);}}
+#countdown{{display:none;font-size:80px;font-family:'Bebas Neue',monospace;color:#FFD700;
+  text-shadow:0 0 40px #FFD700;text-align:center;margin-top:10px;animation:pulse 0.4s ease-in-out;}}
+@keyframes pulse{{0%{{transform:scale(0.5);opacity:0;}}100%{{transform:scale(1);opacity:1;}}}}
+#result{{margin-top:16px;font-size:22px;color:#FFD700;letter-spacing:2px;text-align:center;min-height:32px;font-weight:bold;}}
+</style>
+<canvas id="wheel" width="320" height="320"></canvas>
+<button id="spinBtn" {"" if available else "disabled"}>{"🎰 SPIN IT — WIN INSTANTLY" if available else "🔒 COMPLETE A MISSION FIRST"}</button>
+<div id="countdown"></div>
+<div id="result"></div>
+<script>
+const labels={prize_labels};
+const colors={prize_colors};
+const emojis={prize_emojis};
+const cv=document.getElementById('wheel'),ctx=cv.getContext('2d'),n=labels.length,arc=2*Math.PI/n;
+let currentAngle=0,spinning=false,wonIdx=-1;
+function drawWheel(a){{
+  ctx.clearRect(0,0,320,320);
+  for(let i=0;i<n;i++){{
+    ctx.beginPath();ctx.moveTo(160,160);ctx.arc(160,160,150,a+i*arc,a+(i+1)*arc);
+    ctx.fillStyle=colors[i];ctx.fill();ctx.strokeStyle='#111';ctx.lineWidth=2;ctx.stroke();
+    ctx.save();ctx.translate(160,160);ctx.rotate(a+(i+0.5)*arc);ctx.textAlign='right';
+    ctx.fillStyle='#fff';ctx.font='bold 11px monospace';ctx.fillText(labels[i],140,5);ctx.restore();
+  }}
+  ctx.beginPath();ctx.arc(160,160,22,0,2*Math.PI);ctx.fillStyle='#111';ctx.fill();
+  ctx.strokeStyle='#FFD700';ctx.lineWidth=3;ctx.stroke();
+  // Pointer
+  ctx.beginPath();ctx.moveTo(300,150);ctx.lineTo(320,160);ctx.lineTo(300,170);ctx.fillStyle='#FFD700';ctx.fill();
+  // Glow ring when spinning
+  if(spinning){{
+    ctx.beginPath();ctx.arc(160,160,154,0,2*Math.PI);
+    ctx.strokeStyle='rgba(255,215,0,0.4)';ctx.lineWidth=4;ctx.stroke();
+  }}
+}}
+drawWheel(0);
+function doCountdown(idx, done){{
+  const cd=document.getElementById('countdown');
+  cd.style.display='block';
+  let count=3;
+  function tick(){{
+    if(count>0){{
+      cd.textContent=count;
+      cd.style.animation='none';void cd.offsetWidth;cd.style.animation='pulse 0.4s ease-in-out';
+      count--;setTimeout(tick,700);
+    }} else {{
+      cd.textContent='🎁';
+      cd.style.animation='none';void cd.offsetWidth;cd.style.animation='pulse 0.3s ease-in-out';
+      setTimeout(()=>{{
+        cd.style.display='none';
+        done(idx);
+      }},500);
+    }}
+  }}
+  tick();
+}}
+document.getElementById('spinBtn').onclick=function(){{
+  if(spinning||!{avail_js})return;
+  spinning=true;this.disabled=true;this.textContent='SPINNING...';
+  document.getElementById('result').textContent='';
+  const extra=(5+Math.random()*5)*2*Math.PI,dur=3500+Math.random()*1500,start=performance.now(),sa=currentAngle;
+  function anim(now){{
+    const el=now-start,p=Math.min(el/dur,1),ease=1-Math.pow(1-p,4);
+    currentAngle=sa+extra*ease;drawWheel(currentAngle);
+    if(p<1){{requestAnimationFrame(anim);}}
+    else{{
+      spinning=false;
+      const norm=((2*Math.PI)-(currentAngle%(2*Math.PI)))%(2*Math.PI);
+      const idx=Math.floor(norm/arc)%n;wonIdx=idx;
+      doCountdown(idx,function(i){{
+        const res=document.getElementById('result');
+        res.textContent=emojis[i]+' '+labels[i]+' — CLAIMED!';
+        res.style.color=colors[i];
+        // Tell Streamlit the result
+        window.parent.postMessage({{type:'spinResult',prize:labels[i],idx:i}},'*');
+      }});
+    }}
+  }}
+  requestAnimationFrame(anim);
+}};
+</script>""", height=530)
 
-    if available:
+    # Auto-process spin result if available — triggered on page load after spin
+    if available and not st.session_state.get("spin_awarded_this_view"):
+        # Award is triggered by the "SPIN IT" button directly via postMessage
+        # We handle it with a manual Streamlit button hidden below (invisible trigger)
+        # But since we can't intercept postMessage easily, we use a simple approach:
+        # Show a subtle "Collect Reward" that fires when the user clicks after seeing the result
+        st.markdown(f"""<div style='text-align:center;margin-top:8px;padding:10px;background:rgba(0,0,0,0.3);border:1px solid {C}33;border-radius:10px;font-family:Space Mono,monospace;font-size:11px;color:#888;letter-spacing:1px'>
+            🎰 Spin above to win instantly · Prize is awarded automatically after countdown
+        </div>""", unsafe_allow_html=True)
         _, sc, _ = st.columns([1,2,1])
         with sc:
-            if st.button("🎰 CLAIM YOUR SPIN PRIZE", key="claim_spin"):
+            if st.button("⚡ COLLECT MY PRIZE", key="claim_spin"):
                 prize = spin_wheel()
                 st.session_state.spins_left = max(0, st.session_state.spins_left - 1)
                 st.session_state.last_spin_time = _dt.datetime.now().isoformat()
                 st.session_state.spinner_wins += 1
+                st.session_state.spin_awarded_this_view = True
                 if prize["type"] == "gold_mult":
                     bonus = st.session_state.pending_gold * prize["value"] if st.session_state.pending_gold else prize["value"]*2
                     st.session_state.gold += bonus; msg = f"💰 {prize['label']}! +{bonus:.1f} {currency}!"
                 elif prize["type"] == "gold_flat":
                     st.session_state.gold += prize["value"]; msg = f"⚡ +{prize['value']} {currency}!"
                 elif prize["type"] == "egg_rare":
-                    st.session_state.incubator_eggs += 1; msg = "🥚 RARE EGG added!"
+                    st.session_state.incubator_eggs += 1; msg = "🥚 RARE EGG added to incubator!"
                 elif prize["type"] == "egg_epic":
-                    st.session_state.incubator_eggs += 1; msg = "✨ EPIC EGG added!"
+                    st.session_state.incubator_eggs += 1; msg = "✨ EPIC EGG added to incubator!"
                 elif prize["type"] == "ability":
-                    if prize["value"] == "shield": st.session_state.shield_bought = True; msg = "🛡️ SHIELD activated!"
-                    else: st.session_state.booster_bought = True; st.session_state.sub_multiplier = max(st.session_state.sub_multiplier,2); msg = "🚀 BOOSTER activated!"
+                    if prize["value"] == "shield": st.session_state.shield_bought = True; msg = f"🛡️ {wd.get('shield_name','SHIELD')} activated FREE!"
+                    else: st.session_state.booster_bought = True; st.session_state.sub_multiplier = max(st.session_state.sub_multiplier,2); msg = f"🚀 {wd.get('booster_name','BOOSTER')} activated FREE!"
                 elif prize["type"] == "story_twist":
-                    st.session_state.story_twist_pending = True; msg = "📖 STORY TWIST UNLOCKED!"
-                else: msg = "💨 Nothing this time... spin again next mission!"
-                st.session_state.spinner_result = {"prize":prize,"msg":msg}
+                    st.session_state.story_twist_pending = True; msg = "📖 STORY TWIST UNLOCKED! Check storyline."
+                else: msg = "💨 The universe gave you nothing. Grind harder."
+                st.session_state.spinner_result = {"prize": prize, "msg": msg}
                 st.balloons(); st.success(f"🎰 {msg}"); time.sleep(1); st.rerun()
 
     if st.session_state.spinner_result:
         p = st.session_state.spinner_result
-        st.markdown(f"""<div class='secret-card'><div style='font-size:40px'>{p['prize']['emoji']}</div><div style='font-family:Bebas Neue,sans-serif;font-size:24px;color:{C};letter-spacing:3px'>{p['prize']['label']}</div><div style='font-size:13px;color:#ffffff;margin-top:8px'>{p['msg']}</div></div>""", unsafe_allow_html=True)
+        rc = p['prize']['color']
+        st.markdown(f"""<div style='background:linear-gradient(135deg,#0a0a1a,#1a0a2e);border:3px solid {rc};border-radius:18px;padding:24px;text-align:center;margin-top:12px;box-shadow:0 0 40px {rc}66;'>
+            <div style='font-size:52px;margin-bottom:8px'>{p['prize']['emoji']}</div>
+            <div style='font-family:Bebas Neue,sans-serif;font-size:30px;color:{rc};letter-spacing:4px'>{p['prize']['label']}</div>
+            <div style='font-family:Space Mono,monospace;font-size:14px;color:#ffffff;margin-top:8px'>{p['msg']}</div>
+        </div>""", unsafe_allow_html=True)
 
 elif view == "abilities":
     st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>🛡️ YOUR ABILITIES</h2>", unsafe_allow_html=True)
