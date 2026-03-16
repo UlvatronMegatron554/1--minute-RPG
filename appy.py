@@ -1743,35 +1743,6 @@ elif view == "spinner":
     prize_colors = json.dumps([p["color"] for p in SPINNER_PRIZES])
     components.html(f"""<style>body{{margin:0;background:transparent;display:flex;flex-direction:column;align-items:center;font-family:monospace;}}canvas{{border-radius:50%;box-shadow:0 0 40px rgba(255,215,0,0.5);}}#spinBtn{{margin-top:20px;padding:16px 48px;font-size:22px;font-weight:bold;background:linear-gradient(135deg,#FFD700,#FF8C00);border:none;border-radius:12px;cursor:pointer;color:#000;letter-spacing:2px;box-shadow:0 0 30px rgba(255,215,0,0.5);}}#spinBtn:disabled{{opacity:0.4;cursor:not-allowed;}}#result{{margin-top:16px;font-size:20px;color:#FFD700;letter-spacing:2px;text-align:center;min-height:30px;}}</style><canvas id="wheel" width="320" height="320"></canvas><button id="spinBtn" "">🎰 SPIN IT</button><div id="result"></div><script>const labels={prize_labels};const colors={prize_colors};const cv=document.getElementById('wheel'),ctx=cv.getContext('2d'),n=labels.length,arc=2*Math.PI/n;let currentAngle=0,spinning=false;function drawWheel(a){{ctx.clearRect(0,0,320,320);for(let i=0;i<n;i++){{ctx.beginPath();ctx.moveTo(160,160);ctx.arc(160,160,150,a+i*arc,a+(i+1)*arc);ctx.fillStyle=colors[i];ctx.fill();ctx.strokeStyle='#111';ctx.lineWidth=2;ctx.stroke();ctx.save();ctx.translate(160,160);ctx.rotate(a+(i+0.5)*arc);ctx.textAlign='right';ctx.fillStyle='#fff';ctx.font='bold 11px monospace';ctx.shadowColor='#000';ctx.shadowBlur=4;ctx.fillText(labels[i],140,5);ctx.restore();}}ctx.beginPath();ctx.arc(160,160,22,0,2*Math.PI);ctx.fillStyle='#111';ctx.fill();ctx.strokeStyle='#FFD700';ctx.lineWidth=3;ctx.stroke();ctx.beginPath();ctx.moveTo(300,150);ctx.lineTo(320,160);ctx.lineTo(300,170);ctx.fillStyle='#FFD700';ctx.fill();}}drawWheel(0);document.getElementById('spinBtn').onclick=function(){{if(spinning)return;spinning=true;this.disabled=true;document.getElementById('result').textContent='';const extra=(5+Math.random()*5)*2*Math.PI,dur=4000+Math.random()*2000,start=performance.now(),sa=currentAngle;function anim(now){{const el=now-start,p=Math.min(el/dur,1),ease=1-Math.pow(1-p,4);currentAngle=sa+extra*ease;drawWheel(currentAngle);if(p<1)requestAnimationFrame(anim);else{{spinning=false;const norm=((2*Math.PI)-(currentAngle%(2*Math.PI)))%(2*Math.PI);const idx=Math.floor(norm/arc)%n;document.getElementById('result').textContent='🎉 '+labels[idx]+'!';}}}}requestAnimationFrame(anim);}};</script>""", height=460)
 
-    # ── PRIZE AWARD — fires once when entering spinner with available spins ──
-    if available and not st.session_state.get("spin_awarded_this_view", False):
-        prize = spin_wheel()
-        st.session_state.spins_left = max(0, st.session_state.get("spins_left", 0) - 1)
-        st.session_state.spinner_available = False
-        st.session_state.spinner_wins = st.session_state.get("spinner_wins", 0) + 1
-        st.session_state.last_spin_time = _dt.datetime.now().isoformat()
-        if prize["type"] == "gold_mult":
-            bonus = st.session_state.pending_gold * prize["value"] if st.session_state.pending_gold else prize["value"] * 2
-            st.session_state.gold += bonus; msg = f"💰 {prize['label']}! +{bonus:.1f} {currency}!"
-        elif prize["type"] == "gold_flat":
-            st.session_state.gold += prize["value"]; msg = f"⚡ +{prize['value']} {currency}!"
-        elif prize["type"] == "egg_rare":
-            st.session_state.incubator_eggs += 1; msg = "🥚 RARE EGG added to incubator!"
-        elif prize["type"] == "egg_epic":
-            st.session_state.incubator_eggs += 1; msg = "✨ EPIC EGG added to incubator!"
-        elif prize["type"] == "ability":
-            if prize["value"] == "shield":
-                st.session_state.shield_bought = True; msg = f"🛡️ {wd.get('shield_name','SHIELD')} activated FREE!"
-            else:
-                st.session_state.booster_bought = True; st.session_state.sub_multiplier = max(st.session_state.sub_multiplier, 2); msg = f"🚀 {wd.get('booster_name','BOOSTER')} activated FREE!"
-        elif prize["type"] == "story_twist":
-            st.session_state.story_twist_pending = True; msg = "📖 STORY TWIST UNLOCKED!"
-        else:
-            msg = "💨 Nothing this time... earn more spins from missions!"
-        st.session_state.spinner_result = {"prize": prize, "msg": msg}
-        st.session_state.spin_awarded_this_view = True
-        st.balloons(); st.success(f"🎰 {msg}")
-
     if st.session_state.spinner_result:
         p = st.session_state.spinner_result
         st.markdown(f"""<div class='secret-card'><div style='font-size:40px'>{p['prize']['emoji']}</div><div style='font-family:Bebas Neue,sans-serif;font-size:24px;color:{C};letter-spacing:3px'>{p['prize']['label']}</div><div style='font-size:13px;color:#ffffff;margin-top:8px'>{p['msg']}</div></div>""", unsafe_allow_html=True)
