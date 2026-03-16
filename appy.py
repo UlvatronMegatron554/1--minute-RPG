@@ -1112,7 +1112,7 @@ input,textarea{{background:#ffffff!important;color:#000000!important;caret-color
 input::placeholder,textarea::placeholder{{color:#666666!important;}}
 label,.stTextInput label{{color:{TEXT}!important;font-family:'Space Mono',monospace!important;font-size:11px!important;letter-spacing:2px!important;}}
 @keyframes titan-pulse{{0%{{box-shadow:0 0 20px {C},inset 0 0 10px {C};border-color:{C};}}50%{{box-shadow:0 0 80px {C},inset 0 0 40px {C};border-color:#ffffff;}}100%{{box-shadow:0 0 20px {C},inset 0 0 10px {C};border-color:{C};}}}}
-div.stButton>button{{border:2px solid {C}!important;background:#000000!important;color:#ffffff!important;font-family:'Bebas Neue',sans-serif!important;font-size:13px!important;letter-spacing:2px!important;padding:8px 12px!important;border-radius:10px!important;animation:titan-pulse 2.5s infinite ease-in-out!important;width:100%;text-transform:uppercase;transition:transform 0.3s;margin-bottom:6px;}}
+div.stButton>button{{border:2px solid {C}!important;background:#000000!important;color:#ffffff!important;font-family:'Bebas Neue',sans-serif!important;font-size:13px!important;letter-spacing:2px!important;padding:4px 12px!important;border-radius:10px!important;animation:titan-pulse 2.5s infinite ease-in-out!important;width:100%;text-transform:uppercase;transition:transform 0.3s;margin-bottom:6px;}}
 div.stButton>button:hover{{transform:scale(1.02);}}
 .metric-card,.shop-card,.ach-card,.monster-card,.secret-card{{background:#111111!important;border:2px solid {C}!important;border-radius:14px!important;padding:18px!important;margin-bottom:12px!important;color:#ffffff!important;}}
 .metric-card *,.shop-card *,.ach-card *,.monster-card *,.secret-card *{{color:#ffffff!important;}}
@@ -1590,26 +1590,25 @@ canvas{{border-radius:50%;box-shadow:0 0 50px rgba(255,215,0,0.4);display:block;
   font-size:16px;padding:14px 24px;letter-spacing:2px;}}
 #spinBtn:hover:not(:disabled){{transform:scale(1.07);box-shadow:0 0 55px rgba(255,215,0,0.9);}}
 #spinBtn:active:not(:disabled){{transform:scale(0.96);}}
-#cdown{{display:none;font-size:88px;color:#FFD700;text-align:center;text-shadow:0 0 40px #FFD700cc;
-  font-family:'Bebas Neue',monospace;margin-top:8px;}}
-.cpop{{animation:cpop 0.3s ease-out;}}
-@keyframes cpop{{from{{transform:scale(0.2);opacity:0;}}80%{{transform:scale(1.2);}}to{{transform:scale(1);opacity:1;}}}}
-#result{{margin-top:12px;font-size:21px;color:#FFD700;letter-spacing:2px;text-align:center;
+#result{{margin-top:14px;font-size:21px;color:#FFD700;letter-spacing:2px;text-align:center;
   min-height:28px;font-weight:bold;}}
+#ctimer{{display:none;margin-top:10px;font-family:'Space Mono',monospace;font-size:12px;
+  color:#FF8800;text-align:center;letter-spacing:1px;}}
 </style>
 <div id="wrap">
   <canvas id="wh" width="300" height="300"></canvas>
   <div id="pointer"></div>
 </div>
 <button id="spinBtn" {"disabled" if not can_spin else ""}>{("🎰 SPIN IT" if can_spin else "🔒 " + cooldown_label)}</button>
-<div id="cdown"></div>
 <div id="result"></div>
+<div id="ctimer"></div>
 <script>
 const labels={prize_labels}, colors={prize_colors}, emojis={prize_emojis};
 const canSpin={can_spin_js};
 const cv=document.getElementById('wh'), ctx=cv.getContext('2d');
 const n=labels.length, arc=2*Math.PI/n;
 let angle=0, spinning=false, idleSpeed=0.006;
+const COOLDOWN=21600;
 
 function draw(a){{
   ctx.clearRect(0,0,300,300);
@@ -1623,12 +1622,10 @@ function draw(a){{
     ctx.font='bold 11px monospace'; ctx.fillText(labels[i],130,4);
     ctx.restore();
   }}
-  // outer glow ring when spinning fast
   if(spinning){{
     ctx.beginPath(); ctx.arc(150,150,142,0,2*Math.PI);
     ctx.strokeStyle='rgba(255,215,0,0.5)'; ctx.lineWidth=5; ctx.stroke();
   }}
-  // hub
   ctx.beginPath(); ctx.arc(150,150,22,0,2*Math.PI);
   var hg=ctx.createRadialGradient(144,144,2,150,150,22);
   hg.addColorStop(0,'#fff'); hg.addColorStop(1,'#111');
@@ -1636,22 +1633,19 @@ function draw(a){{
   ctx.strokeStyle='#FFD700'; ctx.lineWidth=3; ctx.stroke();
 }}
 
-// idle rotation
 function idle(){{ if(spinning)return; angle+=idleSpeed; draw(angle); requestAnimationFrame(idle); }}
 idle();
 
-function runCountdown(done){{
-  var el=document.getElementById('cdown');
+function startCountdown(secs){{
+  var el=document.getElementById('ctimer');
   el.style.display='block';
-  var steps=['3','2','1','🎁'];
-  var i=0;
-  function step(){{
-    el.className=''; void el.offsetWidth; el.className='cpop';
-    el.textContent=steps[i];
-    if(i<steps.length-1){{i++;setTimeout(step,650);}}
-    else{{setTimeout(()=>{{el.style.display='none';done();}},500);}}
-  }}
-  step();
+  var r=secs;
+  (function tick(){{
+    if(r<=0){{el.textContent='✅ SPIN READY!';el.style.color='#00FF44';return;}}
+    var h=Math.floor(r/3600),m=Math.floor((r%3600)/60),s=r%60;
+    el.textContent='⏰ NEXT SPIN IN: '+String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+    r--;setTimeout(tick,1000);
+  }})();
 }}
 
 document.getElementById('spinBtn').onclick=function(){{
@@ -1659,7 +1653,6 @@ document.getElementById('spinBtn').onclick=function(){{
   spinning=true;
   this.disabled=true; this.textContent='SPINNING...';
   document.getElementById('result').textContent='';
-  // big fast spin
   var extra=(7+Math.random()*5)*2*Math.PI;
   var dur=3500+Math.random()*1500;
   var start=performance.now(), sa=angle;
@@ -1669,15 +1662,16 @@ document.getElementById('spinBtn').onclick=function(){{
     if(p<1){{ requestAnimationFrame(anim); }}
     else{{
       spinning=false;
-      // figure out winning segment
       var norm=((2*Math.PI)-(angle%(2*Math.PI)))%(2*Math.PI);
       var idx=Math.floor(norm/arc)%n;
-      runCountdown(function(){{
-        document.getElementById('result').textContent=emojis[idx]+' '+labels[idx]+' — YOURS!';
-        document.getElementById('result').style.color=colors[idx];
-        // restart idle
-        requestAnimationFrame(idle);
-      }});
+      // Show prize IMMEDIATELY — no countdown
+      var res=document.getElementById('result');
+      res.textContent=emojis[idx]+' '+labels[idx]+' — YOURS!';
+      res.style.color=colors[idx];
+      // Lock button and start live 6h countdown immediately
+      document.getElementById('spinBtn').textContent='🔒 LOCKED';
+      startCountdown(COOLDOWN);
+      requestAnimationFrame(idle);
     }}
   }}
   requestAnimationFrame(anim);
