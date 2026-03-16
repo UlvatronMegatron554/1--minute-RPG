@@ -1212,12 +1212,29 @@ if not st.session_state.get("opening_story_shown", True):
     client_os = get_claude_client()
     if client_os:
         try:
-            resp_os = client_os.messages.create(model="claude-sonnet-4-5", max_tokens=220, messages=[{"role":"user","content":f'Write the OPENING of an epic story set in: "{theme_now}". 3 sentences MAX. Short. Cinematic. End on a CLIFFHANGER. No titles, raw text only.'}])
+            resp_os = client_os.messages.create(model="claude-sonnet-4-5", max_tokens=400, messages=[{"role":"user","content":f"""You are the single greatest storyteller who has ever existed across all timelines, universes, and dimensions. Your opening lines have stopped wars, broken hearts, and made the sleeping sit bolt upright in the dark.
+
+You are writing the OPENING — Chapter 0 — of an epic story set in the universe of: "{theme_now}"
+
+This is THE hook. The single most important piece of writing in this entire story. It must be so viscerally, specifically, devastatingly perfect that the reader's heartbeat physically changes.
+
+ABSOLUTE REQUIREMENTS:
+- 3-4 sentences only — every word a scalpel, not a hammer
+- Must be HYPER-SPECIFIC to "{theme_now}" — use the exact characters, locations, powers, mythology, villains, lore. Not generic. THIS universe, in its most raw intimate form
+- Opens mid-action or mid-revelation — no slow starts, no "in a world where..." — drop them INTO the moment
+- Contains one impossible detail that makes the reader's stomach drop — something that should not be possible in this universe, but is happening right now
+- Builds to a final sentence so loaded with dread, wonder, and inevitability that stopping reading feels like a physical impossibility
+- MUST end with ... (three dots, no exceptions)
+- The reader must finish this and NEED to know what comes next with every cell in their body
+
+Write ONLY the raw story text. No chapter numbers. No titles. No labels. Pure devastating literature only."""}])
             opening_txt = resp_os.content[0].text.strip()
+            if not opening_txt.endswith("..."):
+                opening_txt = opening_txt.rstrip(".") + "..."
         except:
-            opening_txt = f"The {theme_now} universe shudders. Something ancient has awakened — something that was never meant to be found. And somehow... it knows your name."
+            opening_txt = f"The last thing anyone expected was silence — not the silence of peace, but the silence of something so vast and so wrong that even the laws of {theme_now} had stopped breathing to listen..."
     else:
-        opening_txt = f"The {theme_now} universe shudders. Something ancient has awakened — something that was never meant to be found. And somehow... it knows your name."
+        opening_txt = f"The last thing anyone expected was silence — not the silence of peace, but the silence of something so vast and so wrong that even the laws of {theme_now} had stopped breathing to listen..."
     st.session_state.opening_story_shown = True
     if not st.session_state.story_log: st.session_state.story_log = []
     st.session_state.story_log.insert(0, opening_txt)
