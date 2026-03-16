@@ -1389,23 +1389,40 @@ if view == "main":
     _reward_html = "".join(_reward_parts)
     st.markdown(f"<div style='text-align:center;margin:10px 0 12px;padding:12px;background:#111;border:1px solid {C}33;border-radius:12px'>{_reward_html}</div>", unsafe_allow_html=True)
 
-    # ── START MISSION + ±30s — symmetric [1,3,1], side buttons compact ──────
-    # CSS: override global giant padding just for these 3 buttons
-    st.markdown("""<style>
-.mission-timer-row div.stButton > button {
-    padding: 12px 8px !important;
-    font-size: 15px !important;
+    # ── LAYOUT CUSTOMIZER ────────────────────────────────────────────────────
+    with st.expander("⚙️ Customize Button Layout", expanded=False):
+        st.markdown(f"<div style='font-family:Space Mono,monospace;font-size:10px;color:#888;letter-spacing:1px;margin-bottom:8px'>Drag to adjust — changes apply instantly</div>", unsafe_allow_html=True)
+        cz1, cz2 = st.columns(2)
+        with cz1:
+            btn_font = st.slider("Button text size", min_value=9, max_value=22, value=st.session_state.get("btn_font_size", 15), step=1, key="btn_font_size_slider")
+            st.session_state["btn_font_size"] = btn_font
+        with cz2:
+            btn_pad = st.slider("Button height (padding)", min_value=2, max_value=28, value=st.session_state.get("btn_pad", 12), step=2, key="btn_pad_slider")
+            st.session_state["btn_pad"] = btn_pad
+        center_weight = st.slider("Center button width  ← narrow  |  wide →", min_value=1, max_value=8, value=st.session_state.get("center_weight", 2), step=1, key="center_weight_slider")
+        st.session_state["center_weight"] = center_weight
+        st.caption("Reset to defaults → set text size 15, height 12, width 2")
+
+    _btn_font   = st.session_state.get("btn_font_size", 15)
+    _btn_pad    = st.session_state.get("btn_pad", 12)
+    _cw         = st.session_state.get("center_weight", 2)
+
+    # ── START MISSION + ±30s ─────────────────────────────────────────────────
+    st.markdown(f"""<style>
+.mission-timer-row div.stButton > button {{
+    padding: {_btn_pad}px 8px !important;
+    font-size: {_btn_font}px !important;
     letter-spacing: 1px !important;
     border-width: 2px !important;
     border-radius: 10px !important;
     animation: none !important;
     margin-bottom: 0 !important;
     box-shadow: none !important;
-}
+}}
 </style>""", unsafe_allow_html=True)
     st.markdown(f"<div style='text-align:center;font-family:Bebas Neue,sans-serif;font-size:14px;color:#555;letter-spacing:2px;margin-bottom:4px'>TIMER: {timer}s &nbsp;·&nbsp; min 30s &nbsp;·&nbsp; max 5min</div>", unsafe_allow_html=True)
     st.markdown('<div class="mission-timer-row">', unsafe_allow_html=True)
-    col_m, col_s, col_p = st.columns([1, 1, 1])
+    col_m, col_s, col_p = st.columns([1, _cw, 1])
     with col_m:
         if st.button("－30s", key="timer_minus", use_container_width=True):
             st.session_state.micro_timer_seconds = max(30, timer-30); st.rerun()
