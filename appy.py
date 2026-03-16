@@ -961,7 +961,7 @@ def resolve_universe(theme):
     if client is not None:
         try:
             safe_prompt = get_ai_safety_prefix() + "\n\n" + LORE_PROMPT.format(theme=cleaned_theme)
-            message = client.messages.create(model="claude-sonnet-4-5", max_tokens=400, messages=[{"role":"user","content":safe_prompt}])
+            message = client.messages.create(model="claude-sonnet-4-5", max_tokens=900, messages=[{"role":"user","content":safe_prompt}])
             raw = message.content[0].text.strip()
             if '"blocked"' in raw and "true" in raw.lower():
                 return {"safe": False, "reason": "Our AI detected this theme isn't appropriate. Try a game, anime, sport, movie, or anything you love! 🌌", "data": None}
@@ -979,6 +979,12 @@ def resolve_universe(theme):
         except Exception: pass
     data = get_fallback(cleaned_theme)
     data["shield_effect"] = SHIELD_EFFECT; data["booster_effect"] = BOOSTER_EFFECT
+    data["player_visual"] = {}; data["enemy_visual"] = {}
+    data["lore_achievements"] = [
+        {"name": f"⚡ {cleaned_theme} Initiate", "desc": f"Complete your first mission in the {cleaned_theme} universe."},
+        {"name": f"🔥 {cleaned_theme} Warrior", "desc": f"Reach 10 missions. Your {cleaned_theme} power is growing."},
+        {"name": f"👑 {cleaned_theme} Legend", "desc": f"Hit 50 missions. You've mastered the {cleaned_theme} universe."},
+    ]
     return {"safe": True, "data": data}
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -1027,7 +1033,7 @@ if "gold" not in st.session_state:
         "view": "main", "pending_gold": 0.0, "needs_verification": False,
         "vibe_color": "#FFD700", "sub_tier": "Free", "sub_multiplier": 1,
         "total_missions": 0, "bg_color": "#ffffff",
-        "feedback_list": [], "micro_timer_seconds": 45,
+        "feedback_list": [], "micro_timer_seconds": 30,
         "game_mode": None, "how_open": False,
         "unlocked_achievements": set(),
         "battles_fought": 0, "battles_won": 0,
@@ -1266,6 +1272,29 @@ with st.sidebar:
     if MODE == "obsessed":
         if st.button("📖 MANUAL",   key="nav_manual"):  st.session_state.view = "manual";  st.rerun()
         if st.button("💳 PLANS",    key="nav_plans"):   st.session_state.view = "plans";   st.rerun()
+
+    # ── RANK ──
+    st.write("---")
+    st.markdown(f"<p style='color:#ffffff;font-weight:bold'>👑 RANK</p>", unsafe_allow_html=True)
+    st.markdown(f"""<div class='metric-card' style='text-align:center'>
+        <div style='font-family:Bebas Neue,sans-serif;font-size:28px;color:{C};letter-spacing:3px'>{st.session_state.sub_tier.upper()}</div>
+        <div style='font-size:10px;color:#888;margin-top:4px'>{"3× ALL REWARDS" if st.session_state.sub_tier == "Elite" else "2× ALL REWARDS" if st.session_state.sub_tier == "Premium" else "1× STANDARD"}</div>
+    </div>""", unsafe_allow_html=True)
+
+    # ── ABILITIES ──
+    st.markdown(f"<p style='color:#ffffff;font-weight:bold'>🛡️ ABILITIES</p>", unsafe_allow_html=True)
+    shield_owned = st.session_state.get("shield_bought", False)
+    booster_owned = st.session_state.get("booster_bought", False)
+    st.markdown(f"""<div class='metric-card' style='border-color:{C if shield_owned else "#333"};opacity:{"1.0" if shield_owned else "0.5"}'>
+        <div style='font-size:18px'>🛡️ <span style='font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:2px'>{wd.get("shield_name","Shield")}</span></div>
+        <div style='font-size:10px;color:#aaa;margin-top:4px'>{wd.get("shield_flavor","Protects you.")}</div>
+        <div style='font-size:9px;color:{"#00FF44" if shield_owned else "#FF4444"};margin-top:4px'>{"✅ ACTIVE" if shield_owned else "❌ NOT OWNED"}</div>
+    </div>""", unsafe_allow_html=True)
+    st.markdown(f"""<div class='metric-card' style='border-color:{C if booster_owned else "#333"};opacity:{"1.0" if booster_owned else "0.5"}'>
+        <div style='font-size:18px'>🚀 <span style='font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:2px'>{wd.get("booster_name","Booster")}</span></div>
+        <div style='font-size:10px;color:#aaa;margin-top:4px'>{wd.get("booster_flavor","Moves impossibly fast.")}</div>
+        <div style='font-size:9px;color:{"#00FF44" if booster_owned else "#FF4444"};margin-top:4px'>{"✅ ACTIVE — 3×" if booster_owned else "❌ NOT OWNED"}</div>
+    </div>""", unsafe_allow_html=True)
     st.write("---")
     st.markdown("<p style='color:#ffffff;font-weight:bold'>🎨 BACKGROUND</p>", unsafe_allow_html=True)
     new_bg = st.color_picker("", value=st.session_state.get("bg_color","#ffffff"), key="bg_picker", label_visibility="collapsed")
@@ -1446,18 +1475,32 @@ if view == "main":
     gold_now = st.session_state.get("gold", 0)
     xp_pct = rig_xp_bar(xp_now, level_now)
 
-    col1, col2, col3, col4 = st.columns(4)
+    # ── DAY STREAK PROGRESS BAR — VERY TOP ──
+    streak_color = "#FF4444" if streak_now == 0 else ("#FFD700" if streak_now >= 7 else C)
+    streak_bar_pct = min(streak_now / 30, 1.0)
+    streak_bar_filled = int(streak_bar_pct * 25)
+    streak_bar_str = "█" * streak_bar_filled + "░" * (25 - streak_bar_filled)
+    streak_urgency = get_streak_urgency(st.session_state.get("study_streak", 0), st.session_state.get("last_active_date", ""))
+    st.markdown(f"""<div style='background:#111;border:2px solid {streak_color};border-radius:14px;padding:16px 20px;margin-bottom:20px'>
+        <div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:8px'>
+            <span style='font-family:Bebas Neue,sans-serif;font-size:22px;color:{streak_color};letter-spacing:3px'>🔥 {streak_now}-DAY STREAK</span>
+            <span style='font-family:Space Mono,monospace;font-size:12px;color:#ffffff'>{streak_now}/30 days</span>
+        </div>
+        <div style='font-family:Space Mono,monospace;font-size:12px;color:{streak_color};letter-spacing:1px'>{streak_bar_str}</div>
+        {"<div style='font-size:11px;color:#FF8888;margin-top:6px;font-family:Space Mono,monospace'>" + streak_urgency + "</div>" if streak_urgency else ""}
+    </div>""", unsafe_allow_html=True)
+
+    # ── STATS ROW ──
+    col1, col2, col3 = st.columns(3)
     with col1:
         st.markdown(f"""<div class='metric-card' style='text-align:center'><div style='font-family:Bebas Neue,sans-serif;font-size:36px;color:{C}'>{gold_now:.1f}</div><div style='font-size:10px;letter-spacing:2px;color:#ffffff'>{currency.upper()}</div></div>""", unsafe_allow_html=True)
     with col2:
-        st.markdown(f"""<div class='metric-card' style='text-align:center'><div style='font-family:Bebas Neue,sans-serif;font-size:36px;color:{C}'>LVL {level_now}</div><div style='font-size:10px;letter-spacing:2px;color:#ffffff'>CHAMPION RANK</div></div>""", unsafe_allow_html=True)
+        st.markdown(f"""<div class='metric-card' style='text-align:center'><div style='font-family:Bebas Neue,sans-serif;font-size:36px;color:{C}'>LVL {level_now}</div><div style='font-size:10px;letter-spacing:2px;color:#ffffff'>CHAMPION</div></div>""", unsafe_allow_html=True)
     with col3:
-        streak_color = "#FF4444" if streak_now == 0 else ("#FFD700" if streak_now >= 7 else C)
-        st.markdown(f"""<div class='metric-card' style='text-align:center'><div style='font-family:Bebas Neue,sans-serif;font-size:36px;color:{streak_color}'>🔥 {streak_now}</div><div style='font-size:10px;letter-spacing:2px;color:#ffffff'>DAY STREAK</div></div>""", unsafe_allow_html=True)
-    with col4:
         missions_done = st.session_state.get("total_missions", 0)
         st.markdown(f"""<div class='metric-card' style='text-align:center'><div style='font-family:Bebas Neue,sans-serif;font-size:36px;color:{C}'>{missions_done}</div><div style='font-size:10px;letter-spacing:2px;color:#ffffff'>MISSIONS DONE</div></div>""", unsafe_allow_html=True)
 
+    # ── XP BAR ──
     xp_display = int(xp_pct * 100)
     bar_filled = int(xp_pct * 30); bar_empty = 30 - bar_filled
     xp_bar_str = "█" * bar_filled + "░" * bar_empty
@@ -1465,12 +1508,9 @@ if view == "main":
     xp_msg = "🔥 SO CLOSE! One more mission and you level up!" if xp_pct > 0.9 else "⚡ Keep grinding — you're almost there." if xp_pct > 0.7 else "💪 Every mission gets you closer."
     st.markdown(f"""<div style='background:#111;border:1px solid {C}44;border-radius:12px;padding:14px 20px;margin:8px 0 20px'><div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:6px'><span style='font-family:Bebas Neue,sans-serif;font-size:14px;color:{C};letter-spacing:2px'>LEVEL {level_now} → LEVEL {next_level}</span><span style='font-family:Space Mono,monospace;font-size:12px;color:#ffffff'>{xp_display}%</span></div><div style='font-family:Space Mono,monospace;font-size:11px;color:{C};letter-spacing:1px'>{xp_bar_str}</div><div style='font-size:10px;color:#888;margin-top:4px;font-family:Space Mono,monospace'>{xp_msg}</div></div>""", unsafe_allow_html=True)
 
-    streak_msg = get_streak_urgency(st.session_state.get("study_streak", 0), st.session_state.get("last_active_date", ""))
-    if streak_msg:
-        st.markdown(f"<p style='text-align:center;font-family:Space Mono,monospace;font-size:12px;color:#FF8888'>{streak_msg}</p>", unsafe_allow_html=True)
-
     st.markdown("<br>", unsafe_allow_html=True)
 
+    # ── MISSION BUTTON + 30+/30- TIMER ──
     tier = st.session_state.sub_tier; mult = st.session_state.sub_multiplier; base = 5.0 * mult
     shield = st.session_state.get("shield_bought", False); boost = st.session_state.get("booster_bought", False)
     timer = st.session_state.get("micro_timer_seconds", 30)
@@ -1478,9 +1518,14 @@ if view == "main":
 
     st.markdown(f"""<div style='text-align:center;margin:10px 0 8px'><div style='font-family:Space Mono,monospace;font-size:12px;color:#ffffff;letter-spacing:2px'>POTENTIAL REWARD: <span style='color:{C};font-family:Bebas Neue,sans-serif;font-size:18px'>{reward_min} — {reward_max}</span> {currency}{"<br>🛡️ SHIELD ACTIVE" if shield else ""}{"<br>🚀 3× BOOSTER ACTIVE" if boost else ""}</div></div>""", unsafe_allow_html=True)
 
-    _, mcol, _ = st.columns([1, 3, 1])
-    with mcol:
-        if st.button(f"⚡ START {timer}-SECOND MISSION ⚡", key="start_mission"):
+    # Timer adjust + Start button
+    _, btn_minus, btn_start, btn_plus, _ = st.columns([1, 1, 3, 1, 1])
+    with btn_minus:
+        if st.button("30-", key="timer_minus"):
+            new_t = max(30, st.session_state.micro_timer_seconds - 30)
+            st.session_state.micro_timer_seconds = new_t; st.rerun()
+    with btn_start:
+        if st.button(f"⚡ START {timer}s MISSION ⚡", key="start_mission"):
             st.session_state.needs_verification = True; st.session_state.pending_gold = base
             timer_placeholder = st.empty(); progress_bar = st.progress(0)
             for sec in range(timer, 0, -1):
@@ -1494,58 +1539,17 @@ if view == "main":
                 progress_bar.progress(pct); time.sleep(1)
             timer_placeholder.markdown(f"""<div style='text-align:center;font-family:Bebas Neue,sans-serif;font-size:60px;color:{C};text-shadow:0 0 50px {C};animation:titan-pulse 1s infinite'>⚡ TIME'S UP ⚡</div><div style='text-align:center;font-family:Space Mono,monospace;font-size:14px;color:#ffffff;margin-top:12px'>Upload your proof below to claim your reward.</div>""", unsafe_allow_html=True)
             progress_bar.progress(1.0); time.sleep(0.5); st.rerun()
+    with btn_plus:
+        if st.button("30+", key="timer_plus"):
+            new_t = min(300, st.session_state.micro_timer_seconds + 30)
+            st.session_state.micro_timer_seconds = new_t; st.rerun()
 
-    st.markdown("<br>", unsafe_allow_html=True)
-    _, tcol, _ = st.columns([1, 2, 1])
-    with tcol:
-        t_col1, t_col2 = st.columns(2)
-        with t_col1:
-            if st.button("⚡ 15s BLITZ", key="timer_15"):
-                st.session_state.micro_timer_seconds = 15; st.rerun()
-        with t_col2:
-            if st.button("🔥 45s STANDARD", key="timer_45"):
-                st.session_state.micro_timer_seconds = 45; st.rerun()
-
-    st.markdown("---")
-    st.markdown(f"""<div style='text-align:center;font-family:Bebas Neue,sans-serif;font-size:18px;color:{C};letter-spacing:4px;margin-bottom:16px'>⚡ AVAILABLE NOW</div>""", unsafe_allow_html=True)
-    act_count = 4 if MODE == "obsessed" else 3 if MODE == "grinder" else 2
-    act_cols = st.columns(act_count)
-    with act_cols[0]:
-        spins = st.session_state.get("spins_left", 0)
-        if st.button(f"🎰 SPIN ({spins})", key="quick_spin"): st.session_state.view = "spinner"; st.rerun()
-    with act_cols[1]:
-        eggs = st.session_state.get("incubator_eggs", 0)
-        if st.button(f"🥚 HATCH ({eggs})", key="quick_hatch"): st.session_state.view = "incubator"; st.rerun()
-    if MODE in ("grinder","obsessed") and act_count >= 3:
-        with act_cols[2]:
-            if st.button("⚔️ BATTLE", key="quick_battle"): st.session_state.view = "battle"; st.rerun()
-    if MODE == "obsessed" and act_count >= 4:
-        with act_cols[3]:
-            ch = st.session_state.get("story_chapter", 0)
-            if st.button(f"📖 CH.{ch}", key="quick_story"): st.session_state.view = "story"; st.rerun()
-
-    st.markdown("---")
-
-    ab_col1, ab_col2 = st.columns(2)
-    with ab_col1:
-        shield_owned = st.session_state.get("shield_bought", False)
-        st.markdown(f"""<div class='metric-card' style='border-color:{C if shield_owned else "#333"};opacity:{"1.0" if shield_owned else "0.4"}'><div style='font-size:28px'>🛡️</div><div style='font-family:Bebas Neue,sans-serif;font-size:20px;color:{C};letter-spacing:2px'>{wd.get("shield_name","Shield")}</div><div style='font-size:11px;color:#ffffff;margin-top:4px'>{wd.get("shield_flavor","Protects you from harm.")}</div><div style='font-size:10px;color:#888;margin-top:6px;font-family:Space Mono,monospace'>{"✅ ACTIVE — Negates any debt" if shield_owned else "❌ NOT OWNED — Buy in shop or win from spinner"}</div></div>""", unsafe_allow_html=True)
-    with ab_col2:
-        booster_owned = st.session_state.get("booster_bought", False)
-        st.markdown(f"""<div class='metric-card' style='border-color:{C if booster_owned else "#333"};opacity:{"1.0" if booster_owned else "0.4"}'><div style='font-size:28px'>🚀</div><div style='font-family:Bebas Neue,sans-serif;font-size:20px;color:{C};letter-spacing:2px'>{wd.get("booster_name","Booster")}</div><div style='font-size:11px;color:#ffffff;margin-top:4px'>{wd.get("booster_flavor","Moves at impossible speed.")}</div><div style='font-size:10px;color:#888;margin-top:6px;font-family:Space Mono,monospace'>{"✅ ACTIVE — 3× multiplier on all rewards" if booster_owned else "❌ NOT OWNED — Buy in shop or win from spinner"}</div></div>""", unsafe_allow_html=True)
-
+    # ── STORY TEASER (keep) ──
     if st.session_state.story_log:
         latest = st.session_state.story_log[-1]
         teaser = latest[:180] + "..." if len(latest) > 180 else latest
         ch_num = st.session_state.story_chapter
         st.markdown(f"""<div style='border:1px solid {C}33;border-radius:14px;padding:20px;background:linear-gradient(135deg,rgba(0,0,0,0.4),rgba(0,0,0,0.2));margin:16px 0'><div style='font-family:Bebas Neue,sans-serif;font-size:13px;color:{C};letter-spacing:3px;margin-bottom:8px'>📖 CHAPTER {ch_num} — LATEST</div><div style='font-family:Space Mono,monospace;font-size:13px;color:#ffffff;line-height:1.7;font-style:italic'>{teaser}</div><div style='margin-top:10px;font-size:11px;color:#FF4488;font-family:Space Mono,monospace;animation:blink 1.5s ease-in-out infinite'>▸ Complete a mission to unlock the next chapter</div></div>""", unsafe_allow_html=True)
-
-    monsters = st.session_state.get("hatched_monsters", [])
-    if monsters:
-        rarity_colors = {"Common":"#aaaaaa","Rare":"#4488ff","Epic":"#aa44ff","Legendary":"#FFD700"}
-        recent = monsters[-5:]
-        monster_pills = " ".join([f"<span style='display:inline-block;padding:4px 12px;border-radius:99px;font-size:11px;border:1px solid {rarity_colors.get(m['rarity'],'#888')};color:{rarity_colors.get(m['rarity'],'#fff')};margin:2px;font-family:Space Mono,monospace'>{m['name']}</span>" for m in recent])
-        st.markdown(f"""<div style='text-align:center;margin:8px 0'><div style='font-family:Bebas Neue,sans-serif;font-size:13px;color:{C};letter-spacing:3px;margin-bottom:8px'>YOUR COLLECTION ({len(monsters)} creatures)</div>{monster_pills}</div>""", unsafe_allow_html=True)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
