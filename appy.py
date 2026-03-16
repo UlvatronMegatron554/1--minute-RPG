@@ -782,17 +782,23 @@ Write the chapter now:"""
         return f"Chapter {chapter}: The {theme} universe trembles. Something ancient stirs in the shadows. Your power grows — but so does the threat."
 
 def generate_universe_achievements(theme, client):
-    """Generate universe-specific achievements via AI."""
+    """Generate 10 more universe-specific achievements via AI."""
     try:
-        prompt = f"""Generate 5 achievements specific to the universe "{theme}" AND studying/working hard.
-Each achievement has: name (with emoji, max 4 words), desc (one punchy sentence, how it's earned).
+        existing_count = len(st.session_state.get("universe_achievements", []))
+        min_missions = existing_count + 1
+        max_missions = existing_count + 50
+        prompt = f"""Generate 10 NEW achievements specific to the universe "{theme}" AND studying/working hard.
+These are achievements #{existing_count + 1} through #{existing_count + 10}.
+The difficulty should require between {min_missions} and {max_missions} missions.
+Each must be deeply tied to {theme} lore — reference specific characters, locations, abilities, events.
+Each achievement has: name (with emoji, max 4 words, {theme}-specific), desc (one punchy sentence connecting {theme} lore to the study grind).
 Return ONLY raw JSON array, no markdown:
 [{{"name":"...","desc":"..."}},{{"name":"...","desc":"..."}}]"""
-        msg = client.messages.create(model="claude-sonnet-4-5", max_tokens=400, messages=[{"role":"user","content":prompt}])
+        msg = client.messages.create(model="claude-sonnet-4-5", max_tokens=1200, messages=[{"role":"user","content":prompt}])
         raw = msg.content[0].text.strip()
         raw = re.sub(r"```(?:json)?", "", raw).strip().rstrip("`")
         data = json.loads(raw)
-        return data[:5]
+        return data[:10]
     except:
         return []
 
@@ -878,10 +884,10 @@ Fields:
 - "battle_style": One of "shooter","turnbased","reaction","rpgclick","survival","rhythm","racing","trivia".
 - "player_visual": Object describing the PLAYER character's appearance for 2D pixel art rendering. Include: "hair_color" (hex), "hair_style" (one of: "spiky","long","short","bald","mohawk","ponytail","afro","flowing","twin_tails","messy"), "skin_color" (hex), "outfit_color" (hex), "outfit_secondary" (hex), "weapon" (one of: "sword","dual_sword","triple_sword","gun","staff","fists","bow","scythe","shield_weapon","none","ball","racket","wand"), "weapon_color" (hex), "eye_color" (hex), "cape" (true/false), "cape_color" (hex or ""), "aura_color" (hex), "body_build" (one of: "slim","average","muscular","large","tiny")
 - "enemy_visual": Same format as player_visual but for the enemy boss.
-- "lore_achievements": Array of 3 objects, each with "name" (emoji + 2-4 words, universe-specific) and "desc" (one sentence connecting universe lore to studying). Example for Naruto: {{"name":"🍥 Shadow Clone Scholar","desc":"Complete 10 missions — one for each shadow clone."}}
+- "lore_achievements": Array of 10 objects, each with "name" (emoji + 2-4 words, universe-specific, deeply tied to the lore) and "desc" (one sentence connecting universe lore to studying/working hard). Make them progressively harder. Early ones = 1-3 missions, mid ones = 10-25 missions, late ones = 50-100 missions. Each must reference specific characters, locations, or abilities from the universe. Example for Naruto: {{"name":"🍥 Shadow Clone Scholar","desc":"Complete 10 missions — one for each shadow clone."}}
 
 Return exactly:
-{{"currency":"...","color":"#RRGGBB","shield_name":"...","booster_name":"...","description":"...","shield_flavor":"...","booster_flavor":"...","battle_style":"...","player_visual":{{...}},"enemy_visual":{{...}},"lore_achievements":[{{"name":"...","desc":"..."}},{{"name":"...","desc":"..."}},{{"name":"...","desc":"..."}}]}}"""
+{{"currency":"...","color":"#RRGGBB","shield_name":"...","booster_name":"...","description":"...","shield_flavor":"...","booster_flavor":"...","battle_style":"...","player_visual":{{...}},"enemy_visual":{{...}},"lore_achievements":[{{"name":"...","desc":"..."}},...10 total...]}}"""
 
 # ─────────────────────────────────────────────────────────────────────────────
 # HARD FALLBACKS — ALL 30+ UNIVERSES (ORIGINAL — PRESERVED)
@@ -961,7 +967,7 @@ def resolve_universe(theme):
     if client is not None:
         try:
             safe_prompt = get_ai_safety_prefix() + "\n\n" + LORE_PROMPT.format(theme=cleaned_theme)
-            message = client.messages.create(model="claude-sonnet-4-5", max_tokens=900, messages=[{"role":"user","content":safe_prompt}])
+            message = client.messages.create(model="claude-sonnet-4-5", max_tokens=1800, messages=[{"role":"user","content":safe_prompt}])
             raw = message.content[0].text.strip()
             if '"blocked"' in raw and "true" in raw.lower():
                 return {"safe": False, "reason": "Our AI detected this theme isn't appropriate. Try a game, anime, sport, movie, or anything you love! 🌌", "data": None}
@@ -982,8 +988,20 @@ def resolve_universe(theme):
     data["player_visual"] = {}; data["enemy_visual"] = {}
     data["lore_achievements"] = [
         {"name": f"⚡ {cleaned_theme} Initiate", "desc": f"Complete your first mission in the {cleaned_theme} universe."},
-        {"name": f"🔥 {cleaned_theme} Warrior", "desc": f"Reach 10 missions. Your {cleaned_theme} power is growing."},
-        {"name": f"👑 {cleaned_theme} Legend", "desc": f"Hit 50 missions. You've mastered the {cleaned_theme} universe."},
+        {"name": f"🔥 {cleaned_theme} Spark", "desc": f"Complete 3 missions. The {cleaned_theme} energy is building."},
+        {"name": f"💪 {cleaned_theme} Grinder", "desc": f"Hit 5 missions. You're earning your place in {cleaned_theme}."},
+        {"name": f"📖 {cleaned_theme} Scholar", "desc": f"Reach 8 missions. Knowledge is power in {cleaned_theme}."},
+        {"name": f"⚔️ {cleaned_theme} Warrior", "desc": f"Complete 10 missions. A true {cleaned_theme} fighter emerges."},
+        {"name": f"🛡️ {cleaned_theme} Guardian", "desc": f"Hit 15 missions. You protect {cleaned_theme} with dedication."},
+        {"name": f"🎯 {cleaned_theme} Sharpshooter", "desc": f"Reach 20 missions. Precision and focus define your path."},
+        {"name": f"🏆 {cleaned_theme} Champion", "desc": f"Complete 25 missions. Champions are forged through effort."},
+        {"name": f"🌟 {cleaned_theme} Star", "desc": f"Hit 30 missions. You shine across the {cleaned_theme} universe."},
+        {"name": f"💎 {cleaned_theme} Elite", "desc": f"Reach 40 missions. Only the elite reach this level."},
+        {"name": f"👑 {cleaned_theme} Legend", "desc": f"Complete 50 missions. Legends are built one mission at a time."},
+        {"name": f"🐉 {cleaned_theme} Titan", "desc": f"Hit 65 missions. Titans reshape the {cleaned_theme} universe."},
+        {"name": f"🌌 {cleaned_theme} Infinite", "desc": f"Reach 80 missions. You've transcended normal limits."},
+        {"name": f"💀 {cleaned_theme} Overlord", "desc": f"Complete 100 missions. Absolute domination of {cleaned_theme}."},
+        {"name": f"🔮 {cleaned_theme} Omniscient", "desc": f"Hit 150 missions. You know everything about {cleaned_theme}."},
     ]
     return {"safe": True, "data": data}
 
@@ -1186,6 +1204,9 @@ if st.session_state.user_name is None:
                 st.session_state.world_data = result["data"]
                 st.session_state.vibe_color = result["data"].get("color","#FFD700")
                 st.session_state.user_theme = display_name
+                # Initialize universe achievements from lore data
+                st.session_state.universe_achievements = result["data"].get("lore_achievements", [])
+                st.session_state.universe_ach_loaded = True
                 apply_welcome_bonus()
                 st.rerun()
 
@@ -1609,12 +1630,20 @@ elif view == "secrets":
 elif view == "achievements":
     st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>🏆 {st.session_state.user_theme.upper()} ACHIEVEMENTS</h2>", unsafe_allow_html=True)
 
-    lore_achs = wd.get("lore_achievements", [])
-    if lore_achs:
-        for la in lore_achs:
+    # Use accumulated achievements from session state
+    all_achs = st.session_state.get("universe_achievements", [])
+    # If empty, try loading from world data
+    if not all_achs:
+        all_achs = wd.get("lore_achievements", [])
+        if all_achs:
+            st.session_state.universe_achievements = all_achs
+
+    if all_achs:
+        st.markdown(f"<p style='text-align:center;color:#888;font-family:Space Mono,monospace;font-size:12px;margin-bottom:16px'>{len(all_achs)} achievements · More unlock every 10 missions</p>", unsafe_allow_html=True)
+        for la in all_achs:
             st.markdown(f"""<div class='ach-card' style='border-color:{C};opacity:0.7'><span style='font-family:Bebas Neue,sans-serif;font-size:18px;color:{C}'>{la.get("name","🌌 Achievement")}</span><br><span style='font-family:Space Mono,monospace;font-size:11px;color:{TEXT}'>{la.get("desc","Complete missions to unlock.")}</span></div>""", unsafe_allow_html=True)
     else:
-        st.markdown(f"<p style='text-align:center;color:#888;font-family:Space Mono,monospace'>Achievements are loading for your universe... Complete a mission to generate them.</p>", unsafe_allow_html=True)
+        st.markdown(f"<p style='text-align:center;color:#888;font-family:Space Mono,monospace'>Complete missions to generate achievements for your universe.</p>", unsafe_allow_html=True)
 
 # ── INCUBATOR ──
 elif view == "incubator":
@@ -1833,6 +1862,18 @@ if st.session_state.needs_verification:
             st.session_state.level = 1 + st.session_state.xp // 100
             st.session_state.total_missions += 1
             st.session_state.needs_verification = False; st.session_state.pending_gold = 0.0
+
+            # ── PROGRESSIVE ACHIEVEMENT GENERATION (every 10 missions, up to 300) ──
+            total_m = st.session_state.total_missions
+            current_achs = st.session_state.get("universe_achievements", [])
+            if total_m % 10 == 0 and len(current_achs) < 300:
+                ach_client = get_claude_client()
+                if ach_client:
+                    batch_num = len(current_achs) // 10 + 1
+                    new_achs = generate_universe_achievements(st.session_state.user_theme, ach_client)
+                    if new_achs:
+                        st.session_state.universe_achievements = current_achs + new_achs
+                        st.toast(f"🏆 {len(new_achs)} NEW ACHIEVEMENTS UNLOCKED!", icon="🏆")
             loot_pool = [
                 {"name": f"+{spins} Spinner Spins", "rarity": rarity_label, "color": "#FFD700"},
                 {"name": "RARE INCUBATOR EGG", "rarity": "GREAT", "color": "#4488FF"},
