@@ -1112,7 +1112,7 @@ input,textarea{{background:#ffffff!important;color:#000000!important;caret-color
 input::placeholder,textarea::placeholder{{color:#666666!important;}}
 label,.stTextInput label{{color:{TEXT}!important;font-family:'Space Mono',monospace!important;font-size:11px!important;letter-spacing:2px!important;}}
 @keyframes titan-pulse{{0%{{box-shadow:0 0 20px {C},inset 0 0 10px {C};border-color:{C};}}50%{{box-shadow:0 0 80px {C},inset 0 0 40px {C};border-color:#ffffff;}}100%{{box-shadow:0 0 20px {C},inset 0 0 10px {C};border-color:{C};}}}}
-div.stButton>button{{border:3px solid {C}!important;background:#000000!important;color:#ffffff!important;font-family:'Bebas Neue',sans-serif!important;font-size:16px!important;letter-spacing:2px!important;padding:14px 16px!important;border-radius:12px!important;animation:titan-pulse 2.5s infinite ease-in-out!important;width:100%;text-transform:uppercase;transition:transform 0.3s;margin-bottom:8px;}}
+div.stButton>button{{border:2px solid {C}!important;background:#000000!important;color:#ffffff!important;font-family:'Bebas Neue',sans-serif!important;font-size:13px!important;letter-spacing:2px!important;padding:8px 12px!important;border-radius:10px!important;animation:titan-pulse 2.5s infinite ease-in-out!important;width:100%;text-transform:uppercase;transition:transform 0.3s;margin-bottom:6px;}}
 div.stButton>button:hover{{transform:scale(1.02);}}
 .metric-card,.shop-card,.ach-card,.monster-card,.secret-card{{background:#111111!important;border:2px solid {C}!important;border-radius:14px!important;padding:18px!important;margin-bottom:12px!important;color:#ffffff!important;}}
 .metric-card *,.shop-card *,.ach-card *,.monster-card *,.secret-card *{{color:#ffffff!important;}}
@@ -1684,39 +1684,7 @@ document.getElementById('spinBtn').onclick=function(){{
 }};
 </script>""", height=480)
 
-    # ── Award is processed server-side when Python button exists ────────────────
-    # The HTML wheel handles the visual spin + countdown.
-    # A hidden Streamlit button fires the actual prize award when can_spin.
-    if can_spin:
-        _, sc, _ = st.columns([1,2,1])
-        with sc:
-            if st.button("⚡ CLAIM AFTER SPIN", key="do_spin", use_container_width=True):
-                prize = spin_wheel()
-                st.session_state.spins_left     = max(0, spins_left - 1)
-                st.session_state.last_spin_time = _dt.datetime.now().isoformat()
-                st.session_state.spinner_wins  += 1
-                if prize["type"] == "gold_mult":
-                    bonus = max(2.0, (st.session_state.pending_gold or 2)) * prize["value"]
-                    st.session_state.gold += bonus; msg = f"💰 {prize['label']}! +{bonus:.1f} {currency}!"
-                elif prize["type"] == "gold_flat":
-                    st.session_state.gold += prize["value"]; msg = f"⚡ +{prize['value']} {currency}!"
-                elif prize["type"] == "egg_rare":
-                    st.session_state.incubator_eggs += 1; msg = "🥚 RARE EGG added to incubator!"
-                elif prize["type"] == "egg_epic":
-                    st.session_state.incubator_eggs += 1; msg = "✨ EPIC EGG added to incubator!"
-                elif prize["type"] == "ability":
-                    if prize["value"] == "shield":
-                        st.session_state.shield_bought = True; msg = f"🛡️ {wd.get('shield_name','SHIELD')} ACTIVATED!"
-                    else:
-                        st.session_state.booster_bought = True
-                        st.session_state.sub_multiplier = max(st.session_state.sub_multiplier, 2)
-                        msg = f"🚀 {wd.get('booster_name','BOOSTER')} ACTIVATED!"
-                elif prize["type"] == "story_twist":
-                    st.session_state.story_twist_pending = True; msg = "📖 STORY TWIST UNLOCKED!"
-                else:
-                    msg = "💨 Nothing this time. Grind harder."
-                st.session_state.spinner_result = {"prize": prize, "msg": msg}
-                st.balloons(); st.rerun()
+
 
     # ── Last prize result display ─────────────────────────────────────────────
     if st.session_state.spinner_result:
