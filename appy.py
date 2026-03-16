@@ -1367,7 +1367,7 @@ if view == "main":
 </style>""", unsafe_allow_html=True)
     st.markdown(f"<div style='text-align:center;font-family:Bebas Neue,sans-serif;font-size:14px;color:#555;letter-spacing:2px;margin-bottom:4px'>TIMER: {timer}s &nbsp;·&nbsp; min 30s &nbsp;·&nbsp; max 5min</div>", unsafe_allow_html=True)
     st.markdown('<div class="mission-timer-row">', unsafe_allow_html=True)
-    col_m, col_s, col_p = st.columns([1, 3, 1])
+    col_m, col_s, col_p = st.columns([1, 1, 1])
     with col_m:
         if st.button("－30s", key="timer_minus", use_container_width=True):
             st.session_state.micro_timer_seconds = max(30, timer-30); st.rerun()
