@@ -1607,24 +1607,14 @@ elif view == "secrets":
 
 # ── ACHIEVEMENTS ──
 elif view == "achievements":
-    st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>🏆 ACHIEVEMENTS</h2>", unsafe_allow_html=True)
+    st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>🏆 {st.session_state.user_theme.upper()} ACHIEVEMENTS</h2>", unsafe_allow_html=True)
 
-    # ── UNIVERSE-SPECIFIC LORE ACHIEVEMENTS ──
     lore_achs = wd.get("lore_achievements", [])
     if lore_achs:
-        st.markdown(f"<h3 style='font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:3px;margin-bottom:12px'>🌌 {st.session_state.user_theme.upper()} LORE ACHIEVEMENTS</h3>", unsafe_allow_html=True)
         for la in lore_achs:
-            st.markdown(f"""<div class='ach-card' style='border-color:{C};opacity:0.7'><span style='font-family:Bebas Neue,sans-serif;font-size:18px;color:{C}'>{la.get("name","🌌 Lore Achievement")}</span><br><span style='font-family:Space Mono,monospace;font-size:11px;color:{TEXT}'>{la.get("desc","Complete missions to unlock.")}</span></div>""", unsafe_allow_html=True)
-        st.markdown("---")
-
-    # ── STANDARD ACHIEVEMENTS ──
-    st.markdown(f"<h3 style='font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:3px;margin-bottom:12px'>⚡ UNIVERSAL ACHIEVEMENTS</h3>", unsafe_allow_html=True)
-    unlocked = st.session_state.get("unlocked_achievements", set())
-    for ach in ACHIEVEMENTS:
-        is_done = ach["id"] in unlocked
-        border_col = C if is_done else MUTED
-        opacity = "1.0" if is_done else "0.35"
-        st.markdown(f"""<div class='ach-card' style='border-color:{border_col};opacity:{opacity}'><span style='font-family:Bebas Neue,sans-serif;font-size:18px;color:{C}'>{ach["name"]}</span><br><span style='font-family:Space Mono,monospace;font-size:11px;color:{TEXT}'>{ach["desc"]}</span></div>""", unsafe_allow_html=True)
+            st.markdown(f"""<div class='ach-card' style='border-color:{C};opacity:0.7'><span style='font-family:Bebas Neue,sans-serif;font-size:18px;color:{C}'>{la.get("name","🌌 Achievement")}</span><br><span style='font-family:Space Mono,monospace;font-size:11px;color:{TEXT}'>{la.get("desc","Complete missions to unlock.")}</span></div>""", unsafe_allow_html=True)
+    else:
+        st.markdown(f"<p style='text-align:center;color:#888;font-family:Space Mono,monospace'>Achievements are loading for your universe... Complete a mission to generate them.</p>", unsafe_allow_html=True)
 
 # ── INCUBATOR ──
 elif view == "incubator":
