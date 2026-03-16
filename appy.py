@@ -782,16 +782,29 @@ Write the chapter now:"""
         return f"Chapter {chapter}: The {theme} universe trembles. Something ancient stirs in the shadows. Your power grows — but so does the threat."
 
 def generate_universe_achievements(theme, client):
-    """Generate 10 more universe-specific achievements via AI."""
+    """Generate 10 more universe-specific achievements via AI — CREATIVE and VARIED."""
     try:
         existing_count = len(st.session_state.get("universe_achievements", []))
-        min_missions = existing_count + 1
-        max_missions = existing_count + 50
-        prompt = f"""Generate 10 NEW achievements specific to the universe "{theme}" AND studying/working hard.
+        prompt = f"""Generate 10 NEW creative achievements for the universe "{theme}" connected to studying.
 These are achievements #{existing_count + 1} through #{existing_count + 10}.
-The difficulty should require between {min_missions} and {max_missions} missions.
-Each must be deeply tied to {theme} lore — reference specific characters, locations, abilities, events.
-Each achievement has: name (with emoji, max 4 words, {theme}-specific), desc (one punchy sentence connecting {theme} lore to the study grind).
+
+CRITICAL: Each achievement must have a DIFFERENT unlock condition. DO NOT just use "complete X missions" for all of them.
+Mix these conditions creatively:
+- Earn a specific amount of currency (e.g. 100, 500, 1000)
+- Win a certain number of battles (e.g. 3, 10, 25)
+- Maintain a study streak (e.g. 7 days, 14 days, 30 days)
+- Hatch eggs or get a specific rarity (e.g. hatch 5 eggs, get a Legendary)
+- Reach a story chapter (e.g. chapter 5, 15, 25)
+- Win spinner prizes (e.g. 5 spins, hit a jackpot)
+- Reach a level (e.g. level 5, 10, 20)
+- Complete missions in a row without losing a battle
+- Buy something from the shop
+- Collect a number of universe secrets
+
+Each achievement MUST reference specific {theme} lore — characters, moves, locations, quotes, events.
+Make the names fun and lore-specific (emoji + 2-4 words).
+Make the descriptions one punchy sentence that connects {theme} lore to the condition.
+
 Return ONLY raw JSON array, no markdown:
 [{{"name":"...","desc":"..."}},{{"name":"...","desc":"..."}}]"""
         msg = client.messages.create(model="claude-sonnet-4-5", max_tokens=1200, messages=[{"role":"user","content":prompt}])
@@ -884,7 +897,7 @@ Fields:
 - "battle_style": One of "shooter","turnbased","reaction","rpgclick","survival","rhythm","racing","trivia".
 - "player_visual": Object describing the PLAYER character's appearance for 2D pixel art rendering. Include: "hair_color" (hex), "hair_style" (one of: "spiky","long","short","bald","mohawk","ponytail","afro","flowing","twin_tails","messy"), "skin_color" (hex), "outfit_color" (hex), "outfit_secondary" (hex), "weapon" (one of: "sword","dual_sword","triple_sword","gun","staff","fists","bow","scythe","shield_weapon","none","ball","racket","wand"), "weapon_color" (hex), "eye_color" (hex), "cape" (true/false), "cape_color" (hex or ""), "aura_color" (hex), "body_build" (one of: "slim","average","muscular","large","tiny")
 - "enemy_visual": Same format as player_visual but for the enemy boss.
-- "lore_achievements": Array of 10 objects, each with "name" (emoji + 2-4 words, universe-specific, deeply tied to the lore) and "desc" (one sentence connecting universe lore to studying/working hard). Make them progressively harder. Early ones = 1-3 missions, mid ones = 10-25 missions, late ones = 50-100 missions. Each must reference specific characters, locations, or abilities from the universe. Example for Naruto: {{"name":"🍥 Shadow Clone Scholar","desc":"Complete 10 missions — one for each shadow clone."}}
+- "lore_achievements": Array of 10 objects, each with "name" (emoji + 2-4 words, universe-specific, deeply tied to the lore) and "desc" (one sentence connecting universe lore to studying/working hard). CRITICAL: Each achievement must have a DIFFERENT unlock condition — mix currency earned, battles won, streaks maintained, eggs hatched, story chapters reached, spinner wins, levels gained, secrets collected. NOT just "complete X missions" for all of them. Reference specific characters, locations, or abilities. Example for Naruto: {{"name":"🍥 Ichiraku Regular","desc":"Earn 500 Ryo — enough for a lifetime supply of ramen."}}
 
 Return exactly:
 {{"currency":"...","color":"#RRGGBB","shield_name":"...","booster_name":"...","description":"...","shield_flavor":"...","booster_flavor":"...","battle_style":"...","player_visual":{{...}},"enemy_visual":{{...}},"lore_achievements":[{{"name":"...","desc":"..."}},...10 total...]}}"""
@@ -986,23 +999,32 @@ def resolve_universe(theme):
     data = get_fallback(cleaned_theme)
     data["shield_effect"] = SHIELD_EFFECT; data["booster_effect"] = BOOSTER_EFFECT
     data["player_visual"] = {}; data["enemy_visual"] = {}
-    data["lore_achievements"] = [
-        {"name": f"⚡ {cleaned_theme} Initiate", "desc": f"Complete your first mission in the {cleaned_theme} universe."},
-        {"name": f"🔥 {cleaned_theme} Spark", "desc": f"Complete 3 missions. The {cleaned_theme} energy is building."},
-        {"name": f"💪 {cleaned_theme} Grinder", "desc": f"Hit 5 missions. You're earning your place in {cleaned_theme}."},
-        {"name": f"📖 {cleaned_theme} Scholar", "desc": f"Reach 8 missions. Knowledge is power in {cleaned_theme}."},
-        {"name": f"⚔️ {cleaned_theme} Warrior", "desc": f"Complete 10 missions. A true {cleaned_theme} fighter emerges."},
-        {"name": f"🛡️ {cleaned_theme} Guardian", "desc": f"Hit 15 missions. You protect {cleaned_theme} with dedication."},
-        {"name": f"🎯 {cleaned_theme} Sharpshooter", "desc": f"Reach 20 missions. Precision and focus define your path."},
-        {"name": f"🏆 {cleaned_theme} Champion", "desc": f"Complete 25 missions. Champions are forged through effort."},
-        {"name": f"🌟 {cleaned_theme} Star", "desc": f"Hit 30 missions. You shine across the {cleaned_theme} universe."},
-        {"name": f"💎 {cleaned_theme} Elite", "desc": f"Reach 40 missions. Only the elite reach this level."},
-        {"name": f"👑 {cleaned_theme} Legend", "desc": f"Complete 50 missions. Legends are built one mission at a time."},
-        {"name": f"🐉 {cleaned_theme} Titan", "desc": f"Hit 65 missions. Titans reshape the {cleaned_theme} universe."},
-        {"name": f"🌌 {cleaned_theme} Infinite", "desc": f"Reach 80 missions. You've transcended normal limits."},
-        {"name": f"💀 {cleaned_theme} Overlord", "desc": f"Complete 100 missions. Absolute domination of {cleaned_theme}."},
-        {"name": f"🔮 {cleaned_theme} Omniscient", "desc": f"Hit 150 missions. You know everything about {cleaned_theme}."},
-    ]
+    # Try generating achievements via separate AI call even if main lore call failed
+    ach_client = get_claude_client()
+    if ach_client:
+        data["lore_achievements"] = generate_universe_achievements(cleaned_theme, ach_client)
+    if not data.get("lore_achievements"):
+        # Dynamic randomized fallback — different every time
+        curr = data.get("currency", "Shards")
+        actions = [
+            {"name": f"⚡ First {cleaned_theme} Step", "desc": f"Complete your very first mission in {cleaned_theme}."},
+            {"name": f"💰 {cleaned_theme} Payday", "desc": f"Earn {random.choice([25,50,75,100])} {curr} through pure grind."},
+            {"name": f"⚔️ {cleaned_theme} Fighter", "desc": f"Win {random.choice([1,3,5])} battle{'s' if True else ''} in the {cleaned_theme} arena."},
+            {"name": f"🔥 {cleaned_theme} Flame", "desc": f"Hold a {random.choice([3,5,7])}-day study streak without breaking."},
+            {"name": f"🥚 {cleaned_theme} Collector", "desc": f"Hatch {random.choice([2,3,5])} eggs from the {cleaned_theme} incubator."},
+            {"name": f"🎰 {cleaned_theme} Gambler", "desc": f"Win {random.choice([3,5,8])} spinner prizes. Luck meets effort."},
+            {"name": f"💎 {cleaned_theme} Banker", "desc": f"Stack {random.choice([150,250,500])} {curr} in your vault."},
+            {"name": f"🐉 {cleaned_theme} Mythic", "desc": f"Hatch a Legendary creature. The rarest {cleaned_theme} beast."},
+            {"name": f"📖 {cleaned_theme} Saga", "desc": f"Reach Chapter {random.choice([5,8,10,15])} of your storyline."},
+            {"name": f"👑 {cleaned_theme} Conqueror", "desc": f"Win {random.choice([10,15,20])} battles. Total arena domination."},
+            {"name": f"🔮 {cleaned_theme} Seeker", "desc": f"Unlock {random.choice([5,8,10])} universe secrets."},
+            {"name": f"🛒 {cleaned_theme} Shopper", "desc": f"Buy your first item from the shop with {cleaned_theme} earnings."},
+            {"name": f"🌟 {cleaned_theme} Ascended", "desc": f"Reach Level {random.choice([5,8,10])} through relentless grinding."},
+            {"name": f"💀 {cleaned_theme} Unbroken", "desc": f"Win {random.choice([3,5])} battles in a row without losing."},
+            {"name": f"🏆 {cleaned_theme} Supreme", "desc": f"Earn {random.choice([500,750,1000])} {curr} total across all missions."},
+        ]
+        random.shuffle(actions)
+        data["lore_achievements"] = actions[:10]
     return {"safe": True, "data": data}
 
 # ─────────────────────────────────────────────────────────────────────────────
