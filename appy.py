@@ -1391,25 +1391,21 @@ if view == "main":
 
     # ── LAYOUT CUSTOMIZER ────────────────────────────────────────────────────
     with st.expander("⚙️ Customize Button Layout", expanded=False):
-        st.markdown(f"<div style='font-family:Space Mono,monospace;font-size:10px;color:#888;letter-spacing:1px;margin-bottom:8px'>Drag to adjust — changes apply instantly</div>", unsafe_allow_html=True)
         cz1, cz2 = st.columns(2)
         with cz1:
-            btn_font = st.slider("Button text size", min_value=9, max_value=22, value=st.session_state.get("btn_font_size", 15), step=1, key="btn_font_size_slider")
-            st.session_state["btn_font_size"] = btn_font
+            st.slider("Text size", 9, 26, st.session_state.get("btn_font_size_slider", 13), step=1, key="btn_font_size_slider")
         with cz2:
-            btn_pad = st.slider("Button height (padding)", min_value=2, max_value=28, value=st.session_state.get("btn_pad", 12), step=2, key="btn_pad_slider")
-            st.session_state["btn_pad"] = btn_pad
-        center_weight = st.slider("Center button width  ← narrow  |  wide →", min_value=1, max_value=8, value=st.session_state.get("center_weight", 2), step=1, key="center_weight_slider")
-        st.session_state["center_weight"] = center_weight
-        st.caption("Reset to defaults → set text size 15, height 12, width 2")
+            st.slider("Button height", 2, 32, st.session_state.get("btn_pad_slider", 4), step=2, key="btn_pad_slider")
+        st.slider("Center button width  ← narrow | wide →", 1, 8, st.session_state.get("center_weight_slider", 2), step=1, key="center_weight_slider")
 
-    _btn_font = st.session_state.get("btn_font_size_slider", 13)
-    _btn_pad  = st.session_state.get("btn_pad_slider", 4)
-    _cw       = st.session_state.get("center_weight_slider", 2)
+    _fs = st.session_state.get("btn_font_size_slider", 13)
+    _pd = st.session_state.get("btn_pad_slider", 4)
+    _cw = st.session_state.get("center_weight_slider", 2)
 
-    # Inject live CSS override — runs every rerun with current slider values
+    # Target `p` inside button — that's where Streamlit actually puts the text
     st.markdown(f"""<style>
-div.stButton>button{{font-size:{_btn_font}px!important;padding:{_btn_pad}px 12px!important;}}
+div.stButton>button p{{font-size:{_fs}px!important;line-height:1.2!important;}}
+div.stButton>button{{padding:{_pd}px 12px!important;}}
 </style>""", unsafe_allow_html=True)
 
     # ── START MISSION + ±30s ─────────────────────────────────────────────────
