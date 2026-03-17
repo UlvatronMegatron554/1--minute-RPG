@@ -1133,7 +1133,7 @@ label,.stTextInput label{{color:{TEXT}!important;font-family:'Space Mono',monosp
 [data-testid="stSidebar"] input{{border:1px solid #444444!important;border-radius:6px!important;background:#ffffff!important;color:#000000!important;box-shadow:none!important;padding:8px 10px!important;}}
 [data-testid="stSidebar"] input:focus{{border:1px solid #666666!important;box-shadow:none!important;outline:none!important;}}
 @keyframes titan-pulse{{0%{{box-shadow:0 0 20px {C},inset 0 0 10px {C};border-color:{C};}}50%{{box-shadow:0 0 80px {C},inset 0 0 40px {C};border-color:#ffffff;}}100%{{box-shadow:0 0 20px {C},inset 0 0 10px {C};border-color:{C};}}}}
-div.stButton>button{{border:2px solid {C}!important;background:#000000!important;color:#ffffff!important;font-family:'Bebas Neue',sans-serif!important;font-size:13px!important;letter-spacing:2px!important;padding:4px 12px!important;border-radius:10px!important;animation:titan-pulse 2.5s infinite ease-in-out!important;width:100%!important;text-transform:uppercase;transition:transform 0.3s;margin-bottom:6px;}}
+div.stButton>button{{border:2px solid {C}!important;background:#000000!important;color:#ffffff!important;font-family:'Bebas Neue',sans-serif!important;font-size:{st.session_state.get("btn_font_size",13)}px!important;letter-spacing:2px!important;padding:{st.session_state.get("btn_pad",4)}px 12px!important;border-radius:10px!important;animation:titan-pulse 2.5s infinite ease-in-out!important;width:100%!important;text-transform:uppercase;transition:transform 0.3s;margin-bottom:6px;}}
 div.stButton>button:hover{{transform:scale(1.02);}}
 .metric-card,.shop-card,.ach-card,.monster-card,.secret-card{{background:#111111!important;border:2px solid {C}!important;border-radius:14px!important;padding:18px!important;margin-bottom:12px!important;color:#ffffff!important;}}
 .metric-card *,.shop-card *,.ach-card *,.monster-card *,.secret-card *{{color:#ffffff!important;}}
@@ -1408,18 +1408,6 @@ if view == "main":
     _cw         = st.session_state.get("center_weight", 2)
 
     # ── START MISSION + ±30s ─────────────────────────────────────────────────
-    st.markdown(f"""<style>
-.mission-timer-row div.stButton > button {{
-    padding: {_btn_pad}px 8px !important;
-    font-size: {_btn_font}px !important;
-    letter-spacing: 1px !important;
-    border-width: 2px !important;
-    border-radius: 10px !important;
-    animation: none !important;
-    margin-bottom: 0 !important;
-    box-shadow: none !important;
-}}
-</style>""", unsafe_allow_html=True)
     st.markdown(f"<div style='text-align:center;font-family:Bebas Neue,sans-serif;font-size:14px;color:#555;letter-spacing:2px;margin-bottom:4px'>TIMER: {timer}s &nbsp;·&nbsp; min 30s &nbsp;·&nbsp; max 5min</div>", unsafe_allow_html=True)
     st.markdown('<div class="mission-timer-row">', unsafe_allow_html=True)
     col_m, col_s, col_p = st.columns([1, _cw, 1])
