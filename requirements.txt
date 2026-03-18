@@ -3,4 +3,5 @@ google-generativeai
 Pillow
 anthropic
 supabase
-
+replicate>=0.25.0
+pydantic>=2.0
