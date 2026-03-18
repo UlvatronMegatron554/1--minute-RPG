@@ -3,6 +3,16 @@ import anthropic
 import time, json, re, random
 import datetime as _dt
 import streamlit.components.v1 as components
+try:
+    from supabase import create_client, Client as SupabaseClient
+    SUPABASE_AVAILABLE = True
+except ImportError:
+    SUPABASE_AVAILABLE = False
+try:
+    import replicate
+    REPLICATE_AVAILABLE = True
+except ImportError:
+    REPLICATE_AVAILABLE = False
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 30 SECOND INFINITEVERSE v10.0 — INFINITE ADDICTION EDITION
@@ -746,6 +756,205 @@ def get_claude_client():
     try: return anthropic.Anthropic(api_key=st.secrets["ANTHROPIC_KEY"])
     except Exception: return None
 
+# ─────────────────────────────────────────────────────────────────────────────
+# SUPABASE — PERSISTENT DATABASE
+# ─────────────────────────────────────────────────────────────────────────────
+@st.cache_resource
+def get_supabase():
+    if not SUPABASE_AVAILABLE: return None
+    try:
+        url = st.secrets["SUPABASE_URL"]
+        key = st.secrets["SUPABASE_KEY"]
+        return create_client(url, key)
+    except Exception:
+        return None
+
+def db_save(user_name: str, theme: str):
+    """Save full session state to Supabase."""
+    sb = get_supabase()
+    if not sb or not user_name: return
+    try:
+        payload = {
+            "user_name": user_name.lower().strip(),
+            "theme": theme,
+            "gold": float(st.session_state.get("gold", 0)),
+            "xp": int(st.session_state.get("xp", 0)),
+            "level": int(st.session_state.get("level", 1)),
+            "total_missions": int(st.session_state.get("total_missions", 0)),
+            "study_streak": int(st.session_state.get("study_streak", 0)),
+            "last_active_date": st.session_state.get("last_active_date"),
+            "battles_fought": int(st.session_state.get("battles_fought", 0)),
+            "battles_won": int(st.session_state.get("battles_won", 0)),
+            "eggs_hatched": int(st.session_state.get("eggs_hatched", 0)),
+            "incubator_eggs": int(st.session_state.get("incubator_eggs", 0)),
+            "spinner_wins": int(st.session_state.get("spinner_wins", 0)),
+            "story_chapter": int(st.session_state.get("story_chapter", 0)),
+            "story_log": json.dumps(st.session_state.get("story_log", [])),
+            "secret_queue": json.dumps(st.session_state.get("secret_queue", [])),
+            "unlocked_achievements": json.dumps(list(st.session_state.get("unlocked_achievements", set()))),
+            "universe_achievements": json.dumps(st.session_state.get("universe_achievements", [])),
+            "hatched_monsters": json.dumps(st.session_state.get("hatched_monsters", [])),
+            "sub_tier": st.session_state.get("sub_tier", "Free"),
+            "sub_multiplier": int(st.session_state.get("sub_multiplier", 1)),
+            "shield_bought": bool(st.session_state.get("shield_bought", False)),
+            "booster_bought": bool(st.session_state.get("booster_bought", False)),
+            "legendary_hatched": bool(st.session_state.get("legendary_hatched", False)),
+            "last_spin_time": st.session_state.get("last_spin_time"),
+            "spins_left": int(st.session_state.get("spins_left", 0)),
+            "game_mode": st.session_state.get("game_mode", "chill"),
+            "vibe_color": st.session_state.get("vibe_color", "#FFD700"),
+            "bg_color": st.session_state.get("bg_color", "#ffffff"),
+            "micro_timer_seconds": int(st.session_state.get("micro_timer_seconds", 30)),
+            "updated_at": _dt.datetime.utcnow().isoformat(),
+        }
+        sb.table("players").upsert(payload, on_conflict="user_name").execute()
+    except Exception as e:
+        pass  # Silent fail — never break the app for a DB issue
+
+def db_load(user_name: str) -> dict | None:
+    """Load session state from Supabase. Returns None if not found."""
+    sb = get_supabase()
+    if not sb or not user_name: return None
+    try:
+        res = sb.table("players").select("*").eq("user_name", user_name.lower().strip()).execute()
+        if not res.data: return None
+        row = res.data[0]
+        return row
+    except Exception:
+        return None
+
+def db_apply(row: dict):
+    """Apply a loaded DB row into session state."""
+    st.session_state.gold              = float(row.get("gold", 10))
+    st.session_state.xp               = int(row.get("xp", 0))
+    st.session_state.level            = int(row.get("level", 1))
+    st.session_state.total_missions   = int(row.get("total_missions", 0))
+    st.session_state.study_streak     = int(row.get("study_streak", 0))
+    st.session_state.last_active_date = row.get("last_active_date")
+    st.session_state.battles_fought   = int(row.get("battles_fought", 0))
+    st.session_state.battles_won      = int(row.get("battles_won", 0))
+    st.session_state.eggs_hatched     = int(row.get("eggs_hatched", 0))
+    st.session_state.incubator_eggs   = int(row.get("incubator_eggs", 0))
+    st.session_state.spinner_wins     = int(row.get("spinner_wins", 0))
+    st.session_state.story_chapter    = int(row.get("story_chapter", 0))
+    st.session_state.sub_tier         = row.get("sub_tier", "Free")
+    st.session_state.sub_multiplier   = int(row.get("sub_multiplier", 1))
+    st.session_state.shield_bought    = bool(row.get("shield_bought", False))
+    st.session_state.booster_bought   = bool(row.get("booster_bought", False))
+    st.session_state.legendary_hatched= bool(row.get("legendary_hatched", False))
+    st.session_state.last_spin_time   = row.get("last_spin_time")
+    st.session_state.spins_left       = int(row.get("spins_left", 0))
+    st.session_state.game_mode        = row.get("game_mode", "chill")
+    st.session_state.vibe_color       = row.get("vibe_color", "#FFD700")
+    st.session_state.bg_color         = row.get("bg_color", "#ffffff")
+    st.session_state.micro_timer_seconds = int(row.get("micro_timer_seconds", 30))
+    try: st.session_state.story_log   = json.loads(row.get("story_log", "[]"))
+    except: st.session_state.story_log = []
+    try: st.session_state.secret_queue = json.loads(row.get("secret_queue", "[]"))
+    except: st.session_state.secret_queue = []
+    try: st.session_state.unlocked_achievements = set(json.loads(row.get("unlocked_achievements", "[]")))
+    except: st.session_state.unlocked_achievements = set()
+    try: st.session_state.universe_achievements = json.loads(row.get("universe_achievements", "[]"))
+    except: st.session_state.universe_achievements = []
+    try: st.session_state.hatched_monsters = json.loads(row.get("hatched_monsters", "[]"))
+    except: st.session_state.hatched_monsters = []
+    st.session_state.secrets_seen = len(st.session_state.secret_queue)
+    st.session_state.opening_story_shown = len(st.session_state.story_log) > 0
+
+def db_get_leaderboard(limit: int = 10) -> list:
+    """Get top players by total missions."""
+    sb = get_supabase()
+    if not sb: return []
+    try:
+        res = sb.table("players").select("user_name,total_missions,study_streak,level,theme,sub_tier").order("total_missions", desc=True).limit(limit).execute()
+        return res.data or []
+    except Exception:
+        return []
+
+def db_save_image(key: str, url: str):
+    """Cache a generated image URL in Supabase."""
+    sb = get_supabase()
+    if not sb: return
+    try:
+        sb.table("images").upsert({"key": key, "url": url, "created_at": _dt.datetime.utcnow().isoformat()}, on_conflict="key").execute()
+    except Exception:
+        pass
+
+def db_get_image(key: str) -> str | None:
+    """Retrieve a cached image URL."""
+    sb = get_supabase()
+    if not sb: return None
+    try:
+        res = sb.table("images").select("url").eq("key", key).execute()
+        if res.data: return res.data[0]["url"]
+    except Exception:
+        pass
+    return None
+
+# ─────────────────────────────────────────────────────────────────────────────
+# FLUX IMAGE GENERATION (via Replicate)
+# ─────────────────────────────────────────────────────────────────────────────
+def generate_image(prompt: str, cache_key: str = None, width: int = 768, height: int = 768) -> str | None:
+    """Generate an image with FLUX. Returns URL or None. Uses cache if available."""
+    # Check cache first
+    if cache_key:
+        cached = db_get_image(cache_key)
+        if cached: return cached
+    if not REPLICATE_AVAILABLE: return None
+    try:
+        import replicate as _rep
+        api_token = st.secrets.get("REPLICATE_KEY", "")
+        if not api_token: return None
+        client = _rep.Client(api_token=api_token)
+        output = client.run(
+            "black-forest-labs/flux-schnell",
+            input={"prompt": prompt, "width": width, "height": height, "num_outputs": 1, "output_format": "webp"}
+        )
+        url = str(output[0]) if output else None
+        if url and cache_key:
+            db_save_image(cache_key, url)
+        return url
+    except Exception:
+        return None
+
+def generate_universe_banner(theme: str, color: str) -> str | None:
+    """Generate a cinematic banner for the universe gateway screen."""
+    cache_key = f"banner_{theme.lower().replace(' ', '_')[:40]}"
+    prompt = (
+        f"Cinematic ultra-wide banner art for '{theme}' universe. "
+        f"Epic landscape, dramatic lighting, dominant color {color}, "
+        f"hyper-detailed, 8K, moody atmospheric, no text, no UI elements, "
+        f"professional concept art, stunning composition"
+    )
+    return generate_image(prompt, cache_key, width=1024, height=384)
+
+def generate_character_portrait(theme: str, vis: dict, is_enemy: bool = False) -> str | None:
+    """Generate a character portrait for battle screen."""
+    role = "villain boss enemy" if is_enemy else "hero protagonist player character"
+    hair = vis.get("hair_color", "#000"), vis.get("hair_style", "short")
+    outfit = vis.get("outfit_color", "#000")
+    weapon = vis.get("weapon", "none")
+    build = vis.get("body_build", "average")
+    cache_key = f"char_{theme.lower().replace(' ','_')[:30]}_{'enemy' if is_enemy else 'player'}"
+    prompt = (
+        f"Full body character portrait of the {role} from '{theme}'. "
+        f"{build} build, {hair[1]} {hair[0]} hair, {outfit} outfit, wielding {weapon}. "
+        f"Anime/game art style, ultra detailed, dramatic lighting, transparent background, "
+        f"professional illustration, no text"
+    )
+    return generate_image(prompt, cache_key, width=512, height=768)
+
+def generate_achievement_badge(achievement_name: str, theme: str, color: str) -> str | None:
+    """Generate a badge image for an achievement."""
+    clean_name = re.sub(r'[^a-z0-9]', '_', achievement_name.lower())[:30]
+    cache_key = f"badge_{clean_name}"
+    prompt = (
+        f"Circular achievement badge icon for '{achievement_name}' in the '{theme}' universe. "
+        f"Glowing {color} accent, dark background, ornate border, emblematic symbol, "
+        f"game UI art style, high detail, no text"
+    )
+    return generate_image(prompt, cache_key, width=256, height=256)
+
 def extract_json(raw_text):
     if not raw_text: return None
     cleaned = re.sub(r"```(?:json)?", "", raw_text).strip().rstrip("`").strip()
@@ -945,7 +1154,7 @@ if "gold" not in st.session_state:
         "story_twist_pending": False, "opening_story_shown": False,
         "study_streak": 0, "last_active_date": None,
         "streak_shield": False, "spins_left": 0,
-        "loot_pending": False, "loot_item": None,
+        "loot_pending": False, "loot_item": None, "loot_log": [],
         "total_xp_real": 0,
         "universe_achievements": [], "universe_ach_loaded": False,
         "welcome_bonus_applied": False, "battle_subject_chosen": False,
@@ -1080,7 +1289,15 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                 st.session_state.user_theme = display_name
                 st.session_state.universe_achievements = result["data"].get("lore_achievements",[])
                 st.session_state.universe_ach_loaded = True
-                apply_welcome_bonus()
+                # ── LOAD SAVED DATA FROM SUPABASE ──
+                saved = db_load(name_input.strip())
+                if saved:
+                    db_apply(saved)
+                    st.session_state.world_data = result["data"]
+                    st.session_state.vibe_color = result["data"].get("color","#FFD700")
+                    st.session_state.user_theme = display_name
+                else:
+                    apply_welcome_bonus()
                 st.rerun()
 
     # ── 7 FIDGET SPINNERS (base64 embedded) ──
@@ -1180,6 +1397,8 @@ with st.sidebar:
     if st.button("🔮 SECRETS",       key="nav_secrets"):  st.session_state.view = "secrets";    st.rerun()
     if st.button("🛡️ ABILITIES",    key="nav_abilities"): st.session_state.view = "abilities";  st.rerun()
     if st.button("💬 FEEDBACK",      key="nav_feedback"): st.session_state.view = "feedback";   st.rerun()
+    if st.button("🏆 LEADERBOARD",   key="nav_leader"):   st.session_state.view = "leaderboard"; st.rerun()
+    if st.button("📦 MY BOXES",       key="nav_boxes"):   st.session_state.view = "boxes";      st.rerun()
     if MODE in ("grinder","obsessed"):
         if st.button("🏆 ACHIEVEMENTS", key="nav_ach"):  st.session_state.view = "achievements"; st.rerun()
         if st.button("🥚 INCUBATOR",    key="nav_inc"):  st.session_state.view = "incubator";    st.rerun()
@@ -1193,6 +1412,22 @@ with st.sidebar:
     st.markdown("<p style='color:#ffffff;font-weight:bold'>🌈 THEME COLOR</p>", unsafe_allow_html=True)
     new_tc = st.color_picker("", value=st.session_state.vibe_color, key="theme_picker", label_visibility="collapsed")
     if new_tc != st.session_state.vibe_color: st.session_state.vibe_color = new_tc; st.rerun()
+    st.write("---")
+    # ── SAVE / LOAD PROGRESS ────────────────────────────────────────────────
+    st.markdown("<p style='color:#ffffff;font-weight:bold'>💾 SAVE PROGRESS</p>", unsafe_allow_html=True)
+    import json as _json, base64 as _b64_save
+    _save_keys = ["gold","xp","level","total_missions","study_streak","last_active_date","sub_tier","sub_multiplier","spins_left","incubator_eggs","eggs_hatched","legendary_hatched","secrets_seen","shield_bought","booster_bought","spinner_wins","battles_fought","battle_wins","story_chapter","universe_achievements","vibe_color","bg_color","loot_log","user_theme","user_name","game_mode"]
+    _save_data = {k: st.session_state.get(k) for k in _save_keys}
+    _save_code = _b64_save.b64encode(_json.dumps(_save_data, default=str).encode()).decode()
+    st.text_area("📋 Copy this save code:", value=_save_code, height=68, key="save_code_display", help="Copy and save this. Paste it below to restore progress after refresh.")
+    _load_raw = st.text_input("🔄 Paste save code to restore:", placeholder="Paste code here...", key="load_code_input")
+    if st.button("✅ RESTORE PROGRESS", key="restore_btn"):
+        try:
+            _loaded = _json.loads(_b64_save.b64decode(_load_raw.encode()).decode())
+            for k, v in _loaded.items():
+                if v is not None: st.session_state[k] = v
+            st.success("✅ Progress restored!"); st.rerun()
+        except: st.error("Invalid save code.")
     st.write("---")
     st.markdown("<p style='color:#ffffff;font-weight:bold'>🚨 RESET</p>", unsafe_allow_html=True)
     reset_input = st.text_input("Type RESET to confirm:", key="reset_confirm_input", placeholder="RESET")
@@ -1214,8 +1449,19 @@ if st.session_state.show_secret:
         st.session_state.show_secret = None; st.rerun()
     st.stop()
 
+# ── Try to show universe banner from FLUX ─────────────────────────────────
+_banner_key = f"banner_{st.session_state.user_theme.lower().replace(' ','_')[:40]}"
+_banner_url = db_get_image(_banner_key)
+if _banner_url:
+    st.markdown(f"<img src='{_banner_url}' style='width:100%;height:180px;object-fit:cover;border-radius:14px;margin-bottom:12px;box-shadow:0 0 30px {C}44'>", unsafe_allow_html=True)
 st.markdown(f"""<h1 style='font-family:Bebas Neue,sans-serif;color:{C};text-shadow:0 0 40px {C};font-size:clamp(48px,10vw,100px);text-align:center;letter-spacing:6px;margin-bottom:0'>{st.session_state.user_theme.upper()}</h1><p style='text-align:center;font-size:15px;color:#ffffff;margin-top:4px'>{wd.get("description","A realm of infinite power.")}</p>""", unsafe_allow_html=True)
 st.markdown("---")
+# Generate banner in background if not cached (non-blocking)
+if not _banner_url and st.session_state.user_theme and REPLICATE_AVAILABLE:
+    import threading
+    def _gen_banner():
+        generate_universe_banner(st.session_state.user_theme, st.session_state.vibe_color)
+    threading.Thread(target=_gen_banner, daemon=True).start()
 
 view = st.session_state.view
 
@@ -1302,6 +1548,8 @@ if st.session_state.get("battle_state") == "ready" or view == "battle":
         if "Shield" in pick[2]: st.session_state.streak_shield = True
         st.session_state.gold += int(pick[3]) if len(pick) > 3 else 0
         st.session_state.battle_box_pending = True; st.session_state.battle_box_item = bitem
+        if "loot_log" not in st.session_state: st.session_state.loot_log = []
+        st.session_state.loot_log.append({"name": bitem["name"], "rarity": bitem["rarity"], "color": bitem.get("color","#FFD700"), "source": "Battle"})
         st.session_state.spinner_available = True
         st.session_state.spins_left += (1 if tier_now=="Free" else 3 if tier_now=="Premium" else 6)
         st.rerun()
@@ -1796,6 +2044,44 @@ elif view == "abilities":
         <div style='font-family:Space Mono,monospace;font-size:11px;color:#666'>Win abilities from the 🎰 Spinner · Or purchase Elite/Premium for permanent boosts</div>
     </div>""", unsafe_allow_html=True)
 
+elif view == "boxes":
+    st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>📦 MY LOOT BOXES</h2>", unsafe_allow_html=True)
+    loot_log = st.session_state.get("loot_log", [])
+    if not loot_log:
+        st.markdown(f"<div style='text-align:center;padding:40px;font-family:Space Mono,monospace;color:#555;font-size:13px'>No boxes yet. Complete missions and win battles to earn them!</div>", unsafe_allow_html=True)
+    else:
+        st.markdown(f"<p style='text-align:center;font-family:Space Mono,monospace;font-size:12px;color:#888'>{len(loot_log)} boxes earned total</p>", unsafe_allow_html=True)
+        rarity_colors = {{"JACKPOT":"#FFD700","💥 JACKPOT":"#FFD700","EPIC":"#AA44FF","✨ EPIC":"#AA44FF","GREAT":"#4488FF","⚡ GREAT":"#4488FF","SOLID":"#44FF88","✅ SOLID":"#44FF88","LOW":"#888888","😤 LOW":"#888888","🌟 EPIC REWARD":"#AA44FF","Common":"#aaaaaa","Rare":"#4488FF","Legendary":"#FFD700"}}
+        for box in reversed(loot_log[-50:]):
+            rc = rarity_colors.get(box.get("rarity",""), box.get("color","#FFD700"))
+            source_badge = f"<span style='font-size:9px;padding:2px 6px;background:{rc}22;border:1px solid {rc}44;border-radius:4px;color:{rc};margin-left:8px'>{box.get('source','Mission')}</span>"
+            st.markdown(f"<div style='display:flex;align-items:center;padding:10px 14px;background:#111;border:1px solid {rc}44;border-radius:10px;margin-bottom:6px'><div style='font-size:22px;margin-right:12px'>🎁</div><div style='flex:1'><div style='font-family:Bebas Neue,sans-serif;font-size:15px;color:{rc};letter-spacing:2px'>{box.get('name','Prize')}{source_badge}</div><div style='font-family:Space Mono,monospace;font-size:10px;color:#666;margin-top:2px'>{box.get('rarity','')}</div></div></div>", unsafe_allow_html=True)
+
+elif view == "leaderboard":
+    st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>🏆 GLOBAL LEADERBOARD</h2>", unsafe_allow_html=True)
+    leaders = db_get_leaderboard(15)
+    if not leaders:
+        st.markdown("<p style='text-align:center;color:#888;font-family:Space Mono,monospace'>No players yet — complete a mission to appear here!</p>", unsafe_allow_html=True)
+    else:
+        medals = ["🥇","🥈","🥉"] + ["🏅"]*12
+        for i, p in enumerate(leaders):
+            is_you = p["user_name"] == st.session_state.user_name.lower().strip()
+            border = C if is_you else "#333"
+            tier_badge = {"Elite":"💀","Premium":"⚡","Free":""}.get(p.get("sub_tier","Free"),"")
+            st.markdown(f"""<div style='border:2px solid {border};border-radius:12px;padding:12px 16px;margin:6px 0;background:#{"1a1a2a" if is_you else "111"};display:flex;justify-content:space-between;align-items:center'>
+                <span style='font-family:Bebas Neue,sans-serif;font-size:22px;color:{C if is_you else "#fff"}'>{medals[i]} {p["user_name"].upper()} {tier_badge}</span>
+                <span style='font-family:Space Mono,monospace;font-size:11px;color:#888'>
+                    {p.get("total_missions",0)} missions · {p.get("study_streak",0)}🔥 streak · Lv{p.get("level",1)}
+                    {"  ← YOU" if is_you else ""}
+                </span>
+            </div>""", unsafe_allow_html=True)
+    # Save button
+    _, sc, _ = st.columns([1,2,1])
+    with sc:
+        if st.button("💾 SAVE MY PROGRESS NOW", key="manual_save"):
+            db_save(st.session_state.user_name, st.session_state.user_theme)
+            st.success("✅ Saved to cloud!")
+
 elif view == "feedback":
     st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>💬 FEEDBACK PORTAL</h2>", unsafe_allow_html=True)
     _, col, _ = st.columns([1,2,1])
@@ -1855,6 +2141,10 @@ if st.session_state.needs_verification:
             if "Egg" in loot["name"]: st.session_state.incubator_eggs += 2
             if "Bonus" in loot["name"]: st.session_state.gold += int(earned*2)
             st.session_state.loot_pending = True; st.session_state.loot_item = loot
+            # ── SAVE TO SUPABASE ──
+            db_save(st.session_state.user_name, st.session_state.user_theme)
+            if "loot_log" not in st.session_state: st.session_state.loot_log = []
+            st.session_state.loot_log.append({"name": loot["name"], "rarity": loot["rarity"], "color": loot.get("color","#FFD700"), "source": "Mission"})
             st.session_state.unclaimed_boxes = st.session_state.get('unclaimed_boxes', 0) + 1
             secret = random.choice(UNIVERSE_SECRETS)
             if "secret_queue" not in st.session_state: st.session_state.secret_queue = []
