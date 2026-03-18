@@ -937,7 +937,7 @@ if "gold" not in st.session_state:
         "shield_bought": False, "booster_bought": False,
         "battle_state": None, "current_battle": None, "egg_warmth": {},
         "battle_config": None, "battle_box_pending": False, "battle_box_item": None,
-        "battle_wins": 0, "opening_loot_claimed": False,
+        "battle_wins": 0, "opening_loot_claimed": False, "unclaimed_boxes": 0,
         "secret_queue": [], "show_secret": None,
         "spinner_available": False, "spinner_wins": 0,
         "first_session": True, "spinner_result": None,
@@ -1130,8 +1130,8 @@ html,body,[data-testid="stAppViewContainer"]{{background:{BG}!important;color:{T
 input,textarea{{background:#ffffff!important;color:#000000!important;caret-color:#000000!important;border:2px solid {C}!important;border-radius:10px!important;font-family:'Space Mono',monospace!important;font-size:14px!important;padding:10px 14px!important;}}
 input::placeholder,textarea::placeholder{{color:#666666!important;}}
 label,.stTextInput label{{color:{TEXT}!important;font-family:'Space Mono',monospace!important;font-size:11px!important;letter-spacing:2px!important;}}
-[data-testid="stSidebar"] input{{border:1px solid #444444!important;border-radius:6px!important;background:#ffffff!important;color:#000000!important;box-shadow:none!important;padding:8px 10px!important;}}
-[data-testid="stSidebar"] input:focus{{border:1px solid #666666!important;box-shadow:none!important;outline:none!important;}}
+[data-testid="stSidebar"] input{{border:1px solid transparent!important;border-radius:6px!important;background:#ffffff!important;color:#000000!important;box-shadow:none!important;padding:8px 10px!important;outline:none!important;}}
+[data-testid="stSidebar"] input:focus{{border:1px solid transparent!important;box-shadow:none!important;outline:none!important;}}
 @keyframes titan-pulse{{0%{{box-shadow:0 0 20px {C},inset 0 0 10px {C};border-color:{C};}}50%{{box-shadow:0 0 80px {C},inset 0 0 40px {C};border-color:#ffffff;}}100%{{box-shadow:0 0 20px {C},inset 0 0 10px {C};border-color:{C};}}}}
 div.stButton>button{{border:2px solid {C}!important;background:#000000!important;color:#ffffff!important;font-family:'Bebas Neue',sans-serif!important;font-size:13px!important;letter-spacing:2px!important;padding:4px 12px!important;border-radius:10px!important;animation:titan-pulse 2.5s infinite ease-in-out!important;width:100%!important;text-transform:uppercase;transition:transform 0.3s;margin-bottom:6px;}}
 div.stButton>button:hover{{transform:scale(1.02);}}
@@ -1149,8 +1149,21 @@ with st.sidebar:
     mode_badge = {"chill":"⚡ CHILL","grinder":"🔥 GRINDER","obsessed":"💀 OBSESSED"}.get(MODE,"⚡ CHILL")
     st.markdown(f"<p style='color:#ffffff;margin:3px 0'><b>MODE:</b> {mode_badge}</p>", unsafe_allow_html=True)
     st.markdown(f"<p style='color:#ffffff;margin:3px 0'><b>RANK:</b> {st.session_state.sub_tier.upper()}</p>", unsafe_allow_html=True)
-    _m_done = st.session_state.get("total_missions",0)
-    st.markdown(f"""<div class='metric-card'><div style='font-family:Bebas Neue,sans-serif;font-size:40px;color:{C}'>{st.session_state.gold:.1f}</div><div style='font-size:10px;color:#ffffff;letter-spacing:2px'>{currency.upper()}</div><div style='font-size:11px;color:#ffffff;margin-top:4px'>XP: {st.session_state.xp} · LVL {st.session_state.level}</div><div style='margin-top:6px;padding-top:6px;border-top:1px solid {C}33;font-size:11px;color:#ffffff;letter-spacing:1px'>⚡ <b style='color:{C}'>{_m_done}</b> MISSIONS DONE</div></div>""", unsafe_allow_html=True)
+    _m_done   = st.session_state.get("total_missions", 0)
+    _eggs     = st.session_state.get("incubator_eggs", 0)
+    _boxes    = st.session_state.get("unclaimed_boxes", 0)
+    _sp_left  = st.session_state.get("spins_left", 0)
+    st.markdown(f"""<div class='metric-card'>
+        <div style='font-family:Bebas Neue,sans-serif;font-size:40px;color:{C}'>{st.session_state.gold:.1f}</div>
+        <div style='font-size:10px;color:#ffffff;letter-spacing:2px'>{currency.upper()}</div>
+        <div style='font-size:11px;color:#ffffff;margin-top:4px'>XP: {st.session_state.xp} · LVL {st.session_state.level}</div>
+        <div style='margin-top:6px;padding-top:6px;border-top:1px solid {C}33;font-size:11px;color:#ffffff;letter-spacing:1px'>⚡ <b style='color:{C}'>{_m_done}</b> MISSIONS DONE</div>
+        <div style='margin-top:6px;padding-top:6px;border-top:1px solid {C}22;display:flex;gap:12px;justify-content:space-between;font-size:11px'>
+            <span>🎁 <b style='color:{C}'>{_boxes}</b> boxes</span>
+            <span>🥚 <b style='color:{C}'>{_eggs}</b> eggs</span>
+            <span>🎰 <b style='color:{C}'>{_sp_left}</b> spins</span>
+        </div>
+    </div>""", unsafe_allow_html=True)
     st.write("---")
     st.markdown("<p style='color:#ffffff;font-weight:bold'>👑 ELITE CODE</p>", unsafe_allow_html=True)
     code = st.text_input("Protocol Code:", type="password", key="elite_code")
@@ -1544,10 +1557,10 @@ elif view == "plans":
     st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>💳 UPGRADE PLANS</h2>", unsafe_allow_html=True)
     p_col, e_col = st.columns(2)
     with p_col:
-        st.markdown(f"""<div class='shop-card'><div style='text-align:center;margin-bottom:16px'><div style='font-family:Bebas Neue,sans-serif;font-size:36px;color:{C}'>⚡ PREMIUM</div><div style='font-family:Bebas Neue,sans-serif;font-size:56px;color:#ffffff;line-height:1'>$5<span style='font-size:20px;color:#aaaaaa'>/mo</span></div></div><div style='font-family:Space Mono,monospace;font-size:12px;color:#ffffff;line-height:2.2;margin-bottom:20px'>✅ 2× XP &amp; currency on every mission<br>✅ 3 spins per session (Free=1)<br>✅ Rare + Epic loot pool<br>✅ 6 evolution stages in battle<br>✅ Universe-specific battle dialogue<br>✅ Lore-named achievements<br>✅ Medium story chapters<br>✅ Proof feedback + reason<br>✅ Type any subject in battle<br>✅ Priority AI generation</div><div style='background:#1a1a1a;border:1px solid #444;border-radius:10px;padding:12px;text-align:center;margin-bottom:12px'><div style='font-family:Space Mono,monospace;font-size:10px;color:#aaaaaa;letter-spacing:2px;margin-bottom:4px'>ENTER CODE IN SIDEBAR AFTER PAYING</div><div style='font-family:Bebas Neue,sans-serif;font-size:20px;color:{C};letter-spacing:4px'>1TR5LG89D</div></div></div>""", unsafe_allow_html=True)
+        st.markdown(f"""<div class='shop-card'><div style='text-align:center;margin-bottom:16px'><div style='font-family:Bebas Neue,sans-serif;font-size:36px;color:{C}'>⚡ PREMIUM</div><div style='font-family:Bebas Neue,sans-serif;font-size:56px;color:#ffffff;line-height:1'>$5<span style='font-size:20px;color:#aaaaaa'>/mo</span></div></div><div style='font-family:Space Mono,monospace;font-size:12px;color:#ffffff;line-height:2.2;margin-bottom:20px'>✅ 2× XP &amp; currency on every mission<br>✅ 3 spins per session (Free=1)<br>✅ Rare + Epic loot pool<br>✅ 6 evolution stages in battle<br>✅ Universe-specific battle dialogue<br>✅ Lore-named achievements<br>✅ Medium story chapters<br>✅ Proof feedback + reason<br>✅ Type any subject in battle<br>✅ Priority AI generation</div><div style='background:#1a1a1a;border:1px solid #444;border-radius:10px;padding:12px;text-align:center;margin-bottom:12px'><div style='font-family:Space Mono,monospace;font-size:11px;color:#aaaaaa;letter-spacing:1px'>✅ After subscribing, your unique access code<br>will be sent to your email within minutes.</div></div></div>""", unsafe_allow_html=True)
         st.link_button("⚡ SUBSCRIBE — PREMIUM $5/mo", "https://buy.stripe.com/7sY3co4RC36M0KY495dQQ02", use_container_width=True)
     with e_col:
-        st.markdown(f"""<div class='shop-card' style='border-color:#FFD700'><div style='text-align:center;margin-bottom:16px'><div style='font-family:Bebas Neue,sans-serif;font-size:36px;color:#FFD700'>💀 ELITE</div><div style='font-family:Bebas Neue,sans-serif;font-size:56px;color:#ffffff;line-height:1'>$10<span style='font-size:20px;color:#aaaaaa'>/mo</span></div></div><div style='font-family:Space Mono,monospace;font-size:12px;color:#ffffff;line-height:2.2;margin-bottom:20px'>✅ 3× XP &amp; currency on every mission<br>✅ 6 spins per session (Free=1)<br>✅ Epic + Legendary loot pool<br>✅ 9 evolution stages + exclusives<br>✅ Real-time Claude battle dialogue<br>✅ AI-generated custom achievements<br>✅ Maximum token story chapters<br>✅ Proof feedback + personalized comment<br>✅ Type any subject in battle<br>✅ Legendary egg rate doubled</div><div style='background:#1a1a1a;border:1px solid #FFD700;border-radius:10px;padding:12px;text-align:center;margin-bottom:12px'><div style='font-family:Space Mono,monospace;font-size:10px;color:#aaaaaa;letter-spacing:2px;margin-bottom:4px'>ENTER CODE IN SIDEBAR AFTER PAYING</div><div style='font-family:Bebas Neue,sans-serif;font-size:20px;color:#FFD700;letter-spacing:4px'>4RJ1TV51Z</div></div></div>""", unsafe_allow_html=True)
+        st.markdown(f"""<div class='shop-card' style='border-color:#FFD700'><div style='text-align:center;margin-bottom:16px'><div style='font-family:Bebas Neue,sans-serif;font-size:36px;color:#FFD700'>💀 ELITE</div><div style='font-family:Bebas Neue,sans-serif;font-size:56px;color:#ffffff;line-height:1'>$10<span style='font-size:20px;color:#aaaaaa'>/mo</span></div></div><div style='font-family:Space Mono,monospace;font-size:12px;color:#ffffff;line-height:2.2;margin-bottom:20px'>✅ 3× XP &amp; currency on every mission<br>✅ 6 spins per session (Free=1)<br>✅ Epic + Legendary loot pool<br>✅ 9 evolution stages + exclusives<br>✅ Real-time Claude battle dialogue<br>✅ AI-generated custom achievements<br>✅ Maximum token story chapters<br>✅ Proof feedback + personalized comment<br>✅ Type any subject in battle<br>✅ Legendary egg rate doubled</div><div style='background:#1a1a1a;border:1px solid #FFD700;border-radius:10px;padding:12px;text-align:center;margin-bottom:12px'><div style='font-family:Space Mono,monospace;font-size:11px;color:#aaaaaa;letter-spacing:1px'>✅ After subscribing, your unique access code<br>will be sent to your email within minutes.</div></div></div>""", unsafe_allow_html=True)
         st.link_button("💀 SUBSCRIBE — ELITE $10/mo", "https://buy.stripe.com/14A9AM83O0YE0KYgVRdQQ03", use_container_width=True)
 
 elif view == "spinner":
@@ -1842,6 +1855,7 @@ if st.session_state.needs_verification:
             if "Egg" in loot["name"]: st.session_state.incubator_eggs += 2
             if "Bonus" in loot["name"]: st.session_state.gold += int(earned*2)
             st.session_state.loot_pending = True; st.session_state.loot_item = loot
+            st.session_state.unclaimed_boxes = st.session_state.get('unclaimed_boxes', 0) + 1
             secret = random.choice(UNIVERSE_SECRETS)
             if "secret_queue" not in st.session_state: st.session_state.secret_queue = []
             st.session_state.secret_queue.append(secret)
