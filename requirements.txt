@@ -3,4 +3,4 @@ google-generativeai
 Pillow
 anthropic
 supabase
-replicate==0.25.2
+
