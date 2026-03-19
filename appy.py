@@ -1454,8 +1454,6 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                                 except Exception:
                                     pass
                             st.session_state.reset_pending_name = None
-                            st.session_state.forgot_open = False
-                            st.success("✅ Password reset! You can now log in with your new password.")
 
         st.markdown("<br>", unsafe_allow_html=True)
 
