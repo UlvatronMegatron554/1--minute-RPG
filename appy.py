@@ -875,6 +875,21 @@ def db_get_leaderboard(limit: int = 10) -> list:
     except Exception:
         return []
 
+def db_save_feedback(fb_type: str, message: str, name: str, universe: str):
+    """Save user feedback to Supabase feedback table."""
+    sb = get_supabase()
+    if not sb: return
+    try:
+        sb.table("feedback").insert({
+            "fb_type": fb_type,
+            "message": message,
+            "name": name,
+            "universe": universe,
+            "submitted_at": _dt.datetime.utcnow().isoformat(),
+        }).execute()
+    except Exception:
+        pass
+
 def db_save_image(key: str, url: str):
     """Cache a generated image URL in Supabase."""
     sb = get_supabase()
@@ -1237,8 +1252,43 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
 
     _, col, _ = st.columns([1, 2, 1])
     with col:
-        if st.button("⚡ HOW DOES THIS WORK?", key="how_toggle"):
-            st.session_state.how_open = not st.session_state.how_open
+        hcol1, hcol2 = st.columns(2)
+        with hcol1:
+            if st.button("⚡ HOW DOES THIS WORK?", key="how_toggle"):
+                st.session_state.how_open = not st.session_state.how_open
+                st.session_state.comeback_open = False
+        with hcol2:
+            if st.button("🔑 ALREADY HAVE AN ACCOUNT?", key="comeback_toggle"):
+                st.session_state.comeback_open = not st.session_state.get("comeback_open", False)
+                st.session_state.how_open = False
+
+        if st.session_state.get("comeback_open", False):
+            st.markdown("""<div style='background:rgba(0,0,0,0.85);border:2px solid #FFD700;border-radius:20px;padding:28px;margin-top:12px;'>
+                <div style='font-family:Bebas Neue,sans-serif;font-size:28px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:16px'>
+                    🔑 YOUR STUFF IS SAFE. FOREVER.
+                </div>
+                <div style='font-family:Space Mono,monospace;font-size:13px;color:#ffffff;line-height:2.2;text-align:center;margin-bottom:18px'>
+                    Remember that name you picked? And that password?<br>
+                    <span style='color:#FFD700;font-size:15px;font-family:Bebas Neue,sans-serif;letter-spacing:2px'>THAT'S YOUR KEY. YOUR UNIVERSE. YOUR TREASURE.</span><br>
+                    We kept EVERYTHING for you.<br>
+                    Your gold. Your streak. Your story. Every single mission.<br>
+                    <span style='color:#00FF88'>It's all just sitting there. Waiting. For YOU.</span>
+                </div>
+                <div style='background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.4);border-radius:14px;padding:18px;margin-bottom:12px;'>
+                    <div style='font-family:Bebas Neue,sans-serif;font-size:20px;color:#FFD700;letter-spacing:3px;margin-bottom:10px'>HERE'S WHAT YOU DO:</div>
+                    <div style='font-family:Space Mono,monospace;font-size:12px;color:#ffffff;line-height:2.4'>
+                        <span style='color:#FFD700'>①</span> Type your <b style='color:#FFD700'>Champion Name</b> — the exact name you used before<br>
+                        <span style='color:#FFD700'>②</span> Type your <b style='color:#FFD700'>Password</b> — the one you created when you joined<br>
+                        <span style='color:#FFD700'>③</span> Hit <b style='color:#FFD700'>ENTER THE INFINITEVERSE</b><br>
+                        <span style='color:#00FF88'>④</span> <b style='color:#00FF88'>BOOM. You're home. Everything restored. Instantly.</b>
+                    </div>
+                </div>
+                <div style='text-align:center;font-family:Space Mono,monospace;font-size:11px;color:#888;line-height:1.8'>
+                    ⚠️ Forgot your name or password? Unfortunately there's no recovery yet.<br>
+                    That's why your name + password combo is your <span style='color:#FFD700'>golden ticket</span> — keep it safe!
+                </div>
+            </div>""", unsafe_allow_html=True)
+
         if st.session_state.how_open:
             st.markdown("""<div style='background:rgba(0,0,0,0.6);border:1px solid rgba(255,215,0,0.3);border-radius:20px;padding:24px;margin-top:12px;'>
                 <div style='margin-bottom:18px;'><span style='font-size:28px'>🌌</span><div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700'>1 — PICK YOUR UNIVERSE</div><div style='font-family:Space Mono,monospace;font-size:12px;color:#fff;line-height:1.7'>ANY universe. AI builds it instantly. Colors, currency, abilities, storyline — all yours.</div></div>
@@ -2182,7 +2232,9 @@ elif view == "feedback":
         fb_name = st.text_input("YOUR NAME (optional)", placeholder="Anonymous", key="fb_name")
         if st.button("🚀 SUBMIT", key="submit_fb"):
             if fb_text.strip():
-                st.session_state.feedback_list.append({"type":fb_type,"message":fb_text.strip(),"name":fb_name.strip() or "Anonymous","universe":st.session_state.user_theme,"time":time.strftime("%Y-%m-%d %H:%M")})
+                clean_name = fb_name.strip() or "Anonymous"
+                st.session_state.feedback_list.append({"type":fb_type,"message":fb_text.strip(),"name":clean_name,"universe":st.session_state.user_theme,"time":time.strftime("%Y-%m-%d %H:%M")})
+                db_save_feedback(fb_type, fb_text.strip(), clean_name, st.session_state.user_theme)
                 st.success("✅ RECEIVED. Thank you, Champion. 🔥"); st.balloons()
             else: st.error("Write something first!")
 
