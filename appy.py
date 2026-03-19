@@ -1237,7 +1237,7 @@ if "gold" not in st.session_state:
         "universe_achievements": [], "universe_ach_loaded": False,
         "welcome_bonus_applied": False, "battle_subject_chosen": False,
         "last_spin_time": None, "spin_awarded_this_view": False,
-        "last_auto_save": None, "password_hash": "", "leaderboard_visible": True, "user_email": "",
+        "last_auto_save": None, "password_hash": "", "leaderboard_visible": True, "user_email": "", "gw_page": 1,
     })
 
 
@@ -1275,7 +1275,7 @@ html,body,[data-testid="stAppViewContainer"],[data-testid="stApp"]{background:#0
 .stat-label{font-family:Space Mono,monospace;font-size:10px;color:#ffffff;letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
 .gw-divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,215,0,0.4),transparent);margin:8px 0 28px;}
 .mode-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:16px;}
-.mode-card{background:rgba(255,255,255,0.04);border:2px solid rgba(255,215,0,0.2);border-radius:18px;padding:20px 16px;text-align:center;cursor:pointer;transition:all 0.2s;}
+.mode-card{background:rgba(255,255,255,0.04);border:2px solid rgba(255,215,0,0.2);border-radius:18px;padding:20px 16px;text-align:center;cursor:pointer;transition:all 0.2s;min-height:220px;display:flex;flex-direction:column;justify-content:center;align-items:center;}
 .mode-card:hover{background:rgba(255,215,0,0.08);border-color:rgba(255,215,0,0.5);}
 .mode-emoji{font-size:36px;display:block;margin-bottom:10px;}
 .mode-name{font-family:Bebas Neue,sans-serif;font-size:22px;letter-spacing:3px;color:#FFD700;margin-bottom:8px;}
@@ -1312,7 +1312,16 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
     _, col, _ = st.columns([1, 2, 1])
     with col:
 
-        components.html('<!DOCTYPE html><html><head><style>*{box-sizing:border-box;margin:0;padding:0;font-family:"Segoe UI",sans-serif;}body{background:#111;color:#fff;padding:12px;user-select:none;}h3{color:#FFD700;font-size:13px;letter-spacing:2px;margin-bottom:10px;text-align:center;}.btn{position:absolute;display:flex;align-items:center;justify-content:center;border:2px solid #FFD700;border-radius:8px;background:#1a1a00;color:#FFD700;cursor:move;font-weight:bold;text-align:center;}.btn.selected{box-shadow:0 0 10px #00FF88;}.resize{position:absolute;right:-1px;bottom:-1px;width:14px;height:14px;background:#FFD700;cursor:se-resize;border-radius:2px 0 6px 0;z-index:10;}#canvas{position:relative;width:100%;height:420px;background:#0a0a0a;border:1px solid #333;border-radius:8px;overflow:hidden;}#readout{background:#000;border:1px solid #333;border-radius:6px;padding:10px;margin-top:8px;font-size:11px;font-family:monospace;}#readout table{width:100%;border-collapse:collapse;}#readout td{padding:3px 8px;border-bottom:1px solid #222;}#readout td:first-child{color:#888;}#readout td:last-child{color:#FFD700;font-weight:bold;}.fs-row{display:flex;align-items:center;gap:8px;margin-top:6px;}.fs-row label{color:#aaa;font-size:10px;min-width:130px;}.fs-row input[type=range]{flex:1;accent-color:#FFD700;}.fs-row span{color:#FFD700;font-size:10px;min-width:28px;}</style></head><body><h3>DRAG TO MOVE | DRAG YELLOW CORNER TO RESIZE | SLIDERS FOR FONT SIZE</h3><div id="canvas"><div class="btn" id="b0" style="left:30px;top:16px;width:360px;height:42px;font-size:13px;border-color:#FFD700;background:#1a1a00;color:#FFD700;">HOW IT WORKS<div class="resize"></div></div><div class="btn" id="b1" style="left:10px;top:90px;width:140px;height:52px;font-size:12px;border-color:#FF8800;background:#1a0a00;color:#FF8800;">CHILL<div class="resize"></div></div><div class="btn" id="b2" style="left:158px;top:90px;width:140px;height:52px;font-size:12px;border-color:#FF8800;background:#1a0a00;color:#FF8800;">GRINDER<div class="resize"></div></div><div class="btn" id="b3" style="left:306px;top:90px;width:140px;height:52px;font-size:12px;border-color:#FF8800;background:#1a0a00;color:#FF8800;">OBSESSED<div class="resize"></div></div><div class="btn" id="b4" style="left:250px;top:168px;width:140px;height:32px;font-size:11px;border-color:#FF4444;background:#1a0000;color:#FF4444;">FORGOT PASSWORD<div class="resize"></div></div><div class="btn" id="b5" style="left:30px;top:224px;width:360px;height:52px;font-size:16px;border-color:#00CCFF;background:#001a1a;color:#00CCFF;">ENTER INFINITEVERSE<div class="resize"></div></div></div><div id="readout"><table id="tbl"></table></div><div id="fsc"></div><script>var IDS=["b0","b1","b2","b3","b4","b5"];var LBLS=["HOW IT WORKS","CHILL","GRINDER","OBSESSED","FORGOT PASSWORD","ENTER INFINITEVERSE"];var sel=null,mode="",sX,sY,sL,sT,sW,sH;function info(b){return{x:parseInt(b.style.left),y:parseInt(b.style.top),w:parseInt(b.style.width),h:parseInt(b.style.height),fs:parseInt(b.style.fontSize)};}function upd(){var h="";IDS.forEach(function(id,i){var d=info(document.getElementById(id));h+="<tr><td>"+LBLS[i]+"</td><td>X:"+d.x+" Y:"+d.y+" W:"+d.w+" H:"+d.h+" FS:"+d.fs+"px</td></tr>";});document.getElementById("tbl").innerHTML=h;}IDS.forEach(function(id){var b=document.getElementById(id);b.addEventListener("mousedown",function(e){document.querySelectorAll(".btn").forEach(function(x){x.classList.remove("selected");});b.classList.add("selected");sX=e.clientX;sY=e.clientY;sL=parseInt(b.style.left);sT=parseInt(b.style.top);sW=parseInt(b.style.width);sH=parseInt(b.style.height);mode=e.target.classList.contains("resize")?"resize":"drag";sel=b;e.preventDefault();e.stopPropagation();});});document.addEventListener("mousemove",function(e){if(!sel)return;var dx=e.clientX-sX,dy=e.clientY-sY;if(mode==="drag"){sel.style.left=Math.max(0,sL+dx)+"px";sel.style.top=Math.max(0,sT+dy)+"px";}else{sel.style.width=Math.max(40,sW+dx)+"px";sel.style.height=Math.max(16,sH+dy)+"px";}upd();});document.addEventListener("mouseup",function(){sel=null;upd();});var fc=document.getElementById("fsc");IDS.forEach(function(id,i){var b=document.getElementById(id);var fs=parseInt(b.style.fontSize)||13;var row=document.createElement("div");row.className="fs-row";row.innerHTML="<label>"+LBLS[i]+" font</label><input type=range min=8 max=32 value="+fs+" data-id="+id+"><span id=s"+id+">"+fs+"px</span>";fc.appendChild(row);});fc.querySelectorAll("input").forEach(function(inp){inp.addEventListener("input",function(){var b=document.getElementById(this.dataset.id);b.style.fontSize=this.value+"px";document.getElementById("s"+this.dataset.id).textContent=this.value+"px";upd();});});upd();</script></body></html>', height=820, scrolling=True)
+        st.markdown("""<style>
+        /* HOW IT WORKS */
+        div[data-testid="stColumn"] div.stButton:nth-child(1) > button,
+        div[data-testid="stVerticalBlock"] > div:first-child div.stButton > button {
+            width: 625px !important; min-width: 625px !important;
+            height: 73px !important; min-height: 73px !important;
+            font-size: 11px !important; margin-left: 46px !important;
+            animation: none !important; box-shadow: none !important;
+        }
+        </style>""", unsafe_allow_html=True)
 
         # HOW IT WORKS button
         if st.button("⚡ HOW IT WORKS  ·  RETURNING PLAYER?", key="info_toggle"):
@@ -1328,6 +1337,15 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
         st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("<div style='font-family:Bebas Neue,sans-serif;font-size:18px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:8px'>⚡ CHOOSE YOUR MODE</div>", unsafe_allow_html=True)
+        st.markdown("""<style>
+        div[data-testid="stColumn"] div.stButton > button {
+            height: 52px !important;
+            min-height: 52px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        </style>""", unsafe_allow_html=True)
         mode_col1, mode_col2, mode_col3 = st.columns(3)
         with mode_col1:
             st.markdown("""<div class='mode-card'><span class='mode-emoji'>⚡</span><div class='mode-name'>CHILL</div><div class='mode-desc'>Missions. Currency. Level up.</div></div>""", unsafe_allow_html=True)
@@ -1345,10 +1363,39 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
             mode_labels = {"chill":"⚡ CHILL","grinder":"🔥 GRINDER","obsessed":"💀 OBSESSED"}
             st.success(f"MODE: {mode_labels[st.session_state.game_mode]} ✅")
 
-        name_input  = st.text_input("⚡ Champion Name", placeholder="What are you called?", key="gw_name")
-        email_input = st.text_input("📧 Email", placeholder="your@email.com — needed for password recovery", key="gw_email")
-        pass_input  = st.text_input("🔑 Password", placeholder="Create a password — keep it safe!", type="password", key="gw_pass")
-        theme_input = st.text_input("🌌 Your Universe", placeholder="Leave empty for INFINITE POWER · or type anything: Naruto, F1, Nike...", key="gw_theme")
+        # ── TWO PAGE FLOW ────────────────────────────────────────────────
+        _gw_page = st.session_state.get("gw_page", 1)
+
+        if _gw_page == 1:
+            # PAGE 1: Email + Password only
+            st.markdown(f"<div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:16px'>STEP 1 OF 2 · YOUR ACCOUNT</div>", unsafe_allow_html=True)
+            email_input = st.text_input("📧 Email", placeholder="your@email.com — needed for password recovery", key="gw_email")
+            pass_input  = st.text_input("🔑 Password", placeholder="Create a password — keep it safe!", type="password", key="gw_pass")
+            name_input  = ""
+            theme_input = ""
+            st.markdown("<br>", unsafe_allow_html=True)
+            if st.button("NEXT ⚡", key="gw_next", use_container_width=True):
+                if not st.session_state.get("gw_email","").strip():
+                    st.error("Enter your email.")
+                elif not st.session_state.get("gw_pass","").strip():
+                    st.error("Enter a password.")
+                else:
+                    st.session_state.gw_page = 2
+                    st.rerun()
+            st.stop()
+
+        else:
+            # PAGE 2: Champion Name + Universe + Mode + Enter
+            email_input = st.session_state.get("gw_email", "")
+            pass_input  = st.session_state.get("gw_pass",  "")
+            st.markdown(f"<div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:16px'>STEP 2 OF 2 · YOUR UNIVERSE</div>", unsafe_allow_html=True)
+            name_input  = st.text_input("⚡ Champion Name", placeholder="What are you called?", key="gw_name")
+            theme_input = st.text_input("🌌 Your Universe", placeholder="Leave empty for INFINITE POWER · or type anything: Naruto, F1, Nike...", key="gw_theme")
+            _bc, _ = st.columns([1,4])
+            with _bc:
+                if st.button("← Back", key="gw_back"):
+                    st.session_state.gw_page = 1
+                    st.rerun()
 
         # Small "Forgot password?" button
         st.markdown("""<style>
