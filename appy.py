@@ -1320,41 +1320,24 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
 
         st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("<div style='font-family:Bebas Neue,sans-serif;font-size:18px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:8px'>⚡ CHOOSE YOUR MODE</div>", unsafe_allow_html=True)
-        st.markdown("""<style>
-        .mode-btn > div.stButton > button {
-            position:absolute!important;top:0!important;left:0!important;
-            width:100%!important;height:100%!important;
-            opacity:0!important;cursor:pointer!important;
-            animation:none!important;box-shadow:none!important;
-        }
-        .mode-btn { position:relative!important; }
-        </style>""", unsafe_allow_html=True)
-
+        st.markdown("""<div class='mode-grid'>
+            <div class='mode-card'><span class='mode-emoji'>⚡</span><div class='mode-name'>CHILL</div><div class='mode-desc'>Missions. Currency. Level up.</div></div>
+            <div class='mode-card'><span class='mode-emoji'>🔥</span><div class='mode-name'>GRINDER</div><div class='mode-desc'>Adds Battles, Abilities, Monster Hatching.</div></div>
+            <div class='mode-card'><span class='mode-emoji'>💀</span><div class='mode-name'>OBSESSED</div><div class='mode-desc'>EVERYTHING. Full chaos. No limits.</div></div>
+        </div>""", unsafe_allow_html=True)
         mode_col1, mode_col2, mode_col3 = st.columns(3)
         with mode_col1:
-            st.markdown(f"""<div class='mode-card' style='{"border-color:#FFD700;background:rgba(255,215,0,0.12)" if st.session_state.game_mode=="chill" else ""}'>
-                <span class='mode-emoji'>⚡</span><div class='mode-name'>CHILL</div>
-                <div class='mode-desc'>Missions. Currency. Level up.</div>
-            </div>""", unsafe_allow_html=True)
-            st.markdown('<div class="mode-btn">', unsafe_allow_html=True)
-            if st.button("CHILL", key="mode_chill"): st.session_state.game_mode = "chill"; st.rerun()
-            st.markdown('</div>', unsafe_allow_html=True)
+            if st.button("⚡ CHILL", key="mode_chill", use_container_width=True):
+                st.session_state.game_mode = "chill"; st.rerun()
         with mode_col2:
-            st.markdown(f"""<div class='mode-card' style='{"border-color:#FFD700;background:rgba(255,215,0,0.12)" if st.session_state.game_mode=="grinder" else ""}'>
-                <span class='mode-emoji'>🔥</span><div class='mode-name'>GRINDER</div>
-                <div class='mode-desc'>Adds Battles, Abilities, Monster Hatching.</div>
-            </div>""", unsafe_allow_html=True)
-            st.markdown('<div class="mode-btn">', unsafe_allow_html=True)
-            if st.button("GRINDER", key="mode_grinder"): st.session_state.game_mode = "grinder"; st.rerun()
-            st.markdown('</div>', unsafe_allow_html=True)
+            if st.button("🔥 GRINDER", key="mode_grinder", use_container_width=True):
+                st.session_state.game_mode = "grinder"; st.rerun()
         with mode_col3:
-            st.markdown(f"""<div class='mode-card' style='{"border-color:#FFD700;background:rgba(255,215,0,0.12)" if st.session_state.game_mode=="obsessed" else ""}'>
-                <span class='mode-emoji'>💀</span><div class='mode-name'>OBSESSED</div>
-                <div class='mode-desc'>EVERYTHING. Full chaos. No limits.</div>
-            </div>""", unsafe_allow_html=True)
-            st.markdown('<div class="mode-btn">', unsafe_allow_html=True)
-            if st.button("OBSESSED", key="mode_obsessed"): st.session_state.game_mode = "obsessed"; st.rerun()
-            st.markdown('</div>', unsafe_allow_html=True)
+            if st.button("💀 OBSESSED", key="mode_obsessed", use_container_width=True):
+                st.session_state.game_mode = "obsessed"; st.rerun()
+        if st.session_state.game_mode:
+            mode_labels = {"chill":"⚡ CHILL","grinder":"🔥 GRINDER","obsessed":"💀 OBSESSED"}
+            st.success(f"MODE: {mode_labels[st.session_state.game_mode]} ✅")
         if st.session_state.game_mode:
             mode_labels = {"chill":"⚡ CHILL","grinder":"🔥 GRINDER","obsessed":"💀 OBSESSED"}
             st.success(f"MODE: {mode_labels[st.session_state.game_mode]} ✅")
