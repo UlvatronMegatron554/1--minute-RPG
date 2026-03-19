@@ -1375,12 +1375,34 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
         name_input  = st.text_input("⚡ Champion Name", placeholder="What are you called?", key="gw_name")
         pass_input  = st.text_input("🔑 Password", placeholder="Create a password — keep it safe!", type="password", key="gw_pass")
         theme_input = st.text_input("🌌 Your Universe", placeholder="Leave empty for INFINITE POWER · or type anything: Naruto, F1, Nike, Medieval Space War...", key="gw_theme")
-        st.markdown("<div style='text-align:right;margin-top:2px;margin-bottom:8px'><span style='font-family:Space Mono,monospace;font-size:10px;color:#666'>Locked out? </span><span style='font-family:Space Mono,monospace;font-size:10px;color:#FFD700;cursor:pointer;text-decoration:underline' onclick=\"document.getElementById(\\'reset_panel\\').style.display=\\'block\\'\">Forgot password?</span></div>", unsafe_allow_html=True)
+
+        # Small "Forgot password?" link — styled as text, opens reset panel
+        st.markdown("""<style>
+        div[data-testid='stButton'].fp-link>button{
+            background:none!important;border:none!important;padding:0 4px!important;
+            color:#FFD700!important;font-family:'Space Mono',monospace!important;
+            font-size:10px!important;text-decoration:underline!important;
+            cursor:pointer!important;animation:none!important;box-shadow:none!important;
+            width:auto!important;margin:0!important;min-height:0!important;
+            line-height:1.2!important;
+        }
+        div[data-testid='stButton'].fp-link>button:hover{color:#ffffff!important;}
+        div[data-testid='stButton'].fp-link{display:inline-block;}
+        </style>""", unsafe_allow_html=True)
+        st.markdown("<div style='text-align:right;margin-top:2px;margin-bottom:2px;font-family:Space Mono,monospace;font-size:10px;color:#555'>Locked out?</div>", unsafe_allow_html=True)
+        _, fp_col = st.columns([5, 1])
+        with fp_col:
+            st.markdown('<div class="fp-link">', unsafe_allow_html=True)
+            if st.button("Forgot password?", key="open_reset_panel"):
+                st.session_state.reset_panel_open = not st.session_state.get("reset_panel_open", False)
+                st.session_state.reset_pending_name = None
+                st.rerun()
+            st.markdown('</div>', unsafe_allow_html=True)
 
         # ── RESET PASSWORD PANEL ──────────────────────────────────────────────
         if st.session_state.get("reset_panel_open", False):
             import secrets as _sec, hashlib as _hl2
-            st.markdown(f"""<div style='background:#0a0808;border:2px solid #FF8800;
+            st.markdown("""<div style='background:#0a0808;border:2px solid #FF8800;
                 border-radius:16px;padding:24px;margin:8px 0;'>
                 <div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FF8800;
                     letter-spacing:3px;margin-bottom:10px'>RESET YOUR PASSWORD</div>
@@ -1429,7 +1451,7 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                     st.rerun()
 
             if st.session_state.get("reset_pending_name"):
-                st.markdown(f"<div style='font-family:Space Mono,monospace;font-size:11px;color:#FFD700;margin-top:10px'>Enter the code from your email + your new password:</div>", unsafe_allow_html=True)
+                st.markdown("<div style='font-family:Space Mono,monospace;font-size:11px;color:#FFD700;margin-top:10px'>Enter the code from your email + your new password:</div>", unsafe_allow_html=True)
                 reset_code = st.text_input("6-Character Code:", key="reset_code_input", placeholder="e.g. A3F9B2")
                 new_pass   = st.text_input("New Password:", key="new_pass_input", type="password")
                 new_pass2  = st.text_input("Confirm Password:", key="new_pass2_input", type="password")
@@ -1459,10 +1481,6 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                             st.session_state.reset_pending_name = None
                             st.session_state.reset_panel_open = False
                             st.success("Password reset! Log in with your new password now.")
-        else:
-            if st.button("🔑 Forgot Password?", key="open_reset_panel"):
-                st.session_state.reset_panel_open = True
-                st.rerun()
 
         st.markdown("<br>", unsafe_allow_html=True)
 
