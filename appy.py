@@ -806,6 +806,7 @@ def db_save(user_name: str, theme: str):
             "bg_color": st.session_state.get("bg_color", "#ffffff"),
             "micro_timer_seconds": int(st.session_state.get("micro_timer_seconds", 30)),
             "updated_at": _dt.datetime.utcnow().isoformat(),
+            "password_hash": st.session_state.get("password_hash", ""),
         }
         sb.table("players").upsert(payload, on_conflict="user_name").execute()
     except Exception as e:
@@ -860,6 +861,7 @@ def db_apply(row: dict):
     except: st.session_state.hatched_monsters = []
     st.session_state.secrets_seen = len(st.session_state.secret_queue)
     st.session_state.opening_story_shown = len(st.session_state.story_log) > 0
+    st.session_state.password_hash = row.get("password_hash", "")
 
 def db_get_leaderboard(limit: int = 10) -> list:
     """Get top players by total missions."""
@@ -1159,7 +1161,7 @@ if "gold" not in st.session_state:
         "universe_achievements": [], "universe_ach_loaded": False,
         "welcome_bonus_applied": False, "battle_subject_chosen": False,
         "last_spin_time": None, "spin_awarded_this_view": False,
-        "last_auto_save": None,
+        "last_auto_save": None, "password_hash": "",
     })
 
 
@@ -1264,42 +1266,94 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
 
         st.markdown("<br>", unsafe_allow_html=True)
         name_input  = st.text_input("⚡ Champion Name", placeholder="What are you called?", key="gw_name")
+        pass_input  = st.text_input("🔑 Password", placeholder="Create a password — keep it safe!", type="password", key="gw_pass")
         theme_input = st.text_input("🌌 Your Universe", placeholder="Leave empty for INFINITE POWER · or type anything: Naruto, F1, Nike, Medieval Space War...", key="gw_theme")
+        st.markdown("<div style='font-family:Space Mono,monospace;font-size:10px;color:#888;text-align:center;margin-bottom:8px'>🔒 New player? Your name + password creates your account. Returning? Use the same combo to load your save.</div>", unsafe_allow_html=True)
         st.markdown("<br>", unsafe_allow_html=True)
 
         if st.button("⚡ ENTER THE INFINITEVERSE", key="gw_enter"):
             if not name_input.strip():
                 st.error("Enter your champion name to begin.")
+            elif not pass_input.strip():
+                st.error("Create a password to protect your account.")
             elif not st.session_state.game_mode:
                 st.error("Pick your mode first — CHILL, GRINDER, or OBSESSED!")
             else:
-                theme_val = theme_input.strip()
+                import hashlib as _hl
+                clean_name  = name_input.strip()
+                pass_hash   = _hl.sha256(pass_input.strip().encode()).hexdigest()
+                theme_val   = theme_input.strip()
                 display_name = theme_val if theme_val else DEFAULT_UNIVERSE_NAME
-                if theme_val:
-                    check = filter_universe_input(theme_val)
-                    if not check["safe"]:
-                        st.error(f"⚠️ {check['reason']}"); st.stop()
-                    theme_val = check["cleaned"]; display_name = theme_val
-                with st.spinner(f"🌌 Loading {display_name.upper()}..."):
-                    result = resolve_universe(theme_val)
-                if not result["safe"]:
-                    st.error(f"⚠️ {result['reason']}"); st.stop()
-                st.session_state.user_name  = name_input.strip()
-                st.session_state.world_data = result["data"]
-                st.session_state.vibe_color = result["data"].get("color","#FFD700")
-                st.session_state.user_theme = display_name
-                st.session_state.universe_achievements = result["data"].get("lore_achievements",[])
-                st.session_state.universe_ach_loaded = True
-                # ── LOAD SAVED DATA FROM SUPABASE ──
-                saved = db_load(name_input.strip())
-                if saved:
-                    db_apply(saved)
-                    st.session_state.world_data = result["data"]
-                    st.session_state.vibe_color = result["data"].get("color","#FFD700")
-                    st.session_state.user_theme = display_name
+
+                # ── CHECK SUPABASE FOR EXISTING NAME ──────────────────────────
+                existing = db_load(clean_name)
+
+                if existing:
+                    stored_hash = existing.get("password_hash", "")
+                    if stored_hash and stored_hash != pass_hash:
+                        # ── NAME TAKEN — WRONG PASSWORD ────────────────────────
+                        st.error("🔒 Sorry, that name is already taken. Choose a different name or enter the correct password.")
+                        st.stop()
+                    elif stored_hash == pass_hash:
+                        # ── CORRECT PASSWORD — RETURNING PLAYER ────────────────
+                        saved_theme = existing.get("theme", "") or DEFAULT_UNIVERSE_NAME
+                        with st.spinner(f"🌌 Welcome back, {clean_name}! Loading your universe..."):
+                            result = resolve_universe(saved_theme)
+                        if not result["safe"]:
+                            result = {"safe": True, "data": DEFAULT_UNIVERSE.copy()}
+                        st.session_state.user_name    = clean_name
+                        st.session_state.password_hash = pass_hash
+                        st.session_state.world_data   = result["data"]
+                        st.session_state.vibe_color   = result["data"].get("color", "#FFD700")
+                        st.session_state.user_theme   = saved_theme
+                        st.session_state.game_mode    = existing.get("game_mode", st.session_state.game_mode or "chill")
+                        db_apply(existing)
+                        st.session_state.world_data   = result["data"]
+                        st.session_state.vibe_color   = result["data"].get("color", "#FFD700")
+                        st.session_state.user_theme   = saved_theme
+                        st.session_state.password_hash = pass_hash
+                        st.toast(f"✅ Welcome back, {clean_name}! Progress loaded.", icon="🌌")
+                        st.rerun()
+                    else:
+                        # ── Name exists but no password yet — claim with this password
+                        saved_theme = existing.get("theme", "") or display_name
+                        with st.spinner(f"🌌 Loading {saved_theme.upper()}..."):
+                            result = resolve_universe(saved_theme)
+                        if not result["safe"]:
+                            result = {"safe": True, "data": DEFAULT_UNIVERSE.copy()}
+                        st.session_state.user_name    = clean_name
+                        st.session_state.password_hash = pass_hash
+                        st.session_state.world_data   = result["data"]
+                        st.session_state.vibe_color   = result["data"].get("color", "#FFD700")
+                        st.session_state.user_theme   = saved_theme
+                        db_apply(existing)
+                        st.session_state.world_data   = result["data"]
+                        st.session_state.vibe_color   = result["data"].get("color", "#FFD700")
+                        st.session_state.user_theme   = saved_theme
+                        st.session_state.password_hash = pass_hash
+                        db_save(clean_name, saved_theme)
+                        st.rerun()
                 else:
+                    # ── BRAND NEW PLAYER ───────────────────────────────────────
+                    if theme_val:
+                        check = filter_universe_input(theme_val)
+                        if not check["safe"]:
+                            st.error(f"⚠️ {check['reason']}"); st.stop()
+                        theme_val = check["cleaned"]; display_name = theme_val
+                    with st.spinner(f"🌌 Loading {display_name.upper()}..."):
+                        result = resolve_universe(theme_val)
+                    if not result["safe"]:
+                        st.error(f"⚠️ {result['reason']}"); st.stop()
+                    st.session_state.user_name    = clean_name
+                    st.session_state.password_hash = pass_hash
+                    st.session_state.world_data   = result["data"]
+                    st.session_state.vibe_color   = result["data"].get("color", "#FFD700")
+                    st.session_state.user_theme   = display_name
+                    st.session_state.universe_achievements = result["data"].get("lore_achievements", [])
+                    st.session_state.universe_ach_loaded = True
                     apply_welcome_bonus()
-                st.rerun()
+                    db_save(clean_name, display_name)
+                    st.rerun()
 
     # ── 7 FIDGET SPINNERS (base64 embedded) ──
     import base64 as _b64
@@ -1362,7 +1416,7 @@ div.stButton>button:hover{{transform:scale(1.02);}}
 # ─── SIDEBAR ───
 with st.sidebar:
     st.markdown(f"<h1 style='font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:3px;margin:0'>🌌 INFINITEVERSE HUB</h1>", unsafe_allow_html=True)
-    st.markdown(f"<p style='color:#ffffff;margin:3px 0'><b>CHAMPION:</b> {st.session_state.user_name.upper()}</p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='color:#ffffff;margin:3px 0'><b>CHAMPION:</b> {st.session_state.user_name}</p>", unsafe_allow_html=True)
     st.markdown(f"<p style='color:#ffffff;margin:3px 0'><b>UNIVERSE:</b> {st.session_state.user_theme}</p>", unsafe_allow_html=True)
     mode_badge = {"chill":"⚡ CHILL","grinder":"🔥 GRINDER","obsessed":"💀 OBSESSED"}.get(MODE,"⚡ CHILL")
     st.markdown(f"<p style='color:#ffffff;margin:3px 0'><b>MODE:</b> {mode_badge}</p>", unsafe_allow_html=True)
