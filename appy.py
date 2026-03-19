@@ -11,7 +11,7 @@ except ImportError:
 try:
     import replicate
     REPLICATE_AVAILABLE = True
-except ImportError:
+except Exception:
     REPLICATE_AVAILABLE = False
 
 # ─────────────────────────────────────────────────────────────────────────────
