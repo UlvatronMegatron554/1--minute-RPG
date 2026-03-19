@@ -1747,8 +1747,6 @@ if view == "main":
     streak_urgency = get_streak_urgency(streak_now, st.session_state.get("last_active_date",""))
     _sh = f"<div style='background:#111;border:2px solid {streak_color};border-radius:14px;padding:16px 20px;margin-bottom:20px'><div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:8px'><span style='font-family:Bebas Neue,sans-serif;font-size:22px;color:{streak_color};letter-spacing:3px'>🔥 {streak_now}-DAY STREAK</span><span style='font-family:Space Mono,monospace;font-size:12px;color:#ffffff'>{week_label} · Day {streak_week}/7</span></div><div style='font-size:22px;letter-spacing:6px;text-align:center;padding:6px 0'>{streak_bar_str}</div>"
     if streak_urgency: _sh += f"<div style='font-size:11px;color:#FF8888;margin-top:6px;font-family:Space Mono,monospace'>{streak_urgency}</div>"
-    _sh = f"<div style='background:#111;border:2px solid {streak_color};border-radius:14px;padding:16px 20px;margin-bottom:20px'><div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:8px'><span style='font-family:Bebas Neue,sans-serif;font-size:22px;color:{streak_color};letter-spacing:3px'>🔥 {streak_now}-DAY STREAK</span><span style='font-family:Space Mono,monospace;font-size:12px;color:#ffffff'>{streak_now}/30 days</span></div><div style='font-family:Space Mono,monospace;font-size:12px;color:{streak_color}'>{streak_bar_str}</div>"
-    if streak_urgency: _sh += f"<div style='font-size:11px;color:#FF8888;margin-top:6px;font-family:Space Mono,monospace'>{streak_urgency}</div>"
     _sh += "</div>"
     st.markdown(_sh, unsafe_allow_html=True)
 
