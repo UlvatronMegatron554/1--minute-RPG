@@ -1311,9 +1311,91 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
 
     _, col, _ = st.columns([1, 2, 1])
     with col:
+
+        # ════════════════════════════════════════════════════════════════
+        # 🛠 DEV CONFIGURATOR — remove when done
+        # ════════════════════════════════════════════════════════════════
+        with st.expander("🛠 BUTTON CONFIGURATOR (DEV — REMOVE WHEN DONE)", expanded=False):
+            st.markdown("##### 1️⃣ HOW IT WORKS button")
+            _hw_w  = st.slider("Width (px)",        40, 800, 400, key="hw_w")
+            _hw_h  = st.slider("Height (px)",       20, 100, 42,  key="hw_h")
+            _hw_fs = st.slider("Font size (px)",     8,  28, 13,  key="hw_fs")
+            _hw_x  = st.slider("X from right (px)", 0, 1000, 300, key="hw_x")
+            _hw_y  = st.slider("Y from top (px)",   0, 2000, 120, key="hw_y")
+            st.caption(f"W:{_hw_w}px  H:{_hw_h}px  FS:{_hw_fs}px  X:{_hw_x}  Y:{_hw_y}")
+
+            st.markdown("---")
+            st.markdown("##### 2️⃣ CHILL / GRINDER / OBSESSED buttons")
+            _md_w  = st.slider("Width (px)",        40, 400, 180, key="md_w")
+            _md_h  = st.slider("Height (px)",       30, 200, 52,  key="md_h")
+            _md_fs = st.slider("Font size (px)",     8,  28, 13,  key="md_fs")
+            _md_x  = st.slider("X from right (px)", 0, 1000, 600, key="md_x")
+            _md_y  = st.slider("Y from top (px)",   0, 2000, 420, key="md_y")
+            st.caption(f"W:{_md_w}px  H:{_md_h}px  FS:{_md_fs}px  X:{_md_x}  Y:{_md_y}")
+
+            st.markdown("---")
+            st.markdown("##### 3️⃣ FORGOT PASSWORD button")
+            _fp_w  = st.slider("Width (px)",        40, 400, 160, key="fp_w")
+            _fp_h  = st.slider("Height (px)",       20, 80,  32,  key="fp_h")
+            _fp_fs = st.slider("Font size (px)",     8,  22,  11,  key="fp_fs")
+            _fp_x  = st.slider("X from right (px)", 0, 1000, 20,  key="fp_x")
+            _fp_y  = st.slider("Y from top (px)",   0, 2000, 480, key="fp_y")
+            st.caption(f"W:{_fp_w}px  H:{_fp_h}px  FS:{_fp_fs}px  X:{_fp_x}  Y:{_fp_y}")
+
+            st.markdown("---")
+            st.markdown("##### 4️⃣ ENTER THE INFINITEVERSE button")
+            _en_w  = st.slider("Width (px)",        40, 800, 400, key="en_w")
+            _en_h  = st.slider("Height (px)",       30, 120, 52,  key="en_h")
+            _en_fs = st.slider("Font size (px)",     8,  32, 16,  key="en_fs")
+            _en_x  = st.slider("X from right (px)", 0, 1000, 300, key="en_x")
+            _en_y  = st.slider("Y from top (px)",   0, 2000, 900, key="en_y")
+            st.caption(f"W:{_en_w}px  H:{_en_h}px  FS:{_en_fs}px  X:{_en_x}  Y:{_en_y}")
+
+        # Read values
+        _hw_w  = st.session_state.get("hw_w",  400); _hw_h  = st.session_state.get("hw_h",  42)
+        _hw_fs = st.session_state.get("hw_fs", 13);  _hw_x  = st.session_state.get("hw_x",  300); _hw_y = st.session_state.get("hw_y", 120)
+        _md_w  = st.session_state.get("md_w",  180); _md_h  = st.session_state.get("md_h",  52)
+        _md_fs = st.session_state.get("md_fs", 13);  _md_x  = st.session_state.get("md_x",  600); _md_y = st.session_state.get("md_y", 420)
+        _fp_w  = st.session_state.get("fp_w",  160); _fp_h  = st.session_state.get("fp_h",  32)
+        _fp_fs = st.session_state.get("fp_fs", 11);  _fp_x  = st.session_state.get("fp_x",  20);  _fp_y = st.session_state.get("fp_y", 480)
+        _en_w  = st.session_state.get("en_w",  400); _en_h  = st.session_state.get("en_h",  52)
+        _en_fs = st.session_state.get("en_fs", 16);  _en_x  = st.session_state.get("en_x",  300); _en_y = st.session_state.get("en_y", 900)
+
+        st.markdown(f"""<style>
+        #hw-btn-wrap {{ position:fixed; right:{_hw_x}px; top:{_hw_y}px; width:{_hw_w}px; z-index:9999; }}
+        #hw-btn-wrap div.stButton > button {{
+            width:{_hw_w}px !important; height:{_hw_h}px !important;
+            min-height:0 !important; font-size:{_hw_fs}px !important;
+            padding:0 8px !important; animation:none !important; box-shadow:none !important; line-height:1 !important;
+        }}
+        #md-btn-wrap {{ position:fixed; right:{_md_x}px; top:{_md_y}px; z-index:9999; display:flex; gap:8px; }}
+        .md-btn-wrap div.stButton > button {{
+            width:{_md_w}px !important; height:{_md_h}px !important;
+            min-height:0 !important; font-size:{_md_fs}px !important;
+            padding:0 8px !important; animation:none !important; box-shadow:none !important; line-height:1 !important;
+        }}
+        #fp-btn-wrap {{ position:fixed; right:{_fp_x}px; top:{_fp_y}px; width:{_fp_w}px; z-index:9999; }}
+        #fp-btn-wrap div.stButton > button {{
+            width:{_fp_w}px !important; height:{_fp_h}px !important;
+            min-height:0 !important; font-size:{_fp_fs}px !important;
+            padding:0 8px !important; border-radius:6px !important; border-width:1px !important;
+            animation:none !important; box-shadow:none !important; line-height:1 !important;
+        }}
+        #en-btn-wrap {{ position:fixed; right:{_en_x}px; top:{_en_y}px; width:{_en_w}px; z-index:9999; }}
+        #en-btn-wrap div.stButton > button {{
+            width:{_en_w}px !important; height:{_en_h}px !important;
+            min-height:0 !important; font-size:{_en_fs}px !important;
+            letter-spacing:3px !important; padding:0 8px !important;
+            animation:none !important; box-shadow:none !important; line-height:1 !important;
+        }}
+        </style>""", unsafe_allow_html=True)
+        # ════════════════════════════════════════════════════════════════
+
         # ONE button — toggles the info panel
+        st.markdown('<div id="hw-btn-wrap">', unsafe_allow_html=True)
         if st.button("⚡ HOW IT WORKS  ·  RETURNING PLAYER?", key="info_toggle"):
             st.session_state.info_open = not st.session_state.get("info_open", False)
+        st.markdown('</div>', unsafe_allow_html=True)
 
         if st.session_state.get("info_open", False):
             st.markdown("<div style='background:rgba(0,0,0,0.85);border:2px solid #FFD700;border-radius:20px;padding:28px;margin-top:12px;'><div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;letter-spacing:4px;margin-bottom:14px'>HOW IT WORKS</div><div style='font-family:Space Mono,monospace;font-size:12px;color:#ffffff;line-height:2.2;margin-bottom:20px'>🌌 <b style='color:#FFD700'>Pick any universe</b> — AI builds it instantly. Colors, currency, story, all yours.<br>⏱ <b style='color:#FFD700'>Study for 30 seconds</b> — work, study, do anything productive. Get paid.<br>📸 <b style='color:#FFD700'>Upload proof</b> — no proof = no coins. Then spin, battle, hatch eggs.</div><div style='border-top:1px solid rgba(255,215,0,0.25);padding-top:16px;'><div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;letter-spacing:4px;margin-bottom:10px'>ALREADY HAVE AN ACCOUNT?</div><div style='font-family:Space Mono,monospace;font-size:12px;color:#ffffff;line-height:2.2;margin-bottom:10px'>Your stuff is safe. Forever.<br><span style='color:#00FF88'>Type the same name + password → hit Enter → everything loads back instantly.</span></div><div style='background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.3);border-radius:10px;padding:12px;font-family:Space Mono,monospace;font-size:11px;color:#ffffff;line-height:2.2'><span style='color:#FFD700'>①</span> Type your Champion Name<br><span style='color:#FFD700'>②</span> Type your Password<br><span style='color:#FFD700'>③</span> Hit ENTER THE INFINITEVERSE<br><span style='color:#00FF88'>④ BOOM. Home. Everything restored.</span></div></div></div>", unsafe_allow_html=True)
@@ -1324,16 +1406,22 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
         mode_col1, mode_col2, mode_col3 = st.columns(3)
         with mode_col1:
             st.markdown("""<div class='mode-card'><span class='mode-emoji'>⚡</span><div class='mode-name'>CHILL</div><div class='mode-desc'>Missions. Currency. Level up.</div></div>""", unsafe_allow_html=True)
+            st.markdown('<div class="md-btn-wrap">', unsafe_allow_html=True)
             if st.button("⚡ CHILL", key="mode_chill", use_container_width=True):
                 st.session_state.game_mode = "chill"
+            st.markdown('</div>', unsafe_allow_html=True)
         with mode_col2:
             st.markdown("""<div class='mode-card'><span class='mode-emoji'>🔥</span><div class='mode-name'>GRINDER</div><div class='mode-desc'>Adds Battles, Abilities, Monster Hatching.</div></div>""", unsafe_allow_html=True)
+            st.markdown('<div class="md-btn-wrap">', unsafe_allow_html=True)
             if st.button("🔥 GRINDER", key="mode_grinder", use_container_width=True):
                 st.session_state.game_mode = "grinder"
+            st.markdown('</div>', unsafe_allow_html=True)
         with mode_col3:
             st.markdown("""<div class='mode-card'><span class='mode-emoji'>💀</span><div class='mode-name'>OBSESSED</div><div class='mode-desc'>EVERYTHING. Full chaos. No limits.</div></div>""", unsafe_allow_html=True)
+            st.markdown('<div class="md-btn-wrap">', unsafe_allow_html=True)
             if st.button("💀 OBSESSED", key="mode_obsessed", use_container_width=True):
                 st.session_state.game_mode = "obsessed"
+            st.markdown('</div>', unsafe_allow_html=True)
         if st.session_state.game_mode:
             mode_labels = {"chill":"⚡ CHILL","grinder":"🔥 GRINDER","obsessed":"💀 OBSESSED"}
             st.success(f"MODE: {mode_labels[st.session_state.game_mode]} ✅")
@@ -1357,33 +1445,51 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
             width: auto !important;
         }
         </style>""", unsafe_allow_html=True)
-        st.markdown("""<style>
-        div[data-testid="stMainBlockContainer"] button[kind="secondary"]:last-of-type { }
-        [data-testid="column"] button[data-testid*="open_reset_panel"],
-        button[data-testid*="open_reset_panel"] {
-            padding: 1px 10px !important;
-            min-height: 0px !important;
-            height: 28px !important;
-            font-size: 10px !important;
+        # ── FORGOT PASSWORD — live position/size configurator ────────────────
+        with st.expander("🛠 Adjust Forgot Password Button (dev tool)", expanded=False):
+            _bx  = st.slider("X from right (px)", 0, 800, 20,  key="fp_x")
+            _by  = st.slider("Y from top (px)",   0, 2000, 480, key="fp_y")
+            _bw  = st.slider("Width (px)",         60, 400, 160, key="fp_w")
+            _bh  = st.slider("Height (px)",        20, 80,  32,  key="fp_h")
+            _bfs = st.slider("Font size (px)",     8,  22,  11,  key="fp_fs")
+            st.caption(f"Current values → X:{_bx} Y:{_by} W:{_bw} H:{_bh} FS:{_bfs}")
+
+        _bx  = st.session_state.get("fp_x",  20)
+        _by  = st.session_state.get("fp_y",  480)
+        _bw  = st.session_state.get("fp_w",  160)
+        _bh  = st.session_state.get("fp_h",  32)
+        _bfs = st.session_state.get("fp_fs", 11)
+
+        st.markdown(f"""<style>
+        #fp-fixed-btn {{
+            position: fixed;
+            right: {_bx}px;
+            top: {_by}px;
+            width: {_bw}px;
+            height: {_bh}px;
+            z-index: 9999;
+        }}
+        #fp-fixed-btn button {{
+            width: {_bw}px !important;
+            height: {_bh}px !important;
+            min-height: 0 !important;
+            font-size: {_bfs}px !important;
+            padding: 0 !important;
+            border-radius: 6px !important;
+            border-width: 1px !important;
             animation: none !important;
             box-shadow: none !important;
             line-height: 1 !important;
-            border-radius: 6px !important;
-            border-width: 1px !important;
-        }
-        button[data-testid*="gw_enter"] {
-            width: 100% !important;
-            font-size: 18px !important;
-            padding: 16px !important;
-            letter-spacing: 4px !important;
-        }
-        </style>""", unsafe_allow_html=True)
-        _fp1, _fp2 = st.columns([5, 1])
-        with _fp2:
-            if st.button("🔑 Forgot?", key="open_reset_panel"):
-                st.session_state.reset_panel_open = not st.session_state.get("reset_panel_open", False)
-                st.session_state.reset_pending_name = None
-                st.rerun()
+        }}
+        </style>
+        <div id="fp-fixed-btn">""", unsafe_allow_html=True)
+        st.markdown('<div id="fp-btn-wrap">', unsafe_allow_html=True)
+        if st.button("🔑 Forgot password?", key="open_reset_panel"):
+            st.session_state.reset_panel_open = not st.session_state.get("reset_panel_open", False)
+            st.session_state.reset_pending_name = None
+            st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
 
         # ── RESET PASSWORD PANEL ──────────────────────────────────────────────
         if st.session_state.get("reset_panel_open", False):
@@ -1469,6 +1575,7 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                             st.success("Password reset! Log in with your new password now.")
 
         st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown('<div id="en-btn-wrap">', unsafe_allow_html=True)
         if st.button("⚡ ENTER THE INFINITEVERSE ⚡", key="gw_enter", use_container_width=True):
             if not name_input.strip():
                 st.error("Enter your champion name to begin.")
