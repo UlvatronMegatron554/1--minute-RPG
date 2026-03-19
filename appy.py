@@ -1325,19 +1325,17 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
         with mode_col1:
             st.markdown("""<div class='mode-card'><span class='mode-emoji'>⚡</span><div class='mode-name'>CHILL</div><div class='mode-desc'>Missions. Currency. Level up.</div></div>""", unsafe_allow_html=True)
             if st.button("⚡ CHILL", key="mode_chill", use_container_width=True):
-                st.session_state.game_mode = "chill"; st.rerun()
+                st.session_state.game_mode = "chill"
         with mode_col2:
             st.markdown("""<div class='mode-card'><span class='mode-emoji'>🔥</span><div class='mode-name'>GRINDER</div><div class='mode-desc'>Adds Battles, Abilities, Monster Hatching.</div></div>""", unsafe_allow_html=True)
             if st.button("🔥 GRINDER", key="mode_grinder", use_container_width=True):
-                st.session_state.game_mode = "grinder"; st.rerun()
+                st.session_state.game_mode = "grinder"
         with mode_col3:
             st.markdown("""<div class='mode-card'><span class='mode-emoji'>💀</span><div class='mode-name'>OBSESSED</div><div class='mode-desc'>EVERYTHING. Full chaos. No limits.</div></div>""", unsafe_allow_html=True)
             if st.button("💀 OBSESSED", key="mode_obsessed", use_container_width=True):
-                st.session_state.game_mode = "obsessed"; st.rerun()
+                st.session_state.game_mode = "obsessed"
         if st.session_state.game_mode:
             mode_labels = {"chill":"⚡ CHILL","grinder":"🔥 GRINDER","obsessed":"💀 OBSESSED"}
-            st.success(f"MODE: {mode_labels[st.session_state.game_mode]} ✅")
-
             st.success(f"MODE: {mode_labels[st.session_state.game_mode]} ✅")
 
         name_input  = st.text_input("⚡ Champion Name", placeholder="What are you called?", key="gw_name")
@@ -1359,9 +1357,9 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
             width: auto !important;
         }
         </style>""", unsafe_allow_html=True)
-        _, fp_col = st.columns([5, 1])
-        with fp_col:
-            if st.button("🔑 Forgot password?", key="open_reset_panel"):
+        _fp1, _fp2 = st.columns([5, 1])
+        with _fp2:
+            if st.button("🔑 Forgot?", key="open_reset_panel"):
                 st.session_state.reset_panel_open = not st.session_state.get("reset_panel_open", False)
                 st.session_state.reset_pending_name = None
                 st.rerun()
@@ -1451,7 +1449,8 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
 
         st.markdown("<br>", unsafe_allow_html=True)
 
-        if st.button("⚡ ENTER THE INFINITEVERSE", key="gw_enter"):
+        st.markdown("<br>", unsafe_allow_html=True)
+        if st.button("⚡ ENTER THE INFINITEVERSE ⚡", key="gw_enter", use_container_width=True):
             if not name_input.strip():
                 st.error("Enter your champion name to begin.")
             elif not pass_input.strip():
