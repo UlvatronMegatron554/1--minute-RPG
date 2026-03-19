@@ -1318,31 +1318,34 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
             _hw_w  = st.slider("Width (px)",        40, 800, 400, key="hw_w")
             _hw_h  = st.slider("Height (px)",       20, 100, 42,  key="hw_h")
             _hw_fs = st.slider("Font size (px)",     8,  28, 13,  key="hw_fs")
-            _hw_x  = st.slider("X from right (px)", 0, 1000, 300, key="hw_x")
-            _hw_y  = st.slider("Y from top (px)",   0, 2000, 200, key="hw_y")
-            st.caption(f"W:{st.session_state.get('hw_w',400)}  H:{st.session_state.get('hw_h',42)}  FS:{st.session_state.get('hw_fs',13)}  X:{st.session_state.get('hw_x',300)}  Y:{st.session_state.get('hw_y',200)}")
+            _hw_ml = st.slider("Shift left/right (px, - = left)", -400, 400, 0, key="hw_ml")
+            _hw_mt = st.slider("Shift up/down (px, - = up)",      -200, 200, 0, key="hw_mt")
+            st.caption(f"W:{st.session_state.get('hw_w',400)}  H:{st.session_state.get('hw_h',42)}  FS:{st.session_state.get('hw_fs',13)}  ShiftX:{st.session_state.get('hw_ml',0)}  ShiftY:{st.session_state.get('hw_mt',0)}")
 
         _hw_w  = st.session_state.get("hw_w",  400)
         _hw_h  = st.session_state.get("hw_h",  42)
         _hw_fs = st.session_state.get("hw_fs", 13)
-        _hw_x  = st.session_state.get("hw_x",  300)
-        _hw_y  = st.session_state.get("hw_y",  200)
+        _hw_ml = st.session_state.get("hw_ml", 0)
+        _hw_mt = st.session_state.get("hw_mt", 0)
 
         st.markdown(f"""<style>
-        #hw-wrap {{ position:fixed; right:{_hw_x}px; top:{_hw_y}px; z-index:9999; width:{_hw_w}px; }}
+        #hw-wrap {{
+            width: {_hw_w}px !important;
+            margin-left: {_hw_ml}px !important;
+            margin-top: {_hw_mt}px !important;
+        }}
         #hw-wrap div.stButton > button {{
-            width:{_hw_w}px !important;
-            height:{_hw_h}px !important;
-            min-height:0 !important;
-            font-size:{_hw_fs}px !important;
-            animation:none !important;
-            box-shadow:none !important;
-            line-height:1 !important;
-            padding:0 12px !important;
+            width: {_hw_w}px !important;
+            height: {_hw_h}px !important;
+            min-height: 0 !important;
+            font-size: {_hw_fs}px !important;
+            animation: none !important;
+            box-shadow: none !important;
+            line-height: 1 !important;
+            padding: 0 12px !important;
         }}
         </style>""", unsafe_allow_html=True)
 
-        # HOW IT WORKS button
         st.markdown('<div id="hw-wrap">', unsafe_allow_html=True)
         if st.button("⚡ HOW IT WORKS  ·  RETURNING PLAYER?", key="info_toggle"):
             st.session_state.info_open = not st.session_state.get("info_open", False)
