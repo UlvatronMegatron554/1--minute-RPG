@@ -1316,50 +1316,24 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
             st.session_state.info_open = not st.session_state.get("info_open", False)
 
         if st.session_state.get("info_open", False):
-            st.markdown("""<div style='background:rgba(0,0,0,0.85);border:2px solid #FFD700;border-radius:20px;padding:28px;margin-top:12px;'>
-
-                <div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;letter-spacing:4px;margin-bottom:14px'>HOW IT WORKS</div>
-                <div style='font-family:Space Mono,monospace;font-size:12px;color:#ffffff;line-height:2.0;margin-bottom:20px'>
-                    🌌 <b style='color:#FFD700'>Pick any universe</b> — AI builds it instantly. Colors, currency, story, all yours.<br>
-                    ⏱ <b style='color:#FFD700'>Study for 30 seconds</b> — work, study, do anything productive. Get paid.<br>
-                    📸 <b style='color:#FFD700'>Upload proof</b> — no proof = no coins. Then spin, battle, hatch eggs.
-                </div>
-
-                <div style='border-top:1px solid rgba(255,215,0,0.2);margin-bottom:16px;padding-top:16px;'>
-                    <div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;letter-spacing:4px;margin-bottom:10px'>ALREADY HAVE AN ACCOUNT?</div>
-                    <div style='font-family:Space Mono,monospace;font-size:12px;color:#ffffff;line-height:2.2;margin-bottom:8px'>
-                        Your stuff is safe. Forever.<br>
-                        <span style='color:#00FF88'>Just type the same name + password you used before and hit Enter.</span><br>
-                        Everything — gold, streak, story, eggs — loads back instantly.
-                    </div>
-                    <div style='background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.3);border-radius:10px;padding:12px;font-family:Space Mono,monospace;font-size:11px;color:#ffffff;line-height:2.2'>
-                        <span style='color:#FFD700'>①</span> Type your <b style='color:#FFD700'>Champion Name</b><br>
-                        <span style='color:#FFD700'>②</span> Type your <b style='color:#FFD700'>Password</b><br>
-                        <span style='color:#FFD700'>③</span> Hit <b style='color:#FFD700'>ENTER THE INFINITEVERSE</b><br>
-                        <span style='color:#00FF88'>④</span> <b>BOOM. Home. Everything restored.</b>
-                    </div>
-                </div>
-
-            </div>""", unsafe_allow_html=True)
+            st.markdown("<div style='background:rgba(0,0,0,0.85);border:2px solid #FFD700;border-radius:20px;padding:28px;margin-top:12px;'><div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;letter-spacing:4px;margin-bottom:14px'>HOW IT WORKS</div><div style='font-family:Space Mono,monospace;font-size:12px;color:#ffffff;line-height:2.2;margin-bottom:20px'>🌌 <b style='color:#FFD700'>Pick any universe</b> — AI builds it instantly. Colors, currency, story, all yours.<br>⏱ <b style='color:#FFD700'>Study for 30 seconds</b> — work, study, do anything productive. Get paid.<br>📸 <b style='color:#FFD700'>Upload proof</b> — no proof = no coins. Then spin, battle, hatch eggs.</div><div style='border-top:1px solid rgba(255,215,0,0.25);padding-top:16px;'><div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;letter-spacing:4px;margin-bottom:10px'>ALREADY HAVE AN ACCOUNT?</div><div style='font-family:Space Mono,monospace;font-size:12px;color:#ffffff;line-height:2.2;margin-bottom:10px'>Your stuff is safe. Forever.<br><span style='color:#00FF88'>Type the same name + password → hit Enter → everything loads back instantly.</span></div><div style='background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.3);border-radius:10px;padding:12px;font-family:Space Mono,monospace;font-size:11px;color:#ffffff;line-height:2.2'><span style='color:#FFD700'>①</span> Type your Champion Name<br><span style='color:#FFD700'>②</span> Type your Password<br><span style='color:#FFD700'>③</span> Hit ENTER THE INFINITEVERSE<br><span style='color:#00FF88'>④ BOOM. Home. Everything restored.</span></div></div></div>", unsafe_allow_html=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
-
-        # Mode dropdown
-        mode_choice = st.selectbox(
-            "⚡ Choose Your Mode",
-            ["", "⚡ CHILL — Missions. Currency. Level up.",
-                 "🔥 GRINDER — Adds Battles, Abilities, Monster Hatching.",
-                 "💀 OBSESSED — EVERYTHING. Full chaos. No limits."],
-            key="gw_mode_select",
-            index=0
-        )
-        if mode_choice.startswith("⚡"):   st.session_state.game_mode = "chill"
-        elif mode_choice.startswith("🔥"): st.session_state.game_mode = "grinder"
-        elif mode_choice.startswith("💀"): st.session_state.game_mode = "obsessed"
+        st.markdown("<div style='font-family:Bebas Neue,sans-serif;font-size:18px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:8px'>⚡ CHOOSE YOUR MODE</div>", unsafe_allow_html=True)
+        mode_col1, mode_col2, mode_col3 = st.columns(3)
+        with mode_col1:
+            if st.button("⚡ CHILL", key="mode_chill"): st.session_state.game_mode = "chill"
+        with mode_col2:
+            if st.button("🔥 GRINDER", key="mode_grinder"): st.session_state.game_mode = "grinder"
+        with mode_col3:
+            if st.button("💀 OBSESSED", key="mode_obsessed"): st.session_state.game_mode = "obsessed"
+        if st.session_state.game_mode:
+            mode_labels = {"chill":"⚡ CHILL","grinder":"🔥 GRINDER","obsessed":"💀 OBSESSED"}
+            st.success(f"MODE: {mode_labels[st.session_state.game_mode]} ✅")
 
         name_input  = st.text_input("⚡ Champion Name", placeholder="What are you called?", key="gw_name")
         pass_input  = st.text_input("🔑 Password", placeholder="Create a password — keep it safe!", type="password", key="gw_pass")
-        email_input = st.text_input("📧 Email (optional — for password recovery)", placeholder="your@email.com", key="gw_email")
+        email_input = st.text_input("📧 Email", placeholder="your@email.com — needed for password recovery", key="gw_email")
         theme_input = st.text_input("🌌 Your Universe", placeholder="Leave empty for INFINITE POWER · or type anything: Naruto, F1, Nike...", key="gw_theme")
 
         # Small "Forgot password?" button
@@ -1473,6 +1447,8 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                 st.error("Enter your champion name to begin.")
             elif not pass_input.strip():
                 st.error("Create a password to protect your account.")
+            elif not email_input.strip():
+                st.error("Enter your email — needed if you ever forget your password.")
             elif not st.session_state.game_mode:
                 st.error("Pick your mode first — CHILL, GRINDER, or OBSESSED!")
             else:
