@@ -1318,25 +1318,36 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
             _hw_w  = st.slider("Width (px)",        40, 800, 400, key="hw_w")
             _hw_h  = st.slider("Height (px)",       20, 100, 42,  key="hw_h")
             _hw_fs = st.slider("Font size (px)",     8,  28, 13,  key="hw_fs")
-            st.caption(f"W:{st.session_state.get('hw_w',400)}px  H:{st.session_state.get('hw_h',42)}px  FS:{st.session_state.get('hw_fs',13)}px")
+            _hw_x  = st.slider("X from right (px)", 0, 1000, 300, key="hw_x")
+            _hw_y  = st.slider("Y from top (px)",   0, 2000, 200, key="hw_y")
+            st.caption(f"W:{st.session_state.get('hw_w',400)}  H:{st.session_state.get('hw_h',42)}  FS:{st.session_state.get('hw_fs',13)}  X:{st.session_state.get('hw_x',300)}  Y:{st.session_state.get('hw_y',200)}")
 
         _hw_w  = st.session_state.get("hw_w",  400)
         _hw_h  = st.session_state.get("hw_h",  42)
         _hw_fs = st.session_state.get("hw_fs", 13)
+        _hw_x  = st.session_state.get("hw_x",  300)
+        _hw_y  = st.session_state.get("hw_y",  200)
 
         st.markdown(f"""<style>
-        div.stButton:first-of-type > button {{
-            width: {_hw_w}px !important;
-            height: {_hw_h}px !important;
-            min-height: 0 !important;
-            font-size: {_hw_fs}px !important;
-            animation: none !important;
+        #hw-wrap {{ position:fixed; right:{_hw_x}px; top:{_hw_y}px; z-index:9999; width:{_hw_w}px; }}
+        #hw-wrap div.stButton > button {{
+            width:{_hw_w}px !important;
+            height:{_hw_h}px !important;
+            min-height:0 !important;
+            font-size:{_hw_fs}px !important;
+            animation:none !important;
+            box-shadow:none !important;
+            line-height:1 !important;
+            padding:0 12px !important;
         }}
         </style>""", unsafe_allow_html=True)
 
         # HOW IT WORKS button
+        st.markdown('<div id="hw-wrap">', unsafe_allow_html=True)
         if st.button("⚡ HOW IT WORKS  ·  RETURNING PLAYER?", key="info_toggle"):
             st.session_state.info_open = not st.session_state.get("info_open", False)
+        st.markdown('</div>', unsafe_allow_html=True)
+
 
         if st.session_state.get("info_open", False):
             st.markdown("<div style='background:rgba(0,0,0,0.85);border:2px solid #FFD700;border-radius:20px;padding:28px;margin-top:12px;'><div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;letter-spacing:4px;margin-bottom:14px'>HOW IT WORKS</div><div style='font-family:Space Mono,monospace;font-size:12px;color:#ffffff;line-height:2.2;margin-bottom:20px'>🌌 <b style='color:#FFD700'>Pick any universe</b> — AI builds it instantly. Colors, currency, story, all yours.<br>⏱ <b style='color:#FFD700'>Study for 30 seconds</b> — work, study, do anything productive. Get paid.<br>📸 <b style='color:#FFD700'>Upload proof</b> — no proof = no coins. Then spin, battle, hatch eggs.</div><div style='border-top:1px solid rgba(255,215,0,0.25);padding-top:16px;'><div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;letter-spacing:4px;margin-bottom:10px'>ALREADY HAVE AN ACCOUNT?</div><div style='font-family:Space Mono,monospace;font-size:12px;color:#ffffff;line-height:2.2;margin-bottom:10px'>Your stuff is safe. Forever.<br><span style='color:#00FF88'>Type the same name + password → hit Enter → everything loads back instantly.</span></div><div style='background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.3);border-radius:10px;padding:12px;font-family:Space Mono,monospace;font-size:11px;color:#ffffff;line-height:2.2'><span style='color:#FFD700'>①</span> Type your Champion Name<br><span style='color:#FFD700'>②</span> Type your Password<br><span style='color:#FFD700'>③</span> Hit ENTER THE INFINITEVERSE<br><span style='color:#00FF88'>④ BOOM. Home. Everything restored.</span></div></div></div>", unsafe_allow_html=True)
