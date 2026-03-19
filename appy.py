@@ -1259,13 +1259,16 @@ background:
   radial-gradient(ellipse 55% 40% at 5% 65%,   rgba(0,255,160,0.30) 0%,transparent 55%),
   radial-gradient(ellipse 40% 35% at 60% 50%,  rgba(200,0,255,0.25) 0%,transparent 50%),
   #00000e!important;
-animation:cosmos-breathe 10s ease-in-out infinite alternate!important;
+animation:cosmos-rainbow 6s ease-in-out infinite!important;
 }
-@keyframes cosmos-breathe{
-  0%  {filter:brightness(0.7) saturate(0.8) hue-rotate(0deg);}
-  33% {filter:brightness(1.3) saturate(1.5) hue-rotate(15deg);}
-  66% {filter:brightness(1.1) saturate(1.3) hue-rotate(-10deg);}
-  100%{filter:brightness(0.8) saturate(0.9) hue-rotate(5deg);}
+@keyframes cosmos-rainbow{
+  0%   {filter:brightness(0.9) saturate(1.2) hue-rotate(0deg);}
+  16%  {filter:brightness(1.3) saturate(1.8) hue-rotate(60deg);}
+  33%  {filter:brightness(1.1) saturate(1.5) hue-rotate(120deg);}
+  50%  {filter:brightness(1.4) saturate(2.0) hue-rotate(180deg);}
+  66%  {filter:brightness(1.0) saturate(1.6) hue-rotate(240deg);}
+  83%  {filter:brightness(1.3) saturate(1.9) hue-rotate(300deg);}
+  100% {filter:brightness(0.9) saturate(1.2) hue-rotate(360deg);}
 }
 [data-testid="stAppViewContainer"]::before{
   content:'';position:fixed;top:0;left:0;width:100%;height:100%;
@@ -1311,9 +1314,9 @@ animation:cosmos-breathe 10s ease-in-out infinite alternate!important;
 @keyframes scan-sweep{0%{transform:translateX(-150%);}100%{transform:translateX(400%);}}
 .top-badge{background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.4);border-radius:99px;padding:8px 24px;font-family:Space Mono,monospace;font-size:11px;letter-spacing:3px;color:#FFD700;text-transform:uppercase;text-align:center;display:table;margin:0 auto 20px;animation:badge-pulse 3s ease-in-out infinite alternate;}
 @keyframes badge-pulse{0%{box-shadow:0 0 10px rgba(255,215,0,0.2);}100%{box-shadow:0 0 40px rgba(255,215,0,0.6);}}
-.gw-main-title{font-family:Bebas Neue,sans-serif;font-size:clamp(72px,14vw,150px);text-align:center;letter-spacing:8px;line-height:0.88;background:linear-gradient(135deg,#00FFFF 0%,#0080FF 12%,#8000FF 24%,#FF00FF 36%,#FF0080 48%,#FF4400 60%,#FFD700 72%,#00FF88 84%,#00FFFF 100%);background-size:400% 400%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:title-rainbow 3s ease-in-out infinite,title-corona 2s ease-in-out infinite alternate;margin-bottom:8px;}
-@keyframes title-rainbow{0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
-@keyframes title-corona{0%{filter:drop-shadow(0 0 8px rgba(0,255,255,0.6)) drop-shadow(0 0 20px rgba(128,0,255,0.5)) drop-shadow(0 0 40px rgba(255,0,128,0.4));}50%{filter:drop-shadow(0 0 16px rgba(255,215,0,0.8)) drop-shadow(0 0 40px rgba(0,200,255,0.6)) drop-shadow(0 0 80px rgba(255,0,255,0.5));}100%{filter:drop-shadow(0 0 12px rgba(0,255,136,0.7)) drop-shadow(0 0 30px rgba(255,68,0,0.5)) drop-shadow(0 0 60px rgba(128,0,255,0.4));}}
+.gw-main-title{font-family:Bebas Neue,sans-serif;font-size:clamp(72px,14vw,150px);text-align:center;letter-spacing:8px;line-height:0.88;background:linear-gradient(135deg,#FF0000 0%,#FF4400 25%,#FF2200 50%,#FF6600 75%,#FF0000 100%);background-size:300% 300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:title-fire-shift 2s ease-in-out infinite,title-fire-breathe 1.5s ease-in-out infinite alternate;margin-bottom:8px;}
+@keyframes title-fire-shift{0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
+@keyframes title-fire-breathe{0%{filter:drop-shadow(0 0 10px rgba(255,0,0,0.9)) drop-shadow(0 0 25px rgba(255,50,0,0.7)) drop-shadow(0 0 50px rgba(255,80,0,0.5));transform:scale(1.0);}100%{filter:drop-shadow(0 0 20px rgba(255,0,0,1.0)) drop-shadow(0 0 50px rgba(255,60,0,0.9)) drop-shadow(0 0 100px rgba(255,100,0,0.7));transform:scale(1.02);}}
 .gw-subtitle{font-family:Orbitron,sans-serif;font-size:clamp(12px,1.8vw,18px);text-align:center;letter-spacing:5px;color:#ffffff;text-transform:uppercase;margin-bottom:20px;text-shadow:0 0 20px rgba(255,255,255,0.4);}
 .features-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0 24px;}
 .feature-pill{background:rgba(255,215,0,0.12);border:1px solid rgba(255,215,0,0.35);border-radius:99px;padding:7px 16px;font-family:Space Mono,monospace;font-size:12px;color:#ffffff;letter-spacing:1px;}
