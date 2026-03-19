@@ -1445,51 +1445,12 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
             width: auto !important;
         }
         </style>""", unsafe_allow_html=True)
-        # ── FORGOT PASSWORD — live position/size configurator ────────────────
-        with st.expander("🛠 Adjust Forgot Password Button (dev tool)", expanded=False):
-            _bx  = st.slider("X from right (px)", 0, 800, 20,  key="fp_x")
-            _by  = st.slider("Y from top (px)",   0, 2000, 480, key="fp_y")
-            _bw  = st.slider("Width (px)",         60, 400, 160, key="fp_w")
-            _bh  = st.slider("Height (px)",        20, 80,  32,  key="fp_h")
-            _bfs = st.slider("Font size (px)",     8,  22,  11,  key="fp_fs")
-            st.caption(f"Current values → X:{_bx} Y:{_by} W:{_bw} H:{_bh} FS:{_bfs}")
-
-        _bx  = st.session_state.get("fp_x",  20)
-        _by  = st.session_state.get("fp_y",  480)
-        _bw  = st.session_state.get("fp_w",  160)
-        _bh  = st.session_state.get("fp_h",  32)
-        _bfs = st.session_state.get("fp_fs", 11)
-
-        st.markdown(f"""<style>
-        #fp-fixed-btn {{
-            position: fixed;
-            right: {_bx}px;
-            top: {_by}px;
-            width: {_bw}px;
-            height: {_bh}px;
-            z-index: 9999;
-        }}
-        #fp-fixed-btn button {{
-            width: {_bw}px !important;
-            height: {_bh}px !important;
-            min-height: 0 !important;
-            font-size: {_bfs}px !important;
-            padding: 0 !important;
-            border-radius: 6px !important;
-            border-width: 1px !important;
-            animation: none !important;
-            box-shadow: none !important;
-            line-height: 1 !important;
-        }}
-        </style>
-        <div id="fp-fixed-btn">""", unsafe_allow_html=True)
         st.markdown('<div id="fp-btn-wrap">', unsafe_allow_html=True)
         if st.button("🔑 Forgot password?", key="open_reset_panel"):
             st.session_state.reset_panel_open = not st.session_state.get("reset_panel_open", False)
             st.session_state.reset_pending_name = None
             st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)
 
         # ── RESET PASSWORD PANEL ──────────────────────────────────────────────
         if st.session_state.get("reset_panel_open", False):
