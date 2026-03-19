@@ -1357,6 +1357,27 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
             width: auto !important;
         }
         </style>""", unsafe_allow_html=True)
+        st.markdown("""<style>
+        div[data-testid="stMainBlockContainer"] button[kind="secondary"]:last-of-type { }
+        [data-testid="column"] button[data-testid*="open_reset_panel"],
+        button[data-testid*="open_reset_panel"] {
+            padding: 1px 10px !important;
+            min-height: 0px !important;
+            height: 28px !important;
+            font-size: 10px !important;
+            animation: none !important;
+            box-shadow: none !important;
+            line-height: 1 !important;
+            border-radius: 6px !important;
+            border-width: 1px !important;
+        }
+        button[data-testid*="gw_enter"] {
+            width: 100% !important;
+            font-size: 18px !important;
+            padding: 16px !important;
+            letter-spacing: 4px !important;
+        }
+        </style>""", unsafe_allow_html=True)
         _fp1, _fp2 = st.columns([5, 1])
         with _fp2:
             if st.button("🔑 Forgot?", key="open_reset_panel"):
@@ -1446,8 +1467,6 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                             st.session_state.reset_pending_name = None
                             st.session_state.reset_panel_open = False
                             st.success("Password reset! Log in with your new password now.")
-
-        st.markdown("<br>", unsafe_allow_html=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
         if st.button("⚡ ENTER THE INFINITEVERSE ⚡", key="gw_enter", use_container_width=True):
