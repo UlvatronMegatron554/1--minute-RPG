@@ -822,6 +822,7 @@ def db_save(user_name: str, theme: str):
             "updated_at": _dt.datetime.utcnow().isoformat(),
             "password_hash": st.session_state.get("password_hash", ""),
             "leaderboard_visible": bool(st.session_state.get("leaderboard_visible", True)),
+            "email": st.session_state.get("user_email", ""),
         }
         sb.table("players").upsert(payload, on_conflict="user_name").execute()
     except Exception as e:
@@ -878,6 +879,7 @@ def db_apply(row: dict):
     st.session_state.opening_story_shown = len(st.session_state.story_log) > 0
     st.session_state.password_hash = row.get("password_hash", "")
     st.session_state.leaderboard_visible = bool(row.get("leaderboard_visible", True))
+    st.session_state.user_email = row.get("email", "")
 
 def db_get_leaderboard(limit: int = 10) -> list:
     """Get top players by total missions."""
@@ -903,6 +905,49 @@ def db_save_feedback(fb_type: str, message: str, name: str, universe: str):
         }).execute()
     except Exception:
         pass
+
+def send_reset_email(to_email: str, name: str, token: str) -> bool:
+    """Send password reset email via Gmail SMTP."""
+    import smtplib, ssl
+    from email.mime.text import MIMEText
+    from email.mime.multipart import MIMEMultipart
+    try:
+        gmail_user = st.secrets.get("GMAIL_USER", "")
+        gmail_pass = st.secrets.get("GMAIL_APP_PASSWORD", "")
+        if not gmail_user or not gmail_pass: return False
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = "🌌 30 Second Infiniteverse — Password Reset"
+        msg["From"]    = gmail_user
+        msg["To"]      = to_email
+        html = f"""
+        <div style="background:#000;padding:40px;font-family:'Space Mono',monospace;max-width:500px;margin:0 auto;">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:#FFD700;letter-spacing:4px;text-align:center;margin-bottom:8px;">
+                30 SECOND INFINITEVERSE
+            </div>
+            <div style="color:#ffffff;font-size:18px;text-align:center;margin-bottom:24px;">
+                Password Reset Request
+            </div>
+            <div style="background:#111;border:2px solid #FFD700;border-radius:14px;padding:24px;margin-bottom:20px;">
+                <p style="color:#ffffff;font-size:13px;line-height:1.8;">Hey <b style="color:#FFD700">{name}</b>,</p>
+                <p style="color:#ffffff;font-size:13px;line-height:1.8;">Someone requested a password reset for your account.
+                If that was you, use this code:</p>
+                <div style="background:#000;border:3px solid #FFD700;border-radius:10px;padding:20px;text-align:center;margin:16px 0;">
+                    <div style="font-family:'Bebas Neue',sans-serif;font-size:42px;color:#FFD700;letter-spacing:8px;">{token}</div>
+                    <div style="color:#888;font-size:11px;margin-top:8px;">Valid for 30 minutes</div>
+                </div>
+                <p style="color:#888;font-size:11px;line-height:1.8;">Enter this code in the app under "Forgot Password?" to reset your password.
+                If you didn't request this, ignore this email — your account is safe.</p>
+            </div>
+            <div style="text-align:center;color:#555;font-size:10px;">30 Second Infiniteverse · Powered by AI</div>
+        </div>"""
+        msg.attach(MIMEText(html, "html"))
+        ctx = ssl.create_default_context()
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=ctx) as s:
+            s.login(gmail_user, gmail_pass)
+            s.sendmail(gmail_user, to_email, msg.as_string())
+        return True
+    except Exception:
+        return False
 
 def db_save_image(key: str, url: str):
     """Cache a generated image URL in Supabase."""
@@ -1192,7 +1237,7 @@ if "gold" not in st.session_state:
         "universe_achievements": [], "universe_ach_loaded": False,
         "welcome_bonus_applied": False, "battle_subject_chosen": False,
         "last_spin_time": None, "spin_awarded_this_view": False,
-        "last_auto_save": None, "password_hash": "", "leaderboard_visible": True,
+        "last_auto_save": None, "password_hash": "", "leaderboard_visible": True, "user_email": "",
     })
 
 
@@ -1333,8 +1378,85 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
         st.markdown("<br>", unsafe_allow_html=True)
         name_input  = st.text_input("⚡ Champion Name", placeholder="What are you called?", key="gw_name")
         pass_input  = st.text_input("🔑 Password", placeholder="Create a password — keep it safe!", type="password", key="gw_pass")
+        email_input = st.text_input("📧 Email (for password recovery)", placeholder="your@email.com — only used for resets", key="gw_email")
         theme_input = st.text_input("🌌 Your Universe", placeholder="Leave empty for INFINITE POWER · or type anything: Naruto, F1, Nike, Medieval Space War...", key="gw_theme")
-        st.markdown("<div style='font-family:Space Mono,monospace;font-size:10px;color:#888;text-align:center;margin-bottom:8px'>🔒 New player? Your name + password creates your account. Returning? Use the same combo to load your save.</div>", unsafe_allow_html=True)
+        st.markdown("<div style='font-family:Space Mono,monospace;font-size:10px;color:#888;text-align:center;margin-bottom:4px'>🔒 New player? Name + password + email creates your account. Returning? Just name + password.</div>", unsafe_allow_html=True)
+
+        # ── FORGOT PASSWORD toggle ────────────────────────────────────────────
+        if st.button("🔑 Forgot your password?", key="forgot_toggle"):
+            st.session_state.forgot_open = not st.session_state.get("forgot_open", False)
+
+        if st.session_state.get("forgot_open", False):
+            import secrets as _sec, hashlib as _hl2
+            st.markdown(f"""<div style='background:#0a0808;border:2px solid #FF8800;border-radius:14px;padding:20px;margin:8px 0;'>
+                <div style='font-family:Bebas Neue,sans-serif;font-size:20px;color:#FF8800;letter-spacing:3px;margin-bottom:12px'>🔑 PASSWORD RESET</div>
+                <div style='font-family:Space Mono,monospace;font-size:11px;color:#aaa;line-height:1.8'>
+                Enter your Champion Name and the email you signed up with.<br>
+                We'll send a reset code straight to your inbox.
+                </div>
+            </div>""", unsafe_allow_html=True)
+            reset_name  = st.text_input("Champion Name:", key="reset_name_input", placeholder="Your exact champion name")
+            reset_email = st.text_input("Your Email:", key="reset_email_input", placeholder="The email you signed up with")
+            if st.button("📧 SEND RESET CODE", key="send_reset"):
+                if not reset_name.strip() or not reset_email.strip():
+                    st.error("Enter both your name and email.")
+                else:
+                    existing_r = db_load(reset_name.strip())
+                    stored_email = existing_r.get("email", "") if existing_r else ""
+                    if not existing_r:
+                        st.error("❌ No account found with that name.")
+                    elif stored_email.lower() != reset_email.strip().lower():
+                        st.error("❌ That email doesn't match what's on file for this account.")
+                    else:
+                        token = _sec.token_hex(3).upper()  # 6-char code e.g. A3F9B2
+                        token_hash = _hl2.sha256(token.encode()).hexdigest()
+                        import datetime as _dtt
+                        expiry = (_dtt.datetime.utcnow() + _dtt.timedelta(minutes=30)).isoformat()
+                        sb_r = get_supabase()
+                        if sb_r:
+                            try:
+                                sb_r.table("players").update({"reset_token": token_hash, "reset_expiry": expiry}).eq("user_name", reset_name.strip().lower()).execute()
+                            except Exception:
+                                pass
+                        sent = send_reset_email(reset_email.strip(), reset_name.strip(), token)
+                        if sent:
+                            st.success("✅ Reset code sent! Check your inbox.")
+                            st.session_state.reset_pending_name = reset_name.strip()
+                        else:
+                            st.error("❌ Couldn't send email. Contact support.")
+
+            if st.session_state.get("reset_pending_name"):
+                st.markdown("<div style='font-family:Space Mono,monospace;font-size:11px;color:#FFD700;margin-top:8px'>Enter the 6-character code from your email:</div>", unsafe_allow_html=True)
+                reset_code   = st.text_input("Reset Code:", key="reset_code_input", placeholder="e.g. A3F9B2")
+                new_pass     = st.text_input("New Password:", key="new_pass_input", type="password", placeholder="Your new password")
+                new_pass2    = st.text_input("Confirm Password:", key="new_pass2_input", type="password", placeholder="Same password again")
+                if st.button("✅ RESET MY PASSWORD", key="do_reset"):
+                    import hashlib as _hl3, datetime as _dtt2
+                    if not reset_code.strip() or not new_pass.strip():
+                        st.error("Fill in all fields.")
+                    elif new_pass.strip() != new_pass2.strip():
+                        st.error("Passwords don't match.")
+                    else:
+                        code_hash = _hl3.sha256(reset_code.strip().upper().encode()).hexdigest()
+                        row_r = db_load(st.session_state.reset_pending_name)
+                        if not row_r:
+                            st.error("Account not found.")
+                        elif row_r.get("reset_token","") != code_hash:
+                            st.error("❌ Wrong code. Check your email.")
+                        elif row_r.get("reset_expiry","") < _dtt2.datetime.utcnow().isoformat():
+                            st.error("❌ Code expired. Request a new one.")
+                        else:
+                            new_hash = _hl3.sha256(new_pass.strip().encode()).hexdigest()
+                            sb_r2 = get_supabase()
+                            if sb_r2:
+                                try:
+                                    sb_r2.table("players").update({"password_hash": new_hash, "reset_token": "", "reset_expiry": ""}).eq("user_name", st.session_state.reset_pending_name.lower()).execute()
+                                except Exception:
+                                    pass
+                            st.session_state.reset_pending_name = None
+                            st.session_state.forgot_open = False
+                            st.success("✅ Password reset! You can now log in with your new password.")
+
         st.markdown("<br>", unsafe_allow_html=True)
 
         if st.button("⚡ ENTER THE INFINITEVERSE", key="gw_enter"):
@@ -1412,6 +1534,7 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                         st.error(f"⚠️ {result['reason']}"); st.stop()
                     st.session_state.user_name    = clean_name
                     st.session_state.password_hash = pass_hash
+                    st.session_state.user_email   = email_input.strip()
                     st.session_state.world_data   = result["data"]
                     st.session_state.vibe_color   = result["data"].get("color", "#FFD700")
                     st.session_state.user_theme   = display_name
