@@ -1320,12 +1320,11 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
 
         st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("""<style>
-        div[data-testid="stColumn"] div.stButton > button {
+        #mode-selector div.stButton > button {
             background: rgba(255,255,255,0.04) !important;
             border: 2px solid rgba(255,215,0,0.2) !important;
             border-radius: 18px !important;
             padding: 28px 16px !important;
-            text-align: center !important;
             font-family: 'Bebas Neue', sans-serif !important;
             font-size: 13px !important;
             letter-spacing: 2px !important;
@@ -1337,12 +1336,13 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
             width: 100% !important;
             height: 180px !important;
         }
-        div[data-testid="stColumn"] div.stButton > button:hover {
+        #mode-selector div.stButton > button:hover {
             background: rgba(255,215,0,0.08) !important;
             border-color: rgba(255,215,0,0.5) !important;
             transform: none !important;
         }
-        </style>""", unsafe_allow_html=True)
+        </style>
+        <div id="mode-selector">""", unsafe_allow_html=True)
         st.markdown("<div style='font-family:Bebas Neue,sans-serif;font-size:18px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:8px'>⚡ CHOOSE YOUR MODE</div>", unsafe_allow_html=True)
         mode_col1, mode_col2, mode_col3 = st.columns(3)
         with mode_col1:
@@ -1354,6 +1354,7 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
         with mode_col3:
             if st.button("💀\nOBSESSED\nEVERYTHING.\nFull chaos. No limits.", key="mode_obsessed", use_container_width=True):
                 st.session_state.game_mode = "obsessed"; st.rerun()
+        st.markdown("</div>", unsafe_allow_html=True)
         if st.session_state.game_mode:
             mode_labels = {"chill":"⚡ CHILL","grinder":"🔥 GRINDER","obsessed":"💀 OBSESSED"}
             st.success(f"MODE: {mode_labels[st.session_state.game_mode]} ✅")
