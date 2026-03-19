@@ -1311,70 +1311,56 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
 
     _, col, _ = st.columns([1, 2, 1])
     with col:
-        hcol1, hcol2 = st.columns(2)
-        with hcol1:
-            if st.button("⚡ HOW DOES THIS WORK?", key="how_toggle"):
-                st.session_state.how_open = not st.session_state.how_open
-                st.session_state.comeback_open = False
-        with hcol2:
-            if st.button("🔑 ALREADY HAVE AN ACCOUNT?", key="comeback_toggle"):
-                st.session_state.comeback_open = not st.session_state.get("comeback_open", False)
-                st.session_state.how_open = False
+        # ONE button — toggles the info panel
+        if st.button("⚡ HOW IT WORKS  ·  RETURNING PLAYER?", key="info_toggle"):
+            st.session_state.info_open = not st.session_state.get("info_open", False)
 
-        if st.session_state.get("comeback_open", False):
+        if st.session_state.get("info_open", False):
             st.markdown("""<div style='background:rgba(0,0,0,0.85);border:2px solid #FFD700;border-radius:20px;padding:28px;margin-top:12px;'>
-                <div style='font-family:Bebas Neue,sans-serif;font-size:28px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:16px'>
-                    YOUR STUFF IS SAFE. FOREVER.
+
+                <div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;letter-spacing:4px;margin-bottom:14px'>HOW IT WORKS</div>
+                <div style='font-family:Space Mono,monospace;font-size:12px;color:#ffffff;line-height:2.0;margin-bottom:20px'>
+                    🌌 <b style='color:#FFD700'>Pick any universe</b> — AI builds it instantly. Colors, currency, story, all yours.<br>
+                    ⏱ <b style='color:#FFD700'>Study for 30 seconds</b> — work, study, do anything productive. Get paid.<br>
+                    📸 <b style='color:#FFD700'>Upload proof</b> — no proof = no coins. Then spin, battle, hatch eggs.
                 </div>
-                <div style='font-family:Space Mono,monospace;font-size:13px;color:#ffffff;line-height:2.2;text-align:center;margin-bottom:18px'>
-                    Remember that name you picked? And that password?<br>
-                    <span style='color:#FFD700;font-size:15px;font-family:Bebas Neue,sans-serif;letter-spacing:2px'>THAT IS YOUR KEY. YOUR UNIVERSE. YOUR TREASURE.</span><br>
-                    We kept EVERYTHING for you.<br>
-                    Your gold. Your streak. Your story. Every single mission.<br>
-                    <span style='color:#00FF88'>It is all just sitting there. Waiting. For YOU.</span>
-                </div>
-                <div style='background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.4);border-radius:14px;padding:18px;'>
-                    <div style='font-family:Bebas Neue,sans-serif;font-size:20px;color:#FFD700;letter-spacing:3px;margin-bottom:10px'>TO GET BACK IN:</div>
-                    <div style='font-family:Space Mono,monospace;font-size:12px;color:#ffffff;line-height:2.4'>
-                        <span style='color:#FFD700'>①</span> Type your <b style='color:#FFD700'>Champion Name</b> — the exact name you used<br>
-                        <span style='color:#FFD700'>②</span> Type your <b style='color:#FFD700'>Password</b> — the one you created<br>
+
+                <div style='border-top:1px solid rgba(255,215,0,0.2);margin-bottom:16px;padding-top:16px;'>
+                    <div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;letter-spacing:4px;margin-bottom:10px'>ALREADY HAVE AN ACCOUNT?</div>
+                    <div style='font-family:Space Mono,monospace;font-size:12px;color:#ffffff;line-height:2.2;margin-bottom:8px'>
+                        Your stuff is safe. Forever.<br>
+                        <span style='color:#00FF88'>Just type the same name + password you used before and hit Enter.</span><br>
+                        Everything — gold, streak, story, eggs — loads back instantly.
+                    </div>
+                    <div style='background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.3);border-radius:10px;padding:12px;font-family:Space Mono,monospace;font-size:11px;color:#ffffff;line-height:2.2'>
+                        <span style='color:#FFD700'>①</span> Type your <b style='color:#FFD700'>Champion Name</b><br>
+                        <span style='color:#FFD700'>②</span> Type your <b style='color:#FFD700'>Password</b><br>
                         <span style='color:#FFD700'>③</span> Hit <b style='color:#FFD700'>ENTER THE INFINITEVERSE</b><br>
-                        <span style='color:#00FF88'>④</span> <b style='color:#00FF88'>BOOM. You are home. Everything restored. Instantly.</b>
+                        <span style='color:#00FF88'>④</span> <b>BOOM. Home. Everything restored.</b>
                     </div>
                 </div>
-            </div>""", unsafe_allow_html=True)
 
-        if st.session_state.how_open:
-            st.markdown("""<div style='background:rgba(0,0,0,0.6);border:1px solid rgba(255,215,0,0.3);border-radius:20px;padding:24px;margin-top:12px;'>
-                <div style='margin-bottom:18px;'><span style='font-size:28px'>🌌</span><div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700'>1 — PICK YOUR UNIVERSE</div><div style='font-family:Space Mono,monospace;font-size:12px;color:#fff;line-height:1.7'>ANY universe. AI builds it instantly. Colors, currency, abilities, storyline — all yours.</div></div>
-                <div style='margin-bottom:18px;'><span style='font-size:28px'>⏱</span><div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700'>2 — STUDY FOR 30 SECONDS</div><div style='font-family:Space Mono,monospace;font-size:12px;color:#fff;line-height:1.7'>Work. Study. Do anything productive. Get paid in universe currency.</div></div>
-                <div><span style='font-size:28px'>📸</span><div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700'>3 — PROVE IT. COLLECT IT.</div><div style='font-family:Space Mono,monospace;font-size:12px;color:#fff;line-height:1.7'>Upload proof. No proof = no coins. Then spin the wheel. Battle. Hatch eggs.</div></div>
             </div>""", unsafe_allow_html=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown("""<div style='font-family:Bebas Neue,sans-serif;font-size:26px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:4px'>⚡ CHOOSE YOUR MODE</div>
-        <div class='mode-grid'>
-            <div class='mode-card'><span class='mode-emoji'>⚡</span><div class='mode-name'>CHILL</div><div class='mode-desc'>Missions. Currency. Level up.</div></div>
-            <div class='mode-card'><span class='mode-emoji'>🔥</span><div class='mode-name'>GRINDER</div><div class='mode-desc'>Adds Battles, Abilities, Monster Hatching.</div></div>
-            <div class='mode-card'><span class='mode-emoji'>💀</span><div class='mode-name'>OBSESSED</div><div class='mode-desc'>EVERYTHING. Full chaos. No limits.</div></div>
-        </div>""", unsafe_allow_html=True)
 
-        mode_col1, mode_col2, mode_col3 = st.columns(3)
-        with mode_col1:
-            if st.button("⚡ CHILL", key="mode_chill"): st.session_state.game_mode = "chill"
-        with mode_col2:
-            if st.button("🔥 GRINDER", key="mode_grinder"): st.session_state.game_mode = "grinder"
-        with mode_col3:
-            if st.button("💀 OBSESSED", key="mode_obsessed"): st.session_state.game_mode = "obsessed"
+        # Mode dropdown
+        mode_choice = st.selectbox(
+            "⚡ Choose Your Mode",
+            ["", "⚡ CHILL — Missions. Currency. Level up.",
+                 "🔥 GRINDER — Adds Battles, Abilities, Monster Hatching.",
+                 "💀 OBSESSED — EVERYTHING. Full chaos. No limits."],
+            key="gw_mode_select",
+            index=0
+        )
+        if mode_choice.startswith("⚡"):   st.session_state.game_mode = "chill"
+        elif mode_choice.startswith("🔥"): st.session_state.game_mode = "grinder"
+        elif mode_choice.startswith("💀"): st.session_state.game_mode = "obsessed"
 
-        if st.session_state.game_mode:
-            mode_labels = {"chill":"⚡ CHILL","grinder":"🔥 GRINDER","obsessed":"💀 OBSESSED"}
-            st.success(f"MODE SELECTED: {mode_labels[st.session_state.game_mode]} ✅")
-
-        st.markdown("<br>", unsafe_allow_html=True)
         name_input  = st.text_input("⚡ Champion Name", placeholder="What are you called?", key="gw_name")
         pass_input  = st.text_input("🔑 Password", placeholder="Create a password — keep it safe!", type="password", key="gw_pass")
-        theme_input = st.text_input("🌌 Your Universe", placeholder="Leave empty for INFINITE POWER · or type anything: Naruto, F1, Nike, Medieval Space War...", key="gw_theme")
+        email_input = st.text_input("📧 Email (optional — for password recovery)", placeholder="your@email.com", key="gw_email")
+        theme_input = st.text_input("🌌 Your Universe", placeholder="Leave empty for INFINITE POWER · or type anything: Naruto, F1, Nike...", key="gw_theme")
 
         # Small "Forgot password?" button
         st.markdown("""<style>
@@ -1557,6 +1543,7 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                         st.error(f"⚠️ {result['reason']}"); st.stop()
                     st.session_state.user_name    = clean_name
                     st.session_state.password_hash = pass_hash
+                    st.session_state.user_email   = email_input.strip() if email_input.strip() else ""
                     st.session_state.world_data   = result["data"]
                     st.session_state.vibe_color   = result["data"].get("color", "#FFD700")
                     st.session_state.user_theme   = display_name
