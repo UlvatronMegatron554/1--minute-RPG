@@ -807,6 +807,7 @@ def db_save(user_name: str, theme: str):
             "micro_timer_seconds": int(st.session_state.get("micro_timer_seconds", 30)),
             "updated_at": _dt.datetime.utcnow().isoformat(),
             "password_hash": st.session_state.get("password_hash", ""),
+            "leaderboard_visible": bool(st.session_state.get("leaderboard_visible", True)),
         }
         sb.table("players").upsert(payload, on_conflict="user_name").execute()
     except Exception as e:
@@ -862,13 +863,14 @@ def db_apply(row: dict):
     st.session_state.secrets_seen = len(st.session_state.secret_queue)
     st.session_state.opening_story_shown = len(st.session_state.story_log) > 0
     st.session_state.password_hash = row.get("password_hash", "")
+    st.session_state.leaderboard_visible = bool(row.get("leaderboard_visible", True))
 
 def db_get_leaderboard(limit: int = 10) -> list:
     """Get top players by total missions."""
     sb = get_supabase()
     if not sb: return []
     try:
-        res = sb.table("players").select("user_name,total_missions,study_streak,level,theme,sub_tier").order("total_missions", desc=True).limit(limit).execute()
+        res = sb.table("players").select("user_name,total_missions,study_streak,level,theme,sub_tier").eq("leaderboard_visible", True).order("total_missions", desc=True).limit(limit).execute()
         return res.data or []
     except Exception:
         return []
@@ -1161,7 +1163,7 @@ if "gold" not in st.session_state:
         "universe_achievements": [], "universe_ach_loaded": False,
         "welcome_bonus_applied": False, "battle_subject_chosen": False,
         "last_spin_time": None, "spin_awarded_this_view": False,
-        "last_auto_save": None, "password_hash": "",
+        "last_auto_save": None, "password_hash": "", "leaderboard_visible": True,
     })
 
 
@@ -2116,6 +2118,43 @@ elif view == "boxes":
 
 elif view == "leaderboard":
     st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>🏆 GLOBAL LEADERBOARD</h2>", unsafe_allow_html=True)
+
+    is_visible = st.session_state.get("leaderboard_visible", True)
+
+    # ── Your leaderboard visibility status ───────────────────────────────────
+    if is_visible:
+        st.markdown(f"""<div style='background:#080f08;border:2px solid #00FF44;border-radius:12px;
+            padding:14px 20px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center'>
+            <div>
+                <div style='font-family:Bebas Neue,sans-serif;font-size:18px;color:#00FF44;letter-spacing:2px'>✅ YOU ARE ON THE LEADERBOARD</div>
+                <div style='font-family:Space Mono,monospace;font-size:11px;color:#555;margin-top:3px'>Others can see your rank and progress</div>
+            </div>
+        </div>""", unsafe_allow_html=True)
+        if st.button("🙈 HIDE ME FROM LEADERBOARD", key="lb_hide"):
+            st.session_state.leaderboard_visible = False
+            db_save(st.session_state.user_name, st.session_state.user_theme)
+            st.success("✅ You're now hidden from the leaderboard. Focus on yourself! 💪")
+            st.rerun()
+    else:
+        st.markdown(f"""<div style='background:#0a0808;border:2px solid #FF8800;border-radius:12px;
+            padding:14px 20px;margin-bottom:8px'>
+            <div style='font-family:Bebas Neue,sans-serif;font-size:18px;color:#FF8800;letter-spacing:2px'>🙈 YOU ARE HIDDEN FROM THE LEADERBOARD</div>
+            <div style='font-family:Space Mono,monospace;font-size:11px;color:#555;margin-top:3px'>Only you can see this. Others cannot see your name.</div>
+        </div>""", unsafe_allow_html=True)
+        st.markdown(f"<div style='font-family:Space Mono,monospace;font-size:11px;color:#888;margin-bottom:6px'>Type <b style='color:{C}'>Leaderboard</b> below to rejoin:</div>", unsafe_allow_html=True)
+        rejoin_input = st.text_input("", placeholder="Type: Leaderboard", key="lb_rejoin_input", label_visibility="collapsed")
+        if st.button("⚡ REJOIN LEADERBOARD", key="lb_rejoin"):
+            if rejoin_input.strip() == "Leaderboard":
+                st.session_state.leaderboard_visible = True
+                db_save(st.session_state.user_name, st.session_state.user_theme)
+                st.success("🏆 You're back on the leaderboard!")
+                st.rerun()
+            else:
+                st.error("Type exactly: Leaderboard")
+
+    st.markdown("---")
+
+    # ── Leaderboard table ─────────────────────────────────────────────────────
     leaders = db_get_leaderboard(15)
     if not leaders:
         st.markdown("<p style='text-align:center;color:#888;font-family:Space Mono,monospace'>No players yet — complete a mission to appear here!</p>", unsafe_allow_html=True)
