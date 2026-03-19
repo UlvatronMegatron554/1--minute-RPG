@@ -1337,15 +1337,6 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
         st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("<div style='font-family:Bebas Neue,sans-serif;font-size:18px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:8px'>⚡ CHOOSE YOUR MODE</div>", unsafe_allow_html=True)
-        st.markdown("""<style>
-        div[data-testid="stColumn"] div.stButton > button {
-            height: 52px !important;
-            min-height: 52px !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-        }
-        </style>""", unsafe_allow_html=True)
         mode_col1, mode_col2, mode_col3 = st.columns(3)
         with mode_col1:
             st.markdown("""<div class='mode-card'><span class='mode-emoji'>⚡</span><div class='mode-name'>CHILL</div><div class='mode-desc'>Missions. Currency. Level up.</div></div>""", unsafe_allow_html=True)
