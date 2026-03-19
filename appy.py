@@ -1312,43 +1312,13 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
     _, col, _ = st.columns([1, 2, 1])
     with col:
 
-        # ════════════════════════════════════════════════════════════════
-        # 🛠 HOW IT WORKS BUTTON CONFIGURATOR (DEV)
-        with st.expander("🛠 Adjust: HOW IT WORKS button", expanded=False):
-            _hw_w  = st.slider("Width (px)",        40, 800, 400, key="hw_w")
-            _hw_h  = st.slider("Height (px)",       20, 100, 42,  key="hw_h")
-            _hw_fs = st.slider("Font size (px)",     8,  28, 13,  key="hw_fs")
-            _hw_ml = st.slider("Shift left/right (px, - = left)", -400, 400, 0, key="hw_ml")
-            _hw_mt = st.slider("Shift up/down (px, - = up)",      -200, 200, 0, key="hw_mt")
-            st.caption(f"W:{st.session_state.get('hw_w',400)}  H:{st.session_state.get('hw_h',42)}  FS:{st.session_state.get('hw_fs',13)}  ShiftX:{st.session_state.get('hw_ml',0)}  ShiftY:{st.session_state.get('hw_mt',0)}")
+        components.html('<!DOCTYPE html><html><head><style>*{box-sizing:border-box;margin:0;padding:0;font-family:"Segoe UI",sans-serif;}body{background:#111;color:#fff;padding:12px;user-select:none;}h3{color:#FFD700;font-size:13px;letter-spacing:2px;margin-bottom:10px;text-align:center;}.btn{position:absolute;display:flex;align-items:center;justify-content:center;border:2px solid #FFD700;border-radius:8px;background:#1a1a00;color:#FFD700;cursor:move;font-weight:bold;text-align:center;}.btn.selected{box-shadow:0 0 10px #00FF88;}.resize{position:absolute;right:-1px;bottom:-1px;width:14px;height:14px;background:#FFD700;cursor:se-resize;border-radius:2px 0 6px 0;z-index:10;}#canvas{position:relative;width:100%;height:420px;background:#0a0a0a;border:1px solid #333;border-radius:8px;overflow:hidden;}#readout{background:#000;border:1px solid #333;border-radius:6px;padding:10px;margin-top:8px;font-size:11px;font-family:monospace;}#readout table{width:100%;border-collapse:collapse;}#readout td{padding:3px 8px;border-bottom:1px solid #222;}#readout td:first-child{color:#888;}#readout td:last-child{color:#FFD700;font-weight:bold;}.fs-row{display:flex;align-items:center;gap:8px;margin-top:6px;}.fs-row label{color:#aaa;font-size:10px;min-width:130px;}.fs-row input[type=range]{flex:1;accent-color:#FFD700;}.fs-row span{color:#FFD700;font-size:10px;min-width:28px;}</style></head><body><h3>DRAG TO MOVE | DRAG YELLOW CORNER TO RESIZE | SLIDERS FOR FONT SIZE</h3><div id="canvas"><div class="btn" id="b0" style="left:30px;top:16px;width:360px;height:42px;font-size:13px;border-color:#FFD700;background:#1a1a00;color:#FFD700;">HOW IT WORKS<div class="resize"></div></div><div class="btn" id="b1" style="left:10px;top:90px;width:140px;height:52px;font-size:12px;border-color:#FF8800;background:#1a0a00;color:#FF8800;">CHILL<div class="resize"></div></div><div class="btn" id="b2" style="left:158px;top:90px;width:140px;height:52px;font-size:12px;border-color:#FF8800;background:#1a0a00;color:#FF8800;">GRINDER<div class="resize"></div></div><div class="btn" id="b3" style="left:306px;top:90px;width:140px;height:52px;font-size:12px;border-color:#FF8800;background:#1a0a00;color:#FF8800;">OBSESSED<div class="resize"></div></div><div class="btn" id="b4" style="left:250px;top:168px;width:140px;height:32px;font-size:11px;border-color:#FF4444;background:#1a0000;color:#FF4444;">FORGOT PASSWORD<div class="resize"></div></div><div class="btn" id="b5" style="left:30px;top:224px;width:360px;height:52px;font-size:16px;border-color:#00CCFF;background:#001a1a;color:#00CCFF;">ENTER INFINITEVERSE<div class="resize"></div></div></div><div id="readout"><table id="tbl"></table></div><div id="fsc"></div><script>var IDS=["b0","b1","b2","b3","b4","b5"];var LBLS=["HOW IT WORKS","CHILL","GRINDER","OBSESSED","FORGOT PASSWORD","ENTER INFINITEVERSE"];var sel=null,mode="",sX,sY,sL,sT,sW,sH;function info(b){return{x:parseInt(b.style.left),y:parseInt(b.style.top),w:parseInt(b.style.width),h:parseInt(b.style.height),fs:parseInt(b.style.fontSize)};}function upd(){var h="";IDS.forEach(function(id,i){var d=info(document.getElementById(id));h+="<tr><td>"+LBLS[i]+"</td><td>X:"+d.x+" Y:"+d.y+" W:"+d.w+" H:"+d.h+" FS:"+d.fs+"px</td></tr>";});document.getElementById("tbl").innerHTML=h;}IDS.forEach(function(id){var b=document.getElementById(id);b.addEventListener("mousedown",function(e){document.querySelectorAll(".btn").forEach(function(x){x.classList.remove("selected");});b.classList.add("selected");sX=e.clientX;sY=e.clientY;sL=parseInt(b.style.left);sT=parseInt(b.style.top);sW=parseInt(b.style.width);sH=parseInt(b.style.height);mode=e.target.classList.contains("resize")?"resize":"drag";sel=b;e.preventDefault();e.stopPropagation();});});document.addEventListener("mousemove",function(e){if(!sel)return;var dx=e.clientX-sX,dy=e.clientY-sY;if(mode==="drag"){sel.style.left=Math.max(0,sL+dx)+"px";sel.style.top=Math.max(0,sT+dy)+"px";}else{sel.style.width=Math.max(40,sW+dx)+"px";sel.style.height=Math.max(16,sH+dy)+"px";}upd();});document.addEventListener("mouseup",function(){sel=null;upd();});var fc=document.getElementById("fsc");IDS.forEach(function(id,i){var b=document.getElementById(id);var fs=parseInt(b.style.fontSize)||13;var row=document.createElement("div");row.className="fs-row";row.innerHTML="<label>"+LBLS[i]+" font</label><input type=range min=8 max=32 value="+fs+" data-id="+id+"><span id=s"+id+">"+fs+"px</span>";fc.appendChild(row);});fc.querySelectorAll("input").forEach(function(inp){inp.addEventListener("input",function(){var b=document.getElementById(this.dataset.id);b.style.fontSize=this.value+"px";document.getElementById("s"+this.dataset.id).textContent=this.value+"px";upd();});});upd();</script></body></html>', height=820, scrolling=True)
 
-        _hw_w  = st.session_state.get("hw_w",  400)
-        _hw_h  = st.session_state.get("hw_h",  42)
-        _hw_fs = st.session_state.get("hw_fs", 13)
-        _hw_ml = st.session_state.get("hw_ml", 0)
-        _hw_mt = st.session_state.get("hw_mt", 0)
-
-        st.markdown(f"""<style>
-        #hw-wrap {{
-            width: {_hw_w}px !important;
-            margin-left: {_hw_ml}px !important;
-            margin-top: {_hw_mt}px !important;
-        }}
-        #hw-wrap div.stButton > button {{
-            width: {_hw_w}px !important;
-            height: {_hw_h}px !important;
-            min-height: 0 !important;
-            font-size: {_hw_fs}px !important;
-            animation: none !important;
-            box-shadow: none !important;
-            line-height: 1 !important;
-            padding: 0 12px !important;
-        }}
-        </style>""", unsafe_allow_html=True)
-
-        st.markdown('<div id="hw-wrap">', unsafe_allow_html=True)
+        # HOW IT WORKS button
         if st.button("⚡ HOW IT WORKS  ·  RETURNING PLAYER?", key="info_toggle"):
             st.session_state.info_open = not st.session_state.get("info_open", False)
+
+
         st.markdown('</div>', unsafe_allow_html=True)
 
 
