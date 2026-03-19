@@ -1376,28 +1376,47 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
         pass_input  = st.text_input("🔑 Password", placeholder="Create a password — keep it safe!", type="password", key="gw_pass")
         theme_input = st.text_input("🌌 Your Universe", placeholder="Leave empty for INFINITE POWER · or type anything: Naruto, F1, Nike, Medieval Space War...", key="gw_theme")
 
-        # Small "Forgot password?" link — styled as text, opens reset panel
+        # "Forgot password?" styled as a plain text link
         st.markdown("""<style>
-        div[data-testid='stButton'].fp-link>button{
-            background:none!important;border:none!important;padding:0 4px!important;
-            color:#FFD700!important;font-family:'Space Mono',monospace!important;
-            font-size:10px!important;text-decoration:underline!important;
-            cursor:pointer!important;animation:none!important;box-shadow:none!important;
-            width:auto!important;margin:0!important;min-height:0!important;
-            line-height:1.2!important;
+        div[data-testid="stButton"]:has(button[kind="secondary"]#open_reset_panel),
+        button[data-testid="baseButton-secondary"][key="open_reset_panel"],
+        [data-testid="stColumn"] div.element-container:has(button) button {
+            all: unset !important;
         }
-        div[data-testid='stButton'].fp-link>button:hover{color:#ffffff!important;}
-        div[data-testid='stButton'].fp-link{display:inline-block;}
-        </style>""", unsafe_allow_html=True)
-        st.markdown("<div style='text-align:right;margin-top:2px;margin-bottom:2px;font-family:Space Mono,monospace;font-size:10px;color:#555'>Locked out?</div>", unsafe_allow_html=True)
+        #forgot-pw-link button, #forgot-pw-link div.stButton > button {
+            background: none !important;
+            border: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            color: #FFD700 !important;
+            font-family: 'Space Mono', monospace !important;
+            font-size: 10px !important;
+            text-decoration: underline !important;
+            cursor: pointer !important;
+            animation: none !important;
+            box-shadow: none !important;
+            width: auto !important;
+            min-height: 0 !important;
+            line-height: 1.4 !important;
+            display: inline !important;
+            border-radius: 0 !important;
+        }
+        #forgot-pw-link button:hover {
+            color: #ffffff !important;
+            background: none !important;
+        }
+        </style>
+        <div style='text-align:right;margin-top:2px;margin-bottom:2px'>
+            <span style='font-family:Space Mono,monospace;font-size:10px;color:#555'>Locked out? </span>
+        </div>""", unsafe_allow_html=True)
+        st.markdown('<div id="forgot-pw-link">', unsafe_allow_html=True)
         _, fp_col = st.columns([5, 1])
         with fp_col:
-            st.markdown('<div class="fp-link">', unsafe_allow_html=True)
             if st.button("Forgot password?", key="open_reset_panel"):
                 st.session_state.reset_panel_open = not st.session_state.get("reset_panel_open", False)
                 st.session_state.reset_pending_name = None
                 st.rerun()
-            st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
         # ── RESET PASSWORD PANEL ──────────────────────────────────────────────
         if st.session_state.get("reset_panel_open", False):
