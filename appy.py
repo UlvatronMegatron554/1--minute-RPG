@@ -1159,6 +1159,7 @@ if "gold" not in st.session_state:
         "universe_achievements": [], "universe_ach_loaded": False,
         "welcome_bonus_applied": False, "battle_subject_chosen": False,
         "last_spin_time": None, "spin_awarded_this_view": False,
+        "last_auto_save": None,
     })
 
 
@@ -1413,22 +1414,6 @@ with st.sidebar:
     new_tc = st.color_picker("", value=st.session_state.vibe_color, key="theme_picker", label_visibility="collapsed")
     if new_tc != st.session_state.vibe_color: st.session_state.vibe_color = new_tc; st.rerun()
     st.write("---")
-    # ── SAVE / LOAD PROGRESS ────────────────────────────────────────────────
-    st.markdown("<p style='color:#ffffff;font-weight:bold'>💾 SAVE PROGRESS</p>", unsafe_allow_html=True)
-    import json as _json, base64 as _b64_save
-    _save_keys = ["gold","xp","level","total_missions","study_streak","last_active_date","sub_tier","sub_multiplier","spins_left","incubator_eggs","eggs_hatched","legendary_hatched","secrets_seen","shield_bought","booster_bought","spinner_wins","battles_fought","battle_wins","story_chapter","universe_achievements","vibe_color","bg_color","loot_log","user_theme","user_name","game_mode"]
-    _save_data = {k: st.session_state.get(k) for k in _save_keys}
-    _save_code = _b64_save.b64encode(_json.dumps(_save_data, default=str).encode()).decode()
-    st.text_area("📋 Copy this save code:", value=_save_code, height=68, key="save_code_display", help="Copy and save this. Paste it below to restore progress after refresh.")
-    _load_raw = st.text_input("🔄 Paste save code to restore:", placeholder="Paste code here...", key="load_code_input")
-    if st.button("✅ RESTORE PROGRESS", key="restore_btn"):
-        try:
-            _loaded = _json.loads(_b64_save.b64decode(_load_raw.encode()).decode())
-            for k, v in _loaded.items():
-                if v is not None: st.session_state[k] = v
-            st.success("✅ Progress restored!"); st.rerun()
-        except: st.error("Invalid save code.")
-    st.write("---")
     st.markdown("<p style='color:#ffffff;font-weight:bold'>🚨 RESET</p>", unsafe_allow_html=True)
     reset_input = st.text_input("Type RESET to confirm:", key="reset_confirm_input", placeholder="RESET")
     if st.button("🚨 RESET ALL", key="reset_btn"):
@@ -1440,6 +1425,24 @@ with st.sidebar:
 # ACHIEVEMENT CHECK + SECRET REVEAL + HEADER
 # ─────────────────────────────────────────────────────────────────────────────
 new_ach = check_achievements(st.session_state)
+
+# ── AUTO-SAVE EVERY 3 MINUTES ─────────────────────────────────────────────────
+if st.session_state.user_name:
+    _now = _dt.datetime.now()
+    _last = st.session_state.get("last_auto_save")
+    _should_save = False
+    if _last is None:
+        _should_save = True
+    else:
+        try:
+            _should_save = (_now - _dt.datetime.fromisoformat(_last)).total_seconds() > 180
+        except Exception:
+            _should_save = True
+    if _should_save:
+        db_save(st.session_state.user_name, st.session_state.user_theme)
+        st.session_state.last_auto_save = _now.isoformat()
+        if _last is not None:  # Don't show on first load
+            st.toast("💾 Progress auto-saved!", icon="✅")
 for ach in new_ach:
     st.toast(f"🏆 ACHIEVEMENT UNLOCKED: {ach['name']}", icon="🏆")
 
@@ -1665,8 +1668,8 @@ if view == "main":
 
     # Target `p` inside button — that's where Streamlit actually puts the text
     st.markdown(f"""<style>
-div.stButton>button p{{font-size:{_fs}px!important;line-height:1.2!important;}}
-div.stButton>button{{padding:{_pd}px 12px!important;}}
+[data-testid="stMain"] div.stButton>button p{{font-size:{_fs}px!important;line-height:1.2!important;}}
+[data-testid="stMain"] div.stButton>button{{padding:{_pd}px 12px!important;}}
 </style>""", unsafe_allow_html=True)
 
     # ── START MISSION + ±30s ─────────────────────────────────────────────────
@@ -2075,12 +2078,7 @@ elif view == "leaderboard":
                     {"  ← YOU" if is_you else ""}
                 </span>
             </div>""", unsafe_allow_html=True)
-    # Save button
-    _, sc, _ = st.columns([1,2,1])
-    with sc:
-        if st.button("💾 SAVE MY PROGRESS NOW", key="manual_save"):
-            db_save(st.session_state.user_name, st.session_state.user_theme)
-            st.success("✅ Saved to cloud!")
+
 
 elif view == "feedback":
     st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>💬 FEEDBACK PORTAL</h2>", unsafe_allow_html=True)
