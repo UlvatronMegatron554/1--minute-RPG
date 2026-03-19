@@ -644,7 +644,21 @@ def update_streak() -> tuple:
         streak += 1; st.session_state.study_streak = streak; st.session_state.last_active_date = today
         msg = f"🔥 {streak}-DAY STREAK! You're unstoppable!"
         if streak % 7 == 0:
-            msg = f"🏆 {streak} DAYS — WEEK COMPLETE! Bonus spins unlocked!"; st.session_state.spins_left += 3
+            weeks = streak // 7
+            # ── MASSIVE WEEKLY REWARD ──────────────────────────────────────
+            bonus_gold = 150 * weeks          # scales with how many weeks done
+            bonus_spins = 5 + weeks           # more spins each week
+            bonus_eggs = 2                    # always 2 eggs
+            st.session_state.gold       += bonus_gold
+            st.session_state.spins_left += bonus_spins
+            st.session_state.incubator_eggs += bonus_eggs
+            st.session_state.xp         += 500 * weeks
+            st.session_state.level = 1 + st.session_state.xp // 100
+            st.session_state["weekly_reward_pending"] = {
+                "weeks": weeks, "gold": bonus_gold,
+                "spins": bonus_spins, "eggs": bonus_eggs, "xp": 500 * weeks
+            }
+            msg = f"🏆 WEEK {weeks} COMPLETE — LEGENDARY REWARD INCOMING!"
         return streak, msg, True
     else:
         old = streak; st.session_state.study_streak = 1; st.session_state.last_active_date = today
@@ -1726,16 +1740,64 @@ if view == "main":
 
     # ── STREAK BAR ──
     streak_color = "#FF4444" if streak_now == 0 else ("#FFD700" if streak_now >= 7 else C)
-    streak_bar_pct = min(streak_now / 30, 1.0)
-    streak_bar_filled = int(streak_bar_pct * 25)
-    streak_bar_str = "█" * streak_bar_filled + "░" * (25 - streak_bar_filled)
+    streak_week = streak_now % 7
+    streak_weeks_done = streak_now // 7
+    streak_bar_str = "🔥" * streak_week + "⬜" * (7 - streak_week)
+    week_label = f"WEEK {streak_weeks_done + 1}" if streak_weeks_done > 0 else "WEEK 1"
     streak_urgency = get_streak_urgency(streak_now, st.session_state.get("last_active_date",""))
+    _sh = f"<div style='background:#111;border:2px solid {streak_color};border-radius:14px;padding:16px 20px;margin-bottom:20px'><div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:8px'><span style='font-family:Bebas Neue,sans-serif;font-size:22px;color:{streak_color};letter-spacing:3px'>🔥 {streak_now}-DAY STREAK</span><span style='font-family:Space Mono,monospace;font-size:12px;color:#ffffff'>{week_label} · Day {streak_week}/7</span></div><div style='font-size:22px;letter-spacing:6px;text-align:center;padding:6px 0'>{streak_bar_str}</div>"
+    if streak_urgency: _sh += f"<div style='font-size:11px;color:#FF8888;margin-top:6px;font-family:Space Mono,monospace'>{streak_urgency}</div>"
     _sh = f"<div style='background:#111;border:2px solid {streak_color};border-radius:14px;padding:16px 20px;margin-bottom:20px'><div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:8px'><span style='font-family:Bebas Neue,sans-serif;font-size:22px;color:{streak_color};letter-spacing:3px'>🔥 {streak_now}-DAY STREAK</span><span style='font-family:Space Mono,monospace;font-size:12px;color:#ffffff'>{streak_now}/30 days</span></div><div style='font-family:Space Mono,monospace;font-size:12px;color:{streak_color}'>{streak_bar_str}</div>"
     if streak_urgency: _sh += f"<div style='font-size:11px;color:#FF8888;margin-top:6px;font-family:Space Mono,monospace'>{streak_urgency}</div>"
     _sh += "</div>"
     st.markdown(_sh, unsafe_allow_html=True)
 
     missions_done = st.session_state.get("total_missions",0)  # used by sidebar counter
+
+    # ── WEEKLY REWARD POPUP ──────────────────────────────────────────────────
+    if st.session_state.get("weekly_reward_pending"):
+        wr = st.session_state.weekly_reward_pending
+        st.markdown(f"""<div style='background:linear-gradient(135deg,#1a0a00,#2a1500,#1a0a00);
+            border:3px solid #FFD700;border-radius:20px;padding:28px;text-align:center;
+            margin-bottom:20px;box-shadow:0 0 60px #FFD70088;
+            animation:lootpulse 0.8s ease-in-out 5;'>
+            <div style='font-size:56px;margin-bottom:4px'>🏆</div>
+            <div style='font-family:Bebas Neue,sans-serif;font-size:38px;color:#FFD700;
+                letter-spacing:5px;margin-bottom:6px'>WEEK {wr["weeks"]} COMPLETE!</div>
+            <div style='font-family:Space Mono,monospace;font-size:13px;color:#ffffff;
+                margin-bottom:18px;line-height:1.8'>
+                You studied <b style='color:#FFD700'>7 days straight.</b><br>
+                The universe has noticed. And it is <b style='color:#FF8800'>rewarding you massively.</b>
+            </div>
+            <div style='display:flex;justify-content:center;gap:24px;flex-wrap:wrap;margin-bottom:16px'>
+                <div style='background:#FFD70022;border:2px solid #FFD700;border-radius:12px;
+                    padding:14px 20px;min-width:100px'>
+                    <div style='font-family:Bebas Neue,sans-serif;font-size:32px;color:#FFD700'>+{wr["gold"]}</div>
+                    <div style='font-family:Space Mono,monospace;font-size:10px;color:#ffffff;letter-spacing:1px'>{currency}</div>
+                </div>
+                <div style='background:#AA44FF22;border:2px solid #AA44FF;border-radius:12px;
+                    padding:14px 20px;min-width:100px'>
+                    <div style='font-family:Bebas Neue,sans-serif;font-size:32px;color:#AA44FF'>+{wr["xp"]}</div>
+                    <div style='font-family:Space Mono,monospace;font-size:10px;color:#ffffff;letter-spacing:1px'>XP</div>
+                </div>
+                <div style='background:#00CCFF22;border:2px solid #00CCFF;border-radius:12px;
+                    padding:14px 20px;min-width:100px'>
+                    <div style='font-family:Bebas Neue,sans-serif;font-size:32px;color:#00CCFF'>+{wr["spins"]}</div>
+                    <div style='font-family:Space Mono,monospace;font-size:10px;color:#ffffff;letter-spacing:1px'>SPINS</div>
+                </div>
+                <div style='background:#00FF4422;border:2px solid #00FF44;border-radius:12px;
+                    padding:14px 20px;min-width:100px'>
+                    <div style='font-family:Bebas Neue,sans-serif;font-size:32px;color:#00FF44'>+{wr["eggs"]}</div>
+                    <div style='font-family:Space Mono,monospace;font-size:10px;color:#ffffff;letter-spacing:1px'>EGGS 🥚</div>
+                </div>
+            </div>
+        </div>""", unsafe_allow_html=True)
+        _, cc, _ = st.columns([1,2,1])
+        with cc:
+            if st.button("⚡ CLAIM MY WEEK REWARD", key="claim_weekly"):
+                st.session_state.weekly_reward_pending = None
+                st.balloons()
+                st.rerun()
 
     # ── XP BAR ──
     xp_display = int(xp_pct * 100)
