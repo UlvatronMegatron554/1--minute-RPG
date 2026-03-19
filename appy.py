@@ -1250,10 +1250,60 @@ if st.session_state.user_name is None:
 html,body,[data-testid="stAppViewContainer"],[data-testid="stApp"]{background:#000008!important;color:white!important;}
 [data-testid="stHeader"],[data-testid="stToolbar"],[data-testid="stDecoration"],#MainMenu,footer{display:none!important;}
 .block-container{padding:0 1rem 2rem!important;max-width:100%!important;}
-[data-testid="stAppViewContainer"]{background:radial-gradient(ellipse 65% 55% at 5% 10%,rgba(255,215,0,0.22) 0%,transparent 60%),radial-gradient(ellipse 55% 45% at 95% 5%,rgba(255,50,50,0.18) 0%,transparent 60%),radial-gradient(ellipse 60% 50% at 50% 100%,rgba(0,200,255,0.18) 0%,transparent 60%),radial-gradient(ellipse 45% 40% at 90% 70%,rgba(160,80,220,0.15) 0%,transparent 60%),radial-gradient(ellipse 40% 35% at 10% 80%,rgba(0,255,130,0.12) 0%,transparent 60%),#000008!important;animation:orb-breathe 8s ease-in-out infinite alternate!important;}
-@keyframes orb-breathe{0%{filter:brightness(0.85) saturate(0.85);}50%{filter:brightness(1.25) saturate(1.35);}100%{filter:brightness(0.85) saturate(0.85);}}
-[data-testid="stAppViewContainer"]::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background-image:linear-gradient(rgba(255,215,0,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,215,0,0.04) 1px,transparent 1px);background-size:55px 55px;pointer-events:none;z-index:0;animation:grid-breathe 5s ease-in-out infinite alternate;}
-@keyframes grid-breathe{0%{opacity:0.25;}100%{opacity:0.9;}}
+[data-testid="stAppViewContainer"]{
+background:
+  radial-gradient(ellipse 80% 60% at 20% 0%,   rgba(120,0,255,0.55) 0%,transparent 55%),
+  radial-gradient(ellipse 70% 55% at 85% 5%,   rgba(255,30,80,0.45) 0%,transparent 55%),
+  radial-gradient(ellipse 60% 50% at 50% 100%, rgba(0,220,255,0.40) 0%,transparent 60%),
+  radial-gradient(ellipse 50% 45% at 95% 55%,  rgba(255,140,0,0.38) 0%,transparent 55%),
+  radial-gradient(ellipse 55% 40% at 5% 65%,   rgba(0,255,160,0.30) 0%,transparent 55%),
+  radial-gradient(ellipse 40% 35% at 60% 50%,  rgba(200,0,255,0.25) 0%,transparent 50%),
+  #00000e!important;
+animation:cosmos-breathe 10s ease-in-out infinite alternate!important;
+}
+@keyframes cosmos-breathe{
+  0%  {filter:brightness(0.7) saturate(0.8) hue-rotate(0deg);}
+  33% {filter:brightness(1.3) saturate(1.5) hue-rotate(15deg);}
+  66% {filter:brightness(1.1) saturate(1.3) hue-rotate(-10deg);}
+  100%{filter:brightness(0.8) saturate(0.9) hue-rotate(5deg);}
+}
+[data-testid="stAppViewContainer"]::before{
+  content:'';position:fixed;top:0;left:0;width:100%;height:100%;
+  background-image:
+    radial-gradient(1px 1px at 8% 15%,  rgba(255,255,255,0.9) 0%,transparent 100%),
+    radial-gradient(1px 1px at 22% 72%, rgba(180,140,255,0.8) 0%,transparent 100%),
+    radial-gradient(2px 2px at 35% 38%, rgba(255,255,255,0.7) 0%,transparent 100%),
+    radial-gradient(1px 1px at 48% 88%, rgba(0,220,255,0.8)   0%,transparent 100%),
+    radial-gradient(1px 1px at 57% 12%, rgba(255,255,255,0.9) 0%,transparent 100%),
+    radial-gradient(2px 2px at 67% 55%, rgba(255,180,0,0.7)   0%,transparent 100%),
+    radial-gradient(1px 1px at 73% 82%, rgba(255,255,255,0.8) 0%,transparent 100%),
+    radial-gradient(1px 1px at 82% 28%, rgba(200,100,255,0.7) 0%,transparent 100%),
+    radial-gradient(2px 2px at 91% 65%, rgba(255,255,255,0.9) 0%,transparent 100%),
+    radial-gradient(1px 1px at 15% 45%, rgba(0,255,160,0.7)   0%,transparent 100%),
+    radial-gradient(1px 1px at 42% 60%, rgba(255,80,80,0.6)   0%,transparent 100%),
+    radial-gradient(2px 2px at 78% 10%, rgba(255,255,255,0.8) 0%,transparent 100%),
+    radial-gradient(1px 1px at 95% 40%, rgba(120,200,255,0.7) 0%,transparent 100%),
+    radial-gradient(1px 1px at 30% 95%, rgba(255,255,255,0.6) 0%,transparent 100%);
+  pointer-events:none;z-index:0;
+  animation:stars-twinkle 4s ease-in-out infinite alternate;
+}
+@keyframes stars-twinkle{
+  0%  {opacity:0.3;}
+  50% {opacity:1.0;}
+  100%{opacity:0.5;}
+}
+[data-testid="stAppViewContainer"]::after{
+  content:'';position:fixed;top:0;left:0;width:100%;height:100%;
+  background:
+    repeating-linear-gradient(0deg,  transparent, transparent 59px, rgba(120,0,255,0.04) 60px),
+    repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(0,200,255,0.04) 60px);
+  pointer-events:none;z-index:0;
+  animation:grid-pulse 6s ease-in-out infinite alternate;
+}
+@keyframes grid-pulse{
+  0%  {opacity:0.2;}
+  100%{opacity:0.9;}
+}
 .star-field{width:100%;height:90px;background-image:radial-gradient(2px 2px at 5% 30%,#fff 0%,transparent 100%),radial-gradient(2px 2px at 18% 70%,#fff 0%,transparent 100%),radial-gradient(2px 2px at 32% 20%,#fff 0%,transparent 100%),radial-gradient(2px 2px at 47% 85%,#fff 0%,transparent 100%),radial-gradient(2px 2px at 61% 40%,#fff 0%,transparent 100%),radial-gradient(2px 2px at 75% 65%,#fff 0%,transparent 100%),radial-gradient(3px 3px at 14% 60%,#FFD700 0%,transparent 100%),radial-gradient(3px 3px at 70% 35%,#00C8FF 0%,transparent 100%),radial-gradient(3px 3px at 43% 75%,#FF5050 0%,transparent 100%),radial-gradient(3px 3px at 90% 90%,#A050DC 0%,transparent 100%);animation:star-twinkle 3s ease-in-out infinite alternate;margin-bottom:8px;}
 @keyframes star-twinkle{0%{opacity:0.3;}100%{opacity:1.0;}}
 .scanline-wrap{width:100%;height:4px;overflow:hidden;margin-bottom:16px;}
@@ -1284,7 +1334,38 @@ html,body,[data-testid="stAppViewContainer"],[data-testid="stApp"]{background:#0
 .stTextInput>div>div>input::placeholder{color:#666666!important;}
 .stTextInput>div>div>input:focus{border-color:#FFD700!important;box-shadow:0 0 20px rgba(255,215,0,0.25)!important;}
 .stTextInput label{font-family:Space Mono,monospace!important;font-size:11px!important;letter-spacing:3px!important;color:#ffffff!important;text-transform:uppercase!important;}
-div.stButton>button{background:linear-gradient(135deg,#FFD700,#FF8C00)!important;border:none!important;color:#000000!important;font-family:Bebas Neue,sans-serif!important;font-size:24px!important;letter-spacing:4px!important;padding:18px!important;border-radius:14px!important;width:100%!important;box-shadow:0 0 35px rgba(255,215,0,0.4)!important;transition:all 0.3s!important;margin-top:12px!important;}
+div.stButton>button{
+  background:linear-gradient(135deg,#7B00FF 0%,#FF0080 35%,#FF6600 65%,#00DDFF 100%)!important;
+  background-size:300% 300%!important;
+  border:2px solid rgba(255,255,255,0.25)!important;
+  color:#ffffff!important;
+  font-family:Bebas Neue,sans-serif!important;
+  font-size:24px!important;
+  letter-spacing:4px!important;
+  padding:18px!important;
+  border-radius:14px!important;
+  width:100%!important;
+  text-shadow:0 0 12px rgba(255,255,255,0.9)!important;
+  box-shadow:0 0 30px rgba(123,0,255,0.5),0 0 60px rgba(255,0,128,0.3),inset 0 0 20px rgba(255,255,255,0.08)!important;
+  transition:all 0.3s!important;
+  margin-top:12px!important;
+  animation:btn-cosmic 5s ease-in-out infinite alternate,btn-glow-pulse 2s ease-in-out infinite alternate!important;
+}
+@keyframes btn-cosmic{
+  0%  {background-position:0% 50%;  box-shadow:0 0 30px rgba(123,0,255,0.6),0 0 60px rgba(255,0,128,0.3);}
+  33% {background-position:100% 0%; box-shadow:0 0 40px rgba(255,0,128,0.7),0 0 80px rgba(255,100,0,0.4);}
+  66% {background-position:50% 100%;box-shadow:0 0 35px rgba(0,200,255,0.6),0 0 70px rgba(0,255,150,0.3);}
+  100%{background-position:0% 50%;  box-shadow:0 0 30px rgba(200,0,255,0.6),0 0 60px rgba(0,150,255,0.4);}
+}
+@keyframes btn-glow-pulse{
+  0%  {filter:brightness(1.0) saturate(1.2);}
+  100%{filter:brightness(1.35) saturate(1.6);}
+}
+div.stButton>button:hover{
+  transform:scale(1.04) translateY(-2px)!important;
+  filter:brightness(1.5) saturate(1.8)!important;
+  box-shadow:0 0 70px rgba(255,0,200,0.9),0 0 130px rgba(0,200,255,0.5),inset 0 0 30px rgba(255,255,255,0.15)!important;
+}
 div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rgba(255,215,0,0.7)!important;}
 </style>
 <div class="scanline-wrap"><div class="scanline"></div></div>
