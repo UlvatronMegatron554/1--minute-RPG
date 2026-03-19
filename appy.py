@@ -1312,23 +1312,9 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
     _, col, _ = st.columns([1, 2, 1])
     with col:
 
-        st.markdown("""<style>
-        /* HOW IT WORKS */
-        div[data-testid="stColumn"] div.stButton:nth-child(1) > button,
-        div[data-testid="stVerticalBlock"] > div:first-child div.stButton > button {
-            width: 625px !important; min-width: 625px !important;
-            height: 73px !important; min-height: 73px !important;
-            font-size: 11px !important; margin-left: 46px !important;
-            animation: none !important; box-shadow: none !important;
-        }
-        </style>""", unsafe_allow_html=True)
-
         # HOW IT WORKS button
         if st.button("⚡ HOW IT WORKS  ·  RETURNING PLAYER?", key="info_toggle"):
             st.session_state.info_open = not st.session_state.get("info_open", False)
-
-
-        st.markdown('</div>', unsafe_allow_html=True)
 
 
         if st.session_state.get("info_open", False):
@@ -1388,26 +1374,13 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                     st.session_state.gw_page = 1
                     st.rerun()
 
-        # Small "Forgot password?" button
-        st.markdown("""<style>
-        div[data-testid="stColumn"] div.stButton > button {
-            padding: 2px 10px !important;
-            font-size: 10px !important;
-            animation: none !important;
-            box-shadow: none !important;
-            border-width: 1px !important;
-            border-radius: 6px !important;
-            margin: 0 !important;
-            min-height: 0 !important;
-            width: auto !important;
-        }
-        </style>""", unsafe_allow_html=True)
-        st.markdown('<div id="fp-btn-wrap">', unsafe_allow_html=True)
-        if st.button("🔑 Forgot password?", key="open_reset_panel"):
-            st.session_state.reset_panel_open = not st.session_state.get("reset_panel_open", False)
-            st.session_state.reset_pending_name = None
-            st.rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
+        # Forgot password button
+        _, _fp = st.columns([3, 1])
+        with _fp:
+            if st.button("🔑 Forgot password?", key="open_reset_panel"):
+                st.session_state.reset_panel_open = not st.session_state.get("reset_panel_open", False)
+                st.session_state.reset_pending_name = None
+                st.rerun()
 
         # ── RESET PASSWORD PANEL ──────────────────────────────────────────────
         if st.session_state.get("reset_panel_open", False):
