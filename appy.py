@@ -1591,33 +1591,37 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                             We will send a 6-character reset code to your inbox instantly.
                         </div>
                     </div>""", unsafe_allow_html=True)
-                    _rp_name  = st.text_input("Champion Name:", key="ret_reset_name", placeholder="Your exact champion name")
                     _rp_email = st.text_input("Email you signed up with:", key="ret_reset_email", placeholder="your@email.com")
                     _rpc1, _rpc2 = st.columns(2)
                     with _rpc1:
                         if st.button("Send Reset Code", key="ret_send_reset", use_container_width=True):
-                            if not _rp_name.strip() or not _rp_email.strip():
-                                st.error("Enter both fields.")
+                            if not _rp_email.strip():
+                                st.error("Enter your email.")
                             else:
-                                _ex_r = db_load(_rp_name.strip())
-                                _st_email = _ex_r.get("email","").lower().strip().strip("_") if _ex_r else ""
-                                if not _ex_r:
-                                    st.error("No account found with that name.")
-                                elif not _st_email:
-                                    st.error("No email on file for this account.")
-                                elif _st_email != _rp_email.strip().lower().strip("_"):
-                                    st.error("Email does not match.")
+                                _sbr0 = get_supabase()
+                                _found_r = []
+                                if _sbr0:
+                                    try:
+                                        _lr0 = _sbr0.table("players").select("*").neq("email","").execute()
+                                        _found_r = [r for r in (_lr0.data or []) if r.get("email","").lower().strip().strip("_") == _rp_email.strip().lower().strip("_")]
+                                    except: pass
+                                if not _found_r:
+                                    st.error("No account found with that email.")
                                 else:
+                                    # Send reset to all accounts with that email
+                                    import secrets as _sec2, hashlib as _hl2r
                                     _tok = _sec2.token_hex(3).upper()
                                     _tok_hash = _hl2r.sha256(_tok.encode()).hexdigest()
                                     _expiry_r = (_dt.datetime.utcnow() + _dt.timedelta(minutes=30)).isoformat()
                                     _sbr = get_supabase()
+                                    _first = _found_r[0]
+                                    _rp_name_found = _first.get("user_name","")
                                     if _sbr:
-                                        try: _sbr.table("players").update({"reset_token":_tok_hash,"reset_expiry":_expiry_r}).eq("user_name",_rp_name.strip().lower()).execute()
+                                        try: _sbr.table("players").update({"reset_token":_tok_hash,"reset_expiry":_expiry_r}).eq("user_name",_rp_name_found).execute()
                                         except: pass
-                                    if send_reset_email(_rp_email.strip(), _rp_name.strip(), _tok):
-                                        st.success("Code sent! Check your inbox.")
-                                        st.session_state.ret_reset_pending = _rp_name.strip()
+                                    if send_reset_email(_rp_email.strip(), _rp_name_found, _tok):
+                                        st.success("✅ Code sent to your inbox!")
+                                        st.session_state.ret_reset_pending = _rp_name_found
                                     else:
                                         st.error("Could not send email.")
                     with _rpc2:
