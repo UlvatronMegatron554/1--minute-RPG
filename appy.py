@@ -1557,9 +1557,27 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                             else:
                                 st.success(f"✅ Found {len(_found)} account{'s' if len(_found)>1 else ''}!")
                                 for _f in _found:
-                                    _mode_icons = {"chill":"⚡","grinder":"🔥","obsessed":"💀"}
-                                    _fi = _mode_icons.get(_f.get("game_mode","chill"),"⚡")
-                                    st.markdown(f"<div style='background:#0a0a0a;border:1px solid #FFD700;border-radius:8px;padding:10px 16px;margin:4px 0;font-family:Bebas Neue,sans-serif;font-size:18px;color:#FFD700;letter-spacing:2px'>{_fi} {_f.get('user_name','').upper()} · {_f.get('theme','') or 'INFINITE POWER'}</div>", unsafe_allow_html=True)
+                                    _mode_icons = {"chill":"⚡ CHILL","grinder":"🔥 GRINDER","obsessed":"💀 OBSESSED"}
+                                    _mi = _mode_icons.get(_f.get("game_mode","chill"),"⚡ CHILL")
+                                    _lv = _f.get("level",1)
+                                    _ms = _f.get("total_missions",0)
+                                    _st = _f.get("study_streak",0)
+                                    _gd = _f.get("gold",0)
+                                    _th = (_f.get("theme","") or "INFINITE POWER").upper()
+                                    st.markdown(f"""<div style='background:#0a0a0a;border:2px solid rgba(255,215,0,0.4);
+                                        border-radius:12px;padding:14px 18px;margin:6px 0'>
+                                        <div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;letter-spacing:3px;margin-bottom:6px'>
+                                            🌌 {_th}
+                                        </div>
+                                        <div style='font-family:Space Mono,monospace;font-size:11px;color:#aaa;line-height:2.0'>
+                                            👤 <b style='color:#fff'>{_f.get('user_name','').upper()}</b><br>
+                                            🎮 Mode: <b style='color:#FFD700'>{_mi}</b><br>
+                                            ⭐ Level <b style='color:#fff'>{_lv}</b> &nbsp;·&nbsp;
+                                            🏆 <b style='color:#fff'>{_ms}</b> missions &nbsp;·&nbsp;
+                                            🔥 <b style='color:#fff'>{_st}</b> day streak &nbsp;·&nbsp;
+                                            💰 <b style='color:#fff'>{_gd:.0f}</b> gold
+                                        </div>
+                                    </div>""", unsafe_allow_html=True)
 
                 name_input = ""; email_input = ""; pass_input = ""; theme_input = ""
                 st.stop()
