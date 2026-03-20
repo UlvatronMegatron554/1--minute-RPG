@@ -2142,7 +2142,8 @@ if view == "main":
                 st.session_state.pending_gold  = base
                 st.session_state.pending_xp    = st.session_state.get("pending_xp", 0) + int(base * 10)
                 st.session_state.tribunal_missions_since = st.session_state.get("tribunal_missions_since", 0) + 1
-                if not st.session_state.get("tribunal_due_time"):
+                # Always set a fresh 5-min tribunal window on the FIRST mission
+                if st.session_state.get("tribunal_missions_since", 1) == 1 or not st.session_state.get("tribunal_due_time"):
                     st.session_state.tribunal_due_time = (_dt.datetime.now() + _dt.timedelta(minutes=5)).isoformat()
                 st.session_state.timer_running  = True
                 st.session_state.timer_start    = _dt.datetime.now().isoformat()
@@ -2591,7 +2592,10 @@ _trib_overdue = False
 if _trib_due:
     try:
         _trib_overdue = _dt.datetime.now() > _dt.datetime.fromisoformat(_trib_due)
-    except: pass
+    except:
+        # Corrupted date — clear it
+        st.session_state.tribunal_due_time = None
+        _trib_overdue = False
 
 # Show countdown bar while rewards are pending but tribunal not due yet
 if st.session_state.needs_verification and not _trib_overdue and not st.session_state.get("timer_running", False):
