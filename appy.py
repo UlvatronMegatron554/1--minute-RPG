@@ -1596,7 +1596,7 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
             elif not email_input.strip() and st.session_state.get("gw_page", 1) != 4:
                 st.error("Enter your email — needed if you ever forget your password.")
             elif not st.session_state.game_mode:
-                st.error("Pick your mode first — CHILL, GRINDER, or OBSESSED!")
+                st.error("⚠️ Your universe hasn't been forged yet — choose CHILL, GRINDER, or OBSESSED to define what kind of champion you are.")
             else:
                 import hashlib as _hl
                 clean_name  = name_input.strip()
@@ -1615,6 +1615,13 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                         st.stop()
                     elif stored_hash == pass_hash:
                         # ── CORRECT PASSWORD — RETURNING PLAYER ────────────────
+                        saved_mode  = existing.get("game_mode", "chill") or "chill"
+                        chosen_mode = st.session_state.game_mode or ""
+                        mode_labels = {"chill":"⚡ CHILL","grinder":"🔥 GRINDER","obsessed":"💀 OBSESSED"}
+                        # Block if they picked a mode AND it doesn't match saved mode
+                        if chosen_mode and chosen_mode != saved_mode:
+                            st.error(f"❌ Wrong mode! Your universe **{existing.get('theme','') or DEFAULT_UNIVERSE_NAME}** was created in **{mode_labels.get(saved_mode, saved_mode.upper())}** mode. Please select that mode to continue.")
+                            st.stop()
                         saved_theme = existing.get("theme", "") or DEFAULT_UNIVERSE_NAME
                         with st.spinner(f"🌌 Welcome back, {clean_name}! Loading your universe..."):
                             result = resolve_universe(saved_theme)
@@ -1625,7 +1632,7 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                         st.session_state.world_data   = result["data"]
                         st.session_state.vibe_color   = result["data"].get("color", "#FFD700")
                         st.session_state.user_theme   = saved_theme
-                        st.session_state.game_mode    = existing.get("game_mode", st.session_state.game_mode or "chill")
+                        st.session_state.game_mode    = saved_mode
                         db_apply(existing)
                         st.session_state.world_data   = result["data"]
                         st.session_state.vibe_color   = result["data"].get("color", "#FFD700")
