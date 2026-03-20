@@ -1432,39 +1432,69 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
             mode_labels = {"chill":"⚡ CHILL","grinder":"🔥 GRINDER","obsessed":"💀 OBSESSED"}
             st.success(f"MODE: {mode_labels[st.session_state.game_mode]} ✅")
 
-        # ── TWO PAGE FLOW ────────────────────────────────────────────────
+        # ── MULTI PAGE FLOW ──────────────────────────────────────────────
         _gw_page = st.session_state.get("gw_page", 1)
 
         if _gw_page == 1:
-            # PAGE 1: Email + Password only
-            st.markdown(f"<div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:16px'>STEP 1 OF 2 · YOUR ACCOUNT</div>", unsafe_allow_html=True)
-            email_input = st.text_input("📧 Email", placeholder="your@email.com — needed for password recovery", key="gw_email")
-            pass_input  = st.text_input("🔑 Password", placeholder="Create a password — keep it safe!", type="password", key="gw_pass")
-            name_input  = ""
-            theme_input = ""
-            st.markdown("<br>", unsafe_allow_html=True)
-            if st.button("NEXT ⚡", key="gw_next", use_container_width=True):
-                if not st.session_state.get("gw_email","").strip():
-                    st.error("Enter your email.")
-                elif not st.session_state.get("gw_pass","").strip():
-                    st.error("Enter a password.")
-                else:
-                    st.session_state.gw_page = 2
-                    st.rerun()
+            # PAGE 1: New or Returning
+            st.markdown("<div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:20px'>WHO ARE YOU?</div>", unsafe_allow_html=True)
+            _c1, _c2 = st.columns(2)
+            with _c1:
+                if st.button("🌌 NEW PLAYER\nCreate my account", key="gw_new", use_container_width=True):
+                    st.session_state.gw_page = 2; st.rerun()
+            with _c2:
+                if st.button("⚡ RETURNING PLAYER\nLoad my progress", key="gw_returning", use_container_width=True):
+                    st.session_state.gw_page = 4; st.rerun()
+            name_input = ""; email_input = ""; pass_input = ""; theme_input = ""
             st.stop()
 
-        else:
-            # PAGE 2: Champion Name + Universe + Mode + Enter
+        elif _gw_page == 2:
+            # PAGE 2: New player — email + password
+            st.markdown("<div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:16px'>STEP 1 OF 2 — YOUR ACCOUNT</div>", unsafe_allow_html=True)
+            email_input = st.text_input("📧 Email", placeholder="your@email.com — needed for password recovery", key="gw_email")
+            pass_input  = st.text_input("🔑 Password", placeholder="Create a password — keep it safe!", type="password", key="gw_pass")
+            name_input = ""; theme_input = ""
+            st.markdown("<br>", unsafe_allow_html=True)
+            _nb1, _nb2 = st.columns([1, 4])
+            with _nb1:
+                if st.button("← Back", key="gw_back2"):
+                    st.session_state.gw_page = 1; st.rerun()
+            with _nb2:
+                if st.button("NEXT ⚡", key="gw_next", use_container_width=True):
+                    if not st.session_state.get("gw_email","").strip():
+                        st.error("Enter your email.")
+                    elif not st.session_state.get("gw_pass","").strip():
+                        st.error("Enter a password.")
+                    else:
+                        st.session_state.gw_page = 3; st.rerun()
+            st.stop()
+
+        elif _gw_page == 3:
+            # PAGE 3: New player — champion name + universe
             email_input = st.session_state.get("gw_email", "")
-            pass_input  = st.session_state.get("gw_pass",  "")
-            st.markdown(f"<div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:16px'>STEP 2 OF 2 · YOUR UNIVERSE</div>", unsafe_allow_html=True)
+            pass_input  = st.session_state.get("gw_pass", "")
+            st.markdown("<div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:16px'>STEP 2 OF 2 — YOUR UNIVERSE</div>", unsafe_allow_html=True)
             name_input  = st.text_input("⚡ Champion Name", placeholder="What are you called?", key="gw_name")
             theme_input = st.text_input("🌌 Your Universe", placeholder="Leave empty for INFINITE POWER · or type anything: Naruto, F1, Nike...", key="gw_theme")
             _bc, _ = st.columns([1,4])
             with _bc:
                 if st.button("← Back", key="gw_back"):
-                    st.session_state.gw_page = 1
-                    st.rerun()
+                    st.session_state.gw_page = 2; st.rerun()
+
+        elif _gw_page == 4:
+            # PAGE 4: Returning player — name + password only
+            st.markdown("<div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:8px'>WELCOME BACK, CHAMPION</div>", unsafe_allow_html=True)
+            st.markdown("<div style='font-family:Space Mono,monospace;font-size:11px;color:#888;text-align:center;margin-bottom:16px'>Your universe is waiting. Enter your credentials to return.</div>", unsafe_allow_html=True)
+            name_input  = st.text_input("⚡ Champion Name", placeholder="Your exact champion name", key="gw_name")
+            pass_input  = st.text_input("🔑 Password", placeholder="Your password", type="password", key="gw_pass")
+            email_input = ""; theme_input = ""
+            _rb1, _ = st.columns([1,4])
+            with _rb1:
+                if st.button("← Back", key="gw_back_ret"):
+                    st.session_state.gw_page = 1; st.rerun()
+
+        else:
+            name_input = ""; email_input = ""; pass_input = ""; theme_input = ""
 
         # Forgot password button
         _, _fp = st.columns([3, 1])
