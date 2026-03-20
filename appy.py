@@ -1593,7 +1593,7 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                 st.error("Enter your champion name to begin.")
             elif not pass_input.strip():
                 st.error("Create a password to protect your account.")
-            elif not email_input.strip():
+            elif not email_input.strip() and st.session_state.get("gw_page", 1) != 4:
                 st.error("Enter your email — needed if you ever forget your password.")
             elif not st.session_state.game_mode:
                 st.error("Pick your mode first — CHILL, GRINDER, or OBSESSED!")
