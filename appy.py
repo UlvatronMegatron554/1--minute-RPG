@@ -822,7 +822,7 @@ def db_save(user_name: str, theme: str):
             "updated_at": _dt.datetime.utcnow().isoformat(),
             "password_hash": st.session_state.get("password_hash", ""),
             "leaderboard_visible": bool(st.session_state.get("leaderboard_visible", True)),
-            "email": st.session_state.get("user_email", "").lower().strip(),
+            "email": st.session_state.get("user_email", "").lower().strip().strip("_"),
         }
         # save_key = name_universe_mode (unique per combo)
         _mode  = st.session_state.get("game_mode", "chill") or "chill"
@@ -1543,23 +1543,13 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                         else:
                             _sb2 = get_supabase()
                             _found = []
+                            _clean_email = _lookup_email.strip().lower().strip("_")
                             if _sb2:
                                 try:
-                                    # Try exact match lowercase
-                                    _lr = _sb2.table("players").select("user_name,theme,game_mode,email").eq("email", _lookup_email.strip().lower()).execute()
-                                    _found = _lr.data or []
-                                    st.caption(f"DEBUG eq lowercase: {len(_found)} results")
-                                    if not _found:
-                                        _lr2 = _sb2.table("players").select("user_name,theme,game_mode,email").eq("email", _lookup_email.strip()).execute()
-                                        _found = _lr2.data or []
-                                        st.caption(f"DEBUG eq original case: {len(_found)} results")
-                                    if not _found:
-                                        _lr3 = _sb2.table("players").select("user_name,theme,game_mode,email").ilike("email", _lookup_email.strip()).execute()
-                                        _found = _lr3.data or []
-                                        st.caption(f"DEBUG ilike: {len(_found)} results")
-                                    # Show first few email values in DB for debugging
-                                    _all = _sb2.table("players").select("user_name,email").limit(5).execute()
-                                    st.caption(f"DEBUG sample rows: {[(r.get('user_name'),r.get('email')) for r in (_all.data or [])]}")
+                                    # Fetch all rows and filter client-side to handle dirty stored emails
+                                    _lr = _sb2.table("players").select("user_name,theme,game_mode,email").neq("email","").execute()
+                                    _all_rows = _lr.data or []
+                                    _found = [r for r in _all_rows if r.get("email","").lower().strip().strip("_") == _clean_email]
                                 except Exception as _le:
                                     st.error(f"Search error: {_le}")
                             if not _found:
