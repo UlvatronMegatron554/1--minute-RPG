@@ -2063,45 +2063,66 @@ if view == "main":
         st.session_state.custom_timer_unlocked = True
         st.toast("🔓 Custom timer unlocked! Set any duration you want.", icon="⏱")
     _timer_running = st.session_state.get("timer_running", False)
+    _timer_paused  = st.session_state.get("timer_paused", False)
     _timer_start   = st.session_state.get("timer_start")
     _timer_dur     = st.session_state.get("timer_duration", timer)
+    _timer_rem_saved = st.session_state.get("timer_remaining_saved", _timer_dur)
 
     if _timer_running and _timer_start:
-        # ── TIMER RUNNING — show countdown + stop/restart ─────────────────
-        _elapsed = (_dt.datetime.now() - _dt.datetime.fromisoformat(_timer_start)).total_seconds()
+        _elapsed   = (_dt.datetime.now() - _dt.datetime.fromisoformat(_timer_start)).total_seconds()
         _remaining = max(0, _timer_dur - int(_elapsed))
-        _pct = min(1.0, _elapsed / _timer_dur)
+        _pct       = min(1.0, _elapsed / _timer_dur)
         _bar_color = "#FF2222" if _remaining <= 5 else C
         st.progress(_pct)
-        st.markdown(f"""<div style='text-align:center;background:#111;border:2px solid {_bar_color}66;
-            border-radius:14px;padding:16px;margin:8px 0'>
-            <div style='font-family:Bebas Neue,sans-serif;font-size:56px;color:{_bar_color};line-height:1'>
-                {_remaining}s
-            </div>
-            <div style='font-family:Space Mono,monospace;font-size:12px;color:#888;letter-spacing:2px'>
-                STUDY NOW — DON'T STOP
-            </div>
+        st.markdown(f"""<div style='text-align:center;background:#111;border:2px solid {_bar_color}66;border-radius:14px;padding:16px;margin:8px 0'>
+            <div style='font-family:Bebas Neue,sans-serif;font-size:56px;color:{_bar_color};line-height:1'>{_remaining}s</div>
+            <div style='font-family:Space Mono,monospace;font-size:12px;color:#888;letter-spacing:2px'>STUDY NOW — DON'T STOP</div>
         </div>""", unsafe_allow_html=True)
         _tc1, _tc2 = st.columns(2)
         with _tc1:
             if st.button("⏸ STOP TIMER", key="stop_timer", use_container_width=True):
-                st.session_state.timer_running = False
-                st.session_state.timer_start   = None
-                st.session_state.needs_verification = False
-                st.session_state.pending_gold  = 0.0
-                st.session_state.pending_xp    = 0
+                st.session_state.timer_running       = False
+                st.session_state.timer_paused        = True
+                st.session_state.timer_remaining_saved = _remaining
                 st.rerun()
         with _tc2:
             if st.button("🔄 RESTART", key="restart_timer", use_container_width=True):
-                st.session_state.timer_start = _dt.datetime.now().isoformat()
+                st.session_state.timer_start    = _dt.datetime.now().isoformat()
+                st.session_state.timer_duration = _timer_dur
+                st.session_state.timer_paused   = False
                 st.rerun()
         if _remaining <= 0:
             st.session_state.timer_running = False
+            st.session_state.timer_paused  = False
             st.session_state.timer_start   = None
             st.rerun()
         else:
             time.sleep(1); st.rerun()
+
+    elif _timer_paused:
+        st.progress(1.0 - (_timer_rem_saved / max(_timer_dur,1)))
+        st.markdown(f"""<div style='text-align:center;background:#111;border:2px solid #FF8800;border-radius:14px;padding:16px;margin:8px 0'>
+            <div style='font-family:Bebas Neue,sans-serif;font-size:56px;color:#FF8800;line-height:1'>{_timer_rem_saved}s</div>
+            <div style='font-family:Space Mono,monospace;font-size:12px;color:#888;letter-spacing:2px'>⏸ PAUSED</div>
+        </div>""", unsafe_allow_html=True)
+        _tc1, _tc2 = st.columns(2)
+        with _tc1:
+            if st.button("▶ START TIMER", key="resume_timer", use_container_width=True):
+                _offset = _dt.datetime.now() - _dt.timedelta(seconds=_timer_dur - _timer_rem_saved)
+                st.session_state.timer_running = True
+                st.session_state.timer_paused  = False
+                st.session_state.timer_start   = _offset.isoformat()
+                st.rerun()
+        with _tc2:
+            if st.button("🔄 RESTART", key="restart_timer", use_container_width=True):
+                st.session_state.timer_running  = True
+                st.session_state.timer_paused   = False
+                st.session_state.timer_start    = _dt.datetime.now().isoformat()
+                st.session_state.timer_duration = _timer_dur
+                st.rerun()
+
     else:
+        # ── TIMER IDLE — show controls ────────────────────────────────────
         # ── TIMER IDLE — show controls ────────────────────────────────────
         if st.session_state.get("custom_timer_unlocked", False):
             st.markdown(f"<div style='font-family:Space Mono,monospace;font-size:10px;color:#FFD700;text-align:center;margin-bottom:4px;letter-spacing:1px'>🔓 CUSTOM TIMER UNLOCKED</div>", unsafe_allow_html=True)
