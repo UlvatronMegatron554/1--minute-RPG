@@ -2093,9 +2093,9 @@ if view == "main":
                 st.rerun()
         with _tc2:
             if st.button("🔄 RESTART", key="restart_timer", use_container_width=True):
-                st.session_state.timer_start    = _dt.datetime.now().isoformat()
-                st.session_state.timer_duration = _timer_dur
+                st.session_state.timer_running  = False
                 st.session_state.timer_paused   = False
+                st.session_state.timer_start    = None
                 st.rerun()
         if _remaining <= 0:
             st.session_state.timer_running = False
@@ -2121,10 +2121,9 @@ if view == "main":
                 st.rerun()
         with _tc2:
             if st.button("🔄 RESTART", key="restart_timer", use_container_width=True):
-                st.session_state.timer_running  = True
+                st.session_state.timer_running  = False
                 st.session_state.timer_paused   = False
-                st.session_state.timer_start    = _dt.datetime.now().isoformat()
-                st.session_state.timer_duration = _timer_dur
+                st.session_state.timer_start    = None
                 st.rerun()
 
     else:
@@ -2603,14 +2602,17 @@ if _trib_due:
         st.session_state.tribunal_due_time = None
         _trib_overdue = False
 
-# Show countdown bar while rewards are pending but tribunal not due yet
-if st.session_state.needs_verification and not _trib_overdue:
+# Screenshot Proof progress bar — always visible
+if not _trib_overdue:
     _pg = st.session_state.get("pending_gold", 0)
     _px = st.session_state.get("pending_xp", 0)
-    _nm = st.session_state.get("tribunal_missions_since", 1)
+    _nm = st.session_state.get("tribunal_missions_since", 0)
     try:
-        _total_secs = 300  # 5 minutes
-        _secs_left  = max(0, int((_dt.datetime.fromisoformat(_trib_due) - _dt.datetime.now()).total_seconds()))
+        _total_secs = 300
+        if _trib_due:
+            _secs_left = max(0, int((_dt.datetime.fromisoformat(_trib_due) - _dt.datetime.now()).total_seconds()))
+        else:
+            _secs_left = 300
         _elapsed_pct = min(1.0, (_total_secs - _secs_left) / _total_secs)
         _mins = _secs_left // 60; _secs_r = _secs_left % 60
         _timer_label = f"{_mins}:{str(_secs_r).zfill(2)}"
@@ -2618,18 +2620,20 @@ if st.session_state.needs_verification and not _trib_overdue:
         _elapsed_pct = 0.0; _timer_label = "5:00"
     _bar_fill = int(_elapsed_pct * 20)
     _bar_str  = "█" * _bar_fill + "░" * (20 - _bar_fill)
+    _locked_text = f"+{_pg:.1f} {currency} · +{_px} XP LOCKED" if _pg > 0 else "Start a mission to begin earning"
+    _mission_text = f"{_nm} mission{'s' if _nm!=1 else ''} done" if _nm > 0 else "No missions yet"
     st.markdown(f"""<div style='background:#080808;border:2px solid #FF8800;border-radius:14px;padding:16px 20px;margin:8px 0'>
         <div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:10px'>
             <div style='font-family:Bebas Neue,sans-serif;font-size:18px;color:#FF8800;letter-spacing:3px'>
-                ⚖️ TRIBUNAL IN {_timer_label} · {_nm} MISSION{"S" if _nm!=1 else ""} LOCKED
+                📸 SCREENSHOT PROOF — {_timer_label} LEFT
             </div>
-            <div style='text-align:right'>
-                <span style='font-family:Bebas Neue,sans-serif;font-size:18px;color:#FFD700'>+{_pg:.1f} {currency}</span>
-                <span style='font-family:Space Mono,monospace;font-size:10px;color:#888;margin-left:8px'>+{_px} XP</span>
+            <div style='text-align:right;font-family:Space Mono,monospace;font-size:11px;color:#888'>
+                {_mission_text}
             </div>
         </div>
-        <div style='font-family:Space Mono,monospace;font-size:13px;color:#FF8800;letter-spacing:2px'>{_bar_str} {int(_elapsed_pct*100)}%</div>
-        <div style='font-family:Space Mono,monospace;font-size:10px;color:#555;margin-top:4px'>Keep studying — tribunal fires when bar is full</div>
+        <div style='font-family:Space Mono,monospace;font-size:13px;color:#FF8800;letter-spacing:2px;margin-bottom:6px'>{_bar_str} {int(_elapsed_pct*100)}%</div>
+        <div style='font-family:Bebas Neue,sans-serif;font-size:16px;color:#FFD700'>{_locked_text}</div>
+        <div style='font-family:Space Mono,monospace;font-size:10px;color:#555;margin-top:4px'>When bar hits 100% — upload a screenshot of your work to unlock all rewards</div>
     </div>""", unsafe_allow_html=True)
 
 if st.session_state.needs_verification and _trib_overdue and not st.session_state.get("timer_running", False):
