@@ -2084,7 +2084,7 @@ if view == "main":
         </div>""", unsafe_allow_html=True)
         _tc1, _tc2 = st.columns(2)
         with _tc1:
-            if st.button("⏹ STOP MISSION", key="stop_timer", use_container_width=True):
+            if st.button("⏸ STOP TIMER", key="stop_timer", use_container_width=True):
                 st.session_state.timer_running = False
                 st.session_state.timer_start   = None
                 st.session_state.needs_verification = False
@@ -2629,31 +2629,3 @@ if st.session_state.needs_verification:
             st.balloons()
             st.success(f"✅ {rarity_label}! +{earned:.1f} {currency} · 🔥 {new_streak}-day streak · +{spins} spins{near_miss_display}")
             time.sleep(1); st.rerun()    # ── MISSION TIMER — side buttons small, center button big ─────────────────
-    st.markdown(f"""<style>
-    [data-testid="stHorizontalBlock"] > [data-testid="column"]:first-child div[data-testid="stButton"] > button,
-    [data-testid="stHorizontalBlock"] > [data-testid="column"]:last-child  div[data-testid="stButton"] > button {{
-        padding: 18px 6px !important;
-        font-size: 16px !important;
-        letter-spacing: 1px !important;
-        border-width: 3px !important;
-        border-radius: 12px !important;
-        animation: none !important;
-        margin-bottom: 0 !important;
-        box-shadow: 0 0 12px {C}66 !important;
-    }}
-    </style>""", unsafe_allow_html=True)
-    col_m, col_s, col_p = st.columns([1, 3, 1])
-    with col_m:
-        if st.button("－ 30s", key="timer_minus", use_container_width=True):
-            st.session_state.micro_timer_seconds = max(30, timer-30); st.rerun()
-    with col_s:
-        if st.button(f"⚡ START {timer}s MISSION ⚡", key="start_mission", use_container_width=True):
-            st.session_state.needs_verification = True
-            st.session_state.pending_gold  = base
-            st.session_state.timer_running  = True
-            st.session_state.timer_start    = _dt.datetime.now().isoformat()
-            st.session_state.timer_duration = timer
-            st.rerun()
-    with col_p:
-        if st.button("＋ 30s", key="timer_plus", use_container_width=True):
-            st.session_state.micro_timer_seconds = min(300, timer+30); st.rerun()
