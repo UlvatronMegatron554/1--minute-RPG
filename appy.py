@@ -1254,7 +1254,7 @@ if "gold" not in st.session_state:
         "universe_achievements": [], "universe_ach_loaded": False,
         "welcome_bonus_applied": False, "battle_subject_chosen": False,
         "last_spin_time": None, "spin_awarded_this_view": False,
-        "last_auto_save": None, "password_hash": "", "leaderboard_visible": True, "user_email": "", "gw_page": 1,
+        "last_auto_save": None, "password_hash": "", "leaderboard_visible": True, "user_email": "", "gw_page": 1, "ret_saves_found": None, "ret_pass_hash": "", "ret_name": "",
     })
 
 
@@ -1493,16 +1493,106 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                     st.session_state.gw_page = 2; st.rerun()
 
         elif _gw_page == 4:
-            # PAGE 4: Returning player — name + password only
-            st.markdown("<div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:8px'>WELCOME BACK, CHAMPION</div>", unsafe_allow_html=True)
-            st.markdown("<div style='font-family:Space Mono,monospace;font-size:11px;color:#888;text-align:center;margin-bottom:16px'>Your universe is waiting. Enter your credentials to return.</div>", unsafe_allow_html=True)
-            name_input  = st.text_input("⚡ Champion Name", placeholder="Your exact champion name", key="gw_name")
-            pass_input  = st.text_input("🔑 Password", placeholder="Your password", type="password", key="gw_pass")
-            email_input = ""; theme_input = ""
-            _rb1, _ = st.columns([1,4])
-            with _rb1:
-                if st.button("← Back", key="gw_back_ret"):
-                    st.session_state.gw_page = 1; st.rerun()
+            # PAGE 4: Returning player — name + password → show saves
+            if not st.session_state.get("ret_saves_found"):
+                # Step 1: Enter credentials
+                st.markdown("<div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:8px'>WELCOME BACK, CHAMPION</div>", unsafe_allow_html=True)
+                st.markdown("<div style='font-family:Space Mono,monospace;font-size:11px;color:#888;text-align:center;margin-bottom:16px'>Enter your name and password to see your saves.</div>", unsafe_allow_html=True)
+                ret_name = st.text_input("⚡ Champion Name", placeholder="Your exact champion name", key="gw_ret_name")
+                ret_pass = st.text_input("🔑 Password", placeholder="Your password", type="password", key="gw_ret_pass")
+                _rb1, _rb2 = st.columns([1, 4])
+                with _rb1:
+                    if st.button("← Back", key="gw_back_ret"):
+                        st.session_state.gw_page = 1; st.rerun()
+                with _rb2:
+                    if st.button("🔍 FIND MY SAVES", key="gw_find_saves", use_container_width=True):
+                        if not ret_name.strip():
+                            st.error("Enter your champion name.")
+                        elif not ret_pass.strip():
+                            st.error("Enter your password.")
+                        else:
+                            import hashlib as _hlr
+                            _phash = _hlr.sha256(ret_pass.strip().encode()).hexdigest()
+                            # Load ALL saves with this username
+                            _sb = get_supabase()
+                            _all_saves = []
+                            if _sb:
+                                try:
+                                    _res = _sb.table("players").select("*").eq("user_name", ret_name.strip().lower()).execute()
+                                    _all_saves = _res.data or []
+                                except: pass
+                            if not _all_saves:
+                                st.error("❌ No account found with that name.")
+                            else:
+                                # Check password against first save
+                                _stored = _all_saves[0].get("password_hash","")
+                                if _stored and _stored != _phash:
+                                    st.error("❌ Wrong password.")
+                                else:
+                                    st.session_state.ret_saves_found = _all_saves
+                                    st.session_state.ret_pass_hash   = _phash
+                                    st.session_state.ret_name        = ret_name.strip()
+                                    st.rerun()
+                name_input = ""; email_input = ""; pass_input = ""; theme_input = ""
+                st.stop()
+
+            else:
+                # Step 2: Show save cards
+                _saves = st.session_state.ret_saves_found
+                _ret_name = st.session_state.get("ret_name","")
+                st.markdown(f"<div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:16px'>CHOOSE YOUR UNIVERSE</div>", unsafe_allow_html=True)
+                mode_icons = {"chill":"⚡","grinder":"🔥","obsessed":"💀"}
+                for _sv in _saves:
+                    _sv_theme = _sv.get("theme","") or "INFINITE POWER"
+                    _sv_mode  = _sv.get("game_mode","chill") or "chill"
+                    _sv_lv    = _sv.get("level",1)
+                    _sv_miss  = _sv.get("total_missions",0)
+                    _sv_str   = _sv.get("study_streak",0)
+                    _sv_gold  = _sv.get("gold",0)
+                    _icon     = mode_icons.get(_sv_mode,"⚡")
+                    st.markdown(f"""<div style='background:#0a0a1a;border:2px solid rgba(255,215,0,0.3);
+                        border-radius:16px;padding:18px 20px;margin-bottom:8px'>
+                        <div style='display:flex;justify-content:space-between;align-items:center'>
+                            <div>
+                                <div style='font-family:Bebas Neue,sans-serif;font-size:24px;color:#FFD700;letter-spacing:3px'>
+                                    {_icon} {_sv_theme.upper()}
+                                </div>
+                                <div style='font-family:Space Mono,monospace;font-size:11px;color:#888;margin-top:4px'>
+                                    {_sv_mode.upper()} MODE · Lv {_sv_lv} · {_sv_miss} missions · 🔥 {_sv_str} day streak · {_sv_gold:.0f} gold
+                                </div>
+                            </div>
+                        </div>
+                    </div>""", unsafe_allow_html=True)
+                    if st.button(f"▶ ENTER — {_sv_theme.upper()}", key=f"enter_save_{_sv.get('save_key', _sv_theme)}", use_container_width=True):
+                        # Load this specific save
+                        import hashlib as _hlr2
+                        with st.spinner(f"🌌 Loading {_sv_theme}..."):
+                            _result = resolve_universe(_sv_theme)
+                        if not _result["safe"]:
+                            _result = {"safe":True,"data":DEFAULT_UNIVERSE.copy()}
+                        st.session_state.user_name     = _ret_name
+                        st.session_state.password_hash = st.session_state.ret_pass_hash
+                        st.session_state.game_mode     = _sv_mode
+                        st.session_state.world_data    = _result["data"]
+                        st.session_state.vibe_color    = _result["data"].get("color","#FFD700")
+                        st.session_state.user_theme    = _sv_theme
+                        db_apply(_sv)
+                        st.session_state.world_data    = _result["data"]
+                        st.session_state.vibe_color    = _result["data"].get("color","#FFD700")
+                        st.session_state.user_theme    = _sv_theme
+                        st.session_state.password_hash = st.session_state.ret_pass_hash
+                        st.session_state.ret_saves_found = None
+                        st.toast(f"✅ Welcome back! {_sv_theme} loaded.", icon="🌌")
+                        st.rerun()
+
+                if st.button("← Back", key="gw_back_saves"):
+                    st.session_state.ret_saves_found = None
+                    st.session_state.gw_page = 4
+                    st.rerun()
+
+                name_input = ""; email_input = ""; pass_input = ""; theme_input = ""
+                st.stop()
+
 
         else:
             name_input = ""; email_input = ""; pass_input = ""; theme_input = ""
