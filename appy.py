@@ -1462,7 +1462,8 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
         elif _gw_page == 2:
             # PAGE 2: New player — email + password
             st.markdown("<div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:16px'>STEP 1 OF 2 — YOUR ACCOUNT</div>", unsafe_allow_html=True)
-            email_input = st.text_input("📧 Email", placeholder="your@email.com — needed for password recovery", key="gw_email")
+            email_input = st.text_input("📧 Email", placeholder="Your email — your lifeline if you ever get locked out. We never spam. Ever.", key="gw_email")
+            st.markdown("<div style='font-family:Space Mono,monospace;font-size:10px;color:#555;text-align:center;margin-top:2px;margin-bottom:8px'>🔒 This is your rescue rope. One day you might need it — and you'll be glad it's there.</div>", unsafe_allow_html=True)
             pass_input  = st.text_input("🔑 Password", placeholder="Create a password — keep it safe!", type="password", key="gw_pass")
             name_input = ""; theme_input = ""
             st.markdown("<br>", unsafe_allow_html=True)
@@ -1513,7 +1514,6 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                         else:
                             import hashlib as _hlr
                             _phash = _hlr.sha256(ret_pass.strip().encode()).hexdigest()
-                            # Load ALL saves with this username
                             _sb = get_supabase()
                             _all_saves = []
                             if _sb:
@@ -1524,7 +1524,6 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                             if not _all_saves:
                                 st.error("❌ No account found with that name.")
                             else:
-                                # Check password against first save
                                 _stored = _all_saves[0].get("password_hash","")
                                 if _stored and _stored != _phash:
                                     st.error("❌ Wrong password.")
@@ -1533,6 +1532,31 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                                     st.session_state.ret_pass_hash   = _phash
                                     st.session_state.ret_name        = ret_name.strip()
                                     st.rerun()
+
+                # ── Forgot champion name ──────────────────────────────────────
+                with st.expander("🤔 Forgot your Champion Name?"):
+                    st.markdown("<div style='font-family:Space Mono,monospace;font-size:11px;color:#aaa;margin-bottom:8px'>Enter the email you signed up with — we'll find your champion name instantly.</div>", unsafe_allow_html=True)
+                    _lookup_email = st.text_input("📧 Your Email:", placeholder="the email you used to sign up", key="lookup_email")
+                    if st.button("🔎 FIND MY CHAMPION NAME", key="find_name_btn", use_container_width=True):
+                        if not _lookup_email.strip():
+                            st.error("Enter your email.")
+                        else:
+                            _sb2 = get_supabase()
+                            _found = []
+                            if _sb2:
+                                try:
+                                    _lr = _sb2.table("players").select("user_name,theme,game_mode").eq("email", _lookup_email.strip().lower()).execute()
+                                    _found = _lr.data or []
+                                except: pass
+                            if not _found:
+                                st.error("❌ No account found with that email.")
+                            else:
+                                st.success(f"✅ Found {len(_found)} account{'s' if len(_found)>1 else ''}!")
+                                for _f in _found:
+                                    _mode_icons = {"chill":"⚡","grinder":"🔥","obsessed":"💀"}
+                                    _fi = _mode_icons.get(_f.get("game_mode","chill"),"⚡")
+                                    st.markdown(f"<div style='background:#0a0a0a;border:1px solid #FFD700;border-radius:8px;padding:10px 16px;margin:4px 0;font-family:Bebas Neue,sans-serif;font-size:18px;color:#FFD700;letter-spacing:2px'>{_fi} {_f.get('user_name','').upper()} · {_f.get('theme','') or 'INFINITE POWER'}</div>", unsafe_allow_html=True)
+
                 name_input = ""; email_input = ""; pass_input = ""; theme_input = ""
                 st.stop()
 
