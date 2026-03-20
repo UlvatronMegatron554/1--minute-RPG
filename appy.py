@@ -824,15 +824,26 @@ def db_save(user_name: str, theme: str):
             "leaderboard_visible": bool(st.session_state.get("leaderboard_visible", True)),
             "email": st.session_state.get("user_email", ""),
         }
-        sb.table("players").upsert(payload, on_conflict="user_name").execute()
+        # save_key = name_universe_mode (unique per combo)
+        _mode  = st.session_state.get("game_mode", "chill") or "chill"
+        _theme_key = (theme or "infinitepower").lower().strip().replace(" ","_")[:30]
+        _save_key  = f"{user_name.lower().strip()}_{_theme_key}_{_mode}"
+        payload["save_key"] = _save_key
+        sb.table("players").upsert(payload, on_conflict="save_key").execute()
     except Exception as e:
         pass  # Silent fail — never break the app for a DB issue
 
-def db_load(user_name: str) -> dict | None:
-    """Load session state from Supabase. Returns None if not found."""
+def db_load(user_name: str, theme: str = "", mode: str = "") -> dict | None:
+    """Load session state from Supabase. Uses save_key if theme+mode provided, else falls back to user_name."""
     sb = get_supabase()
     if not sb or not user_name: return None
     try:
+        if theme and mode:
+            _theme_key = (theme or "infinitepower").lower().strip().replace(" ","_")[:30]
+            _save_key  = f"{user_name.lower().strip()}_{_theme_key}_{mode}"
+            res = sb.table("players").select("*").eq("save_key", _save_key).execute()
+            if res.data: return res.data[0]
+        # Fallback: load any save matching user_name (first one found)
         res = sb.table("players").select("*").eq("user_name", user_name.lower().strip()).execute()
         if not res.data: return None
         row = res.data[0]
@@ -1605,7 +1616,13 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                 display_name = theme_val if theme_val else DEFAULT_UNIVERSE_NAME
 
                 # ── CHECK SUPABASE FOR EXISTING NAME ──────────────────────────
-                existing = db_load(clean_name)
+                # Load save using name + universe + mode combo if returning player
+                _login_theme = theme_val.strip() if theme_val.strip() else ""
+                _login_mode  = st.session_state.game_mode or ""
+                existing = db_load(clean_name, _login_theme, _login_mode)
+                if not existing:
+                    # Try loading any save with this name (for returning player flow)
+                    existing = db_load(clean_name)
 
                 if existing:
                     stored_hash = existing.get("password_hash", "")
