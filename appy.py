@@ -880,6 +880,12 @@ def db_apply(row: dict):
     st.session_state.password_hash = row.get("password_hash", "")
     st.session_state.leaderboard_visible = bool(row.get("leaderboard_visible", True))
     st.session_state.user_email = row.get("email", "")
+    # Always reset tribunal on login — never carry over stale due_time
+    st.session_state.tribunal_due_time = None
+    st.session_state.tribunal_missions_since = 0
+    st.session_state.needs_verification = False
+    st.session_state.pending_gold = 0.0
+    st.session_state.pending_xp = 0
 
 def db_get_leaderboard(limit: int = 10) -> list:
     """Get top players by total missions."""
@@ -2142,8 +2148,8 @@ if view == "main":
                 st.session_state.pending_gold  = base
                 st.session_state.pending_xp    = st.session_state.get("pending_xp", 0) + int(base * 10)
                 st.session_state.tribunal_missions_since = st.session_state.get("tribunal_missions_since", 0) + 1
-                # Always set a fresh 5-min tribunal window on the FIRST mission
-                if st.session_state.get("tribunal_missions_since", 1) == 1 or not st.session_state.get("tribunal_due_time"):
+                # Set tribunal due time on very first mission only
+                if not st.session_state.get("tribunal_due_time"):
                     st.session_state.tribunal_due_time = (_dt.datetime.now() + _dt.timedelta(minutes=5)).isoformat()
                 st.session_state.timer_running  = True
                 st.session_state.timer_start    = _dt.datetime.now().isoformat()
@@ -2598,30 +2604,32 @@ if _trib_due:
         _trib_overdue = False
 
 # Show countdown bar while rewards are pending but tribunal not due yet
-if st.session_state.needs_verification and not _trib_overdue and not st.session_state.get("timer_running", False):
+if st.session_state.needs_verification and not _trib_overdue:
     _pg = st.session_state.get("pending_gold", 0)
     _px = st.session_state.get("pending_xp", 0)
     _nm = st.session_state.get("tribunal_missions_since", 1)
     try:
-        _secs_left = int((_dt.datetime.fromisoformat(_trib_due) - _dt.datetime.now()).total_seconds())
-        _mins = _secs_left // 60; _secs = _secs_left % 60
-        _timer_label = f"{_mins}:{str(_secs).zfill(2)}"
+        _total_secs = 300  # 5 minutes
+        _secs_left  = max(0, int((_dt.datetime.fromisoformat(_trib_due) - _dt.datetime.now()).total_seconds()))
+        _elapsed_pct = min(1.0, (_total_secs - _secs_left) / _total_secs)
+        _mins = _secs_left // 60; _secs_r = _secs_left % 60
+        _timer_label = f"{_mins}:{str(_secs_r).zfill(2)}"
     except:
-        _timer_label = "soon"
-    st.markdown(f"""<div style='background:#0a0800;border:2px solid #FF8800;border-radius:14px;
-        padding:14px 20px;margin:8px 0;display:flex;justify-content:space-between;align-items:center'>
-        <div>
+        _elapsed_pct = 0.0; _timer_label = "5:00"
+    _bar_fill = int(_elapsed_pct * 20)
+    _bar_str  = "█" * _bar_fill + "░" * (20 - _bar_fill)
+    st.markdown(f"""<div style='background:#080808;border:2px solid #FF8800;border-radius:14px;padding:16px 20px;margin:8px 0'>
+        <div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:10px'>
             <div style='font-family:Bebas Neue,sans-serif;font-size:18px;color:#FF8800;letter-spacing:3px'>
-                ⚖️ TRIBUNAL IN {_timer_label}
+                ⚖️ TRIBUNAL IN {_timer_label} · {_nm} MISSION{"S" if _nm!=1 else ""} LOCKED
             </div>
-            <div style='font-family:Space Mono,monospace;font-size:11px;color:#888;margin-top:3px'>
-                {_nm} mission{"s" if _nm != 1 else ""} worth of rewards locked — keep studying!
+            <div style='text-align:right'>
+                <span style='font-family:Bebas Neue,sans-serif;font-size:18px;color:#FFD700'>+{_pg:.1f} {currency}</span>
+                <span style='font-family:Space Mono,monospace;font-size:10px;color:#888;margin-left:8px'>+{_px} XP</span>
             </div>
         </div>
-        <div style='text-align:right'>
-            <div style='font-family:Bebas Neue,sans-serif;font-size:20px;color:#FFD700'>+{_pg:.1f} {currency}</div>
-            <div style='font-family:Space Mono,monospace;font-size:10px;color:#888'>+{_px} XP LOCKED</div>
-        </div>
+        <div style='font-family:Space Mono,monospace;font-size:13px;color:#FF8800;letter-spacing:2px'>{_bar_str} {int(_elapsed_pct*100)}%</div>
+        <div style='font-family:Space Mono,monospace;font-size:10px;color:#555;margin-top:4px'>Keep studying — tribunal fires when bar is full</div>
     </div>""", unsafe_allow_html=True)
 
 if st.session_state.needs_verification and _trib_overdue and not st.session_state.get("timer_running", False):
