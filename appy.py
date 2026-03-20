@@ -1528,10 +1528,33 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                                 if _stored and _stored != _phash:
                                     st.error("❌ Wrong password.")
                                 else:
-                                    st.session_state.ret_saves_found = _all_saves
-                                    st.session_state.ret_pass_hash   = _phash
-                                    st.session_state.ret_name        = ret_name.strip()
-                                    st.rerun()
+                                    if len(_all_saves) == 1:
+                                        # Single save — load instantly, no cards needed
+                                        _sv = _all_saves[0]
+                                        _sv_theme = _sv.get("theme","") or DEFAULT_UNIVERSE_NAME
+                                        with st.spinner(f"🌌 Welcome back! Loading {_sv_theme}..."):
+                                            _result = resolve_universe(_sv_theme)
+                                        if not _result["safe"]:
+                                            _result = {"safe":True,"data":DEFAULT_UNIVERSE.copy()}
+                                        st.session_state.user_name     = ret_name.strip()
+                                        st.session_state.password_hash = _phash
+                                        st.session_state.game_mode     = _sv.get("game_mode","chill") or "chill"
+                                        st.session_state.world_data    = _result["data"]
+                                        st.session_state.vibe_color    = _result["data"].get("color","#FFD700")
+                                        st.session_state.user_theme    = _sv_theme
+                                        db_apply(_sv)
+                                        st.session_state.world_data    = _result["data"]
+                                        st.session_state.vibe_color    = _result["data"].get("color","#FFD700")
+                                        st.session_state.user_theme    = _sv_theme
+                                        st.session_state.password_hash = _phash
+                                        st.toast(f"✅ Welcome back! {_sv_theme} loaded.", icon="🌌")
+                                        st.rerun()
+                                    else:
+                                        # Multiple saves — show cards to pick
+                                        st.session_state.ret_saves_found = _all_saves
+                                        st.session_state.ret_pass_hash   = _phash
+                                        st.session_state.ret_name        = ret_name.strip()
+                                        st.rerun()
 
                 # ── Forgot champion name ──────────────────────────────────────
                 with st.expander("🤔 Forgot your Champion Name?"):
