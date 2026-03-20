@@ -2584,9 +2584,43 @@ elif view == "feedback":
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# THE TRIBUNAL
+# THE TRIBUNAL — only fires after 5 minutes
 # ─────────────────────────────────────────────────────────────────────────────
-if st.session_state.needs_verification:
+_trib_due = st.session_state.get("tribunal_due_time")
+_trib_overdue = False
+if _trib_due:
+    try:
+        _trib_overdue = _dt.datetime.now() > _dt.datetime.fromisoformat(_trib_due)
+    except: pass
+
+# Show countdown bar while rewards are pending but tribunal not due yet
+if st.session_state.needs_verification and not _trib_overdue and not st.session_state.get("timer_running", False):
+    _pg = st.session_state.get("pending_gold", 0)
+    _px = st.session_state.get("pending_xp", 0)
+    _nm = st.session_state.get("tribunal_missions_since", 1)
+    try:
+        _secs_left = int((_dt.datetime.fromisoformat(_trib_due) - _dt.datetime.now()).total_seconds())
+        _mins = _secs_left // 60; _secs = _secs_left % 60
+        _timer_label = f"{_mins}:{str(_secs).zfill(2)}"
+    except:
+        _timer_label = "soon"
+    st.markdown(f"""<div style='background:#0a0800;border:2px solid #FF8800;border-radius:14px;
+        padding:14px 20px;margin:8px 0;display:flex;justify-content:space-between;align-items:center'>
+        <div>
+            <div style='font-family:Bebas Neue,sans-serif;font-size:18px;color:#FF8800;letter-spacing:3px'>
+                ⚖️ TRIBUNAL IN {_timer_label}
+            </div>
+            <div style='font-family:Space Mono,monospace;font-size:11px;color:#888;margin-top:3px'>
+                {_nm} mission{"s" if _nm != 1 else ""} worth of rewards locked — keep studying!
+            </div>
+        </div>
+        <div style='text-align:right'>
+            <div style='font-family:Bebas Neue,sans-serif;font-size:20px;color:#FFD700'>+{_pg:.1f} {currency}</div>
+            <div style='font-family:Space Mono,monospace;font-size:10px;color:#888'>+{_px} XP LOCKED</div>
+        </div>
+    </div>""", unsafe_allow_html=True)
+
+if st.session_state.needs_verification and _trib_overdue and not st.session_state.get("timer_running", False):
     st.markdown("---")
     st.markdown(f"<h2 style='text-align:center;font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:4px'>⚖️ THE TRIBUNAL</h2>", unsafe_allow_html=True)
     _, col, _ = st.columns([1,2,1])
