@@ -1424,27 +1424,30 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
             st.markdown("<div style='background:rgba(0,0,0,0.85);border:2px solid #FFD700;border-radius:20px;padding:28px;margin-top:12px;'><div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;letter-spacing:4px;margin-bottom:14px'>HOW IT WORKS</div><div style='font-family:Space Mono,monospace;font-size:12px;color:#ffffff;line-height:2.2;margin-bottom:20px'>🌌 <b style='color:#FFD700'>Pick any universe</b> — AI builds it instantly. Colors, currency, story, all yours.<br>⏱ <b style='color:#FFD700'>Study for 30 seconds</b> — work, study, do anything productive. Get paid.<br>📸 <b style='color:#FFD700'>Upload proof</b> — no proof = no coins. Then spin, battle, hatch eggs.</div><div style='border-top:1px solid rgba(255,215,0,0.25);padding-top:16px;'><div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;letter-spacing:4px;margin-bottom:10px'>ALREADY HAVE AN ACCOUNT?</div><div style='font-family:Space Mono,monospace;font-size:12px;color:#ffffff;line-height:2.2;margin-bottom:10px'>Your stuff is safe. Forever.<br><span style='color:#00FF88'>Type the same name + password → hit Enter → everything loads back instantly.</span></div><div style='background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.3);border-radius:10px;padding:12px;font-family:Space Mono,monospace;font-size:11px;color:#ffffff;line-height:2.2'><span style='color:#FFD700'>①</span> Type your Champion Name<br><span style='color:#FFD700'>②</span> Type your Password<br><span style='color:#FFD700'>③</span> Hit ENTER THE INFINITEVERSE<br><span style='color:#00FF88'>④ BOOM. Home. Everything restored.</span></div></div></div>", unsafe_allow_html=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown("<div style='font-family:Bebas Neue,sans-serif;font-size:18px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:8px'>⚡ CHOOSE YOUR MODE</div>", unsafe_allow_html=True)
-        mode_col1, mode_col2, mode_col3 = st.columns(3)
-        with mode_col1:
-            st.markdown("""<div class='mode-card'><span class='mode-emoji'>⚡</span><div class='mode-name'>CHILL</div><div class='mode-desc'>Missions. Currency. Level up.</div></div>""", unsafe_allow_html=True)
-            if st.button("⚡ CHILL", key="mode_chill", use_container_width=True):
-                st.session_state.game_mode = "chill"
-        with mode_col2:
-            st.markdown("""<div class='mode-card'><span class='mode-emoji'>🔥</span><div class='mode-name'>GRINDER</div><div class='mode-desc'>Adds Battles, Abilities, Monster Hatching.</div></div>""", unsafe_allow_html=True)
-            if st.button("🔥 GRINDER", key="mode_grinder", use_container_width=True):
-                st.session_state.game_mode = "grinder"
-        with mode_col3:
-            st.markdown("""<div class='mode-card'><span class='mode-emoji'>💀</span><div class='mode-name'>OBSESSED</div><div class='mode-desc'>EVERYTHING. Full chaos. No limits.</div></div>""", unsafe_allow_html=True)
-            if st.button("💀 OBSESSED", key="mode_obsessed", use_container_width=True):
-                st.session_state.game_mode = "obsessed"
-        if st.session_state.game_mode:
-            mode_labels = {"chill":"⚡ CHILL","grinder":"🔥 GRINDER","obsessed":"💀 OBSESSED"}
-            st.success(f"MODE: {mode_labels[st.session_state.game_mode]} ✅")
 
         # ── MULTI PAGE FLOW ──────────────────────────────────────────────
         _gw_page = st.session_state.get("gw_page", 1)
+
+        # Mode cards only shown for new players setting up their universe
+        if _gw_page == 3:
+            st.markdown("<br>", unsafe_allow_html=True)
+            st.markdown("<div style='font-family:Bebas Neue,sans-serif;font-size:18px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:8px'>⚡ CHOOSE YOUR MODE</div>", unsafe_allow_html=True)
+            mode_col1, mode_col2, mode_col3 = st.columns(3)
+            with mode_col1:
+                st.markdown("""<div class='mode-card'><span class='mode-emoji'>⚡</span><div class='mode-name'>CHILL</div><div class='mode-desc'>Missions. Currency. Level up.</div></div>""", unsafe_allow_html=True)
+                if st.button("⚡ CHILL", key="mode_chill", use_container_width=True):
+                    st.session_state.game_mode = "chill"
+            with mode_col2:
+                st.markdown("""<div class='mode-card'><span class='mode-emoji'>🔥</span><div class='mode-name'>GRINDER</div><div class='mode-desc'>Adds Battles, Abilities, Monster Hatching.</div></div>""", unsafe_allow_html=True)
+                if st.button("🔥 GRINDER", key="mode_grinder", use_container_width=True):
+                    st.session_state.game_mode = "grinder"
+            with mode_col3:
+                st.markdown("""<div class='mode-card'><span class='mode-emoji'>💀</span><div class='mode-name'>OBSESSED</div><div class='mode-desc'>EVERYTHING. Full chaos. No limits.</div></div>""", unsafe_allow_html=True)
+                if st.button("💀 OBSESSED", key="mode_obsessed", use_container_width=True):
+                    st.session_state.game_mode = "obsessed"
+            if st.session_state.game_mode:
+                mode_labels = {"chill":"⚡ CHILL","grinder":"🔥 GRINDER","obsessed":"💀 OBSESSED"}
+                st.success(f"MODE: {mode_labels[st.session_state.game_mode]} ✅")
 
         if _gw_page == 1:
             # PAGE 1: New or Returning
