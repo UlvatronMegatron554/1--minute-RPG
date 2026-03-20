@@ -2057,35 +2057,80 @@ if view == "main":
 </style>""", unsafe_allow_html=True)
 
     # ── START MISSION + ±30s ─────────────────────────────────────────────────
-    st.markdown(f"<div style='text-align:center;font-family:Bebas Neue,sans-serif;font-size:14px;color:#555;letter-spacing:2px;margin-bottom:4px'>TIMER: {timer}s &nbsp;·&nbsp; min 30s &nbsp;·&nbsp; max 5min</div>", unsafe_allow_html=True)
-    st.markdown('<div class="mission-timer-row">', unsafe_allow_html=True)
-    col_m, col_s, col_p = st.columns([1, _cw, 1])
-    with col_m:
-        if st.button("－30s", key="timer_minus", use_container_width=True):
-            st.session_state.micro_timer_seconds = max(30, timer-30); st.rerun()
-    with col_s:
-        if st.button(f"⚡ START {timer}s MISSION ⚡", key="start_mission", use_container_width=True):
-            st.session_state.needs_verification = True; st.session_state.pending_gold = base
-            progress_bar = st.progress(0)
-            timer_status = st.empty()
-            for sec in range(timer, 0, -1):
-                pct = (timer-sec)/timer
-                bar_color = "#FF2222" if sec <= 5 else C
-                timer_status.markdown(
-                    f"<div style='text-align:center;background:#111;border:1px solid {bar_color}44;border-radius:10px;padding:8px;margin:4px 0'>"
-                    f"<span style='font-family:Bebas Neue,sans-serif;font-size:30px;color:{bar_color}'>{sec}s</span>"
-                    f"<span style='font-family:Space Mono,monospace;font-size:11px;color:#888;margin-left:10px'>STUDY NOW</span></div>",
-                    unsafe_allow_html=True)
-                progress_bar.progress(pct); time.sleep(1)
-            timer_status.markdown(
-                f"<div style='text-align:center;background:#111;border:2px solid {C};border-radius:10px;padding:8px;margin:4px 0'>"
-                f"<span style='font-family:Bebas Neue,sans-serif;font-size:22px;color:{C};letter-spacing:2px'>⚡ TIME'S UP — UPLOAD PROOF ⚡</span></div>",
-                unsafe_allow_html=True)
-            progress_bar.progress(1.0); time.sleep(0.5); st.rerun()
-    with col_p:
-        if st.button("＋30s", key="timer_plus", use_container_width=True):
-            st.session_state.micro_timer_seconds = min(300, timer+30); st.rerun()
-    st.markdown('</div>', unsafe_allow_html=True)
+    _trib_passed = st.session_state.get("tribunal_verdict") == "pass"
+    _custom_unlocked = st.session_state.get("custom_timer_unlocked", False)
+    if _trib_passed and not _custom_unlocked:
+        st.session_state.custom_timer_unlocked = True
+        st.toast("🔓 Custom timer unlocked! Set any duration you want.", icon="⏱")
+    _timer_running = st.session_state.get("timer_running", False)
+    _timer_start   = st.session_state.get("timer_start")
+    _timer_dur     = st.session_state.get("timer_duration", timer)
+
+    if _timer_running and _timer_start:
+        # ── TIMER RUNNING — show countdown + stop/restart ─────────────────
+        _elapsed = (_dt.datetime.now() - _dt.datetime.fromisoformat(_timer_start)).total_seconds()
+        _remaining = max(0, _timer_dur - int(_elapsed))
+        _pct = min(1.0, _elapsed / _timer_dur)
+        _bar_color = "#FF2222" if _remaining <= 5 else C
+        st.progress(_pct)
+        st.markdown(f"""<div style='text-align:center;background:#111;border:2px solid {_bar_color}66;
+            border-radius:14px;padding:16px;margin:8px 0'>
+            <div style='font-family:Bebas Neue,sans-serif;font-size:56px;color:{_bar_color};line-height:1'>
+                {_remaining}s
+            </div>
+            <div style='font-family:Space Mono,monospace;font-size:12px;color:#888;letter-spacing:2px'>
+                STUDY NOW — DON'T STOP
+            </div>
+        </div>""", unsafe_allow_html=True)
+        _tc1, _tc2 = st.columns(2)
+        with _tc1:
+            if st.button("⏹ STOP MISSION", key="stop_timer", use_container_width=True):
+                st.session_state.timer_running = False
+                st.session_state.timer_start   = None
+                st.session_state.needs_verification = False
+                st.session_state.pending_gold  = 0.0
+                st.session_state.pending_xp    = 0
+                st.rerun()
+        with _tc2:
+            if st.button("🔄 RESTART", key="restart_timer", use_container_width=True):
+                st.session_state.timer_start = _dt.datetime.now().isoformat()
+                st.rerun()
+        if _remaining <= 0:
+            st.session_state.timer_running = False
+            st.session_state.timer_start   = None
+            st.rerun()
+        else:
+            time.sleep(1); st.rerun()
+    else:
+        # ── TIMER IDLE — show controls ────────────────────────────────────
+        if st.session_state.get("custom_timer_unlocked", False):
+            st.markdown(f"<div style='font-family:Space Mono,monospace;font-size:10px;color:#FFD700;text-align:center;margin-bottom:4px;letter-spacing:1px'>🔓 CUSTOM TIMER UNLOCKED</div>", unsafe_allow_html=True)
+            _custom_val = st.number_input("Set your timer (seconds):", min_value=30, max_value=3600, value=timer, step=30, key="custom_timer_input")
+            st.session_state.micro_timer_seconds = _custom_val
+            timer = _custom_val
+        else:
+            st.markdown(f"<div style='text-align:center;font-family:Bebas Neue,sans-serif;font-size:14px;color:#555;letter-spacing:2px;margin-bottom:4px'>TIMER: {timer}s &nbsp;·&nbsp; min 30s &nbsp;·&nbsp; max 5min · Pass tribunal to unlock custom</div>", unsafe_allow_html=True)
+        st.markdown('<div class="mission-timer-row">', unsafe_allow_html=True)
+        col_m, col_s, col_p = st.columns([1, _cw, 1])
+        with col_m:
+            if st.button("－30s", key="timer_minus", use_container_width=True):
+                st.session_state.micro_timer_seconds = max(30, timer-30); st.rerun()
+        with col_s:
+            if st.button(f"⚡ START {timer}s MISSION ⚡", key="start_mission", use_container_width=True):
+                st.session_state.needs_verification = True
+                st.session_state.pending_gold  = base
+                st.session_state.pending_xp    = st.session_state.get("pending_xp", 0) + int(base * 10)
+                st.session_state.tribunal_missions_since = st.session_state.get("tribunal_missions_since", 0) + 1
+                if not st.session_state.get("tribunal_due_time"):
+                    st.session_state.tribunal_due_time = (_dt.datetime.now() + _dt.timedelta(minutes=5)).isoformat()
+                st.session_state.timer_running  = True
+                st.session_state.timer_start    = _dt.datetime.now().isoformat()
+                st.session_state.timer_duration = timer
+                st.rerun()
+        with col_p:
+            if st.button("＋30s", key="timer_plus", use_container_width=True):
+                st.session_state.micro_timer_seconds = min(300, timer+30); st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
 
 
 
@@ -2603,23 +2648,12 @@ if st.session_state.needs_verification:
             st.session_state.micro_timer_seconds = max(30, timer-30); st.rerun()
     with col_s:
         if st.button(f"⚡ START {timer}s MISSION ⚡", key="start_mission", use_container_width=True):
-            st.session_state.needs_verification = True; st.session_state.pending_gold = base
-            progress_bar = st.progress(0)
-            timer_status = st.empty()
-            for sec in range(timer, 0, -1):
-                pct = (timer-sec)/timer
-                bar_color = "#FF2222" if sec <= 5 else C
-                timer_status.markdown(
-                    f"""<div style='text-align:center;background:#111;border:1px solid {bar_color}44;border-radius:10px;padding:8px;margin:4px 0'>
-                        <span style='font-family:Bebas Neue,sans-serif;font-size:32px;color:{bar_color}'>{sec}s</span>
-                        <span style='font-family:Space Mono,monospace;font-size:11px;color:#888;margin-left:10px'>STUDY NOW</span>
-                    </div>""", unsafe_allow_html=True)
-                progress_bar.progress(pct); time.sleep(1)
-            timer_status.markdown(
-                f"""<div style='text-align:center;background:#111;border:2px solid {C};border-radius:10px;padding:10px;margin:4px 0'>
-                    <span style='font-family:Bebas Neue,sans-serif;font-size:24px;color:{C};letter-spacing:2px'>⚡ TIME'S UP — UPLOAD PROOF ⚡</span>
-                </div>""", unsafe_allow_html=True)
-            progress_bar.progress(1.0); time.sleep(0.5); st.rerun()
+            st.session_state.needs_verification = True
+            st.session_state.pending_gold  = base
+            st.session_state.timer_running  = True
+            st.session_state.timer_start    = _dt.datetime.now().isoformat()
+            st.session_state.timer_duration = timer
+            st.rerun()
     with col_p:
         if st.button("＋ 30s", key="timer_plus", use_container_width=True):
             st.session_state.micro_timer_seconds = min(300, timer+30); st.rerun()
