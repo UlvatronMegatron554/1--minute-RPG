@@ -1733,7 +1733,7 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                             </div>
                         </div>
                     </div>""", unsafe_allow_html=True)
-                    if st.button(f"▶ ENTER — {_sv_theme.upper()}", key=f"enter_save_{_sv.get('save_key', _sv_theme)}", use_container_width=True):
+                    if st.button(f"▶ ENTER — {_sv_theme.upper()}", key=f"enter_save_{i}_{_sv_theme[:10]}", use_container_width=True):
                         # Load this specific save
                         import hashlib as _hlr2
                         with st.spinner(f"🌌 Loading {_sv_theme}..."):
