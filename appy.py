@@ -1532,70 +1532,54 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
         elif _gw_page == 4:
             # PAGE 4: Returning player — name + password → show saves
             if not st.session_state.get("ret_saves_found"):
-                # Step 1: Enter credentials
+                # Step 1: Email only — no password needed
                 st.markdown("<div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:8px'>WELCOME BACK, CHAMPION</div>", unsafe_allow_html=True)
-                st.markdown("<div style='font-family:Space Mono,monospace;font-size:11px;color:#888;text-align:center;margin-bottom:16px'>Enter your name and password to see your saves.</div>", unsafe_allow_html=True)
-                ret_name = st.text_input("⚡ Champion Name", placeholder="Your exact champion name", key="gw_ret_name")
-                ret_pass = st.text_input("🔑 Password", placeholder="Your password", type="password", key="gw_ret_pass")
+                st.markdown("<div style='font-family:Space Mono,monospace;font-size:11px;color:#888;text-align:center;margin-bottom:16px'>Enter your email to find your saves instantly.</div>", unsafe_allow_html=True)
+                ret_email = st.text_input("📧 Your Email", placeholder="The email you signed up with", key="gw_ret_email")
                 _rb1, _rb2 = st.columns([1, 4])
                 with _rb1:
                     if st.button("← Back", key="gw_back_ret"):
                         st.session_state.gw_page = 1; st.rerun()
                 with _rb2:
                     if st.button("🔍 FIND MY SAVES", key="gw_find_saves", use_container_width=True):
-                        if not ret_name.strip():
-                            st.error("Enter your champion name.")
-                        elif not ret_pass.strip():
-                            st.error("Enter your password.")
+                        if not ret_email.strip():
+                            st.error("Enter your email.")
                         else:
-                            import hashlib as _hlr
-                            _phash = _hlr.sha256(ret_pass.strip().encode()).hexdigest()
+                            _clean_ret_email = ret_email.strip().lower().strip("_")
                             _sb = get_supabase()
                             _all_saves = []
                             if _sb:
                                 try:
-                                    _res = _sb.table("players").select("*").eq("user_name", ret_name.strip().lower()).execute()
-                                    _all_saves = _res.data or []
+                                    _lr = _sb.table("players").select("*").neq("email","").execute()
+                                    _all_saves = [r for r in (_lr.data or []) if r.get("email","").lower().strip().strip("_") == _clean_ret_email]
                                 except: pass
                             if not _all_saves:
-                                st.error("❌ No account found with that name.")
+                                st.error("❌ No account found with that email.")
                             else:
-                                _stored = _all_saves[0].get("password_hash","")
-                                if _stored and _stored != _phash:
-                                    st.error("❌ Wrong password.")
+                                if len(_all_saves) == 1:
+                                    _sv = _all_saves[0]
+                                    _sv_theme = _sv.get("theme","") or DEFAULT_UNIVERSE_NAME
+                                    _sv_name  = _sv.get("user_name","")
+                                    with st.spinner(f"🌌 Welcome back! Loading {_sv_theme}..."):
+                                        _result = resolve_universe(_sv_theme)
+                                    if not _result["safe"]:
+                                        _result = {"safe":True,"data":DEFAULT_UNIVERSE.copy()}
+                                    st.session_state.user_name   = _sv_name
+                                    st.session_state.game_mode   = _sv.get("game_mode","chill") or "chill"
+                                    st.session_state.world_data  = _result["data"]
+                                    st.session_state.vibe_color  = _result["data"].get("color","#FFD700")
+                                    st.session_state.user_theme  = _sv_theme
+                                    db_apply(_sv)
+                                    st.session_state.world_data  = _result["data"]
+                                    st.session_state.vibe_color  = _result["data"].get("color","#FFD700")
+                                    st.session_state.user_theme  = _sv_theme
+                                    st.query_params["u"] = _sv_name.lower()
+                                    st.toast(f"✅ Welcome back! {_sv_theme} loaded.", icon="🌌")
+                                    st.rerun()
                                 else:
-                                    if len(_all_saves) == 1:
-                                        # Single save — load instantly, no cards needed
-                                        _sv = _all_saves[0]
-                                        _sv_theme = _sv.get("theme","") or DEFAULT_UNIVERSE_NAME
-                                        with st.spinner(f"🌌 Welcome back! Loading {_sv_theme}..."):
-                                            _result = resolve_universe(_sv_theme)
-                                        if not _result["safe"]:
-                                            _result = {"safe":True,"data":DEFAULT_UNIVERSE.copy()}
-                                        st.session_state.user_name     = ret_name.strip()
-                                        st.session_state.password_hash = _phash
-                                        st.session_state.game_mode     = _sv.get("game_mode","chill") or "chill"
-                                        st.session_state.world_data    = _result["data"]
-                                        st.session_state.vibe_color    = _result["data"].get("color","#FFD700")
-                                        st.session_state.user_theme    = _sv_theme
-                                        db_apply(_sv)
-                                        st.session_state.world_data    = _result["data"]
-                                        st.session_state.vibe_color    = _result["data"].get("color","#FFD700")
-                                        st.session_state.user_theme    = _sv_theme
-                                        st.session_state.password_hash = _phash
-                                        _mode_k = st.session_state.get("game_mode","chill") or "chill"
-                                        _theme_k = (_sv_theme or "infinitepower").lower().strip().replace(" ","_")[:30]
-                                        _sk = f"{ret_name.strip().lower()}_{_theme_k}_{_mode_k}"
-                                        st.query_params["u"]  = ret_name.strip().lower()
-                                        st.query_params["sk"] = _sk
-                                        st.toast(f"✅ Welcome back! {_sv_theme} loaded.", icon="🌌")
-                                        st.rerun()
-                                    else:
-                                        # Multiple saves — show cards to pick
-                                        st.session_state.ret_saves_found = _all_saves
-                                        st.session_state.ret_pass_hash   = _phash
-                                        st.session_state.ret_name        = ret_name.strip()
-                                        st.rerun()
+                                    st.session_state.ret_saves_found = _all_saves
+                                    st.session_state.ret_name = _all_saves[0].get("user_name","")
+                                    st.rerun()
 
                 # ── Forgot champion name ──────────────────────────────────────
                 with st.expander("🤔 Forgot your Champion Name?"):
@@ -2805,6 +2789,11 @@ document.getElementById('spinBtn').onclick=function(){{
       document.getElementById('spinBtn').textContent='🔒 LOCKED';
       startCountdown(COOLDOWN);
       requestAnimationFrame(idle);
+      // Tell Python the spin happened via URL param
+      var url = new URL(window.parent.location.href);
+      url.searchParams.set('spin_idx', idx);
+      url.searchParams.set('spin_ts', Date.now());
+      window.parent.history.replaceState(null,'',url.toString());
     }}
   }}
   requestAnimationFrame(anim);
@@ -2813,7 +2802,34 @@ document.getElementById('spinBtn').onclick=function(){{
 
 
 
-    # ── Server-side cooldown validation (prevents HTML exploit) ─────────────
+    # ── Python SPIN button — server-side, navigation-proof ──────────────────
+    if can_spin:
+        if st.button("⚡ CLICK TO CLAIM YOUR SPIN PRIZE", key="python_spin_btn", use_container_width=True):
+            _now_s = _dt.datetime.now()
+            _last_s = st.session_state.get("last_spin_time")
+            _spin_ok = True
+            if _last_s:
+                try:
+                    if (_now_s - _dt.datetime.fromisoformat(_last_s)).total_seconds() < 21600:
+                        _spin_ok = False
+                except: pass
+            if _spin_ok and st.session_state.get("spins_left", 0) > 0:
+                _prize = random.choice(SPINNER_PRIZES)
+                st.session_state.last_spin_time = _now_s.isoformat()
+                st.session_state.spins_left = max(0, st.session_state.get("spins_left",1) - 1)
+                st.session_state.spinner_wins = st.session_state.get("spinner_wins",0) + 1
+                st.session_state.spinner_result = {"prize": _prize, "msg": f"You won: {_prize['label']}!"}
+                if _prize.get("type") == "gold":
+                    st.session_state.gold += float(_prize.get("value", 0))
+                elif _prize.get("type") == "xp":
+                    st.session_state.xp += int(_prize.get("value", 0))
+                elif _prize.get("type") == "spins":
+                    st.session_state.spins_left += int(_prize.get("value", 1))
+                db_save(st.session_state.user_name, st.session_state.user_theme)
+                st.rerun()
+            else:
+                st.error("⏰ Cooldown not finished!")
+    # ── Cooldown validation ───────────────────────────────────────────────────
     if st.session_state.get("spinner_result"):
         _now = _dt.datetime.now()
         _last = st.session_state.get("last_spin_time")
@@ -2824,7 +2840,6 @@ document.getElementById('spinBtn').onclick=function(){{
                 if _elapsed < 21600:
                     _valid_spin = False
                     st.session_state.spinner_result = None
-                    st.warning("⏰ Spin rejected — cooldown not finished. Nice try!")
             except: pass
 
     # ── Last prize result display ─────────────────────────────────────────────
