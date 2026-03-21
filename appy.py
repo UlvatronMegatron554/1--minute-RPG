@@ -1712,7 +1712,7 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                 _ret_name = st.session_state.get("ret_name","")
                 st.markdown(f"<div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:16px'>CHOOSE YOUR UNIVERSE</div>", unsafe_allow_html=True)
                 mode_icons = {"chill":"⚡","grinder":"🔥","obsessed":"💀"}
-                for _sv in _saves:
+                for i, _sv in enumerate(_saves):
                     _sv_theme = _sv.get("theme","") or "INFINITE POWER"
                     _sv_mode  = _sv.get("game_mode","chill") or "chill"
                     _sv_lv    = _sv.get("level",1)
