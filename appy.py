@@ -1269,20 +1269,14 @@ if "gold" not in st.session_state:
 if st.session_state.user_name is None:
     _qp = st.query_params
     _qp_name = _qp.get("u", "")
-    _qp_sk   = _qp.get("sk", "")
-    if _qp_name and _qp_sk:
-        # Try to auto-reload from Supabase using stored save key
+    if _qp_name:
         with st.spinner("🌌 Restoring your progress..."):
             _auto_save = None
             _sb_auto = get_supabase()
             if _sb_auto:
                 try:
-                    if _qp_sk:
-                        _r = _sb_auto.table("players").select("*").eq("save_key", _qp_sk).execute()
-                        if _r.data: _auto_save = _r.data[0]
-                    if not _auto_save:
-                        _r2 = _sb_auto.table("players").select("*").eq("user_name", _qp_name.lower()).execute()
-                        if _r2.data: _auto_save = _r2.data[0]
+                    _r2 = _sb_auto.table("players").select("*").eq("user_name", _qp_name.lower().strip()).execute()
+                    if _r2.data: _auto_save = _r2.data[0]
                 except: pass
         if _auto_save:
             _auto_theme = _auto_save.get("theme","") or DEFAULT_UNIVERSE_NAME
@@ -1297,7 +1291,7 @@ if st.session_state.user_name is None:
             st.session_state.world_data  = _auto_result["data"]
             st.session_state.vibe_color  = _auto_result["data"].get("color","#FFD700")
             st.session_state.user_theme  = _auto_theme
-            st.toast("✅ Progress restored automatically!", icon="🌌")
+            st.toast("✅ Progress restored!", icon="🌌")
             st.rerun()
 
 if st.session_state.user_name is None:
@@ -2080,6 +2074,20 @@ with st.sidebar:
     if code == "1TR5LG89D" and st.session_state.sub_tier not in ("Elite","Premium"):
         st.session_state.sub_tier = "Premium"; st.session_state.sub_multiplier = 2; st.success("⚡ PREMIUM STATUS SECURED!"); st.balloons(); time.sleep(1); st.rerun()
     st.write("---")
+    _sq1, _sq2 = st.columns(2)
+    with _sq1:
+        if st.button("⏸ PAUSE", key="nav_pause", use_container_width=True):
+            st.session_state.timer_running = False
+            st.session_state.timer_paused  = True
+            st.session_state.view = "main"
+            st.rerun()
+    with _sq2:
+        if st.button("🚪 QUIT", key="nav_quit", use_container_width=True):
+            db_save(st.session_state.user_name, st.session_state.user_theme)
+            st.query_params.clear()
+            for _k in list(st.session_state.keys()):
+                del st.session_state[_k]
+            st.rerun()
     if st.button("🚀 MISSION HUB",   key="nav_hub"):      st.session_state.view = "main";       st.rerun()
     if st.button("⚔️ BATTLE",        key="nav_battle"):   st.session_state.view = "battle";     st.rerun()
     if st.button("🎰 SPINNER",       key="nav_spin"):     st.session_state.view = "spinner";    st.session_state.spin_awarded_this_view = False; st.rerun()
@@ -2974,114 +2982,116 @@ elif view == "feedback":
             else: st.error("Write something first!")
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# THE TRIBUNAL — only fires after 5 minutes
-# ─────────────────────────────────────────────────────────────────────────────
-_trib_due = st.session_state.get("tribunal_due_time")
-_trib_overdue = False
-if _trib_due:
-    try:
-        _trib_overdue = _dt.datetime.now() > _dt.datetime.fromisoformat(_trib_due)
-    except:
-        # Corrupted date — clear it
-        st.session_state.tribunal_due_time = None
-        _trib_overdue = False
 
-# Screenshot Proof progress bar — always visible
-if not _trib_overdue:
-    _pg = st.session_state.get("pending_gold", 0)
-    _px = st.session_state.get("pending_xp", 0)
-    _nm = st.session_state.get("tribunal_missions_since", 0)
-    try:
-        _total_secs = 300
-        if _trib_due:
-            _secs_left = max(0, int((_dt.datetime.fromisoformat(_trib_due) - _dt.datetime.now()).total_seconds()))
-        else:
-            _secs_left = 300
-        _elapsed_pct = min(1.0, (_total_secs - _secs_left) / _total_secs)
-        _mins = _secs_left // 60; _secs_r = _secs_left % 60
-        _timer_label = f"{_mins}:{str(_secs_r).zfill(2)}"
-    except:
-        _elapsed_pct = 0.0; _timer_label = "5:00"
-    _bar_fill = int(_elapsed_pct * 20)
-    _bar_str  = "█" * _bar_fill + "░" * (20 - _bar_fill)
-    _locked_text = f"+{_pg:.1f} {currency} · +{_px} XP LOCKED" if _pg > 0 else "Start a mission to begin earning"
-    _mission_text = f"{_nm} mission{'s' if _nm!=1 else ''} done" if _nm > 0 else "No missions yet"
-    st.markdown(f"""<div style='background:#080808;border:2px solid #FF8800;border-radius:14px;padding:16px 20px;margin:8px 0'>
-        <div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:10px'>
-            <div style='font-family:Bebas Neue,sans-serif;font-size:18px;color:#FF8800;letter-spacing:3px'>
-                📸 SCREENSHOT PROOF — {_timer_label} LEFT
+if view == "main":
+    # ─────────────────────────────────────────────────────────────────────────────
+    # THE TRIBUNAL — only fires after 5 minutes
+    # ─────────────────────────────────────────────────────────────────────────────
+    _trib_due = st.session_state.get("tribunal_due_time")
+    _trib_overdue = False
+    if _trib_due:
+        try:
+            _trib_overdue = _dt.datetime.now() > _dt.datetime.fromisoformat(_trib_due)
+        except:
+            # Corrupted date — clear it
+            st.session_state.tribunal_due_time = None
+            _trib_overdue = False
+    
+    # Screenshot Proof progress bar — always visible
+    if not _trib_overdue:
+        _pg = st.session_state.get("pending_gold", 0)
+        _px = st.session_state.get("pending_xp", 0)
+        _nm = st.session_state.get("tribunal_missions_since", 0)
+        try:
+            _total_secs = 300
+            if _trib_due:
+                _secs_left = max(0, int((_dt.datetime.fromisoformat(_trib_due) - _dt.datetime.now()).total_seconds()))
+            else:
+                _secs_left = 300
+            _elapsed_pct = min(1.0, (_total_secs - _secs_left) / _total_secs)
+            _mins = _secs_left // 60; _secs_r = _secs_left % 60
+            _timer_label = f"{_mins}:{str(_secs_r).zfill(2)}"
+        except:
+            _elapsed_pct = 0.0; _timer_label = "5:00"
+        _bar_fill = int(_elapsed_pct * 20)
+        _bar_str  = "█" * _bar_fill + "░" * (20 - _bar_fill)
+        _locked_text = f"+{_pg:.1f} {currency} · +{_px} XP LOCKED" if _pg > 0 else "Start a mission to begin earning"
+        _mission_text = f"{_nm} mission{'s' if _nm!=1 else ''} done" if _nm > 0 else "No missions yet"
+        st.markdown(f"""<div style='background:#080808;border:2px solid #FF8800;border-radius:14px;padding:16px 20px;margin:8px 0'>
+            <div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:10px'>
+                <div style='font-family:Bebas Neue,sans-serif;font-size:18px;color:#FF8800;letter-spacing:3px'>
+                    📸 SCREENSHOT PROOF — {_timer_label} LEFT
+                </div>
+                <div style='text-align:right;font-family:Space Mono,monospace;font-size:11px;color:#888'>
+                    {_mission_text}
+                </div>
             </div>
-            <div style='text-align:right;font-family:Space Mono,monospace;font-size:11px;color:#888'>
-                {_mission_text}
-            </div>
-        </div>
-        <div style='font-family:Space Mono,monospace;font-size:13px;color:#FF8800;letter-spacing:2px;margin-bottom:6px'>{_bar_str} {int(_elapsed_pct*100)}%</div>
-        <div style='font-family:Bebas Neue,sans-serif;font-size:16px;color:#FFD700'>{_locked_text}</div>
-        <div style='font-family:Space Mono,monospace;font-size:10px;color:#555;margin-top:4px'>When bar hits 100% — upload a screenshot of your work to unlock all rewards</div>
-    </div>""", unsafe_allow_html=True)
-
-if st.session_state.needs_verification and _trib_overdue and not st.session_state.get("timer_running", False):
-    st.markdown("---")
-    st.markdown(f"<h2 style='text-align:center;font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:4px'>⚖️ THE TRIBUNAL</h2>", unsafe_allow_html=True)
-    _, col, _ = st.columns([1,2,1])
-    with col:
-        st.info(f"Upload proof of work to claim **{st.session_state.pending_gold:.1f} {currency}**")
-        uploaded = st.file_uploader("PROOF OF LABOR:", key="proof_upload")
-        if uploaded and st.button("⚡ SUBMIT FOR JUDGMENT", key="submit_proof"):
-            base_gold = st.session_state.pending_gold
-            earned, rarity_label, rarity_msg, near_miss = variable_reward(base_gold)
-            earned = round(earned, 1)
-            new_streak, streak_msg, is_new_day = update_streak()
-            spins = get_spins_for_tier(st.session_state.get("sub_tier","Free"))
-            st.session_state.spins_left = st.session_state.get("spins_left",0) + spins
-            st.session_state.gold += earned; st.session_state.xp += int(earned * 10)
-            st.session_state.total_xp_real = st.session_state.get("total_xp_real",0) + int(earned*10)
-            st.session_state.level = 1 + st.session_state.xp // 100
-            st.session_state.total_missions += 1
-            st.session_state.needs_verification = False; st.session_state.pending_gold = 0.0
-
-            total_m = st.session_state.total_missions
-            current_achs = st.session_state.get("universe_achievements",[])
-            if total_m % 10 == 0 and len(current_achs) < 300:
-                ach_client = get_claude_client()
-                if ach_client:
-                    new_achs = generate_universe_achievements(st.session_state.user_theme, ach_client)
-                    if new_achs:
-                        st.session_state.universe_achievements = current_achs + new_achs
-                        st.toast(f"🏆 {len(new_achs)} NEW ACHIEVEMENTS UNLOCKED!", icon="🏆")
-
-            loot_pool = [
-                {"name":f"+{spins} Spinner Spins","rarity":rarity_label,"color":"#FFD700"},
-                {"name":"RARE INCUBATOR EGG","rarity":"GREAT","color":"#4488FF"},
-                {"name":"STREAK SHIELD (protects 1 day)","rarity":"EPIC","color":"#AA44FF"},
-                {"name":f"+{int(earned*2)} Bonus {currency}","rarity":rarity_label,"color":"#00FF88"},
-                {"name":"STORY CHAPTER UNLOCKED","rarity":"GREAT","color":"#FF44AA"},
-            ]
-            loot = random.choice(loot_pool)
-            if "Shield" in loot["name"]: st.session_state.streak_shield = True
-            if "Egg" in loot["name"]: st.session_state.incubator_eggs += 2
-            if "Bonus" in loot["name"]: st.session_state.gold += int(earned*2)
-            st.session_state.loot_pending = True; st.session_state.loot_item = loot
-            # ── SAVE TO SUPABASE ──
-            db_save(st.session_state.user_name, st.session_state.user_theme)
-            if "loot_log" not in st.session_state: st.session_state.loot_log = []
-            st.session_state.loot_log.append({"name": loot["name"], "rarity": loot["rarity"], "color": loot.get("color","#FFD700"), "source": "Mission"})
-            st.session_state.unclaimed_boxes = st.session_state.get('unclaimed_boxes', 0) + 1
-            secret = random.choice(UNIVERSE_SECRETS)
-            if "secret_queue" not in st.session_state: st.session_state.secret_queue = []
-            st.session_state.secret_queue.append(secret)
-            st.session_state.secrets_seen = len(st.session_state.secret_queue)
-            st.session_state.show_secret = secret
-            st.session_state.spinner_available = True
-            client = get_claude_client()
-            prev = " ".join(st.session_state.story_log[-2:]) if st.session_state.story_log else ""
-            st.session_state.story_chapter += 1
-            new_chapter = generate_story_chapter(st.session_state.user_theme, st.session_state.story_chapter, prev, client)
-            st.session_state.story_log.append(new_chapter)
-            if MODE in ("grinder","obsessed"): st.session_state.battle_state = "ready"
-            st.session_state.incubator_eggs += 1
-            near_miss_display = f" · 🎯 {near_miss}" if near_miss else ""
-            st.balloons()
-            st.success(f"✅ {rarity_label}! +{earned:.1f} {currency} · 🔥 {new_streak}-day streak · +{spins} spins{near_miss_display}")
-            time.sleep(1); st.rerun()    # ── MISSION TIMER — side buttons small, center button big ─────────────────
+            <div style='font-family:Space Mono,monospace;font-size:13px;color:#FF8800;letter-spacing:2px;margin-bottom:6px'>{_bar_str} {int(_elapsed_pct*100)}%</div>
+            <div style='font-family:Bebas Neue,sans-serif;font-size:16px;color:#FFD700'>{_locked_text}</div>
+            <div style='font-family:Space Mono,monospace;font-size:10px;color:#555;margin-top:4px'>When bar hits 100% — upload a screenshot of your work to unlock all rewards</div>
+        </div>""", unsafe_allow_html=True)
+    
+    if st.session_state.needs_verification and _trib_overdue and not st.session_state.get("timer_running", False):
+        st.markdown("---")
+        st.markdown(f"<h2 style='text-align:center;font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:4px'>⚖️ THE TRIBUNAL</h2>", unsafe_allow_html=True)
+        _, col, _ = st.columns([1,2,1])
+        with col:
+            st.info(f"Upload proof of work to claim **{st.session_state.pending_gold:.1f} {currency}**")
+            uploaded = st.file_uploader("PROOF OF LABOR:", key="proof_upload")
+            if uploaded and st.button("⚡ SUBMIT FOR JUDGMENT", key="submit_proof"):
+                base_gold = st.session_state.pending_gold
+                earned, rarity_label, rarity_msg, near_miss = variable_reward(base_gold)
+                earned = round(earned, 1)
+                new_streak, streak_msg, is_new_day = update_streak()
+                spins = get_spins_for_tier(st.session_state.get("sub_tier","Free"))
+                st.session_state.spins_left = st.session_state.get("spins_left",0) + spins
+                st.session_state.gold += earned; st.session_state.xp += int(earned * 10)
+                st.session_state.total_xp_real = st.session_state.get("total_xp_real",0) + int(earned*10)
+                st.session_state.level = 1 + st.session_state.xp // 100
+                st.session_state.total_missions += 1
+                st.session_state.needs_verification = False; st.session_state.pending_gold = 0.0
+    
+                total_m = st.session_state.total_missions
+                current_achs = st.session_state.get("universe_achievements",[])
+                if total_m % 10 == 0 and len(current_achs) < 300:
+                    ach_client = get_claude_client()
+                    if ach_client:
+                        new_achs = generate_universe_achievements(st.session_state.user_theme, ach_client)
+                        if new_achs:
+                            st.session_state.universe_achievements = current_achs + new_achs
+                            st.toast(f"🏆 {len(new_achs)} NEW ACHIEVEMENTS UNLOCKED!", icon="🏆")
+    
+                loot_pool = [
+                    {"name":f"+{spins} Spinner Spins","rarity":rarity_label,"color":"#FFD700"},
+                    {"name":"RARE INCUBATOR EGG","rarity":"GREAT","color":"#4488FF"},
+                    {"name":"STREAK SHIELD (protects 1 day)","rarity":"EPIC","color":"#AA44FF"},
+                    {"name":f"+{int(earned*2)} Bonus {currency}","rarity":rarity_label,"color":"#00FF88"},
+                    {"name":"STORY CHAPTER UNLOCKED","rarity":"GREAT","color":"#FF44AA"},
+                ]
+                loot = random.choice(loot_pool)
+                if "Shield" in loot["name"]: st.session_state.streak_shield = True
+                if "Egg" in loot["name"]: st.session_state.incubator_eggs += 2
+                if "Bonus" in loot["name"]: st.session_state.gold += int(earned*2)
+                st.session_state.loot_pending = True; st.session_state.loot_item = loot
+                # ── SAVE TO SUPABASE ──
+                db_save(st.session_state.user_name, st.session_state.user_theme)
+                if "loot_log" not in st.session_state: st.session_state.loot_log = []
+                st.session_state.loot_log.append({"name": loot["name"], "rarity": loot["rarity"], "color": loot.get("color","#FFD700"), "source": "Mission"})
+                st.session_state.unclaimed_boxes = st.session_state.get('unclaimed_boxes', 0) + 1
+                secret = random.choice(UNIVERSE_SECRETS)
+                if "secret_queue" not in st.session_state: st.session_state.secret_queue = []
+                st.session_state.secret_queue.append(secret)
+                st.session_state.secrets_seen = len(st.session_state.secret_queue)
+                st.session_state.show_secret = secret
+                st.session_state.spinner_available = True
+                client = get_claude_client()
+                prev = " ".join(st.session_state.story_log[-2:]) if st.session_state.story_log else ""
+                st.session_state.story_chapter += 1
+                new_chapter = generate_story_chapter(st.session_state.user_theme, st.session_state.story_chapter, prev, client)
+                st.session_state.story_log.append(new_chapter)
+                if MODE in ("grinder","obsessed"): st.session_state.battle_state = "ready"
+                st.session_state.incubator_eggs += 1
+                near_miss_display = f" · 🎯 {near_miss}" if near_miss else ""
+                st.balloons()
+                st.success(f"✅ {rarity_label}! +{earned:.1f} {currency} · 🔥 {new_streak}-day streak · +{spins} spins{near_miss_display}")
+                time.sleep(1); st.rerun()    # ── MISSION TIMER — side buttons small, center button big ─────────────────
