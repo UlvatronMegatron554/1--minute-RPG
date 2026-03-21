@@ -829,7 +829,11 @@ def db_save(user_name: str, theme: str):
         _theme_key = (theme or "infinitepower").lower().strip().replace(" ","_")[:30]
         _save_key  = f"{user_name.lower().strip()}_{_theme_key}_{_mode}"
         payload["save_key"] = _save_key
-        sb.table("players").upsert(payload, on_conflict="save_key").execute()
+        try:
+            sb.table("players").upsert(payload, on_conflict="save_key").execute()
+        except Exception:
+            # Fallback: upsert on user_name for old saves without save_key
+            sb.table("players").upsert(payload, on_conflict="user_name").execute()
     except Exception as e:
         pass  # Silent fail — never break the app for a DB issue
 
@@ -1261,6 +1265,41 @@ if "gold" not in st.session_state:
 # ─────────────────────────────────────────────────────────────────────────────
 # GATEWAY SCREEN
 # ─────────────────────────────────────────────────────────────────────────────
+# ── AUTO-RELOAD ON REFRESH via query params ──────────────────────────────────
+if st.session_state.user_name is None:
+    _qp = st.query_params
+    _qp_name = _qp.get("u", "")
+    _qp_sk   = _qp.get("sk", "")
+    if _qp_name and _qp_sk:
+        # Try to auto-reload from Supabase using stored save key
+        with st.spinner("🌌 Restoring your progress..."):
+            _auto_save = None
+            _sb_auto = get_supabase()
+            if _sb_auto:
+                try:
+                    if _qp_sk:
+                        _r = _sb_auto.table("players").select("*").eq("save_key", _qp_sk).execute()
+                        if _r.data: _auto_save = _r.data[0]
+                    if not _auto_save:
+                        _r2 = _sb_auto.table("players").select("*").eq("user_name", _qp_name.lower()).execute()
+                        if _r2.data: _auto_save = _r2.data[0]
+                except: pass
+        if _auto_save:
+            _auto_theme = _auto_save.get("theme","") or DEFAULT_UNIVERSE_NAME
+            _auto_result = resolve_universe(_auto_theme)
+            if not _auto_result["safe"]: _auto_result = {"safe":True,"data":DEFAULT_UNIVERSE.copy()}
+            st.session_state.user_name   = _qp_name
+            st.session_state.game_mode   = _auto_save.get("game_mode","chill") or "chill"
+            st.session_state.world_data  = _auto_result["data"]
+            st.session_state.vibe_color  = _auto_result["data"].get("color","#FFD700")
+            st.session_state.user_theme  = _auto_theme
+            db_apply(_auto_save)
+            st.session_state.world_data  = _auto_result["data"]
+            st.session_state.vibe_color  = _auto_result["data"].get("color","#FFD700")
+            st.session_state.user_theme  = _auto_theme
+            st.toast("✅ Progress restored automatically!", icon="🌌")
+            st.rerun()
+
 if st.session_state.user_name is None:
     st.markdown("""<style>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Orbitron:wght@400;700;900&display=swap');
@@ -1550,6 +1589,11 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                                         st.session_state.vibe_color    = _result["data"].get("color","#FFD700")
                                         st.session_state.user_theme    = _sv_theme
                                         st.session_state.password_hash = _phash
+                                        _mode_k = st.session_state.get("game_mode","chill") or "chill"
+                                        _theme_k = (_sv_theme or "infinitepower").lower().strip().replace(" ","_")[:30]
+                                        _sk = f"{ret_name.strip().lower()}_{_theme_k}_{_mode_k}"
+                                        st.query_params["u"]  = ret_name.strip().lower()
+                                        st.query_params["sk"] = _sk
                                         st.toast(f"✅ Welcome back! {_sv_theme} loaded.", icon="🌌")
                                         st.rerun()
                                     else:
@@ -1893,6 +1937,11 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                         st.session_state.vibe_color   = result["data"].get("color", "#FFD700")
                         st.session_state.user_theme   = saved_theme
                         st.session_state.password_hash = pass_hash
+                        _mode_kw = existing.get("game_mode","chill") or "chill"
+                        _theme_kw = (saved_theme or "infinitepower").lower().strip().replace(" ","_")[:30]
+                        _skw = f"{clean_name.lower()}_{_theme_kw}_{_mode_kw}"
+                        st.query_params["u"]  = clean_name.lower()
+                        st.query_params["sk"] = _skw
                         st.toast(f"✅ Welcome back, {clean_name}! Progress loaded.", icon="🌌")
                         st.rerun()
                     else:
@@ -1935,6 +1984,11 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                     st.session_state.universe_ach_loaded = True
                     apply_welcome_bonus()
                     db_save(clean_name, display_name)
+                    _mode_kn = st.session_state.get("game_mode","chill") or "chill"
+                    _theme_kn = (display_name or "infinitepower").lower().strip().replace(" ","_")[:30]
+                    _skn = f"{clean_name.lower()}_{_theme_kn}_{_mode_kn}"
+                    st.query_params["u"]  = clean_name.lower()
+                    st.query_params["sk"] = _skn
                     st.rerun()
 
     # ── 7 FIDGET SPINNERS (base64 embedded) ──
@@ -1975,7 +2029,7 @@ except: CR, CG, CB = 255, 215, 0
 
 st.markdown(f"""<style>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap');
-html,body,[data-testid="stAppViewContainer"]{{background:{BG}!important;color:{TEXT}!important;font-family:'Space Mono',monospace;}}
+html,body,[data-testid="stAppViewContainer"]{{background:{BG if BG and BG != "#ffffff" else "#0a0010"}!important;color:{TEXT}!important;font-family:'Space Mono',monospace;}}
 [data-testid="stHeader"],[data-testid="stToolbar"]{{background:transparent!important;}}
 [data-testid="stSidebar"]{{background:#111111!important;}}
 [data-testid="stSidebar"] *{{color:#ffffff!important;}}
@@ -2165,6 +2219,21 @@ if st.session_state.get("battle_state") == "ready" or view == "battle":
     st.session_state.view = "battle"
     theme    = st.session_state.user_theme or "Infinite Power"
     tier_now = st.session_state.get("sub_tier","Free")
+    _battle_mode = st.session_state.get("game_mode","chill")
+    if _battle_mode == "chill":
+        st.markdown(f"""<div style='text-align:center;padding:40px;background:#0a0a1a;
+            border:2px solid #FF8800;border-radius:20px;margin:20px 0'>
+            <div style='font-size:48px'>⚔️</div>
+            <div style='font-family:Bebas Neue,sans-serif;font-size:32px;color:#FF8800;
+                letter-spacing:4px;margin:12px 0'>BATTLES LOCKED IN CHILL MODE</div>
+            <div style='font-family:Space Mono,monospace;font-size:13px;color:#aaa;line-height:1.8'>
+                Battles are available in 🔥 GRINDER and 💀 OBSESSED modes.<br>
+                Create a new universe with one of those modes to unlock battles.
+            </div>
+        </div>""", unsafe_allow_html=True)
+        if st.button("← Back to Mission Hub", key="battle_back_chill"):
+            st.session_state.view = "main"; st.rerun()
+        st.stop()
 
     if st.session_state.get("battle_box_pending") and st.session_state.get("battle_box_item"):
         item = st.session_state.battle_box_item
@@ -2378,7 +2447,7 @@ if view == "main":
         </div>""", unsafe_allow_html=True)
         _tc1, _tc2 = st.columns(2)
         with _tc1:
-            if st.button("⏸ STOP TIMER", key="stop_timer", use_container_width=True):
+            if st.button("⏸ PAUSE TIMER", key="stop_timer", use_container_width=True):
                 st.session_state.timer_running       = False
                 st.session_state.timer_paused        = True
                 st.session_state.timer_remaining_saved = _remaining
@@ -2736,6 +2805,20 @@ document.getElementById('spinBtn').onclick=function(){{
 
 
 
+    # ── Server-side cooldown validation (prevents HTML exploit) ─────────────
+    if st.session_state.get("spinner_result"):
+        _now = _dt.datetime.now()
+        _last = st.session_state.get("last_spin_time")
+        _valid_spin = True
+        if _last:
+            try:
+                _elapsed = (_now - _dt.datetime.fromisoformat(_last)).total_seconds()
+                if _elapsed < 21600:
+                    _valid_spin = False
+                    st.session_state.spinner_result = None
+                    st.warning("⏰ Spin rejected — cooldown not finished. Nice try!")
+            except: pass
+
     # ── Last prize result display ─────────────────────────────────────────────
     if st.session_state.spinner_result:
         p  = st.session_state.spinner_result
@@ -2853,16 +2936,26 @@ elif view == "leaderboard":
     else:
         medals = ["🥇","🥈","🥉"] + ["🏅"]*12
         for i, p in enumerate(leaders):
-            is_you = p["user_name"] == st.session_state.user_name.lower().strip()
-            border = C if is_you else "#333"
+            is_you    = p["user_name"] == st.session_state.user_name.lower().strip()
+            bg        = "#1a1a2a" if is_you else "#111"
+            border    = C if is_you else "#333"
+            name_col  = C if is_you else "#fff"
             tier_badge = {"Elite":"💀","Premium":"⚡","Free":""}.get(p.get("sub_tier","Free"),"")
-            st.markdown(f"""<div style='border:2px solid {border};border-radius:12px;padding:12px 16px;margin:6px 0;background:#{"1a1a2a" if is_you else "111"};display:flex;justify-content:space-between;align-items:center'>
-                <span style='font-family:Bebas Neue,sans-serif;font-size:22px;color:{C if is_you else "#fff"}'>{medals[i]} {p["user_name"].upper()} {tier_badge}</span>
-                <span style='font-family:Space Mono,monospace;font-size:11px;color:#888'>
-                    {p.get("total_missions",0)} missions · {p.get("study_streak",0)}🔥 streak · Lv{p.get("level",1)}
-                    {"  ← YOU" if is_you else ""}
-                </span>
-            </div>""", unsafe_allow_html=True)
+            you_tag   = "&nbsp;&nbsp;← YOU" if is_you else ""
+            missions  = p.get("total_missions", 0)
+            streak    = p.get("study_streak", 0)
+            level     = p.get("level", 1)
+            uname     = p["user_name"].upper()
+            st.markdown(
+                f"<div style='border:2px solid {border};border-radius:12px;padding:12px 16px;"
+                f"margin:6px 0;background:{bg};display:flex;justify-content:space-between;align-items:center'>"
+                f"<span style='font-family:Bebas Neue,sans-serif;font-size:22px;color:{name_col}'>"
+                f"{medals[i]} {uname} {tier_badge}</span>"
+                f"<span style='font-family:Space Mono,monospace;font-size:11px;color:#888'>"
+                f"{missions} missions &middot; {streak}🔥 streak &middot; Lv{level}{you_tag}</span>"
+                f"</div>",
+                unsafe_allow_html=True
+            )
 
 
 elif view == "feedback":
