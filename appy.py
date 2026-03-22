@@ -3112,3 +3112,4 @@ if view == "main":
                 st.balloons()
                 st.success(f"✅ {rarity_label}! +{earned:.1f} {currency} · 🔥 {new_streak}-day streak · +{spins} spins{near_miss_display}")
                 time.sleep(1); st.rerun()    # ── MISSION TIMER — side buttons small, center button big ─────────────────
+    
