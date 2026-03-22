@@ -1551,12 +1551,9 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                             if _sb:
                                 try:
                                     _lr = _sb.table("players").select("*").execute()
-                                    _seen_ids = set()
                                     for _row in (_lr.data or []):
                                         _re = _row.get("email","").lower().strip().strip("_")
-                                        _row_id = _row.get("id") or _row.get("user_name","") + str(_row.get("theme","")) + str(_row.get("game_mode",""))
-                                        if _re == _clean_ret_email and _row_id not in _seen_ids:
-                                            _seen_ids.add(_row_id)
+                                        if _re == _clean_ret_email:
                                             _all_saves.append(_row)
                                 except: pass
                             if not _all_saves:
@@ -1570,17 +1567,14 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                                         _result = resolve_universe(_sv_theme)
                                     if not _result["safe"]:
                                         _result = {"safe":True,"data":DEFAULT_UNIVERSE.copy()}
+                                    db_apply(_sv)
                                     st.session_state.user_name   = _sv_name
                                     st.session_state.game_mode   = _sv.get("game_mode","chill") or "chill"
                                     st.session_state.world_data  = _result["data"]
                                     st.session_state.vibe_color  = _result["data"].get("color","#FFD700")
                                     st.session_state.user_theme  = _sv_theme
-                                    db_apply(_sv)
-                                    st.session_state.world_data  = _result["data"]
-                                    st.session_state.vibe_color  = _result["data"].get("color","#FFD700")
-                                    st.session_state.user_theme  = _sv_theme
                                     st.query_params["u"] = _sv_name.lower()
-                                    st.toast(f"✅ Welcome back! {_sv_theme} loaded.", icon="🌌")
+                                    st.rerun()
                                 else:
                                     st.session_state.ret_saves_found = _all_saves
                                     st.session_state.ret_name = _all_saves[0].get("user_name","")
