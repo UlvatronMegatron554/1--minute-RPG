@@ -1549,15 +1549,13 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                             if _sb:
                                 try:
                                     _lr = _sb.table("players").select("*").execute()
-                                    # Filter by email AND deduplicate by user_name+theme+mode
-                                    _seen = set()
+                                    _seen_ids = set()
                                     for _row in (_lr.data or []):
                                         _re = _row.get("email","").lower().strip().strip("_")
-                                        if _re == _clean_ret_email:
-                                            _dedup_key = f"{_row.get('user_name','')}_{_row.get('theme','')}_{_row.get('game_mode','')}"
-                                            if _dedup_key not in _seen:
-                                                _seen.add(_dedup_key)
-                                                _all_saves.append(_row)
+                                        _row_id = _row.get("id") or _row.get("user_name","") + str(_row.get("theme","")) + str(_row.get("game_mode",""))
+                                        if _re == _clean_ret_email and _row_id not in _seen_ids:
+                                            _seen_ids.add(_row_id)
+                                            _all_saves.append(_row)
                                 except: pass
                             if not _all_saves:
                                 st.error("❌ No account found with that email.")
