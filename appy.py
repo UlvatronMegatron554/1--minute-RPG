@@ -1265,10 +1265,18 @@ if "gold" not in st.session_state:
 # ─────────────────────────────────────────────────────────────────────────────
 # GATEWAY SCREEN
 # ─────────────────────────────────────────────────────────────────────────────
-# ── AUTO-RELOAD ON REFRESH via query params ──────────────────────────────────
+# ── AUTO-RELOAD ON REFRESH via localStorage ──────────────────────────────────
 if st.session_state.user_name is None:
-    _qp = st.query_params
-    _qp_name = _qp.get("u", "")
+    # Read username stored in browser localStorage
+    _ls_result = components.html("""
+        <script>
+            var u = localStorage.getItem('infiniteverse_user');
+            if(u) {
+                window.parent.postMessage({type:'infiniteverse_user', user: u}, '*');
+            }
+        </script>
+    """, height=0)
+    _qp_name = st.query_params.get("u", "")
     if _qp_name:
         _auto_save = None
         _sb_auto = get_supabase()
@@ -1279,18 +1287,17 @@ if st.session_state.user_name is None:
             except: pass
         if _auto_save:
             _auto_theme = _auto_save.get("theme","") or DEFAULT_UNIVERSE_NAME
-            # Use cached world_data from DB if available, skip resolve_universe
-            _auto_vibe = _auto_save.get("vibe_color","#FFD700") or "#FFD700"
-            st.session_state.user_name   = _auto_save.get("user_name", _qp_name)
-            st.session_state.game_mode   = _auto_save.get("game_mode","chill") or "chill"
-            st.session_state.vibe_color  = _auto_vibe
-            st.session_state.user_theme  = _auto_theme
-            st.session_state.world_data  = DEFAULT_UNIVERSE.copy()
+            _auto_vibe  = _auto_save.get("vibe_color","#FFD700") or "#FFD700"
+            st.session_state.user_name  = _auto_save.get("user_name", _qp_name)
+            st.session_state.game_mode  = _auto_save.get("game_mode","chill") or "chill"
+            st.session_state.vibe_color = _auto_vibe
+            st.session_state.user_theme = _auto_theme
+            st.session_state.world_data = DEFAULT_UNIVERSE.copy()
             st.session_state.world_data["color"] = _auto_vibe
             db_apply(_auto_save)
-            st.session_state.vibe_color  = _auto_vibe
-            st.session_state.user_theme  = _auto_theme
-            st.rerun()
+            st.session_state.vibe_color = _auto_vibe
+            st.session_state.user_theme = _auto_theme
+            # Don't rerun - just continue rendering with restored state
 
 if st.session_state.user_name is None:
     st.markdown("""<style>
@@ -1578,6 +1585,7 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                                     st.session_state.vibe_color  = _result["data"].get("color","#FFD700")
                                     st.session_state.user_theme  = _sv_theme
                                     st.query_params.from_dict({"u": _sv_name.lower()})
+                                    components.html(f"""<script>localStorage.setItem('infiniteverse_user','{_sv_name.lower()}');</script>""", height=0)
                                     st.toast(f"✅ Welcome back! {_sv_theme} loaded.", icon="🌌")
                                     st.rerun()
                                 else:
@@ -1923,6 +1931,7 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                         _theme_kw = (saved_theme or "infinitepower").lower().strip().replace(" ","_")[:30]
                         _skw = f"{clean_name.lower()}_{_theme_kw}_{_mode_kw}"
                         st.query_params.from_dict({"u": clean_name.lower()})
+                        components.html(f"""<script>localStorage.setItem('infiniteverse_user','{clean_name.lower()}');</script>""", height=0)
                         st.toast(f"✅ Welcome back, {clean_name}! Progress loaded.", icon="🌌")
                         st.rerun()
                     else:
@@ -2071,6 +2080,7 @@ with st.sidebar:
         if st.button("🚪 QUIT", key="nav_quit", use_container_width=True):
             db_save(st.session_state.user_name, st.session_state.user_theme)
             st.query_params.clear()
+            components.html("<script>localStorage.removeItem('infiniteverse_user');</script>", height=0)
             for _k in list(st.session_state.keys()):
                 del st.session_state[_k]
             st.rerun()
