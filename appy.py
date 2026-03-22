@@ -1267,7 +1267,7 @@ if "gold" not in st.session_state:
 # ─────────────────────────────────────────────────────────────────────────────
 # ── AUTO-RELOAD ON REFRESH via query params ──────────────────────────────────
 if st.session_state.user_name is None:
-    _qp_name = st.query_params.get("u", "")
+    _qp_name = st.experimental_get_query_params().get("u", [""])[0]
     if _qp_name:
         _auto_save = None
         _sb_auto = get_supabase()
@@ -1575,7 +1575,7 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                                     st.session_state.world_data  = _result["data"]
                                     st.session_state.vibe_color  = _result["data"].get("color","#FFD700")
                                     st.session_state.user_theme  = _sv_theme
-                                    st.query_params.from_dict({"u": _sv_name.lower()})
+                                    st.experimental_set_query_params(u=_sv_name.lower())
                                     st.toast(f"✅ Welcome back! {_sv_theme} loaded.", icon="🌌")
                                     st.rerun()
                                 else:
@@ -1920,7 +1920,7 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                         _mode_kw = existing.get("game_mode","chill") or "chill"
                         _theme_kw = (saved_theme or "infinitepower").lower().strip().replace(" ","_")[:30]
                         _skw = f"{clean_name.lower()}_{_theme_kw}_{_mode_kw}"
-                        st.query_params.from_dict({"u": clean_name.lower()})
+                        st.experimental_set_query_params(u=clean_name.lower())
                         st.toast(f"✅ Welcome back, {clean_name}! Progress loaded.", icon="🌌")
                         st.rerun()
                     else:
@@ -2068,7 +2068,7 @@ with st.sidebar:
     with _sq2:
         if st.button("🚪 QUIT", key="nav_quit", use_container_width=True):
             db_save(st.session_state.user_name, st.session_state.user_theme)
-            st.query_params.clear()
+            st.experimental_set_query_params()
             for _k in list(st.session_state.keys()):
                 del st.session_state[_k]
             st.rerun()
