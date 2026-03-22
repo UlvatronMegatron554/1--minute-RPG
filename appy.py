@@ -1548,9 +1548,16 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                             _all_saves = []
                             if _sb:
                                 try:
-                                    # Fetch ALL saves and filter by email client-side
                                     _lr = _sb.table("players").select("*").execute()
-                                    _all_saves = [r for r in (_lr.data or []) if r.get("email","").lower().strip().strip("_") == _clean_ret_email]
+                                    # Filter by email AND deduplicate by user_name+theme+mode
+                                    _seen = set()
+                                    for _row in (_lr.data or []):
+                                        _re = _row.get("email","").lower().strip().strip("_")
+                                        if _re == _clean_ret_email:
+                                            _dedup_key = f"{_row.get('user_name','')}_{_row.get('theme','')}_{_row.get('game_mode','')}"
+                                            if _dedup_key not in _seen:
+                                                _seen.add(_dedup_key)
+                                                _all_saves.append(_row)
                                 except: pass
                             if not _all_saves:
                                 st.error("❌ No account found with that email.")
@@ -1572,7 +1579,7 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                                     st.session_state.world_data  = _result["data"]
                                     st.session_state.vibe_color  = _result["data"].get("color","#FFD700")
                                     st.session_state.user_theme  = _sv_theme
-                                    st.query_params["u"] = _sv_name.lower()
+                                    st.query_params.from_dict({"u": _sv_name.lower()})
                                     st.toast(f"✅ Welcome back! {_sv_theme} loaded.", icon="🌌")
                                     st.rerun()
                                 else:
@@ -1917,8 +1924,7 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                         _mode_kw = existing.get("game_mode","chill") or "chill"
                         _theme_kw = (saved_theme or "infinitepower").lower().strip().replace(" ","_")[:30]
                         _skw = f"{clean_name.lower()}_{_theme_kw}_{_mode_kw}"
-                        st.query_params["u"]  = clean_name.lower()
-                        st.query_params["sk"] = _skw
+                        st.query_params.from_dict({"u": clean_name.lower()})
                         st.toast(f"✅ Welcome back, {clean_name}! Progress loaded.", icon="🌌")
                         st.rerun()
                     else:
@@ -1965,7 +1971,6 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                     _theme_kn = (display_name or "infinitepower").lower().strip().replace(" ","_")[:30]
                     _skn = f"{clean_name.lower()}_{_theme_kn}_{_mode_kn}"
                     st.query_params["u"]  = clean_name.lower()
-                    st.query_params["sk"] = _skn
                     st.rerun()
 
     # ── 7 FIDGET SPINNERS (base64 embedded) ──
