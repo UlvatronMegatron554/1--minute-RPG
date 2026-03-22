@@ -1278,16 +1278,20 @@ if st.session_state.user_name is None:
             except: pass
         if _auto_save:
             _auto_theme = _auto_save.get("theme","") or DEFAULT_UNIVERSE_NAME
-            _auto_vibe  = _auto_save.get("vibe_color","#FFD700") or "#FFD700"
+            with st.spinner(f"🌌 Loading {_auto_theme}..."):
+                _auto_result = resolve_universe(_auto_theme)
+            if not _auto_result or not _auto_result.get("safe"):
+                _auto_result = {"safe": True, "data": DEFAULT_UNIVERSE.copy()}
+            _auto_data = _auto_result["data"]
             st.session_state.user_name  = _auto_save.get("user_name", _qp_name)
             st.session_state.game_mode  = _auto_save.get("game_mode","chill") or "chill"
-            st.session_state.vibe_color = _auto_vibe
+            st.session_state.vibe_color = _auto_data.get("color","#FFD700")
             st.session_state.user_theme = _auto_theme
-            st.session_state.world_data = DEFAULT_UNIVERSE.copy()
-            st.session_state.world_data["color"] = _auto_vibe
+            st.session_state.world_data = _auto_data
             db_apply(_auto_save)
-            st.session_state.vibe_color = _auto_vibe
+            st.session_state.vibe_color = _auto_data.get("color","#FFD700")
             st.session_state.user_theme = _auto_theme
+            st.session_state.world_data = _auto_data
             st.rerun()
 
 if st.session_state.user_name is None:
