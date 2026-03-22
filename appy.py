@@ -1279,20 +1279,25 @@ if st.session_state.user_name is None:
                     if _r2.data: _auto_save = _r2.data[0]
                 except: pass
         if _auto_save:
-            _auto_theme = _auto_save.get("theme","") or DEFAULT_UNIVERSE_NAME
-            _auto_result = resolve_universe(_auto_theme)
-            if not _auto_result["safe"]: _auto_result = {"safe":True,"data":DEFAULT_UNIVERSE.copy()}
-            st.session_state.user_name   = _qp_name
-            st.session_state.game_mode   = _auto_save.get("game_mode","chill") or "chill"
-            st.session_state.world_data  = _auto_result["data"]
-            st.session_state.vibe_color  = _auto_result["data"].get("color","#FFD700")
-            st.session_state.user_theme  = _auto_theme
-            db_apply(_auto_save)
-            st.session_state.world_data  = _auto_result["data"]
-            st.session_state.vibe_color  = _auto_result["data"].get("color","#FFD700")
-            st.session_state.user_theme  = _auto_theme
-            st.toast("✅ Progress restored!", icon="🌌")
-            st.rerun()
+            try:
+                _auto_theme = _auto_save.get("theme","") or DEFAULT_UNIVERSE_NAME
+                _auto_result = resolve_universe(_auto_theme)
+                if not _auto_result or not _auto_result.get("safe"):
+                    _auto_result = {"safe":True,"data":DEFAULT_UNIVERSE.copy()}
+                _auto_data = _auto_result.get("data", DEFAULT_UNIVERSE.copy())
+                st.session_state.user_name   = _auto_save.get("user_name", _qp_name)
+                st.session_state.game_mode   = _auto_save.get("game_mode","chill") or "chill"
+                st.session_state.world_data  = _auto_data
+                st.session_state.vibe_color  = _auto_data.get("color","#FFD700")
+                st.session_state.user_theme  = _auto_theme
+                db_apply(_auto_save)
+                st.session_state.world_data  = _auto_data
+                st.session_state.vibe_color  = _auto_data.get("color","#FFD700")
+                st.session_state.user_theme  = _auto_theme
+                st.toast("✅ Progress restored!", icon="🌌")
+                st.rerun()
+            except Exception as _ae:
+                pass  # Silent fail — show login screen
 
 if st.session_state.user_name is None:
     st.markdown("""<style>
@@ -2699,7 +2704,7 @@ canvas{{border-radius:50%;box-shadow:0 0 50px rgba(255,215,0,0.4);display:block;
 #pointer{{position:absolute;right:-14px;top:50%;transform:translateY(-50%);
   width:0;height:0;border-top:18px solid transparent;border-bottom:18px solid transparent;border-left:28px solid #FFD700;
   filter:drop-shadow(0 0 8px #FFD700);}}
-#spinBtn{{margin-top:20px;padding:16px 56px;font-size:22px;font-weight:bold;letter-spacing:3px;
+#spinBtn{{display:none!important;margin-top:20px;padding:16px 56px;font-size:22px;font-weight:bold;letter-spacing:3px;
   background:linear-gradient(135deg,#FFD700,#FF8C00);border:none;border-radius:14px;
   cursor:pointer;color:#000;box-shadow:0 0 30px rgba(255,215,0,0.55);transition:all 0.15s;
   font-family:'Bebas Neue',monospace;}}
@@ -2804,7 +2809,7 @@ document.getElementById('spinBtn').onclick=function(){{
 
     # ── Python SPIN button — server-side, navigation-proof ──────────────────
     if can_spin:
-        if st.button("⚡ CLICK TO CLAIM YOUR SPIN PRIZE", key="python_spin_btn", use_container_width=True):
+        if st.button("🎰 SPIN IT ⚡", key="python_spin_btn", use_container_width=True):
             _now_s = _dt.datetime.now()
             _last_s = st.session_state.get("last_spin_time")
             _spin_ok = True
