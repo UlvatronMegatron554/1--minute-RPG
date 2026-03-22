@@ -877,7 +877,7 @@ def db_apply(row: dict):
     st.session_state.last_spin_time   = row.get("last_spin_time")
     st.session_state.spins_left       = int(row.get("spins_left", 0))
     st.session_state.game_mode        = row.get("game_mode", "chill")
-    st.session_state.vibe_color       = row.get("vibe_color", "#FFD700")
+    # vibe_color is set by resolve_universe, not db_apply
     st.session_state.bg_color         = row.get("bg_color", "#ffffff")
     st.session_state.micro_timer_seconds = int(row.get("micro_timer_seconds", 30))
     try: st.session_state.story_log   = json.loads(row.get("story_log", "[]"))
@@ -1567,11 +1567,15 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                                         _result = resolve_universe(_sv_theme)
                                     if not _result["safe"]:
                                         _result = {"safe":True,"data":DEFAULT_UNIVERSE.copy()}
+                                    with st.spinner(f"🌌 Loading {_sv_theme}..."):
+                                        _result2 = resolve_universe(_sv_theme)
+                                    if not _result2 or not _result2.get("safe"):
+                                        _result2 = {"safe":True,"data":DEFAULT_UNIVERSE.copy()}
                                     db_apply(_sv)
                                     st.session_state.user_name   = _sv_name
                                     st.session_state.game_mode   = _sv.get("game_mode","chill") or "chill"
-                                    st.session_state.world_data  = _result["data"]
-                                    st.session_state.vibe_color  = _result["data"].get("color","#FFD700")
+                                    st.session_state.world_data  = _result2["data"]
+                                    st.session_state.vibe_color  = _result2["data"].get("color","#FFD700")
                                     st.session_state.user_theme  = _sv_theme
                                     st.query_params["u"] = _sv_name.lower()
                                     st.rerun()
