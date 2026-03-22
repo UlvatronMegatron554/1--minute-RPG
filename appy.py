@@ -1581,7 +1581,6 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                                     st.session_state.user_theme  = _sv_theme
                                     st.query_params["u"] = _sv_name.lower()
                                     st.toast(f"✅ Welcome back! {_sv_theme} loaded.", icon="🌌")
-                                    st.rerun()
                                 else:
                                     st.session_state.ret_saves_found = _all_saves
                                     st.session_state.ret_name = _all_saves[0].get("user_name","")
@@ -1925,6 +1924,7 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                         _theme_kw = (saved_theme or "infinitepower").lower().strip().replace(" ","_")[:30]
                         _skw = f"{clean_name.lower()}_{_theme_kw}_{_mode_kw}"
                         st.query_params["u"] = clean_name.lower()
+                        st.session_state.gw_page = 1
                         st.toast(f"✅ Welcome back, {clean_name}! Progress loaded.", icon="🌌")
                         st.rerun()
                     else:
