@@ -1270,34 +1270,27 @@ if st.session_state.user_name is None:
     _qp = st.query_params
     _qp_name = _qp.get("u", "")
     if _qp_name:
-        with st.spinner("🌌 Restoring your progress..."):
-            _auto_save = None
-            _sb_auto = get_supabase()
-            if _sb_auto:
-                try:
-                    _r2 = _sb_auto.table("players").select("*").eq("user_name", _qp_name.lower().strip()).execute()
-                    if _r2.data: _auto_save = _r2.data[0]
-                except: pass
-        if _auto_save:
+        _auto_save = None
+        _sb_auto = get_supabase()
+        if _sb_auto:
             try:
-                _auto_theme = _auto_save.get("theme","") or DEFAULT_UNIVERSE_NAME
-                _auto_result = resolve_universe(_auto_theme)
-                if not _auto_result or not _auto_result.get("safe"):
-                    _auto_result = {"safe":True,"data":DEFAULT_UNIVERSE.copy()}
-                _auto_data = _auto_result.get("data", DEFAULT_UNIVERSE.copy())
-                st.session_state.user_name   = _auto_save.get("user_name", _qp_name)
-                st.session_state.game_mode   = _auto_save.get("game_mode","chill") or "chill"
-                st.session_state.world_data  = _auto_data
-                st.session_state.vibe_color  = _auto_data.get("color","#FFD700")
-                st.session_state.user_theme  = _auto_theme
-                db_apply(_auto_save)
-                st.session_state.world_data  = _auto_data
-                st.session_state.vibe_color  = _auto_data.get("color","#FFD700")
-                st.session_state.user_theme  = _auto_theme
-                st.toast("✅ Progress restored!", icon="🌌")
-                st.rerun()
-            except Exception as _ae:
-                pass  # Silent fail — show login screen
+                _r2 = _sb_auto.table("players").select("*").eq("user_name", _qp_name.lower().strip()).execute()
+                if _r2.data: _auto_save = _r2.data[0]
+            except: pass
+        if _auto_save:
+            _auto_theme = _auto_save.get("theme","") or DEFAULT_UNIVERSE_NAME
+            # Use cached world_data from DB if available, skip resolve_universe
+            _auto_vibe = _auto_save.get("vibe_color","#FFD700") or "#FFD700"
+            st.session_state.user_name   = _auto_save.get("user_name", _qp_name)
+            st.session_state.game_mode   = _auto_save.get("game_mode","chill") or "chill"
+            st.session_state.vibe_color  = _auto_vibe
+            st.session_state.user_theme  = _auto_theme
+            st.session_state.world_data  = DEFAULT_UNIVERSE.copy()
+            st.session_state.world_data["color"] = _auto_vibe
+            db_apply(_auto_save)
+            st.session_state.vibe_color  = _auto_vibe
+            st.session_state.user_theme  = _auto_theme
+            st.rerun()
 
 if st.session_state.user_name is None:
     st.markdown("""<style>
@@ -1555,7 +1548,8 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                             _all_saves = []
                             if _sb:
                                 try:
-                                    _lr = _sb.table("players").select("*").neq("email","").execute()
+                                    # Fetch ALL saves and filter by email client-side
+                                    _lr = _sb.table("players").select("*").execute()
                                     _all_saves = [r for r in (_lr.data or []) if r.get("email","").lower().strip().strip("_") == _clean_ret_email]
                                 except: pass
                             if not _all_saves:
