@@ -2108,9 +2108,6 @@ with st.sidebar:
     if st.button("💾 SAVE NOW", key="manual_save"):
         db_save(st.session_state.user_name, st.session_state.user_theme)
         st.success("✅ Saved!")
-    if st.button("💾 SAVE NOW", key="manual_save"):
-        db_save(st.session_state.user_name, st.session_state.user_theme)
-        st.success("✅ Saved!")
     st.write("---")
     st.markdown("<p style='color:#ffffff;font-weight:bold'>🚨 RESET</p>", unsafe_allow_html=True)
     reset_input = st.text_input("Type RESET to confirm:", key="reset_confirm_input", placeholder="RESET")
