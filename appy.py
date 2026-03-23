@@ -1305,20 +1305,23 @@ html,body,[data-testid="stAppViewContainer"],[data-testid="stApp"]{background:#0
 .block-container{padding:0 1rem 2rem!important;max-width:100%!important;}
 [data-testid="stAppViewContainer"]{
 background:
-  radial-gradient(ellipse 90% 70% at 15% 10%,  rgba(0,80,255,0.75)  0%,transparent 50%),
-  radial-gradient(ellipse 80% 65% at 88% 8%,   rgba(0,180,255,0.55) 0%,transparent 50%),
-  radial-gradient(ellipse 70% 60% at 50% 105%, rgba(0,60,200,0.65)  0%,transparent 55%),
-  radial-gradient(ellipse 60% 55% at 92% 60%,  rgba(0,120,255,0.50) 0%,transparent 50%),
-  radial-gradient(ellipse 65% 50% at 8%  70%,  rgba(0,40,180,0.55)  0%,transparent 50%),
-  radial-gradient(ellipse 50% 45% at 55% 45%,  rgba(0,100,220,0.40) 0%,transparent 45%),
+  radial-gradient(ellipse 90% 70% at 15% 10%,  rgba(120,0,255,0.80) 0%,transparent 50%),
+  radial-gradient(ellipse 80% 65% at 88% 8%,   rgba(255,0,200,0.65) 0%,transparent 50%),
+  radial-gradient(ellipse 70% 60% at 50% 105%, rgba(0,200,255,0.65) 0%,transparent 55%),
+  radial-gradient(ellipse 60% 55% at 92% 60%,  rgba(255,140,0,0.50) 0%,transparent 50%),
+  radial-gradient(ellipse 65% 50% at 8%  70%,  rgba(0,255,120,0.45) 0%,transparent 50%),
+  radial-gradient(ellipse 55% 45% at 55% 45%,  rgba(255,0,80,0.40)  0%,transparent 45%),
+  radial-gradient(ellipse 45% 40% at 30% 80%,  rgba(0,80,255,0.50)  0%,transparent 45%),
+  radial-gradient(ellipse 40% 35% at 70% 20%,  rgba(200,255,0,0.35) 0%,transparent 45%),
   #000510!important;
-animation:neonblue-breathe 6s ease-in-out infinite alternate!important;
+animation:cosmic-epic 12s ease-in-out infinite alternate!important;
 }
-@keyframes neonblue-breathe{
-  0%  {filter:brightness(0.65) saturate(1.0);}
-  40% {filter:brightness(1.30) saturate(1.6);}
-  70% {filter:brightness(1.10) saturate(1.4);}
-  100%{filter:brightness(0.75) saturate(1.1);}
+@keyframes cosmic-epic{
+  0%  {filter:brightness(0.70) saturate(1.2) hue-rotate(0deg);}
+  25% {filter:brightness(1.20) saturate(1.8) hue-rotate(20deg);}
+  50% {filter:brightness(1.10) saturate(1.6) hue-rotate(-15deg);}
+  75% {filter:brightness(1.30) saturate(2.0) hue-rotate(10deg);}
+  100%{filter:brightness(0.80) saturate(1.3) hue-rotate(-5deg);}
 }
 [data-testid="stAppViewContainer"]::before{
   content:'';position:fixed;top:0;left:0;width:100%;height:100%;
@@ -1393,9 +1396,9 @@ animation:neonblue-breathe 6s ease-in-out infinite alternate!important;
 .stTextInput>div>div>input:focus{border-color:#FFD700!important;box-shadow:0 0 20px rgba(255,215,0,0.25)!important;}
 .stTextInput label{font-family:Space Mono,monospace!important;font-size:11px!important;letter-spacing:3px!important;color:#ffffff!important;text-transform:uppercase!important;}
 div.stButton>button{
-  background:linear-gradient(135deg,#7B00FF 0%,#FF0080 35%,#FF6600 65%,#00DDFF 100%)!important;
+  background:linear-gradient(135deg,#7B68EE,#FF00FF,#00FFFF)!important;
   background-size:300% 300%!important;
-  border:2px solid rgba(255,255,255,0.25)!important;
+  border:none!important;
   color:#ffffff!important;
   font-family:Bebas Neue,sans-serif!important;
   font-size:24px!important;
@@ -1424,7 +1427,7 @@ div.stButton>button:hover{
   filter:brightness(1.5) saturate(1.8)!important;
   box-shadow:0 0 70px rgba(255,0,200,0.9),0 0 130px rgba(0,200,255,0.5),inset 0 0 30px rgba(255,255,255,0.15)!important;
 }
-div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rgba(255,215,0,0.7)!important;}
+
 </style>
 <div class="scanline-wrap"><div class="scanline"></div></div>
 <div class="star-field"></div>
@@ -2102,6 +2105,12 @@ with st.sidebar:
     st.markdown("<p style='color:#ffffff;font-weight:bold'>🌈 THEME COLOR</p>", unsafe_allow_html=True)
     new_tc = st.color_picker("", value=st.session_state.vibe_color, key="theme_picker", label_visibility="collapsed")
     if new_tc != st.session_state.vibe_color: st.session_state.vibe_color = new_tc; st.rerun()
+    if st.button("💾 SAVE NOW", key="manual_save"):
+        db_save(st.session_state.user_name, st.session_state.user_theme)
+        st.success("✅ Saved!")
+    if st.button("💾 SAVE NOW", key="manual_save"):
+        db_save(st.session_state.user_name, st.session_state.user_theme)
+        st.success("✅ Saved!")
     st.write("---")
     st.markdown("<p style='color:#ffffff;font-weight:bold'>🚨 RESET</p>", unsafe_allow_html=True)
     reset_input = st.text_input("Type RESET to confirm:", key="reset_confirm_input", placeholder="RESET")
