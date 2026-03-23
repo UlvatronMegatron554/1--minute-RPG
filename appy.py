@@ -2020,6 +2020,12 @@ div.stButton>button:hover{
 # ─────────────────────────────────────────────────────────────────────────────
 # MAIN APP SETUP
 # ─────────────────────────────────────────────────────────────────────────────
+# ── ENSURE QUERY PARAMS ARE ALWAYS SET WHEN LOGGED IN ──
+if st.session_state.user_name and not st.query_params.get("u"):
+    st.query_params["u"] = st.session_state.user_name.lower().strip()
+    st.query_params["t"] = (st.session_state.get("user_theme", "") or "").strip()
+    st.query_params["m"] = (st.session_state.get("game_mode", "chill") or "chill").strip()
+
 MODE   = st.session_state.game_mode or "chill"
 wd     = st.session_state.world_data
 BG     = st.session_state.get("bg_color","#ffffff")
