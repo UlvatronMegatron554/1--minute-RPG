@@ -2864,18 +2864,6 @@ document.getElementById('spinBtn').onclick=function(){{
             else:
                 st.error("⏰ Cooldown not finished!")
     # ── Cooldown validation ───────────────────────────────────────────────────
-    if st.session_state.get("spinner_result"):
-        _now = _dt.datetime.now()
-        _last = st.session_state.get("last_spin_time")
-        _valid_spin = True
-        if _last:
-            try:
-                _elapsed = (_now - _dt.datetime.fromisoformat(_last)).total_seconds()
-                if _elapsed < 21600:
-                    _valid_spin = False
-                    st.session_state.spinner_result = None
-            except: pass
-
     # ── Last prize result display ─────────────────────────────────────────────
     if st.session_state.spinner_result:
         p  = st.session_state.spinner_result
