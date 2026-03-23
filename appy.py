@@ -1551,10 +1551,15 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                             if _sb:
                                 try:
                                     _lr = _sb.table("players").select("*").execute()
+                                    _seen_keys = set()
                                     for _row in (_lr.data or []):
                                         _re = _row.get("email","").lower().strip().strip("_")
                                         if _re == _clean_ret_email:
-                                            _all_saves.append(_row)
+                                            # Deduplicate by theme+mode
+                                            _key = (_row.get("theme","") or "") + "|" + (_row.get("game_mode","") or "")
+                                            if _key not in _seen_keys:
+                                                _seen_keys.add(_key)
+                                                _all_saves.append(_row)
                                 except: pass
                             if not _all_saves:
                                 st.error("❌ No account found with that email.")
@@ -1563,19 +1568,16 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                                     _sv = _all_saves[0]
                                     _sv_theme = _sv.get("theme","") or DEFAULT_UNIVERSE_NAME
                                     _sv_name  = _sv.get("user_name","")
-                                    with st.spinner(f"🌌 Welcome back! Loading {_sv_theme}..."):
-                                        _result = resolve_universe(_sv_theme)
-                                    if not _result["safe"]:
-                                        _result = {"safe":True,"data":DEFAULT_UNIVERSE.copy()}
                                     with st.spinner(f"🌌 Loading {_sv_theme}..."):
-                                        _result2 = resolve_universe(_sv_theme)
-                                    if not _result2 or not _result2.get("safe"):
-                                        _result2 = {"safe":True,"data":DEFAULT_UNIVERSE.copy()}
+                                        _result = resolve_universe(_sv_theme)
+                                    if not _result or not _result.get("safe"):
+                                        _result = {"safe":True,"data":DEFAULT_UNIVERSE.copy()}
+                                    _rdata = _result["data"]
                                     db_apply(_sv)
                                     st.session_state.user_name   = _sv_name
                                     st.session_state.game_mode   = _sv.get("game_mode","chill") or "chill"
-                                    st.session_state.world_data  = _result2["data"]
-                                    st.session_state.vibe_color  = _result2["data"].get("color","#FFD700")
+                                    st.session_state.world_data  = _rdata
+                                    st.session_state.vibe_color  = _rdata.get("color","#FFD700")
                                     st.session_state.user_theme  = _sv_theme
                                     st.query_params["u"] = _sv_name.lower()
                                     st.rerun()
@@ -3112,4 +3114,3 @@ if view == "main":
                 st.balloons()
                 st.success(f"✅ {rarity_label}! +{earned:.1f} {currency} · 🔥 {new_streak}-day streak · +{spins} spins{near_miss_display}")
                 time.sleep(1); st.rerun()    # ── MISSION TIMER — side buttons small, center button big ─────────────────
-    
