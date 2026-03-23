@@ -1285,6 +1285,9 @@ if st.session_state.user_name is None:
             _auto_data = _auto_result["data"]
             st.session_state.user_name  = _auto_save.get("user_name", _qp_name)
             st.session_state.game_mode  = _auto_save.get("game_mode","chill") or "chill"
+            _asaved_color = _auto_save.get("vibe_color","")
+            if _asaved_color and __import__('re').match(r'^#[0-9A-Fa-f]{6}$', _asaved_color):
+                _auto_data["color"] = _asaved_color
             st.session_state.vibe_color = _auto_data.get("color","#FFD700")
             st.session_state.user_theme = _auto_theme
             st.session_state.world_data = _auto_data
@@ -1573,6 +1576,10 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                                     if not _result or not _result.get("safe"):
                                         _result = {"safe":True,"data":DEFAULT_UNIVERSE.copy()}
                                     _rdata = _result["data"]
+                                    # Use saved color from DB if available
+                                    _saved_color = _sv.get("vibe_color","")
+                                    if _saved_color and re.match(r'^#[0-9A-Fa-f]{6}$', _saved_color):
+                                        _rdata["color"] = _saved_color
                                     db_apply(_sv)
                                     st.session_state.user_name   = _sv_name
                                     st.session_state.game_mode   = _sv.get("game_mode","chill") or "chill"
@@ -1748,12 +1755,13 @@ div.stButton>button:hover{transform:scale(1.02)!important;box-shadow:0 0 60px rg
                         st.session_state.user_name     = _ret_name
                         st.session_state.password_hash = st.session_state.ret_pass_hash
                         st.session_state.game_mode     = _sv_mode
-                        st.session_state.world_data    = _result["data"]
-                        st.session_state.vibe_color    = _result["data"].get("color","#FFD700")
-                        st.session_state.user_theme    = _sv_theme
+                        _mdata = _result["data"]
+                        _msaved_color = _sv.get("vibe_color","")
+                        if _msaved_color and __import__('re').match(r'^#[0-9A-Fa-f]{6}$', _msaved_color):
+                            _mdata["color"] = _msaved_color
                         db_apply(_sv)
-                        st.session_state.world_data    = _result["data"]
-                        st.session_state.vibe_color    = _result["data"].get("color","#FFD700")
+                        st.session_state.world_data    = _mdata
+                        st.session_state.vibe_color    = _mdata.get("color","#FFD700")
                         st.session_state.user_theme    = _sv_theme
                         st.session_state.password_hash = st.session_state.ret_pass_hash
                         st.session_state.ret_saves_found = None
