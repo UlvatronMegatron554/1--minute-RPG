@@ -1601,8 +1601,6 @@ div.stButton>button:hover{
                                     st.query_params["u"] = _sv_name.lower()
                                     st.query_params["t"] = (st.session_state.user_theme or "").strip()
                                     st.query_params["m"] = (st.session_state.game_mode or "chill").strip()
-                                    st.query_params["t"] = (st.session_state.user_theme or "").strip()
-                                    st.query_params["m"] = (st.session_state.game_mode or "chill").strip()
                                     st.rerun()
                                 else:
                                     st.session_state.ret_saves_found = _all_saves
@@ -1950,8 +1948,6 @@ div.stButton>button:hover{
                         st.query_params["u"] = clean_name.lower()
                         st.query_params["t"] = (st.session_state.user_theme or "").strip()
                         st.query_params["m"] = (st.session_state.game_mode or "chill").strip()
-                        st.query_params["t"] = (st.session_state.user_theme or "").strip()
-                        st.query_params["m"] = (st.session_state.game_mode or "chill").strip()
                         st.session_state.gw_page = 1
                         st.toast(f"✅ Welcome back, {clean_name}! Progress loaded.", icon="🌌")
                         st.rerun()
@@ -1999,8 +1995,6 @@ div.stButton>button:hover{
                     _theme_kn = (display_name or "infinitepower").lower().strip().replace(" ","_")[:30]
                     _skn = f"{clean_name.lower()}_{_theme_kn}_{_mode_kn}"
                     st.query_params["u"]  = clean_name.lower()
-                    st.query_params["t"] = (st.session_state.user_theme or "").strip()
-                    st.query_params["m"] = (st.session_state.game_mode or "chill").strip()
                     st.query_params["t"] = (st.session_state.user_theme or "").strip()
                     st.query_params["m"] = (st.session_state.game_mode or "chill").strip()
                     st.rerun()
