@@ -1598,6 +1598,7 @@ div.stButton>button:hover{
                                     st.session_state.world_data  = _rdata
                                     st.session_state.vibe_color  = _rdata.get("color","#FFD700")
                                     st.session_state.user_theme  = _sv_theme
+                                    st.toast(f"DEBUG: Setting query params for {_sv_name}", icon="🔍")
                                     st.query_params["u"] = _sv_name.lower()
                                     st.query_params["t"] = (st.session_state.user_theme or "").strip()
                                     st.query_params["m"] = (st.session_state.game_mode or "chill").strip()
@@ -1945,6 +1946,7 @@ div.stButton>button:hover{
                         _mode_kw = existing.get("game_mode","chill") or "chill"
                         _theme_kw = (saved_theme or "infinitepower").lower().strip().replace(" ","_")[:30]
                         _skw = f"{clean_name.lower()}_{_theme_kw}_{_mode_kw}"
+                        st.toast(f"DEBUG: Setting query params for {clean_name}", icon="🔍")
                         st.query_params["u"] = clean_name.lower()
                         st.query_params["t"] = (st.session_state.user_theme or "").strip()
                         st.query_params["m"] = (st.session_state.game_mode or "chill").strip()
@@ -1994,6 +1996,7 @@ div.stButton>button:hover{
                     _mode_kn = st.session_state.get("game_mode","chill") or "chill"
                     _theme_kn = (display_name or "infinitepower").lower().strip().replace(" ","_")[:30]
                     _skn = f"{clean_name.lower()}_{_theme_kn}_{_mode_kn}"
+                    st.toast(f"DEBUG: Setting query params for {clean_name}", icon="🔍")
                     st.query_params["u"]  = clean_name.lower()
                     st.query_params["t"] = (st.session_state.user_theme or "").strip()
                     st.query_params["m"] = (st.session_state.game_mode or "chill").strip()
