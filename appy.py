@@ -1268,6 +1268,8 @@ if "gold" not in st.session_state:
 # ── AUTO-RELOAD ON REFRESH via query params ──────────────────────────────────
 if st.session_state.user_name is None:
     _qp_name = st.query_params.get("u", "")
+    _qp_theme = st.query_params.get("t", "")
+    _qp_mode = st.query_params.get("m", "")
     if _qp_name:
         _auto_save = None
         _sb_auto = get_supabase()
@@ -1286,7 +1288,7 @@ if st.session_state.user_name is None:
             st.session_state.user_name  = _auto_save.get("user_name", _qp_name)
             st.session_state.game_mode  = _auto_save.get("game_mode","chill") or "chill"
             _asaved_color = _auto_save.get("vibe_color","")
-            if _asaved_color and __import__('re').match(r'^#[0-9A-Fa-f]{6}$', _asaved_color):
+            if _asaved_color and re.match(r'^#[0-9A-Fa-f]{6}$', _asaved_color):
                 _auto_data["color"] = _asaved_color
             st.session_state.vibe_color = _auto_data.get("color","#FFD700")
             st.session_state.user_theme = _auto_theme
@@ -1295,6 +1297,18 @@ if st.session_state.user_name is None:
             st.session_state.vibe_color = _auto_data.get("color","#FFD700")
             st.session_state.user_theme = _auto_theme
             st.session_state.world_data = _auto_data
+            st.rerun()
+        elif _qp_theme:
+            with st.spinner(f"🌌 Reloading {_qp_theme}..."):
+                _fallback_result = resolve_universe(_qp_theme)
+            if not _fallback_result or not _fallback_result.get("safe"):
+                _fallback_result = {"safe": True, "data": DEFAULT_UNIVERSE.copy()}
+            _fb_data = _fallback_result["data"]
+            st.session_state.user_name = _qp_name
+            st.session_state.game_mode = _qp_mode or "chill"
+            st.session_state.world_data = _fb_data
+            st.session_state.vibe_color = _fb_data.get("color","#FFD700")
+            st.session_state.user_theme = _qp_theme
             st.rerun()
 
 if st.session_state.user_name is None:
@@ -1585,6 +1599,10 @@ div.stButton>button:hover{
                                     st.session_state.vibe_color  = _rdata.get("color","#FFD700")
                                     st.session_state.user_theme  = _sv_theme
                                     st.query_params["u"] = _sv_name.lower()
+                                    st.query_params["t"] = (st.session_state.user_theme or "").strip()
+                                    st.query_params["m"] = (st.session_state.game_mode or "chill").strip()
+                                    st.query_params["t"] = (st.session_state.user_theme or "").strip()
+                                    st.query_params["m"] = (st.session_state.game_mode or "chill").strip()
                                     st.rerun()
                                 else:
                                     st.session_state.ret_saves_found = _all_saves
@@ -1930,6 +1948,10 @@ div.stButton>button:hover{
                         _theme_kw = (saved_theme or "infinitepower").lower().strip().replace(" ","_")[:30]
                         _skw = f"{clean_name.lower()}_{_theme_kw}_{_mode_kw}"
                         st.query_params["u"] = clean_name.lower()
+                        st.query_params["t"] = (st.session_state.user_theme or "").strip()
+                        st.query_params["m"] = (st.session_state.game_mode or "chill").strip()
+                        st.query_params["t"] = (st.session_state.user_theme or "").strip()
+                        st.query_params["m"] = (st.session_state.game_mode or "chill").strip()
                         st.session_state.gw_page = 1
                         st.toast(f"✅ Welcome back, {clean_name}! Progress loaded.", icon="🌌")
                         st.rerun()
@@ -1977,6 +1999,10 @@ div.stButton>button:hover{
                     _theme_kn = (display_name or "infinitepower").lower().strip().replace(" ","_")[:30]
                     _skn = f"{clean_name.lower()}_{_theme_kn}_{_mode_kn}"
                     st.query_params["u"]  = clean_name.lower()
+                    st.query_params["t"] = (st.session_state.user_theme or "").strip()
+                    st.query_params["m"] = (st.session_state.game_mode or "chill").strip()
+                    st.query_params["t"] = (st.session_state.user_theme or "").strip()
+                    st.query_params["m"] = (st.session_state.game_mode or "chill").strip()
                     st.rerun()
 
     # ── 7 FIDGET SPINNERS (base64 embedded) ──
