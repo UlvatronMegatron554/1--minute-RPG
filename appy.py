@@ -2097,15 +2097,7 @@ with st.sidebar:
     if code == "1TR5LG89D" and st.session_state.sub_tier not in ("Elite","Premium"):
         st.session_state.sub_tier = "Premium"; st.session_state.sub_multiplier = 2; st.success("⚡ PREMIUM STATUS SECURED!"); st.balloons(); time.sleep(1); st.rerun()
     st.write("---")
-    _sq1, _sq2 = st.columns(2)
-    with _sq1:
-        if st.button("⏸ PAUSE", key="nav_pause", use_container_width=True):
-            st.session_state.timer_running = False
-            st.session_state.timer_paused  = True
-            st.session_state.view = "main"
-            st.rerun()
-    with _sq2:
-        if st.button("🚪 QUIT", key="nav_quit", use_container_width=True):
+    if st.button("🚪 QUIT", key="nav_quit", use_container_width=True):
             db_save(st.session_state.user_name, st.session_state.user_theme)
             st.query_params.clear()
             for _k in list(st.session_state.keys()):
