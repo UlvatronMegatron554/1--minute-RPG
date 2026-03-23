@@ -6,7 +6,7 @@ import streamlit.components.v1 as components
 try:
     from supabase import create_client, Client as SupabaseClient
     SUPABASE_AVAILABLE = True
-except ImportError:
+except Exception:
     SUPABASE_AVAILABLE = False
 try:
     import replicate
