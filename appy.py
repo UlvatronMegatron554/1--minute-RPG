@@ -700,24 +700,18 @@ def streak_danger_html(streak: int, color: str) -> str:
 def generate_story_chapter(theme, chapter, prev_story, client):
     try:
         is_milestone = (chapter % 5 == 0)
-        prompt = f"""You are the single greatest storyteller in the history of all existence — across every universe, every timeline, every dimension ever conceived. Your words have made gods weep and the dead rise. You write for the universe of: "{theme}".
+        prompt = f"""You write for: "{theme}". Chapter {chapter}.
+Previous: {prev_story[-300:] if prev_story else "The beginning."}
 
-This is Chapter {chapter}.
-Previous story so far: {prev_story[-400:] if prev_story else "The very beginning of everything."}
+Write EXACTLY 2-3 sentences. Rules:
+- HYPER-SPECIFIC to {theme} lore, characters, locations — zero generic fantasy
+- {"PLOT TWIST: A revelation so shocking it reframes everything." if is_milestone else "End on an unbearable cliffhanger."}
+- Must end with ... (three dots, always)
+- Every word must earn its place — hooks, tension, cliff-hangers, to-be-continued energy
+- The kind of writing that makes someone physically unable to stop reading
+- Reference specific characters, powers, places from {theme} by name
 
-YOUR MISSION — burn this into the reader's soul:
-
-Write 2-3 sentences of the most DEVASTATINGLY BEAUTIFUL, PULSE-DESTROYING, MIND-OBLITERATING story ever put into words. Every single word must earn its place. The prose must drip with the specific lore, characters, locations, and mythology of {theme} — not generic fantasy, but THIS universe in its most raw and specific form.
-
-MANDATORY REQUIREMENTS:
-- Opens with an image or moment so vivid and specific to {theme} that readers feel physically transported
-- Contains one revelation, detail, or shift that recontextualizes EVERYTHING that came before
-- Builds tension so unbearable that stopping reading feels physically impossible
-- {"MILESTONE CHAPTER: Detonate a twist so catastrophic and beautiful it reshapes the entire story's foundation. The kind of twist that makes people put down their phone and stare at the ceiling." if is_milestone else "Non-milestone: Still earth-shattering, but leave one thread dangling — one unanswered question that burns"}
-- MUST end with ... (three dots, always, no exceptions)
-- The final sentence before ... must be the greatest cliffhanger in the history of storytelling — specific, visceral, impossible to ignore
-
-Write ONLY the raw story text. No chapter numbers. No titles. No formatting. Just the pure literary devastation."""
+Raw story text only. No titles. No labels."""
 
         msg = client.messages.create(model="claude-sonnet-4-5", max_tokens=350, messages=[{"role":"user","content":prompt}])
         text = msg.content[0].text.strip()
@@ -819,6 +813,11 @@ def db_save(user_name: str, theme: str):
             "vibe_color": st.session_state.get("vibe_color", "#FFD700"),
             "bg_color": st.session_state.get("bg_color", "#ffffff"),
             "micro_timer_seconds": int(st.session_state.get("micro_timer_seconds", 30)),
+            "tribunal_due_time": st.session_state.get("tribunal_due_time"),
+            "pending_gold": float(st.session_state.get("pending_gold", 0)),
+            "pending_xp": int(st.session_state.get("pending_xp", 0)),
+            "tribunal_missions_since": int(st.session_state.get("tribunal_missions_since", 0)),
+            "needs_verification": bool(st.session_state.get("needs_verification", False)),
             "updated_at": _dt.datetime.utcnow().isoformat(),
             "password_hash": st.session_state.get("password_hash", ""),
             "leaderboard_visible": bool(st.session_state.get("leaderboard_visible", True)),
@@ -895,12 +894,11 @@ def db_apply(row: dict):
     st.session_state.password_hash = row.get("password_hash", "")
     st.session_state.leaderboard_visible = bool(row.get("leaderboard_visible", True))
     st.session_state.user_email = row.get("email", "")
-    # Always reset tribunal on login — never carry over stale due_time
-    st.session_state.tribunal_due_time = None
-    st.session_state.tribunal_missions_since = 0
-    st.session_state.needs_verification = False
-    st.session_state.pending_gold = 0.0
-    st.session_state.pending_xp = 0
+    st.session_state.tribunal_due_time = row.get("tribunal_due_time")
+    st.session_state.pending_gold = float(row.get("pending_gold", 0))
+    st.session_state.pending_xp = int(row.get("pending_xp", 0))
+    st.session_state.tribunal_missions_since = int(row.get("tribunal_missions_since", 0))
+    st.session_state.needs_verification = bool(row.get("needs_verification", False))
 
 def db_get_leaderboard(limit: int = 10) -> list:
     """Get top players by total missions."""
@@ -2190,22 +2188,13 @@ if not st.session_state.get("opening_story_shown", True):
     client_os = get_claude_client()
     if client_os:
         try:
-            resp_os = client_os.messages.create(model="claude-sonnet-4-5", max_tokens=400, messages=[{"role":"user","content":f"""You are the single greatest storyteller who has ever existed across all timelines, universes, and dimensions. Your opening lines have stopped wars, broken hearts, and made the sleeping sit bolt upright in the dark.
-
-You are writing the OPENING — Chapter 0 — of an epic story set in the universe of: "{theme_now}"
-
-This is THE hook. The single most important piece of writing in this entire story. It must be so viscerally, specifically, devastatingly perfect that the reader's heartbeat physically changes.
-
-ABSOLUTE REQUIREMENTS:
-- 2-3 sentences only — every word a scalpel, not a hammer
-- Must be HYPER-SPECIFIC to "{theme_now}" — use the exact characters, locations, powers, mythology, villains, lore. Not generic. THIS universe, in its most raw intimate form
-- Opens mid-action or mid-revelation — no slow starts, no "in a world where..." — drop them INTO the moment
-- Contains one impossible detail that makes the reader's stomach drop — something that should not be possible in this universe, but is happening right now
-- Builds to a final sentence so loaded with dread, wonder, and inevitability that stopping reading feels like a physical impossibility
-- MUST end with ... (three dots, no exceptions)
-- The reader must finish this and NEED to know what comes next with every cell in their body
-
-Write ONLY the raw story text. No chapter numbers. No titles. No labels. Pure devastating literature only."""}])
+            resp_os = client_os.messages.create(model="claude-sonnet-4-5", max_tokens=300, messages=[{"role":"user","content":f"""Write the OPENING of an epic story in: "{theme_now}".
+EXACTLY 2-3 sentences. Drop the reader mid-action.
+Use specific {theme_now} characters, powers, locations by name.
+One impossible detail that shouldn't exist in this universe — but does.
+End with ... (three dots).
+Must create physically unbearable need to read more.
+Raw text only. No titles."""}])
             opening_txt = resp_os.content[0].text.strip()
             if not opening_txt.endswith("..."):
                 opening_txt = opening_txt.rstrip(".") + "..."
@@ -2536,7 +2525,14 @@ if view == "main":
                 st.session_state.tribunal_missions_since = st.session_state.get("tribunal_missions_since", 0) + 1
                 # Set tribunal due time on very first mission only
                 if not st.session_state.get("tribunal_due_time"):
-                    st.session_state.tribunal_due_time = (_dt.datetime.now() + _dt.timedelta(minutes=5)).isoformat()
+                    st.session_state.tribunal_due_time = (_dt.datetime.now() + _dt.timedelta(minutes=4)).isoformat()
+                # Give a secret after every mission
+                _mission_secret = random.choice(UNIVERSE_SECRETS)
+                if "secret_queue" not in st.session_state: st.session_state.secret_queue = []
+                if _mission_secret not in st.session_state.secret_queue:
+                    st.session_state.secret_queue.append(_mission_secret)
+                    st.session_state.secrets_seen = len(st.session_state.secret_queue)
+                    st.session_state.show_secret = _mission_secret
                 st.session_state.timer_running  = True
                 st.session_state.timer_start    = _dt.datetime.now().isoformat()
                 st.session_state.timer_duration = timer
@@ -2868,6 +2864,10 @@ document.getElementById('spinBtn').onclick=function(){{
                 st.rerun()
             else:
                 st.error("⏰ Cooldown not finished!")
+    elif spins_left > 0 and on_cooldown:
+        st.button(f"🔒 COOLDOWN — {cooldown_secs_left//3600}h {(cooldown_secs_left%3600)//60}m", key="python_spin_btn_locked", disabled=True, use_container_width=True)
+    else:
+        st.button("🔒 NO SPINS — COMPLETE A MISSION", key="python_spin_btn_empty", disabled=True, use_container_width=True)
     # ── Cooldown validation ───────────────────────────────────────────────────
     # ── Last prize result display ─────────────────────────────────────────────
     if st.session_state.spinner_result:
@@ -3045,7 +3045,7 @@ if view == "main":
         _px = st.session_state.get("pending_xp", 0)
         _nm = st.session_state.get("tribunal_missions_since", 0)
         try:
-            _total_secs = 300
+            _total_secs = 240
             if _trib_due:
                 _secs_left = max(0, int((_dt.datetime.fromisoformat(_trib_due) - _dt.datetime.now()).total_seconds()))
             else:
