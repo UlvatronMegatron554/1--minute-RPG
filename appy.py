@@ -700,18 +700,15 @@ def streak_danger_html(streak: int, color: str) -> str:
 def generate_story_chapter(theme, chapter, prev_story, client):
     try:
         is_milestone = (chapter % 5 == 0)
-        prompt = f"""You write for: "{theme}". Chapter {chapter}.
-Previous: {prev_story[-300:] if prev_story else "The beginning."}
-
-Write EXACTLY 2-3 sentences. Rules:
-- HYPER-SPECIFIC to {theme} lore, characters, locations — zero generic fantasy
-- {"PLOT TWIST: A revelation so shocking it reframes everything." if is_milestone else "End on an unbearable cliffhanger."}
-- Must end with ... (three dots, always)
-- Every word must earn its place — hooks, tension, cliff-hangers, to-be-continued energy
-- The kind of writing that makes someone physically unable to stop reading
-- Reference specific characters, powers, places from {theme} by name
-
-Raw story text only. No titles. No labels."""
+        prompt = f"""Universe: "{theme}". Chapter {chapter}.
+Previous: {prev_story[-200:] if prev_story else "Beginning."}
+STRICT RULES — VIOLATING ANY = FAILURE:
+- MAXIMUM 3 sentences. If you write 4+ sentences you have FAILED.
+- Each sentence MAX 25 words.
+- {"TWIST: One shocking revelation that changes everything." if is_milestone else "CLIFFHANGER: End on something impossible and unresolved."}
+- Use SPECIFIC {theme} character names, locations, powers.
+- End with ... (three dots, mandatory)
+- No titles. No labels. Raw text only."""
 
         msg = client.messages.create(model="claude-sonnet-4-5", max_tokens=350, messages=[{"role":"user","content":prompt}])
         text = msg.content[0].text.strip()
@@ -894,11 +891,11 @@ def db_apply(row: dict):
     st.session_state.password_hash = row.get("password_hash", "")
     st.session_state.leaderboard_visible = bool(row.get("leaderboard_visible", True))
     st.session_state.user_email = row.get("email", "")
-    st.session_state.tribunal_due_time = row.get("tribunal_due_time")
+    st.session_state.tribunal_due_time = None
     st.session_state.pending_gold = float(row.get("pending_gold", 0))
     st.session_state.pending_xp = int(row.get("pending_xp", 0))
     st.session_state.tribunal_missions_since = int(row.get("tribunal_missions_since", 0))
-    st.session_state.needs_verification = bool(row.get("needs_verification", False))
+    st.session_state.needs_verification = False
 
 def db_get_leaderboard(limit: int = 10) -> list:
     """Get top players by total missions."""
@@ -2188,13 +2185,12 @@ if not st.session_state.get("opening_story_shown", True):
     client_os = get_claude_client()
     if client_os:
         try:
-            resp_os = client_os.messages.create(model="claude-sonnet-4-5", max_tokens=300, messages=[{"role":"user","content":f"""Write the OPENING of an epic story in: "{theme_now}".
-EXACTLY 2-3 sentences. Drop the reader mid-action.
-Use specific {theme_now} characters, powers, locations by name.
-One impossible detail that shouldn't exist in this universe — but does.
+            resp_os = client_os.messages.create(model="claude-sonnet-4-5", max_tokens=200, messages=[{"role":"user","content":f"""Universe: "{theme_now}". Opening chapter.
+MAXIMUM 3 sentences. Each MAX 25 words.
+Drop reader mid-action using specific {theme_now} characters and locations.
+One detail that should be impossible in this universe.
 End with ... (three dots).
-Must create physically unbearable need to read more.
-Raw text only. No titles."""}])
+Raw text only."""}])
             opening_txt = resp_os.content[0].text.strip()
             if not opening_txt.endswith("..."):
                 opening_txt = opening_txt.rstrip(".") + "..."
@@ -2477,12 +2473,6 @@ if view == "main":
             st.session_state.timer_running = False
             st.session_state.timer_paused  = False
             st.session_state.timer_start   = None
-            _mission_secret = random.choice(UNIVERSE_SECRETS)
-            if "secret_queue" not in st.session_state: st.session_state.secret_queue = []
-            if _mission_secret not in st.session_state.secret_queue:
-                st.session_state.secret_queue.append(_mission_secret)
-                st.session_state.secrets_seen = len(st.session_state.secret_queue)
-                st.session_state.show_secret = _mission_secret
             st.rerun()
         else:
             time.sleep(1); st.rerun()
