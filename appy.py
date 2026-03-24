@@ -892,9 +892,9 @@ def db_apply(row: dict):
     st.session_state.leaderboard_visible = bool(row.get("leaderboard_visible", True))
     st.session_state.user_email = row.get("email", "")
     st.session_state.tribunal_due_time = None
-    st.session_state.pending_gold = 0.0
-    st.session_state.pending_xp = 0
-    st.session_state.tribunal_missions_since = 0
+    st.session_state.pending_gold = float(row.get("pending_gold", 0))
+    st.session_state.pending_xp = int(row.get("pending_xp", 0))
+    st.session_state.tribunal_missions_since = int(row.get("tribunal_missions_since", 0))
     st.session_state.needs_verification = False
 
 def db_get_leaderboard(limit: int = 10) -> list:
@@ -2870,9 +2870,6 @@ document.getElementById('spinBtn').onclick=function(){{
                         letter-spacing:4px;margin-bottom:8px'>{p["prize"]["label"]}</div>
             <div style='font-family:Space Mono,monospace;font-size:13px;color:#fff'>{p["msg"]}</div>
         </div>""", unsafe_allow_html=True)
-        if st.button("✅ DISMISS", key="dismiss_spin_result"):
-            st.session_state.spinner_result = None
-            st.rerun()
 
 elif view == "abilities":
     st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>🛡️ YOUR ABILITIES</h2>", unsafe_allow_html=True)
@@ -3065,17 +3062,7 @@ if view == "main":
             <div style='font-family:Space Mono,monospace;font-size:10px;color:#555;margin-top:4px'>When bar hits 100% — upload a screenshot of your work to unlock all rewards</div>
         </div>""", unsafe_allow_html=True)
     
-    _show_tribunal = False
-    if st.session_state.needs_verification and st.session_state.get("tribunal_missions_since", 0) > 0:
-        _trib_due_str = st.session_state.get("tribunal_due_time")
-        if _trib_due_str:
-            try:
-                _show_tribunal = _dt.datetime.now() > _dt.datetime.fromisoformat(_trib_due_str)
-            except:
-                _show_tribunal = False
-        if st.session_state.get("timer_running", False) or st.session_state.get("timer_paused", False):
-            _show_tribunal = False
-    if _show_tribunal:
+    if st.session_state.needs_verification and _trib_overdue and not st.session_state.get("timer_running", False) and not st.session_state.get("timer_paused", False) and st.session_state.get("tribunal_missions_since", 0) > 0:
         st.markdown("---")
         st.markdown(f"<h2 style='text-align:center;font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:4px'>⚖️ THE TRIBUNAL</h2>", unsafe_allow_html=True)
         _, col, _ = st.columns([1,2,1])
