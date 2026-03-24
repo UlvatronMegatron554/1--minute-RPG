@@ -2477,6 +2477,12 @@ if view == "main":
             st.session_state.timer_running = False
             st.session_state.timer_paused  = False
             st.session_state.timer_start   = None
+            _mission_secret = random.choice(UNIVERSE_SECRETS)
+            if "secret_queue" not in st.session_state: st.session_state.secret_queue = []
+            if _mission_secret not in st.session_state.secret_queue:
+                st.session_state.secret_queue.append(_mission_secret)
+                st.session_state.secrets_seen = len(st.session_state.secret_queue)
+                st.session_state.show_secret = _mission_secret
             st.rerun()
         else:
             time.sleep(1); st.rerun()
@@ -2524,15 +2530,8 @@ if view == "main":
                 st.session_state.pending_xp    = st.session_state.get("pending_xp", 0) + int(base * 10)
                 st.session_state.tribunal_missions_since = st.session_state.get("tribunal_missions_since", 0) + 1
                 # Set tribunal due time on very first mission only
-                if not st.session_state.get("tribunal_due_time"):
+                if not st.session_state.get("tribunal_due_time") or st.session_state.get("tribunal_missions_since", 0) == 0:
                     st.session_state.tribunal_due_time = (_dt.datetime.now() + _dt.timedelta(minutes=4)).isoformat()
-                # Give a secret after every mission
-                _mission_secret = random.choice(UNIVERSE_SECRETS)
-                if "secret_queue" not in st.session_state: st.session_state.secret_queue = []
-                if _mission_secret not in st.session_state.secret_queue:
-                    st.session_state.secret_queue.append(_mission_secret)
-                    st.session_state.secrets_seen = len(st.session_state.secret_queue)
-                    st.session_state.show_secret = _mission_secret
                 st.session_state.timer_running  = True
                 st.session_state.timer_start    = _dt.datetime.now().isoformat()
                 st.session_state.timer_duration = timer
@@ -3073,7 +3072,7 @@ if view == "main":
             <div style='font-family:Space Mono,monospace;font-size:10px;color:#555;margin-top:4px'>When bar hits 100% — upload a screenshot of your work to unlock all rewards</div>
         </div>""", unsafe_allow_html=True)
     
-    if st.session_state.needs_verification and _trib_overdue and not st.session_state.get("timer_running", False):
+    if st.session_state.needs_verification and _trib_overdue and not st.session_state.get("timer_running", False) and not st.session_state.get("timer_paused", False) and st.session_state.get("tribunal_missions_since", 0) > 0:
         st.markdown("---")
         st.markdown(f"<h2 style='text-align:center;font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:4px'>⚖️ THE TRIBUNAL</h2>", unsafe_allow_html=True)
         _, col, _ = st.columns([1,2,1])
