@@ -707,7 +707,7 @@ Previous story so far: {prev_story[-400:] if prev_story else "The very beginning
 
 YOUR MISSION — burn this into the reader's soul:
 
-Write 3-4 sentences of the most DEVASTATINGLY BEAUTIFUL, PULSE-DESTROYING, MIND-OBLITERATING story ever put into words. Every single word must earn its place. The prose must drip with the specific lore, characters, locations, and mythology of {theme} — not generic fantasy, but THIS universe in its most raw and specific form.
+Write 2-3 sentences of the most DEVASTATINGLY BEAUTIFUL, PULSE-DESTROYING, MIND-OBLITERATING story ever put into words. Every single word must earn its place. The prose must drip with the specific lore, characters, locations, and mythology of {theme} — not generic fantasy, but THIS universe in its most raw and specific form.
 
 MANDATORY REQUIREMENTS:
 - Opens with an image or moment so vivid and specific to {theme} that readers feel physically transported
@@ -2197,7 +2197,7 @@ You are writing the OPENING — Chapter 0 — of an epic story set in the univer
 This is THE hook. The single most important piece of writing in this entire story. It must be so viscerally, specifically, devastatingly perfect that the reader's heartbeat physically changes.
 
 ABSOLUTE REQUIREMENTS:
-- 3-4 sentences only — every word a scalpel, not a hammer
+- 2-3 sentences only — every word a scalpel, not a hammer
 - Must be HYPER-SPECIFIC to "{theme_now}" — use the exact characters, locations, powers, mythology, villains, lore. Not generic. THIS universe, in its most raw intimate form
 - Opens mid-action or mid-revelation — no slow starts, no "in a world where..." — drop them INTO the moment
 - Contains one impossible detail that makes the reader's stomach drop — something that should not be possible in this universe, but is happening right now
@@ -2824,10 +2824,7 @@ document.getElementById('spinBtn').onclick=function(){{
       startCountdown(COOLDOWN);
       requestAnimationFrame(idle);
       // Tell Python the spin happened via URL param
-      var url = new URL(window.parent.location.href);
-      url.searchParams.set('spin_idx', idx);
-      url.searchParams.set('spin_ts', Date.now());
-      window.parent.history.replaceState(null,'',url.toString());
+
     }}
   }}
   requestAnimationFrame(anim);
@@ -2853,12 +2850,20 @@ document.getElementById('spinBtn').onclick=function(){{
                 st.session_state.spins_left = max(0, st.session_state.get("spins_left",1) - 1)
                 st.session_state.spinner_wins = st.session_state.get("spinner_wins",0) + 1
                 st.session_state.spinner_result = {"prize": _prize, "msg": f"You won: {_prize['label']}!"}
-                if _prize.get("type") == "gold":
-                    st.session_state.gold += float(_prize.get("value", 0))
-                elif _prize.get("type") == "xp":
-                    st.session_state.xp += int(_prize.get("value", 0))
-                elif _prize.get("type") == "spins":
-                    st.session_state.spins_left += int(_prize.get("value", 1))
+                _pt = _prize.get("type", "nothing")
+                if _pt == "gold_mult":
+                    st.session_state.gold += st.session_state.gold * (_prize["value"] - 1)
+                elif _pt == "gold_flat":
+                    st.session_state.gold += float(_prize["value"])
+                elif _pt == "egg_rare" or _pt == "egg_epic":
+                    st.session_state.incubator_eggs += int(_prize["value"])
+                elif _pt == "ability":
+                    if _prize["value"] == "shield":
+                        st.session_state.shield_bought = True
+                    elif _prize["value"] == "booster":
+                        st.session_state.booster_bought = True
+                elif _pt == "story_twist":
+                    st.session_state.story_twist_pending = True
                 db_save(st.session_state.user_name, st.session_state.user_theme)
                 st.rerun()
             else:
@@ -3073,7 +3078,7 @@ if view == "main":
         st.markdown(f"<h2 style='text-align:center;font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:4px'>⚖️ THE TRIBUNAL</h2>", unsafe_allow_html=True)
         _, col, _ = st.columns([1,2,1])
         with col:
-            st.info(f"Upload proof of work to claim **{st.session_state.pending_gold:.1f} {currency}**")
+            st.info(f"Upload proof of work to claim **{st.session_state.pending_gold:.1f} {currency}** + a 🔮 Universe Secret + 📖 Story Chapter + 🎁 Loot Box")
             uploaded = st.file_uploader("PROOF OF LABOR:", key="proof_upload")
             if uploaded and st.button("⚡ SUBMIT FOR JUDGMENT", key="submit_proof"):
                 base_gold = st.session_state.pending_gold
