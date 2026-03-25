@@ -2683,30 +2683,24 @@ elif view == "spinner":
     on_cooldown = cooldown_secs_left > 0
     can_spin    = spins_left > 0 and not on_cooldown
 
-    # ── Live 6-hour countdown (shows immediately, ticks every second) ─────────
+    # ── Status display ────────────────────────────────────────────────────────
     if on_cooldown:
         components.html(f"""<div style="text-align:center;padding:16px;background:#0a0808;
                 border:2px solid #FF8800;border-radius:14px;">
-            <div style="font-family:'Bebas Neue',monospace;font-size:28px;color:#FF8800;
-                        letter-spacing:3px" id="lbl">
+            <div style="font-family:monospace;font-size:28px;color:#FF8800;letter-spacing:3px" id="lbl">
                 ⏰ NEXT SPIN IN: <span id="val">--:--:--</span>
             </div>
-            <div style="font-family:'Space Mono',monospace;font-size:11px;color:#666;margin-top:6px">
+            <div style="font-family:monospace;font-size:11px;color:#666;margin-top:6px">
                 {spins_left} spin(s) banked · 6h cooldown after each spin
             </div>
         </div>
         <script>
         var r={cooldown_secs_left};
         (function tick(){{
-            if(r<=0){{
-                document.getElementById('val').textContent='READY NOW!';
-                document.getElementById('lbl').style.color='#00FF44';
-                return;
-            }}
+            if(r<=0){{document.getElementById('val').textContent='READY NOW!';document.getElementById('lbl').style.color='#00FF44';return;}}
             var h=Math.floor(r/3600),m=Math.floor((r%3600)/60),s=r%60;
-            document.getElementById('val').textContent=
-                String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
-            r--; setTimeout(tick,1000);
+            document.getElementById('val').textContent=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+            r--;setTimeout(tick,1000);
         }})();
         </script>""", height=80)
     elif can_spin:
@@ -2714,8 +2708,6 @@ elif view == "spinner":
             border:2px solid #00FF44;border-radius:14px;margin:4px 0'>
             <div style='font-family:Bebas Neue,sans-serif;font-size:26px;color:#00FF44;letter-spacing:3px'>
                 ✅ {spins_left} SPIN(S) READY</div>
-            <div style='font-family:Space Mono,monospace;font-size:11px;color:#555;margin-top:5px'>
-                Locked for 6 hours after spinning</div>
         </div>""", unsafe_allow_html=True)
     else:
         st.markdown(f"""<div style='text-align:center;padding:14px;background:#0a0a0a;
@@ -2724,52 +2716,37 @@ elif view == "spinner":
                 🔒 COMPLETE A MISSION TO EARN SPINS</div>
         </div>""", unsafe_allow_html=True)
 
-    # ── Live prize wheel + SPIN IT — everything in one component ────────────────
+    # ── Build JS data ─────────────────────────────────────────────────────────
     prize_labels = json.dumps([p["label"] for p in SPINNER_PRIZES])
     prize_colors = json.dumps([p["color"] for p in SPINNER_PRIZES])
     prize_emojis = json.dumps([p["emoji"] for p in SPINNER_PRIZES])
-    prize_types  = json.dumps([p["type"]  for p in SPINNER_PRIZES])
-    prize_values = json.dumps([p["value"] for p in SPINNER_PRIZES])
     can_spin_js  = "true" if can_spin else "false"
     _land_idx = st.session_state.get("spinner_landing_index", -1)
-    cooldown_label = f"LOCKED — {cooldown_secs_left//3600}h {(cooldown_secs_left%3600)//60}m REMAINING" if on_cooldown else "COMPLETE A MISSION TO EARN SPINS"
+
+    # ── WHEEL + AUTO-SPIN ANIMATION ──────────────────────────────────────────
     components.html(f"""
 <style>
 *{{box-sizing:border-box;margin:0;padding:0;}}
-body{{background:transparent;display:flex;flex-direction:column;align-items:center;padding:12px 0;font-family:'Space Mono',monospace;}}
+body{{background:transparent;display:flex;flex-direction:column;align-items:center;padding:12px 0;font-family:monospace;}}
 #wrap{{position:relative;width:420px;height:420px;}}
 canvas{{border-radius:50%;box-shadow:0 0 50px rgba(255,215,0,0.4);display:block;}}
 #pointer{{position:absolute;right:-14px;top:50%;transform:translateY(-50%);
   width:0;height:0;border-top:18px solid transparent;border-bottom:18px solid transparent;border-left:28px solid #FFD700;
   filter:drop-shadow(0 0 8px #FFD700);}}
-#spinBtn{{display:none!important;margin-top:20px;padding:16px 56px;font-size:22px;font-weight:bold;letter-spacing:3px;
-  background:linear-gradient(135deg,#FFD700,#FF8C00);border:none;border-radius:14px;
-  cursor:pointer;color:#000;box-shadow:0 0 30px rgba(255,215,0,0.55);transition:all 0.15s;
-  font-family:'Bebas Neue',monospace;}}
-#spinBtn:disabled{{opacity:0.35;cursor:not-allowed;background:#2a2a2a;color:#555;box-shadow:none;
-  font-size:16px;padding:14px 24px;letter-spacing:2px;}}
-#spinBtn:hover:not(:disabled){{transform:scale(1.07);box-shadow:0 0 55px rgba(255,215,0,0.9);}}
-#spinBtn:active:not(:disabled){{transform:scale(0.96);}}
 #result{{margin-top:14px;font-size:21px;color:#FFD700;letter-spacing:2px;text-align:center;
   min-height:28px;font-weight:bold;}}
-#ctimer{{display:none;margin-top:12px;font-family:'Bebas Neue',monospace;font-size:28px;
-  color:#FF8800;text-align:center;letter-spacing:3px;text-shadow:0 0 20px #FF880066;}}
 </style>
 <div id="wrap">
   <canvas id="wh" width="420" height="420"></canvas>
   <div id="pointer"></div>
 </div>
-<button id="spinBtn" {"disabled" if not can_spin else ""}>{("🎰 SPIN IT" if can_spin else "🔒 " + cooldown_label)}</button>
 <div id="result"></div>
-<div id="ctimer"></div>
 <script>
 const labels={prize_labels}, colors={prize_colors}, emojis={prize_emojis};
-const canSpin={can_spin_js};
-const autoLand={_land_idx};
 const cv=document.getElementById('wh'), ctx=cv.getContext('2d');
 const n=labels.length, arc=2*Math.PI/n;
 let angle=0, spinning=false, idleSpeed=0.006;
-const COOLDOWN=21600;
+const autoLand={_land_idx};
 
 function draw(a){{
   ctx.clearRect(0,0,420,420);
@@ -2794,56 +2771,34 @@ function draw(a){{
   ctx.strokeStyle='#FFD700'; ctx.lineWidth=3; ctx.stroke();
 }}
 
-function idle(){{ if(spinning)return; angle+=idleSpeed; draw(angle); requestAnimationFrame(idle); }}
-idle();
+function doIdle(){{ if(spinning)return; angle+=idleSpeed; draw(angle); requestAnimationFrame(doIdle); }}
 
-function startCountdown(secs){{
-  var el=document.getElementById('ctimer');
-  el.style.display='block';
-  var r=secs;
-  (function tick(){{
-    if(r<=0){{el.textContent='✅ SPIN READY!';el.style.color='#00FF44';return;}}
-    var h=Math.floor(r/3600),m=Math.floor((r%3600)/60),s=r%60;
-    el.textContent='⏰ NEXT SPIN IN: '+String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
-    r--;setTimeout(tick,1000);
-  }})();
-}}
-
-document.getElementById('spinBtn').onclick=function(){{
-  if(!canSpin||spinning)return;
-  spinning=true;
-  this.disabled=true; this.textContent='SPINNING...';
-  document.getElementById('result').textContent='';
-  var extra=(7+Math.random()*5)*2*Math.PI;
-  var dur=3500+Math.random()*1500;
-  var start=performance.now(), sa=angle;
-  function anim(now){{
-    var el=now-start, p=Math.min(el/dur,1), ease=1-Math.pow(1-p,4);
-    angle=sa+extra*ease; draw(angle);
-    if(p<1){{ requestAnimationFrame(anim); }}
+if(autoLand >= 0){{
+  spinning = true;
+  var targetA = (2*Math.PI) - (autoLand + 0.5) * arc;
+  var totalSpin = targetA + (6 + Math.random()*3) * 2 * Math.PI;
+  var dur = 4000;
+  var t0 = performance.now(), a0 = angle;
+  (function spinAnim(now){{
+    var elapsed = now - t0, p = Math.min(elapsed/dur, 1);
+    var ease = 1 - Math.pow(1-p, 4);
+    angle = a0 + totalSpin * ease;
+    draw(angle);
+    if(p < 1){{ requestAnimationFrame(spinAnim); }}
     else{{
-      spinning=false;
-      var norm=((2*Math.PI)-(angle%(2*Math.PI)))%(2*Math.PI);
-      var idx=Math.floor(norm/arc)%n;
-      // Show prize IMMEDIATELY — no countdown
-      var res=document.getElementById('result');
-      res.textContent=emojis[idx]+' '+labels[idx]+' — YOURS!';
-      res.style.color=colors[idx];
-      // Lock button and start live 6h countdown immediately
-      document.getElementById('spinBtn').textContent='🔒 LOCKED';
-      startCountdown(COOLDOWN);
-      requestAnimationFrame(idle);
-      // Tell Python the spin happened via URL param
-
+      spinning = false;
+      var res = document.getElementById('result');
+      res.textContent = emojis[autoLand] + ' ' + labels[autoLand] + ' — YOURS!';
+      res.style.color = colors[autoLand];
+      requestAnimationFrame(doIdle);
     }}
-  }}
-  requestAnimationFrame(anim);
-}};
-</script>""", height=600)
+  }})(performance.now());
+}} else {{
+  doIdle();
+}}
+</script>""", height=520)
 
-
-
-    # ── Python SPIN button — server-side, navigation-proof ──────────────────
+    # ── Python SPIN button ────────────────────────────────────────────────────
     if can_spin:
         if st.button("🎰 SPIN IT ⚡", key="python_spin_btn", use_container_width=True):
             _now_s = _dt.datetime.now()
@@ -2883,9 +2838,9 @@ document.getElementById('spinBtn').onclick=function(){{
         st.button(f"🔒 COOLDOWN — {cooldown_secs_left//3600}h {(cooldown_secs_left%3600)//60}m", key="python_spin_btn_locked", disabled=True, use_container_width=True)
     else:
         st.button("🔒 NO SPINS — COMPLETE A MISSION", key="python_spin_btn_empty", disabled=True, use_container_width=True)
-    # ── Cooldown validation ───────────────────────────────────────────────────
-    # ── Last prize result display ─────────────────────────────────────────────
-    if st.session_state.spinner_result:
+
+    # ── Prize result display ──────────────────────────────────────────────────
+    if st.session_state.get("spinner_result"):
         p  = st.session_state.spinner_result
         rc = p["prize"]["color"]
         st.markdown(f"""<div style='background:linear-gradient(135deg,#0a0a1a,#1a0a2e);
@@ -2900,9 +2855,7 @@ document.getElementById('spinBtn').onclick=function(){{
             st.session_state.spinner_result = None
             st.session_state.spinner_landing_index = -1
             st.rerun()
-    # Clear landing index after showing
-    if st.session_state.get("spinner_landing_index", -1) >= 0 and not st.session_state.get("spinner_result"):
-        st.session_state.spinner_landing_index = -1
+
 
 elif view == "abilities":
     st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>🛡️ YOUR ABILITIES</h2>", unsafe_allow_html=True)
