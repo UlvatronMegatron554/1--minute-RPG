@@ -484,6 +484,27 @@ var allQ=CFG.questions||[];questions=allQ.slice().sort(function(){{return Math.r
 if(!questions.length)questions=[{{q:'What is 2+2?',choices:['A: 3','B: 4','C: 5','D: 6'],answer:'B',hint:'math'}}];
 setTimeout(function(){{STATE='B';showQ();}},2800);
 loop();
+if(autoLand >= 0) {{
+  spinning = true;
+  var targetAngle = (2*Math.PI) - (autoLand + 0.5) * arc;
+  var extra = targetAngle + (5 + Math.random()*3) * 2 * Math.PI;
+  var dur = 3500 + Math.random()*1500;
+  var startT = performance.now(), startA = angle;
+  function autoAnim(now) {{
+    var el = now - startT, p = Math.min(el/dur, 1), ease = 1 - Math.pow(1-p, 4);
+    angle = startA + extra * ease;
+    draw(angle);
+    if(p < 1) {{ requestAnimationFrame(autoAnim); }}
+    else {{
+      spinning = false;
+      var res = document.getElementById('result');
+      res.textContent = emojis[autoLand] + ' ' + labels[autoLand] + ' — YOURS!';
+      res.style.color = colors[autoLand];
+      requestAnimationFrame(idle);
+    }}
+  }}
+  requestAnimationFrame(autoAnim);
+}}
 </script></body></html>"""
 
 
@@ -892,9 +913,9 @@ def db_apply(row: dict):
     st.session_state.leaderboard_visible = bool(row.get("leaderboard_visible", True))
     st.session_state.user_email = row.get("email", "")
     st.session_state.tribunal_due_time = None
-    st.session_state.pending_gold = float(row.get("pending_gold", 0))
-    st.session_state.pending_xp = int(row.get("pending_xp", 0))
-    st.session_state.tribunal_missions_since = int(row.get("tribunal_missions_since", 0))
+    st.session_state.pending_gold = 0.0
+    st.session_state.pending_xp = 0
+    st.session_state.tribunal_missions_since = 0
     st.session_state.needs_verification = False
 
 def db_get_leaderboard(limit: int = 10) -> list:
@@ -2741,6 +2762,7 @@ canvas{{border-radius:50%;box-shadow:0 0 50px rgba(255,215,0,0.4);display:block;
 <script>
 const labels={prize_labels}, colors={prize_colors}, emojis={prize_emojis};
 const canSpin={can_spin_js};
+const autoLand={st.session_state.get("spinner_landing_index", -1)};
 const cv=document.getElementById('wh'), ctx=cv.getContext('2d');
 const n=labels.length, arc=2*Math.PI/n;
 let angle=0, spinning=false, idleSpeed=0.006;
@@ -2835,6 +2857,7 @@ document.getElementById('spinBtn').onclick=function(){{
                 st.session_state.spins_left = max(0, st.session_state.get("spins_left",1) - 1)
                 st.session_state.spinner_wins = st.session_state.get("spinner_wins",0) + 1
                 st.session_state.spinner_result = {"prize": _prize, "msg": f"You won: {_prize['label']}!"}
+                st.session_state.spinner_landing_index = SPINNER_PRIZES.index(_prize)
                 _pt = _prize.get("type", "nothing")
                 if _pt == "gold_mult":
                     st.session_state.gold += st.session_state.gold * (_prize["value"] - 1)
@@ -2870,6 +2893,13 @@ document.getElementById('spinBtn').onclick=function(){{
                         letter-spacing:4px;margin-bottom:8px'>{p["prize"]["label"]}</div>
             <div style='font-family:Space Mono,monospace;font-size:13px;color:#fff'>{p["msg"]}</div>
         </div>""", unsafe_allow_html=True)
+        if st.button("✅ DISMISS", key="dismiss_spin_result"):
+            st.session_state.spinner_result = None
+            st.session_state.spinner_landing_index = -1
+            st.rerun()
+    # Clear landing index after showing
+    if st.session_state.get("spinner_landing_index", -1) >= 0 and not st.session_state.get("spinner_result"):
+        st.session_state.spinner_landing_index = -1
 
 elif view == "abilities":
     st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>🛡️ YOUR ABILITIES</h2>", unsafe_allow_html=True)
@@ -3048,21 +3078,48 @@ if view == "main":
         _bar_str  = "█" * _bar_fill + "░" * (20 - _bar_fill)
         _locked_text = f"+{_pg:.1f} {currency} · +{_px} XP LOCKED" if _pg > 0 else "Start a mission to begin earning"
         _mission_text = f"{_nm} mission{'s' if _nm!=1 else ''} done" if _nm > 0 else "No missions yet"
-        st.markdown(f"""<div style='background:#080808;border:2px solid #FF8800;border-radius:14px;padding:16px 20px;margin:8px 0'>
-            <div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:10px'>
-                <div style='font-family:Bebas Neue,sans-serif;font-size:18px;color:#FF8800;letter-spacing:3px'>
-                    📸 SCREENSHOT PROOF — {_timer_label} LEFT
+        components.html(f"""<div style="background:#080808;border:2px solid #FF8800;border-radius:14px;padding:16px 20px;margin:8px 0">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+                <div style="font-family:monospace;font-size:18px;color:#FF8800;letter-spacing:3px">
+                    📸 SCREENSHOT PROOF — <span id="timer">{_timer_label}</span> LEFT
                 </div>
-                <div style='text-align:right;font-family:Space Mono,monospace;font-size:11px;color:#888'>
-                    {_mission_text}
-                </div>
+                <div style="font-family:monospace;font-size:11px;color:#888">{_mission_text}</div>
             </div>
-            <div style='font-family:Space Mono,monospace;font-size:13px;color:#FF8800;letter-spacing:2px;margin-bottom:6px'>{_bar_str} {int(_elapsed_pct*100)}%</div>
-            <div style='font-family:Bebas Neue,sans-serif;font-size:16px;color:#FFD700'>{_locked_text}</div>
-            <div style='font-family:Space Mono,monospace;font-size:10px;color:#555;margin-top:4px'>When bar hits 100% — upload a screenshot of your work to unlock all rewards</div>
-        </div>""", unsafe_allow_html=True)
+            <div style="background:#333;border-radius:4px;height:16px;overflow:hidden;margin-bottom:6px">
+                <div id="pbar" style="background:#FF8800;height:100%;width:{int(_elapsed_pct*100)}%;transition:width 1s linear;border-radius:4px"></div>
+            </div>
+            <div style="font-family:monospace;font-size:16px;color:#FFD700">{_locked_text}</div>
+            <div style="font-family:monospace;font-size:10px;color:#555;margin-top:4px">When bar hits 100% — upload proof to unlock rewards</div>
+        </div>
+        <script>
+        var secsLeft = {_secs_left};
+        var total = {_total_secs};
+        (function tick() {{
+            if(secsLeft <= 0) {{
+                document.getElementById('timer').textContent = 'READY!';
+                document.getElementById('pbar').style.width = '100%';
+                return;
+            }}
+            var m = Math.floor(secsLeft/60), s = secsLeft % 60;
+            document.getElementById('timer').textContent = m + ':' + String(s).padStart(2,'0');
+            var pct = Math.min(100, ((total - secsLeft) / total) * 100);
+            document.getElementById('pbar').style.width = pct + '%';
+            secsLeft--;
+            setTimeout(tick, 1000);
+        }})();
+        </script>""", height=140)
     
-    if st.session_state.needs_verification and _trib_overdue and not st.session_state.get("timer_running", False) and not st.session_state.get("timer_paused", False) and st.session_state.get("tribunal_missions_since", 0) > 0:
+    _show_tribunal = False
+    if st.session_state.needs_verification and st.session_state.get("tribunal_missions_since", 0) > 0:
+        _trib_due_str = st.session_state.get("tribunal_due_time")
+        if _trib_due_str:
+            try:
+                _show_tribunal = _dt.datetime.now() > _dt.datetime.fromisoformat(_trib_due_str)
+            except:
+                _show_tribunal = False
+        if st.session_state.get("timer_running", False) or st.session_state.get("timer_paused", False):
+            _show_tribunal = False
+    if _show_tribunal:
         st.markdown("---")
         st.markdown(f"<h2 style='text-align:center;font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:4px'>⚖️ THE TRIBUNAL</h2>", unsafe_allow_html=True)
         _, col, _ = st.columns([1,2,1])
