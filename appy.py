@@ -2684,8 +2684,8 @@ elif view == "spinner":
 
     if on_cooldown:
         components.html(f"""<div style="text-align:center;padding:16px;background:#0a0808;border:2px solid #FF8800;border-radius:14px;">
-            <div style="font-family:monospace;font-size:28px;color:#FF8800;letter-spacing:3px" id="lbl">⏰ NEXT SPIN IN: <span id="val">--:--:--</span></div>
-            <div style="font-family:monospace;font-size:11px;color:#666;margin-top:6px">{spins_left} spin(s) banked · 6h cooldown</div>
+            <div style="font-family:monospace;font-size:28px;color:#FF8800;letter-spacing:3px" id="lbl">NEXT SPIN IN: <span id="val">--:--:--</span></div>
+            <div style="font-family:monospace;font-size:11px;color:#666;margin-top:6px">{spins_left} spin(s) banked - 6h cooldown</div>
         </div>
         <script>
         var r={cooldown_secs_left};
@@ -2693,17 +2693,18 @@ elif view == "spinner":
         </script>""", height=80)
     elif can_spin:
         st.markdown(f"""<div style='text-align:center;padding:14px;background:#080f08;border:2px solid #00FF44;border-radius:14px;margin:4px 0'>
-            <div style='font-family:Bebas Neue,sans-serif;font-size:26px;color:#00FF44;letter-spacing:3px'>✅ {spins_left} SPIN(S) READY</div>
+            <div style='font-family:Bebas Neue,sans-serif;font-size:26px;color:#00FF44;letter-spacing:3px'>{spins_left} SPIN(S) READY</div>
         </div>""", unsafe_allow_html=True)
     else:
         st.markdown(f"""<div style='text-align:center;padding:14px;background:#0a0a0a;border:2px solid #333;border-radius:14px;margin:4px 0'>
-            <div style='font-family:Bebas Neue,sans-serif;font-size:26px;color:#555;letter-spacing:3px'>🔒 COMPLETE A MISSION TO EARN SPINS</div>
+            <div style='font-family:Bebas Neue,sans-serif;font-size:26px;color:#555;letter-spacing:3px'>COMPLETE A MISSION TO EARN SPINS</div>
         </div>""", unsafe_allow_html=True)
 
     prize_labels = json.dumps([p["label"] for p in SPINNER_PRIZES])
     prize_colors = json.dumps([p["color"] for p in SPINNER_PRIZES])
     prize_emojis = json.dumps([p["emoji"] for p in SPINNER_PRIZES])
     _land_idx = st.session_state.get("spinner_landing_index", -1)
+    _is_animating = (_land_idx >= 0)
 
     components.html(f"""
 <style>
@@ -2712,7 +2713,7 @@ body{{background:transparent;display:flex;flex-direction:column;align-items:cent
 #wrap{{position:relative;width:420px;height:420px;}}
 canvas{{border-radius:50%;box-shadow:0 0 50px rgba(255,215,0,0.4);display:block;}}
 #pointer{{position:absolute;right:-14px;top:50%;transform:translateY(-50%);width:0;height:0;border-top:18px solid transparent;border-bottom:18px solid transparent;border-left:28px solid #FFD700;filter:drop-shadow(0 0 8px #FFD700);}}
-#result{{margin-top:14px;font-size:21px;color:#FFD700;letter-spacing:2px;text-align:center;min-height:28px;font-weight:bold;}}
+#result{{margin-top:18px;font-size:24px;color:#FFD700;letter-spacing:2px;text-align:center;min-height:32px;font-weight:bold;opacity:0;transition:opacity 0.5s;}}
 </style>
 <div id="wrap">
   <canvas id="wh" width="420" height="420"></canvas>
@@ -2768,18 +2769,23 @@ if(autoLand >= 0){{
     else{{
       spinning = false;
       var res = document.getElementById('result');
-      res.textContent = emojis[autoLand] + ' ' + labels[autoLand] + ' — YOURS!';
+      res.textContent = emojis[autoLand] + ' ' + labels[autoLand] + ' - YOURS!';
       res.style.color = colors[autoLand];
+      res.style.opacity = '1';
       requestAnimationFrame(doIdle);
     }}
   }})(performance.now());
 }} else {{
   doIdle();
 }}
-</script>""", height=520)
+</script>""", height=540)
 
-    if can_spin:
-        if st.button("🎰 SPIN IT ⚡", key="python_spin_btn", use_container_width=True):
+    if _is_animating:
+        if st.button("CLAIM MY PRIZE", key="claim_spin_prize", use_container_width=True):
+            st.session_state.spinner_landing_index = -1
+            st.rerun()
+    elif can_spin:
+        if st.button("SPIN IT", key="python_spin_btn", use_container_width=True):
             _now_s = _dt.datetime.now()
             _last_s = st.session_state.get("last_spin_time")
             _spin_ok = True
@@ -2812,13 +2818,13 @@ if(autoLand >= 0){{
                 db_save(st.session_state.user_name, st.session_state.user_theme)
                 st.rerun()
             else:
-                st.error("⏰ Cooldown not finished!")
+                st.error("Cooldown not finished!")
     elif spins_left > 0 and on_cooldown:
-        st.button(f"🔒 COOLDOWN — {cooldown_secs_left//3600}h {(cooldown_secs_left%3600)//60}m", key="python_spin_btn_locked", disabled=True, use_container_width=True)
+        st.button(f"COOLDOWN - {cooldown_secs_left//3600}h {(cooldown_secs_left%3600)//60}m", key="python_spin_btn_locked", disabled=True, use_container_width=True)
     else:
-        st.button("🔒 NO SPINS — COMPLETE A MISSION", key="python_spin_btn_empty", disabled=True, use_container_width=True)
+        st.button("NO SPINS - COMPLETE A MISSION", key="python_spin_btn_empty", disabled=True, use_container_width=True)
 
-    if st.session_state.get("spinner_result"):
+    if st.session_state.get("spinner_result") and not _is_animating:
         p  = st.session_state.spinner_result
         rc = p["prize"]["color"]
         st.markdown(f"""<div style='background:linear-gradient(135deg,#0a0a1a,#1a0a2e);
@@ -2829,9 +2835,8 @@ if(autoLand >= 0){{
                         letter-spacing:4px;margin-bottom:8px'>{p["prize"]["label"]}</div>
             <div style='font-family:Space Mono,monospace;font-size:13px;color:#fff'>{p["msg"]}</div>
         </div>""", unsafe_allow_html=True)
-        if st.button("✅ DISMISS", key="dismiss_spin_result"):
+        if st.button("DISMISS", key="dismiss_spin_result"):
             st.session_state.spinner_result = None
-            st.session_state.spinner_landing_index = -1
             st.rerun()
 
 
