@@ -1330,823 +1330,395 @@ if st.session_state.user_name is None:
 
 if st.session_state.user_name is None:
     st.markdown("""<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Orbitron:wght@400;700;900&display=swap');
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation: none !important;
-    transition: none !important;
-  }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
 }
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap');
-html,body,[data-testid="stAppViewContainer"],[data-testid="stApp"]{background:#050008!important;color:white!important;}
+html,body,[data-testid="stAppViewContainer"],[data-testid="stApp"]{background:#000!important;color:white!important;}
 [data-testid="stHeader"],[data-testid="stToolbar"],[data-testid="stDecoration"],#MainMenu,footer{display:none!important;}
 .block-container{padding:0 1rem 2rem!important;max-width:100%!important;}
-
-/* ═══════════════════════ BACKGROUND — LIVING NEBULA ═══════════════════════ */
-[data-testid="stAppViewContainer"]{
-background:
-  radial-gradient(ellipse 110% 80% at 50% -10%, rgba(157,0,255,0.80)  0%,transparent 50%),
-  radial-gradient(ellipse 80%  60% at 5%  15%,  rgba(120,0,220,0.90)  0%,transparent 40%),
-  radial-gradient(ellipse 70%  55% at 95% 10%,  rgba(204,0,255,0.70)  0%,transparent 40%),
-  radial-gradient(ellipse 90%  70% at 50% 110%, rgba(100,0,200,0.85)  0%,transparent 50%),
-  radial-gradient(ellipse 55%  50% at 85% 65%,  rgba(180,0,255,0.55)  0%,transparent 40%),
-  radial-gradient(ellipse 60%  45% at 15% 75%,  rgba(80,0,180,0.65)   0%,transparent 40%),
-  radial-gradient(ellipse 45%  40% at 55% 40%,  rgba(255,0,200,0.35)  0%,transparent 35%),
-  radial-gradient(ellipse 40%  35% at 30% 30%,  rgba(140,0,255,0.60)  0%,transparent 35%),
-  radial-gradient(ellipse 35%  30% at 70% 80%,  rgba(200,0,255,0.45)  0%,transparent 30%),
-  radial-gradient(ellipse 30%  25% at 50% 50%,  rgba(238,136,255,0.25) 0%,transparent 30%),
-  #050008!important;
-animation:nebula-shift 16s ease-in-out infinite alternate!important;
-}
-@keyframes nebula-shift{
-  0%  {filter:brightness(0.55) saturate(2.0) hue-rotate(0deg);}
-  10% {filter:brightness(0.85) saturate(2.6) hue-rotate(-8deg);}
-  20% {filter:brightness(1.20) saturate(3.0) hue-rotate(5deg);}
-  30% {filter:brightness(0.90) saturate(2.4) hue-rotate(-12deg);}
-  40% {filter:brightness(1.40) saturate(3.2) hue-rotate(8deg);}
-  50% {filter:brightness(1.10) saturate(2.8) hue-rotate(-5deg);}
-  60% {filter:brightness(1.50) saturate(3.4) hue-rotate(10deg);}
-  70% {filter:brightness(0.95) saturate(2.6) hue-rotate(-8deg);}
-  80% {filter:brightness(1.30) saturate(3.0) hue-rotate(4deg);}
-  90% {filter:brightness(0.75) saturate(2.2) hue-rotate(-6deg);}
-  100%{filter:brightness(0.65) saturate(1.8) hue-rotate(3deg);}
-}
-
-/* ═══════════════════════ STARS — MULTICOLOR PULSING ═══════════════════════ */
-[data-testid="stAppViewContainer"]::before{
-  content:'';position:fixed;top:0;left:0;width:100%;height:100%;
-  background-image:
-    radial-gradient(2px 2px at 5% 12%,  #fff 0%,transparent 100%),
-    radial-gradient(1px 1px at 12% 68%, rgba(0,255,200,0.9) 0%,transparent 100%),
-    radial-gradient(2px 2px at 22% 25%, #fff 0%,transparent 100%),
-    radial-gradient(1px 1px at 30% 90%, rgba(255,0,150,0.8) 0%,transparent 100%),
-    radial-gradient(3px 3px at 38% 42%, rgba(0,180,255,0.9) 0%,transparent 100%),
-    radial-gradient(1px 1px at 45% 78%, #fff 0%,transparent 100%),
-    radial-gradient(2px 2px at 52% 15%, rgba(255,200,0,0.8) 0%,transparent 100%),
-    radial-gradient(1px 1px at 60% 55%, rgba(0,255,120,0.8) 0%,transparent 100%),
-    radial-gradient(2px 2px at 68% 82%, #fff 0%,transparent 100%),
-    radial-gradient(3px 3px at 75% 30%, rgba(255,0,200,0.9) 0%,transparent 100%),
-    radial-gradient(1px 1px at 82% 65%, rgba(0,200,255,0.8) 0%,transparent 100%),
-    radial-gradient(2px 2px at 88% 10%, #fff 0%,transparent 100%),
-    radial-gradient(1px 1px at 93% 48%, rgba(120,255,0,0.7) 0%,transparent 100%),
-    radial-gradient(2px 2px at 17% 50%, rgba(255,100,0,0.7) 0%,transparent 100%),
-    radial-gradient(1px 1px at 55% 35%, rgba(200,0,255,0.8) 0%,transparent 100%),
-    radial-gradient(3px 3px at 42% 92%, rgba(0,255,255,0.9) 0%,transparent 100%);
-  pointer-events:none;z-index:0;
-  animation:stars-breathe 3s ease-in-out infinite alternate;
-}
-@keyframes stars-breathe{
-  0%  {opacity:0.2;filter:hue-rotate(0deg);}
-  33% {opacity:1.0;filter:hue-rotate(20deg);}
-  66% {opacity:0.5;filter:hue-rotate(-15deg);}
-  100%{opacity:0.8;filter:hue-rotate(10deg);}
-}
-
-/* ═══════════════════════ GRID OVERLAY — CYBER ═══════════════════════ */
-[data-testid="stAppViewContainer"]::after{
-  content:'';position:fixed;top:0;left:0;width:100%;height:100%;
-  background:
-    repeating-linear-gradient(0deg,  transparent, transparent 79px, rgba(0,255,200,0.03) 80px),
-    repeating-linear-gradient(90deg, transparent, transparent 79px, rgba(255,0,150,0.03) 80px);
-  pointer-events:none;z-index:0;
-  animation:grid-flicker 8s ease-in-out infinite alternate;
-}
-@keyframes grid-flicker{
-  0%  {opacity:0.1;}
-  30% {opacity:0.7;}
-  50% {opacity:0.3;}
-  70% {opacity:0.9;}
-  100%{opacity:0.2;}
-}
-
-/* ═══════════════════════ ELEMENTS ═══════════════════════ */
-.star-field{width:100%;height:90px;background-image:radial-gradient(2px 2px at 5% 30%,#0ff 0%,transparent 100%),radial-gradient(2px 2px at 18% 70%,#f0a 0%,transparent 100%),radial-gradient(3px 3px at 32% 20%,#fff 0%,transparent 100%),radial-gradient(2px 2px at 47% 85%,#0f8 0%,transparent 100%),radial-gradient(2px 2px at 61% 40%,#fff 0%,transparent 100%),radial-gradient(2px 2px at 75% 65%,#f08 0%,transparent 100%),radial-gradient(3px 3px at 14% 60%,#0ff 0%,transparent 100%),radial-gradient(3px 3px at 70% 35%,#ff0 0%,transparent 100%),radial-gradient(3px 3px at 43% 75%,#0f0 0%,transparent 100%),radial-gradient(3px 3px at 90% 90%,#f0f 0%,transparent 100%);animation:starfield-pulse 2.5s ease-in-out infinite alternate;margin-bottom:8px;}
-@keyframes starfield-pulse{0%{opacity:0.2;transform:scale(1);}50%{opacity:1.0;transform:scale(1.02);}100%{opacity:0.4;transform:scale(1);}}
-
+[data-testid="stAppViewContainer"]{background:#000!important;}
+.star-field{display:none;}
 .scanline-wrap{width:100%;height:4px;overflow:hidden;margin-bottom:16px;}
-.scanline{width:40%;height:4px;background:linear-gradient(90deg,transparent,#00FFD4,#FF00AA,#00CCFF,transparent);animation:scan-sweep 1.8s linear infinite;box-shadow:0 0 30px 8px rgba(0,255,212,0.7),0 0 60px 4px rgba(255,0,170,0.4);}
+.scanline{width:40%;height:4px;background:linear-gradient(90deg,transparent,#FFD700,transparent);animation:scan-sweep 2s linear infinite;box-shadow:0 0 20px 4px rgba(255,215,0,0.6);}
 @keyframes scan-sweep{0%{transform:translateX(-150%);}100%{transform:translateX(400%);}}
-
-.top-badge{background:rgba(0,255,200,0.06);border:1px solid rgba(0,255,200,0.35);border-radius:99px;padding:8px 24px;font-family:Rajdhani,sans-serif;font-size:12px;font-weight:700;letter-spacing:4px;color:#00FFD4;text-transform:uppercase;text-align:center;display:table;margin:0 auto 20px;animation:badge-neon 2.5s ease-in-out infinite alternate;}
-@keyframes badge-neon{0%{box-shadow:0 0 8px rgba(0,255,200,0.2);text-shadow:0 0 8px rgba(0,255,200,0.4);}100%{box-shadow:0 0 40px rgba(0,255,200,0.7),0 0 80px rgba(0,255,200,0.3);text-shadow:0 0 20px rgba(0,255,200,0.9),0 0 40px rgba(0,200,255,0.5);}}
-
-/* ═══════════════════════ TITLE — HOLOGRAPHIC NEON ═══════════════════════ */
-.gw-main-title{
-  font-family:Bebas Neue,sans-serif;
-  font-size:clamp(72px,14vw,150px);
-  text-align:center;letter-spacing:8px;line-height:0.88;
-  background:linear-gradient(90deg,#00FFD4 0%,#00CCFF 15%,#FF00AA 30%,#FFD700 45%,#00FF88 60%,#AA00FF 75%,#00EEFF 90%,#FF0066 100%);
-  background-size:300% 100%;
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  animation:title-holo 6s linear infinite,title-throb 3s ease-in-out infinite alternate;
-  margin-bottom:8px;
-}
-@keyframes title-holo{
-  0%  {background-position:0% 50%;}
-  100%{background-position:300% 50%;}
-}
-@keyframes title-throb{
-  0%  {filter:drop-shadow(0 0 10px rgba(0,255,200,0.6)) drop-shadow(0 0 30px rgba(255,0,170,0.4)) drop-shadow(0 0 60px rgba(0,200,255,0.3));transform:scale(1.0);}
-  100%{filter:drop-shadow(0 0 25px rgba(255,0,170,0.9)) drop-shadow(0 0 60px rgba(0,255,200,0.7)) drop-shadow(0 0 120px rgba(0,100,255,0.5));transform:scale(1.02);}
-}
-
-.gw-subtitle{font-family:Rajdhani,sans-serif;font-size:clamp(13px,2vw,20px);font-weight:700;text-align:center;letter-spacing:6px;color:#ffffff;text-transform:uppercase;margin-bottom:20px;text-shadow:0 0 15px rgba(0,255,200,0.5),0 0 30px rgba(255,0,170,0.3);}
-
-.features-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0 24px;}
-.feature-pill{background:rgba(0,255,200,0.06);border:1px solid rgba(0,255,200,0.25);border-radius:99px;padding:7px 16px;font-family:Rajdhani,sans-serif;font-size:13px;font-weight:600;color:#ffffff;letter-spacing:1px;transition:all 0.3s;}
-.feature-pill:hover{background:rgba(0,255,200,0.15);border-color:rgba(0,255,200,0.6);box-shadow:0 0 20px rgba(0,255,200,0.3);transform:translateY(-2px);}
+.top-badge{background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.4);border-radius:99px;padding:8px 24px;font-family:Space Mono,monospace;font-size:11px;letter-spacing:3px;color:#FFD700;text-transform:uppercase;text-align:center;display:table;margin:0 auto 20px;animation:badge-pulse 3s ease-in-out infinite alternate;position:relative;z-index:5;}
+@keyframes badge-pulse{0%{box-shadow:0 0 10px rgba(255,215,0,0.2);}100%{box-shadow:0 0 40px rgba(255,215,0,0.6);}}
+.gw-main-title{font-family:Bebas Neue,sans-serif;font-size:clamp(72px,14vw,150px);text-align:center;letter-spacing:8px;line-height:0.88;color:#FFD700;animation:title-gold-breathe 4s ease-in-out infinite alternate;margin-bottom:8px;position:relative;z-index:5;}
+@keyframes title-gold-breathe{0%{filter:drop-shadow(0 0 10px rgba(255,215,0,0.7)) drop-shadow(0 0 25px rgba(255,200,0,0.5)) drop-shadow(0 0 50px rgba(255,180,0,0.3));transform:scale(1.0);}
+100%{filter:drop-shadow(0 0 22px rgba(255,235,100,1.0)) drop-shadow(0 0 55px rgba(255,215,0,0.9)) drop-shadow(0 0 110px rgba(255,200,0,0.6));transform:scale(1.018);}}
+.gw-subtitle{font-family:Orbitron,sans-serif;font-size:clamp(12px,1.8vw,18px);text-align:center;letter-spacing:5px;color:#ffffff;text-transform:uppercase;margin-bottom:20px;text-shadow:0 0 20px rgba(255,255,255,0.4);position:relative;z-index:5;}
+.features-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0 24px;position:relative;z-index:5;}
+.feature-pill{background:rgba(255,215,0,0.12);border:1px solid rgba(255,215,0,0.35);border-radius:99px;padding:7px 16px;font-family:Space Mono,monospace;font-size:12px;color:#ffffff;letter-spacing:1px;}
 .feature-pill span{margin-right:5px;}
-
-.stats-ticker{display:flex;gap:32px;justify-content:center;margin-bottom:24px;flex-wrap:wrap;}
-.stat-item{text-align:center;animation:stat-hover 3s ease-in-out infinite alternate;}
-.stat-item:nth-child(2){animation-delay:-0.8s;}.stat-item:nth-child(3){animation-delay:-1.6s;}.stat-item:nth-child(4){animation-delay:-2.4s;}
-@keyframes stat-hover{0%{transform:translateY(0);filter:brightness(0.9);}100%{transform:translateY(-8px);filter:brightness(1.3);}}
-.stat-num{font-family:Orbitron,monospace;font-size:42px;font-weight:900;background:linear-gradient(135deg,#00FFD4,#00CCFF,#FF00AA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;text-shadow:none;}
-.stat-label{font-family:Rajdhani,sans-serif;font-size:11px;font-weight:700;color:#ffffff;letter-spacing:3px;text-transform:uppercase;margin-top:2px;opacity:0.7;}
-
-.gw-divider{width:100%;height:2px;background:linear-gradient(90deg,transparent,#00FFD4,#FF00AA,#00CCFF,transparent);margin:8px 0 28px;animation:divider-glow 3s ease-in-out infinite alternate;}
-@keyframes divider-glow{0%{opacity:0.4;filter:blur(0px);}100%{opacity:1.0;filter:blur(1px);box-shadow:0 0 20px rgba(0,255,200,0.5);}}
-
-/* ═══════════════════════ MODE CARDS ═══════════════════════ */
-.mode-card{border-radius:22px;padding:24px 16px;text-align:center;cursor:pointer;transition:all 0.4s;min-height:220px;display:flex;flex-direction:column;justify-content:center;align-items:center;position:relative;overflow:hidden;}
-.mode-card::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:conic-gradient(from 0deg,transparent,rgba(0,255,200,0.1),transparent,rgba(255,0,170,0.1),transparent);animation:card-rotate 8s linear infinite;z-index:0;}
-@keyframes card-rotate{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
-.mode-card>*{position:relative;z-index:1;}
-.mode-card:nth-child(1){background:rgba(0,20,40,0.85);border:2px solid rgba(0,255,200,0.4);box-shadow:0 0 30px rgba(0,255,200,0.15),inset 0 0 40px rgba(0,255,200,0.05);}
-.mode-card:nth-child(2){background:rgba(20,0,40,0.85);border:2px solid rgba(255,0,170,0.4);box-shadow:0 0 30px rgba(255,0,170,0.15),inset 0 0 40px rgba(255,0,170,0.05);}
-.mode-card:nth-child(3){background:rgba(10,0,30,0.85);border:2px solid rgba(120,0,255,0.4);box-shadow:0 0 30px rgba(120,0,255,0.15),inset 0 0 40px rgba(120,0,255,0.05);}
-.mode-card:hover{transform:translateY(-8px) scale(1.04);box-shadow:0 0 60px rgba(0,255,200,0.4),0 0 120px rgba(255,0,170,0.2);}
+.stats-ticker{display:flex;gap:32px;justify-content:center;margin-bottom:24px;flex-wrap:wrap;position:relative;z-index:5;}
+.stat-item{text-align:center;animation:stat-float 3s ease-in-out infinite alternate;}
+.stat-item:nth-child(2){animation-delay:-1s;}.stat-item:nth-child(3){animation-delay:-2s;}
+@keyframes stat-float{0%{transform:translateY(0);}100%{transform:translateY(-7px);}}
+.stat-num{font-family:Bebas Neue,sans-serif;font-size:42px;color:#FFD700;line-height:1;text-shadow:0 0 20px rgba(255,215,0,0.5);}
+.stat-label{font-family:Space Mono,monospace;font-size:10px;color:#ffffff;letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
+.gw-divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,215,0,0.4),transparent);margin:8px 0 28px;position:relative;z-index:5;}
+.mode-card{border-radius:22px;padding:24px 16px;text-align:center;cursor:pointer;transition:transform 0.3s,box-shadow 0.3s;min-height:220px;display:flex;flex-direction:column;justify-content:center;align-items:center;animation:card-breathe 5s ease-in-out infinite alternate;position:relative;z-index:5;}
+.mode-card:nth-child(1){background:linear-gradient(160deg,#0a0020 0%,#150040 50%,#0d0030 100%);border:2px solid rgba(120,60,255,0.5);box-shadow:0 0 30px rgba(100,40,255,0.2),inset 0 0 40px rgba(80,0,200,0.1);}
+.mode-card:nth-child(2){background:linear-gradient(160deg,#001020 0%,#002040 50%,#001530 100%);border:2px solid rgba(0,160,255,0.5);box-shadow:0 0 30px rgba(0,140,255,0.2),inset 0 0 40px rgba(0,80,200,0.1);}
+.mode-card:nth-child(3){background:linear-gradient(160deg,#1a0010 0%,#300020 50%,#200015 100%);border:2px solid rgba(200,0,120,0.5);box-shadow:0 0 30px rgba(180,0,100,0.2),inset 0 0 40px rgba(160,0,80,0.1);}
+.mode-card:hover{transform:translateY(-6px) scale(1.03);box-shadow:0 0 60px rgba(160,80,255,0.4),inset 0 0 60px rgba(100,40,255,0.15);}
+@keyframes card-breathe{0%{box-shadow:0 0 20px rgba(100,40,255,0.15);}100%{box-shadow:0 0 50px rgba(100,40,255,0.35),0 8px 40px rgba(0,0,0,0.5);}}
 .mode-emoji{font-size:36px;display:block;margin-bottom:10px;}
-.mode-name{font-family:Orbitron,monospace;font-size:18px;font-weight:900;letter-spacing:4px;background:linear-gradient(90deg,#00FFD4,#FF00AA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px;}
-.mode-desc{font-family:Rajdhani,sans-serif;font-size:13px;font-weight:600;color:#ffffff;line-height:1.6;opacity:0.8;}
-
-/* ═══════════════════════ INPUTS ═══════════════════════ */
-.stTextInput>div>div>input{background:rgba(0,10,20,0.9)!important;border:2px solid rgba(0,255,200,0.3)!important;border-radius:10px!important;color:#ffffff!important;font-family:Rajdhani,sans-serif!important;font-size:15px!important;font-weight:600!important;padding:12px 16px!important;caret-color:#00FFD4!important;transition:all 0.3s!important;}
-.stTextInput>div>div>input::placeholder{color:#555555!important;}
-.stTextInput>div>div>input:focus{border-color:#00FFD4!important;box-shadow:0 0 25px rgba(0,255,200,0.25),0 0 50px rgba(0,255,200,0.1)!important;}
-.stTextInput label{font-family:Rajdhani,sans-serif!important;font-size:12px!important;font-weight:700!important;letter-spacing:3px!important;color:#ffffff!important;text-transform:uppercase!important;}
-
-/* ═══════════════════════ BUTTONS — NEON PLASMA ═══════════════════════ */
+.mode-name{font-family:Bebas Neue,sans-serif;font-size:22px;letter-spacing:3px;color:#FFD700;margin-bottom:8px;}
+.mode-desc{font-family:Space Mono,monospace;font-size:11px;color:#ffffff;line-height:1.6;}
+.stTextInput>div>div>input{background:#ffffff!important;border:2px solid rgba(255,215,0,0.5)!important;border-radius:10px!important;color:#000000!important;font-family:Space Mono,monospace!important;font-size:14px!important;padding:12px 16px!important;caret-color:#000000!important;position:relative;z-index:5;}
+.stTextInput>div>div>input::placeholder{color:#666666!important;}
+.stTextInput>div>div>input:focus{border-color:#FFD700!important;box-shadow:0 0 20px rgba(255,215,0,0.25)!important;}
+.stTextInput label{font-family:Space Mono,monospace!important;font-size:11px!important;letter-spacing:3px!important;color:#ffffff!important;text-transform:uppercase!important;position:relative;z-index:5;}
 div.stButton>button{
-  background:linear-gradient(135deg,#00FFD4,#00CCFF,#FF00AA,#AA00FF,#00FFD4)!important;
-  background-size:400% 400%!important;
+  background:linear-gradient(135deg,#7B68EE,#FF00FF,#00FFFF)!important;
+  background-size:300% 300%!important;
   border:none!important;
-  color:#000000!important;
-  font-family:Orbitron,monospace!important;
-  font-size:16px!important;
-  font-weight:900!important;
-  letter-spacing:3px!important;
+  color:#ffffff!important;
+  font-family:Bebas Neue,sans-serif!important;
+  font-size:24px!important;
+  letter-spacing:4px!important;
   padding:18px!important;
   border-radius:14px!important;
   width:100%!important;
-  text-shadow:none!important;
-  box-shadow:0 0 30px rgba(0,255,200,0.5),0 0 60px rgba(255,0,170,0.3),inset 0 0 20px rgba(255,255,255,0.1)!important;
+  text-shadow:0 0 12px rgba(255,255,255,0.9)!important;
+  box-shadow:0 0 30px rgba(123,0,255,0.5),0 0 60px rgba(255,0,128,0.3),inset 0 0 20px rgba(255,255,255,0.08)!important;
   transition:all 0.3s!important;
   margin-top:12px!important;
-  animation:btn-plasma 4s ease-in-out infinite,btn-neon-pulse 2s ease-in-out infinite alternate!important;
+  animation:btn-cosmic 5s ease-in-out infinite alternate,btn-glow-pulse 2s ease-in-out infinite alternate!important;
+  position:relative;z-index:5;
 }
-@keyframes btn-plasma{
-  0%  {background-position:0% 50%;}
-  25% {background-position:100% 0%;}
-  50% {background-position:50% 100%;}
-  75% {background-position:0% 50%;}
-  100%{background-position:100% 50%;}
+@keyframes btn-cosmic{
+  0%  {background-position:0% 50%;  box-shadow:0 0 30px rgba(123,0,255,0.6),0 0 60px rgba(255,0,128,0.3);}
+  33% {background-position:100% 0%; box-shadow:0 0 40px rgba(255,0,128,0.7),0 0 80px rgba(255,100,0,0.4);}
+  66% {background-position:50% 100%;box-shadow:0 0 35px rgba(0,200,255,0.6),0 0 70px rgba(0,255,150,0.3);}
+  100%{background-position:0% 50%;  box-shadow:0 0 30px rgba(200,0,255,0.6),0 0 60px rgba(0,150,255,0.4);}
 }
-@keyframes btn-neon-pulse{
-  0%  {box-shadow:0 0 25px rgba(0,255,200,0.5),0 0 50px rgba(255,0,170,0.2);filter:brightness(1.0);}
-  100%{box-shadow:0 0 50px rgba(0,255,200,0.8),0 0 100px rgba(255,0,170,0.5),0 0 150px rgba(0,200,255,0.3);filter:brightness(1.3);}
+@keyframes btn-glow-pulse{
+  0%  {filter:brightness(1.0) saturate(1.2);}
+  100%{filter:brightness(1.35) saturate(1.6);}
 }
 div.stButton>button:hover{
-  transform:scale(1.06) translateY(-3px)!important;
-  filter:brightness(1.5) saturate(1.5)!important;
-  box-shadow:0 0 80px rgba(0,255,200,0.9),0 0 160px rgba(255,0,170,0.6),0 0 240px rgba(0,150,255,0.4),inset 0 0 40px rgba(255,255,255,0.2)!important;
+  transform:scale(1.04) translateY(-2px)!important;
+  filter:brightness(1.5) saturate(1.8)!important;
+  box-shadow:0 0 70px rgba(255,0,200,0.9),0 0 130px rgba(0,200,255,0.5),inset 0 0 30px rgba(255,255,255,0.15)!important;
 }
+[data-testid="stExpander"]{position:relative;z-index:5;}
+[data-testid="column"]{position:relative;z-index:5;}
 
-</style>
-<div class="scanline-wrap"><div class="scanline"></div></div>
-<div class="star-field"></div>
-<div style="text-align:center;font-family:Rajdhani,sans-serif;font-size:10px;color:rgba(255,255,255,0.25);letter-spacing:2px;margin-bottom:12px">⚠️ THIS PAGE CONTAINS ANIMATED EFFECTS · <a href="#" onclick="document.querySelectorAll('*').forEach(e=>{e.style.animation='none';e.style.transition='none'});this.parentElement.textContent='✅ ANIMATIONS DISABLED';return false;" style="color:rgba(0,255,200,0.4);text-decoration:underline;cursor:pointer">CLICK HERE TO DISABLE</a></div>
-<div class="top-badge">⚡ 30-Second RPG Study System · Any Universe · Zero Limits</div>
-<div class="scanline-wrap"><div class="scanline"></div></div>
-<div class="star-field"></div>
-<div class="top-badge">⚡ 30-Second RPG Study System · Any Universe · Zero Limits</div>
-<div class="gw-main-title">30 SECOND<br>INFINITEVERSE</div>
-<div class="gw-subtitle">Infiniteverse · Study RPG · Unlock Your Power</div>
-<div class="features-row">
-    <div class="feature-pill"><span>🎮</span>Pick ANY Universe</div>
-    <div class="feature-pill"><span>⏱</span>30-Second Missions</div>
-    <div class="feature-pill"><span>💰</span>Earn Real Rewards</div>
-    <div class="feature-pill"><span>🔥</span>Study Like a Champion</div>
-    <div class="feature-pill"><span>🌈</span>Fully Customizable</div>
-    <div class="feature-pill"><span>⚡</span>Powered by AI</div>
-</div>
-<div class="stats-ticker">
-    <div class="stat-item"><div class="stat-num">∞</div><div class="stat-label">Universes</div></div>
-    <div class="stat-item"><div class="stat-num">30s</div><div class="stat-label">To Start</div></div>
-    <div class="stat-item"><div class="stat-num">100%</div><div class="stat-label">Free</div></div>
-    <div class="stat-item"><div class="stat-num">0</div><div class="stat-label">Excuses</div></div>
-</div>
-<div class="gw-divider"></div>
-""", unsafe_allow_html=True)
-
-    _, col, _ = st.columns([1, 2, 1])
-    with col:
-
-        # HOW IT WORKS button
-        if st.button("⚡ HOW IT WORKS  ·  RETURNING PLAYER?", key="info_toggle"):
-            st.session_state.info_open = not st.session_state.get("info_open", False)
-
-
-        if st.session_state.get("info_open", False):
-            st.markdown("<div style='background:rgba(0,0,0,0.85);border:2px solid #FFD700;border-radius:20px;padding:28px;margin-top:12px;'><div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;letter-spacing:4px;margin-bottom:14px'>HOW IT WORKS</div><div style='font-family:Space Mono,monospace;font-size:12px;color:#ffffff;line-height:2.2;margin-bottom:20px'>🌌 <b style='color:#FFD700'>Pick any universe</b> — AI builds it instantly. Colors, currency, story, all yours.<br>⏱ <b style='color:#FFD700'>Study for 30 seconds</b> — work, study, do anything productive. Get paid.<br>📸 <b style='color:#FFD700'>Upload proof</b> — no proof = no coins. Then spin, battle, hatch eggs.</div><div style='border-top:1px solid rgba(255,215,0,0.25);padding-top:16px;'><div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;letter-spacing:4px;margin-bottom:10px'>ALREADY HAVE AN ACCOUNT?</div><div style='font-family:Space Mono,monospace;font-size:12px;color:#ffffff;line-height:2.2;margin-bottom:10px'>Your stuff is safe. Forever.<br><span style='color:#00FF88'>Type the same name + password → hit Enter → everything loads back instantly.</span></div><div style='background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.3);border-radius:10px;padding:12px;font-family:Space Mono,monospace;font-size:11px;color:#ffffff;line-height:2.2'><span style='color:#FFD700'>①</span> Type your Champion Name<br><span style='color:#FFD700'>②</span> Type your Password<br><span style='color:#FFD700'>③</span> Hit ENTER THE INFINITEVERSE<br><span style='color:#00FF88'>④ BOOM. Home. Everything restored.</span></div></div></div>", unsafe_allow_html=True)
-
-        st.markdown("<br>", unsafe_allow_html=True)
-
-        # ── MULTI PAGE FLOW ──────────────────────────────────────────────
-        _gw_page = st.session_state.get("gw_page", 1)
-
-        # Mode cards only shown for new players setting up their universe
-        if _gw_page == 3:
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.markdown("<div style='font-family:Bebas Neue,sans-serif;font-size:18px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:8px'>⚡ CHOOSE YOUR MODE</div>", unsafe_allow_html=True)
-            mode_col1, mode_col2, mode_col3 = st.columns(3)
-            with mode_col1:
-                st.markdown("""<div class='mode-card'><span class='mode-emoji'>⚡</span><div class='mode-name'>CHILL</div><div class='mode-desc'>Missions. Currency. Level up.</div></div>""", unsafe_allow_html=True)
-                if st.button("⚡ CHILL", key="mode_chill", use_container_width=True):
-                    st.session_state.game_mode = "chill"
-            with mode_col2:
-                st.markdown("""<div class='mode-card'><span class='mode-emoji'>🔥</span><div class='mode-name'>GRINDER</div><div class='mode-desc'>Adds Battles, Abilities, Monster Hatching.</div></div>""", unsafe_allow_html=True)
-                if st.button("🔥 GRINDER", key="mode_grinder", use_container_width=True):
-                    st.session_state.game_mode = "grinder"
-            with mode_col3:
-                st.markdown("""<div class='mode-card'><span class='mode-emoji'>💀</span><div class='mode-name'>OBSESSED</div><div class='mode-desc'>EVERYTHING. Full chaos. No limits.</div></div>""", unsafe_allow_html=True)
-                if st.button("💀 OBSESSED", key="mode_obsessed", use_container_width=True):
-                    st.session_state.game_mode = "obsessed"
-            if st.session_state.game_mode:
-                mode_labels = {"chill":"⚡ CHILL","grinder":"🔥 GRINDER","obsessed":"💀 OBSESSED"}
-                st.success(f"MODE: {mode_labels[st.session_state.game_mode]} ✅")
-
-        if _gw_page == 1:
-            # PAGE 1: New or Returning
-            st.markdown("<div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:20px'>WHO ARE YOU?</div>", unsafe_allow_html=True)
-            _c1, _c2 = st.columns(2)
-            with _c1:
-                if st.button("🌌 NEW PLAYER\nCreate my account", key="gw_new", use_container_width=True):
-                    st.session_state.gw_page = 2; st.rerun()
-            with _c2:
-                if st.button("⚡ RETURNING PLAYER\nLoad my progress", key="gw_returning", use_container_width=True):
-                    st.session_state.gw_page = 4; st.rerun()
-            name_input = ""; email_input = ""; pass_input = ""; theme_input = ""
-            st.stop()
-
-        elif _gw_page == 2:
-            # PAGE 2: New player — email + password
-            st.markdown("<div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:16px'>STEP 1 OF 2 — YOUR ACCOUNT</div>", unsafe_allow_html=True)
-            email_input = st.text_input("📧 Email", placeholder="Your email — your lifeline if you ever get locked out. We never spam. Ever.", key="gw_email")
-            st.markdown("<div style='font-family:Space Mono,monospace;font-size:10px;color:#555;text-align:center;margin-top:2px;margin-bottom:8px'>🔒 This is your rescue rope. One day you might need it — and you'll be glad it's there.</div>", unsafe_allow_html=True)
-            pass_input  = st.text_input("🔑 Password", placeholder="Create a password — keep it safe!", type="password", key="gw_pass")
-            name_input = ""; theme_input = ""
-            st.markdown("<br>", unsafe_allow_html=True)
-            _nb1, _nb2 = st.columns([1, 4])
-            with _nb1:
-                if st.button("← Back", key="gw_back2"):
-                    st.session_state.gw_page = 1; st.rerun()
-            with _nb2:
-                if st.button("NEXT ⚡", key="gw_next", use_container_width=True):
-                    if not st.session_state.get("gw_email","").strip():
-                        st.error("Enter your email.")
-                    elif not st.session_state.get("gw_pass","").strip():
-                        st.error("Enter a password.")
-                    else:
-                        st.session_state.gw_page = 3; st.rerun()
-            st.stop()
-
-        elif _gw_page == 3:
-            # PAGE 3: New player — champion name + universe
-            email_input = st.session_state.get("gw_email", "")
-            pass_input  = st.session_state.get("gw_pass", "")
-            st.markdown("<div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:16px'>STEP 2 OF 2 — YOUR UNIVERSE</div>", unsafe_allow_html=True)
-            name_input  = st.text_input("⚡ Champion Name", placeholder="What are you called?", key="gw_name")
-            theme_input = st.text_input("🌌 Your Universe", placeholder="Leave empty for INFINITE POWER · or type anything: Naruto, F1, Nike...", key="gw_theme")
-            _bc, _ = st.columns([1,4])
-            with _bc:
-                if st.button("← Back", key="gw_back"):
-                    st.session_state.gw_page = 2; st.rerun()
-
-        elif _gw_page == 4:
-            # PAGE 4: Returning player — name + password → show saves
-            if not st.session_state.get("ret_saves_found"):
-                # Step 1: Email only — no password needed
-                st.markdown("<div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:8px'>WELCOME BACK, CHAMPION</div>", unsafe_allow_html=True)
-                st.markdown("<div style='font-family:Space Mono,monospace;font-size:11px;color:#888;text-align:center;margin-bottom:16px'>Enter your email to find your saves instantly.</div>", unsafe_allow_html=True)
-                ret_email = st.text_input("📧 Your Email", placeholder="The email you signed up with", key="gw_ret_email")
-                _rb1, _rb2 = st.columns([1, 4])
-                with _rb1:
-                    if st.button("← Back", key="gw_back_ret"):
-                        st.session_state.gw_page = 1; st.rerun()
-                with _rb2:
-                    if st.button("🔍 FIND MY SAVES", key="gw_find_saves", use_container_width=True):
-                        if not ret_email.strip():
-                            st.error("Enter your email.")
-                        else:
-                            _clean_ret_email = ret_email.strip().lower().strip("_")
-                            _sb = get_supabase()
-                            _all_saves = []
-                            if _sb:
-                                try:
-                                    _lr = _sb.table("players").select("*").execute()
-                                    for _row in (_lr.data or []):
-                                        _re = _row.get("email","").lower().strip().strip("_")
-                                        if _re == _clean_ret_email:
-                                            _all_saves.append(_row)
-                                except: pass
-                            if not _all_saves:
-                                st.error("❌ No account found with that email.")
-                            else:
-                                if len(_all_saves) == 1:
-                                    _sv = _all_saves[0]
-                                    _sv_theme = _sv.get("theme","") or DEFAULT_UNIVERSE_NAME
-                                    _sv_name  = _sv.get("user_name","")
-                                    with st.spinner(f"🌌 Loading {_sv_theme}..."):
-                                        _result = resolve_universe(_sv_theme)
-                                    if not _result or not _result.get("safe"):
-                                        _result = {"safe":True,"data":DEFAULT_UNIVERSE.copy()}
-                                    _rdata = _result["data"]
-                                    # Use saved color from DB if available
-                                    _saved_color = _sv.get("vibe_color","")
-                                    if _saved_color and re.match(r'^#[0-9A-Fa-f]{6}$', _saved_color):
-                                        _rdata["color"] = _saved_color
-                                    db_apply(_sv)
-                                    st.session_state.user_name   = _sv_name
-                                    st.session_state.game_mode   = _sv.get("game_mode","chill") or "chill"
-                                    st.session_state.world_data  = _rdata
-                                    st.session_state.vibe_color  = _rdata.get("color","#FFD700")
-                                    st.session_state.user_theme  = _sv_theme
-                                    st.toast(f"DEBUG: Setting query params for {_sv_name}", icon="🔍")
-                                    st.query_params["u"] = _sv_name.lower()
-                                    st.query_params["t"] = (st.session_state.user_theme or "").strip()
-                                    st.query_params["m"] = (st.session_state.game_mode or "chill").strip()
-                                    st.rerun()
-                                else:
-                                    st.session_state.ret_saves_found = _all_saves
-                                    st.session_state.ret_name = _all_saves[0].get("user_name","")
-                                    st.rerun()
-
-                # ── Forgot champion name ──────────────────────────────────────
-                with st.expander("🤔 Forgot your Champion Name?"):
-                    st.markdown("<div style='font-family:Space Mono,monospace;font-size:11px;color:#aaa;margin-bottom:8px'>Enter the email you signed up with — we'll find your champion name instantly.</div>", unsafe_allow_html=True)
-                    _lookup_email = st.text_input("📧 Your Email:", placeholder="the email you used to sign up", key="lookup_email")
-                    if st.button("🔎 FIND MY CHAMPION NAME", key="find_name_btn", use_container_width=True):
-                        if not _lookup_email.strip():
-                            st.error("Enter your email.")
-                        else:
-                            _sb2 = get_supabase()
-                            _found = []
-                            _clean_email = _lookup_email.strip().lower().strip("_")
-                            if _sb2:
-                                try:
-                                    # Fetch all rows and filter client-side to handle dirty stored emails
-                                    _lr = _sb2.table("players").select("user_name,theme,game_mode,email").neq("email","").execute()
-                                    _all_rows = _lr.data or []
-                                    _found = [r for r in _all_rows if r.get("email","").lower().strip().strip("_") == _clean_email]
-                                except Exception as _le:
-                                    st.error(f"Search error: {_le}")
-                            if not _found:
-                                st.warning("❌ No account found with that email.")
-                            else:
-                                st.success(f"✅ Found {len(_found)} account{'s' if len(_found)>1 else ''}!")
-                                for _f in _found:
-                                    _mode_icons = {"chill":"⚡ CHILL","grinder":"🔥 GRINDER","obsessed":"💀 OBSESSED"}
-                                    _mi = _mode_icons.get(_f.get("game_mode","chill"),"⚡ CHILL")
-                                    _lv = _f.get("level",1)
-                                    _ms = _f.get("total_missions",0)
-                                    _st = _f.get("study_streak",0)
-                                    _gd = _f.get("gold",0)
-                                    _th = (_f.get("theme","") or "INFINITE POWER").upper()
-                                    st.markdown(f"""<div style='background:#0a0a0a;border:2px solid rgba(255,215,0,0.4);
-                                        border-radius:12px;padding:14px 18px;margin:6px 0'>
-                                        <div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;letter-spacing:3px;margin-bottom:6px'>
-                                            🌌 {_th}
-                                        </div>
-                                        <div style='font-family:Space Mono,monospace;font-size:11px;color:#aaa;line-height:2.0'>
-                                            👤 <b style='color:#fff'>{_f.get('user_name','').upper()}</b><br>
-                                            🎮 Mode: <b style='color:#FFD700'>{_mi}</b><br>
-                                            ⭐ Level <b style='color:#fff'>{_lv}</b> &nbsp;·&nbsp;
-                                            🏆 <b style='color:#fff'>{_ms}</b> missions &nbsp;·&nbsp;
-                                            🔥 <b style='color:#fff'>{_st}</b> day streak &nbsp;·&nbsp;
-                                            💰 <b style='color:#fff'>{_gd:.0f}</b> gold
-                                        </div>
-                                    </div>""", unsafe_allow_html=True)
-
-                name_input = ""; email_input = ""; pass_input = ""; theme_input = ""
-
-                # ── Forgot Password panel ─────────────────────────────────────
-                with st.expander("🔑 Forgot your Password?"):
-                    import secrets as _sec2, hashlib as _hl2r
-                    st.markdown("""<div style='background:#0a0808;border:2px solid #FF8800;border-radius:14px;padding:18px;margin-bottom:12px'>
-                        <div style='font-family:Bebas Neue,sans-serif;font-size:20px;color:#FF8800;letter-spacing:3px;margin-bottom:8px'>RESET YOUR PASSWORD</div>
-                        <div style='font-family:Space Mono,monospace;font-size:11px;color:#aaa;line-height:1.8'>
-                            Enter your Champion Name + the email you signed up with.<br>
-                            We will send a 6-character reset code to your inbox instantly.
-                        </div>
-                    </div>""", unsafe_allow_html=True)
-                    _rp_email = st.text_input("Email you signed up with:", key="ret_reset_email", placeholder="your@email.com")
-                    _rpc1, _rpc2 = st.columns(2)
-                    with _rpc1:
-                        if st.button("Send Reset Code", key="ret_send_reset", use_container_width=True):
-                            if not _rp_email.strip():
-                                st.error("Enter your email.")
-                            else:
-                                _sbr0 = get_supabase()
-                                _found_r = []
-                                if _sbr0:
-                                    try:
-                                        _lr0 = _sbr0.table("players").select("*").neq("email","").execute()
-                                        _found_r = [r for r in (_lr0.data or []) if r.get("email","").lower().strip().strip("_") == _rp_email.strip().lower().strip("_")]
-                                    except: pass
-                                if not _found_r:
-                                    st.error("No account found with that email.")
-                                else:
-                                    # Send reset to all accounts with that email
-                                    import secrets as _sec2, hashlib as _hl2r
-                                    _tok = _sec2.token_hex(3).upper()
-                                    _tok_hash = _hl2r.sha256(_tok.encode()).hexdigest()
-                                    _expiry_r = (_dt.datetime.utcnow() + _dt.timedelta(minutes=30)).isoformat()
-                                    _sbr = get_supabase()
-                                    _first = _found_r[0]
-                                    _rp_name_found = _first.get("user_name","")
-                                    if _sbr:
-                                        try: _sbr.table("players").update({"reset_token":_tok_hash,"reset_expiry":_expiry_r}).eq("user_name",_rp_name_found).execute()
-                                        except: pass
-                                    if send_reset_email(_rp_email.strip(), _rp_name_found, _tok):
-                                        st.success("✅ Code sent to your inbox!")
-                                        st.session_state.ret_reset_pending = _rp_name_found
-                                    else:
-                                        st.error("Could not send email.")
-                    with _rpc2:
-                        if st.button("Cancel", key="ret_cancel_reset", use_container_width=True):
-                            st.session_state.ret_reset_pending = None; st.rerun()
-                    if st.session_state.get("ret_reset_pending"):
-                        st.markdown("<div style='font-family:Space Mono,monospace;font-size:11px;color:#FFD700;margin-top:10px'>Enter the 6-character code + your new password:</div>", unsafe_allow_html=True)
-                        _rc_code  = st.text_input("Reset Code:", key="ret_code_input", placeholder="e.g. A3F9B2")
-                        _rc_pass  = st.text_input("New Password:", key="ret_new_pass", type="password")
-                        _rc_pass2 = st.text_input("Confirm Password:", key="ret_new_pass2", type="password")
-                        if st.button("Reset My Password", key="ret_do_reset", use_container_width=True):
-                            import hashlib as _hl3r, datetime as _dtt2r
-                            if not _rc_code.strip() or not _rc_pass.strip():
-                                st.error("Fill in all fields.")
-                            elif _rc_pass.strip() != _rc_pass2.strip():
-                                st.error("Passwords do not match.")
-                            else:
-                                _c_hash = _hl3r.sha256(_rc_code.strip().upper().encode()).hexdigest()
-                                _row_r  = db_load(st.session_state.ret_reset_pending)
-                                if not _row_r:
-                                    st.error("Account not found.")
-                                elif _row_r.get("reset_token","") != _c_hash:
-                                    st.error("Wrong code.")
-                                elif _row_r.get("reset_expiry","") < _dtt2r.datetime.utcnow().isoformat():
-                                    st.error("Code expired. Request a new one.")
-                                else:
-                                    _new_h = _hl3r.sha256(_rc_pass.strip().encode()).hexdigest()
-                                    _sbr2 = get_supabase()
-                                    if _sbr2:
-                                        try: _sbr2.table("players").update({"password_hash":_new_h,"reset_token":"","reset_expiry":""}).eq("user_name",st.session_state.ret_reset_pending.lower()).execute()
-                                        except: pass
-                                    st.session_state.ret_reset_pending = None
-                                    st.success("Password reset! Enter your new password above to log in.")
-
-                st.stop()
-
-            else:
-                # Step 2: Show save cards
-                _saves = st.session_state.ret_saves_found
-                _ret_name = st.session_state.get("ret_name","")
-                st.markdown(f"<div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:16px'>CHOOSE YOUR UNIVERSE</div>", unsafe_allow_html=True)
-                mode_icons = {"chill":"⚡","grinder":"🔥","obsessed":"💀"}
-                for i, _sv in enumerate(_saves):
-                    _sv_theme = _sv.get("theme","") or "INFINITE POWER"
-                    _sv_mode  = _sv.get("game_mode","chill") or "chill"
-                    _sv_lv    = _sv.get("level",1)
-                    _sv_miss  = _sv.get("total_missions",0)
-                    _sv_str   = _sv.get("study_streak",0)
-                    _sv_gold  = _sv.get("gold",0)
-                    _icon     = mode_icons.get(_sv_mode,"⚡")
-                    st.markdown(f"""<div style='background:#0a0a1a;border:2px solid rgba(255,215,0,0.3);
-                        border-radius:16px;padding:18px 20px;margin-bottom:8px'>
-                        <div style='display:flex;justify-content:space-between;align-items:center'>
-                            <div>
-                                <div style='font-family:Bebas Neue,sans-serif;font-size:24px;color:#FFD700;letter-spacing:3px'>
-                                    {_icon} {_sv_theme.upper()}
-                                </div>
-                                <div style='font-family:Space Mono,monospace;font-size:11px;color:#888;margin-top:4px'>
-                                    {_sv_mode.upper()} MODE · Lv {_sv_lv} · {_sv_miss} missions · 🔥 {_sv_str} day streak · {_sv_gold:.0f} gold
-                                </div>
-                            </div>
-                        </div>
-                    </div>""", unsafe_allow_html=True)
-                    if st.button(f"▶ ENTER — {_sv_theme.upper()}", key=f"enter_save_{i}_{_sv_theme[:10]}", use_container_width=True):
-                        # Load this specific save
-                        import hashlib as _hlr2
-                        with st.spinner(f"🌌 Loading {_sv_theme}..."):
-                            _result = resolve_universe(_sv_theme)
-                        if not _result["safe"]:
-                            _result = {"safe":True,"data":DEFAULT_UNIVERSE.copy()}
-                        st.session_state.user_name     = _ret_name
-                        st.session_state.password_hash = st.session_state.ret_pass_hash
-                        st.session_state.game_mode     = _sv_mode
-                        _mdata = _result["data"]
-                        _msaved_color = _sv.get("vibe_color","")
-                        if _msaved_color and __import__('re').match(r'^#[0-9A-Fa-f]{6}$', _msaved_color):
-                            _mdata["color"] = _msaved_color
-                        db_apply(_sv)
-                        st.session_state.world_data    = _mdata
-                        st.session_state.vibe_color    = _mdata.get("color","#FFD700")
-                        st.session_state.user_theme    = _sv_theme
-                        st.session_state.password_hash = st.session_state.ret_pass_hash
-                        st.session_state.ret_saves_found = None
-                        st.toast(f"✅ Welcome back! {_sv_theme} loaded.", icon="🌌")
-                        st.rerun()
-
-                if st.button("← Back", key="gw_back_saves"):
-                    st.session_state.ret_saves_found = None
-                    st.session_state.gw_page = 4
-                    st.rerun()
-
-                name_input = ""; email_input = ""; pass_input = ""; theme_input = ""
-                st.stop()
-
-
-        else:
-            name_input = ""; email_input = ""; pass_input = ""; theme_input = ""
-
-        # Forgot password button
-        _, _fp = st.columns([3, 1])
-        with _fp:
-            if st.button("🔑 Forgot password?", key="open_reset_panel"):
-                st.session_state.reset_panel_open = not st.session_state.get("reset_panel_open", False)
-                st.session_state.reset_pending_name = None
-                st.rerun()
-
-        # ── RESET PASSWORD PANEL ──────────────────────────────────────────────
-        if st.session_state.get("reset_panel_open", False):
-            import secrets as _sec, hashlib as _hl2
-            st.markdown("""<div style='background:#0a0808;border:2px solid #FF8800;
-                border-radius:16px;padding:24px;margin:8px 0;'>
-                <div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FF8800;
-                    letter-spacing:3px;margin-bottom:10px'>RESET YOUR PASSWORD</div>
-                <div style='font-family:Space Mono,monospace;font-size:11px;color:#aaa;line-height:1.8;margin-bottom:12px'>
-                    Enter your Champion Name and the email you signed up with.<br>
-                    We will send a 6-character code to your inbox instantly.
-                </div>
-            </div>""", unsafe_allow_html=True)
-            reset_name  = st.text_input("Champion Name:", key="reset_name_input", placeholder="Your exact champion name")
-            reset_email = st.text_input("Email you signed up with:", key="reset_email_input", placeholder="your@email.com")
-            rc1, rc2 = st.columns(2)
-            with rc1:
-                if st.button("Send Reset Code", key="send_reset"):
-                    if not reset_name.strip() or not reset_email.strip():
-                        st.error("Enter both fields.")
-                    else:
-                        existing_r = db_load(reset_name.strip())
-                        stored_email = existing_r.get("email", "") if existing_r else ""
-                        if not existing_r:
-                            st.error("No account found with that name.")
-                        elif not stored_email:
-                            st.error("No email on file. Contact support.")
-                        elif stored_email.lower() != reset_email.strip().lower():
-                            st.error("Email does not match.")
-                        else:
-                            token = _sec.token_hex(3).upper()
-                            token_hash = _hl2.sha256(token.encode()).hexdigest()
-                            import datetime as _dtt
-                            expiry = (_dtt.datetime.utcnow() + _dtt.timedelta(minutes=30)).isoformat()
-                            sb_r = get_supabase()
-                            if sb_r:
-                                try:
-                                    sb_r.table("players").update({"reset_token": token_hash, "reset_expiry": expiry}).eq("user_name", reset_name.strip().lower()).execute()
-                                except Exception:
-                                    pass
-                            sent = send_reset_email(reset_email.strip(), reset_name.strip(), token)
-                            if sent:
-                                st.success("Code sent! Check your inbox.")
-                                st.session_state.reset_pending_name = reset_name.strip()
-                            else:
-                                st.error("Could not send email.")
-            with rc2:
-                if st.button("✕ Close", key="close_reset_panel"):
-                    st.session_state.reset_panel_open = False
-                    st.session_state.reset_pending_name = None
-                    st.rerun()
-
-            if st.session_state.get("reset_pending_name"):
-                st.markdown("<div style='font-family:Space Mono,monospace;font-size:11px;color:#FFD700;margin-top:10px'>Enter the code from your email + your new password:</div>", unsafe_allow_html=True)
-                reset_code = st.text_input("6-Character Code:", key="reset_code_input", placeholder="e.g. A3F9B2")
-                new_pass   = st.text_input("New Password:", key="new_pass_input", type="password")
-                new_pass2  = st.text_input("Confirm Password:", key="new_pass2_input", type="password")
-                if st.button("Reset My Password", key="do_reset"):
-                    import hashlib as _hl3, datetime as _dtt2
-                    if not reset_code.strip() or not new_pass.strip():
-                        st.error("Fill in all fields.")
-                    elif new_pass.strip() != new_pass2.strip():
-                        st.error("Passwords do not match.")
-                    else:
-                        code_hash = _hl3.sha256(reset_code.strip().upper().encode()).hexdigest()
-                        row_r = db_load(st.session_state.reset_pending_name)
-                        if not row_r:
-                            st.error("Account not found.")
-                        elif row_r.get("reset_token","") != code_hash:
-                            st.error("Wrong code.")
-                        elif row_r.get("reset_expiry","") < _dtt2.datetime.utcnow().isoformat():
-                            st.error("Code expired. Request a new one.")
-                        else:
-                            new_hash = _hl3.sha256(new_pass.strip().encode()).hexdigest()
-                            sb_r2 = get_supabase()
-                            if sb_r2:
-                                try:
-                                    sb_r2.table("players").update({"password_hash": new_hash, "reset_token": "", "reset_expiry": ""}).eq("user_name", st.session_state.reset_pending_name.lower()).execute()
-                                except Exception:
-                                    pass
-                            st.session_state.reset_pending_name = None
-                            st.session_state.reset_panel_open = False
-                            st.success("Password reset! Log in with your new password now.")
-
-        st.markdown("<br>", unsafe_allow_html=True)
-        if st.button("⚡ ENTER THE INFINITEVERSE ⚡", key="gw_enter", use_container_width=True):
-            if not name_input.strip():
-                st.error("Enter your champion name to begin.")
-            elif not pass_input.strip():
-                st.error("Create a password to protect your account.")
-            elif not email_input.strip() and st.session_state.get("gw_page", 1) != 4:
-                st.error("Enter your email — needed if you ever forget your password.")
-            elif not st.session_state.game_mode:
-                st.error("⚠️ Your universe hasn't been forged yet — choose CHILL, GRINDER, or OBSESSED to define what kind of champion you are.")
-            else:
-                import hashlib as _hl
-                clean_name  = name_input.strip()
-                pass_hash   = _hl.sha256(pass_input.strip().encode()).hexdigest()
-                theme_val   = theme_input.strip()
-                display_name = theme_val if theme_val else DEFAULT_UNIVERSE_NAME
-
-                # ── CHECK SUPABASE FOR EXISTING NAME ──────────────────────────
-                # Load save using name + universe + mode combo if returning player
-                _login_theme = theme_val.strip() if theme_val.strip() else ""
-                _login_mode  = st.session_state.game_mode or ""
-                existing = db_load(clean_name, _login_theme, _login_mode)
-                if not existing:
-                    # Try loading any save with this name (for returning player flow)
-                    existing = db_load(clean_name)
-
-                if existing:
-                    stored_hash = existing.get("password_hash", "")
-                    if stored_hash and stored_hash != pass_hash:
-                        # ── NAME TAKEN — WRONG PASSWORD ────────────────────────
-                        st.error("🔒 Sorry, that name is already taken. Choose a different name or enter the correct password.")
-                        st.stop()
-                    elif stored_hash == pass_hash:
-                        # ── CORRECT PASSWORD — RETURNING PLAYER ────────────────
-                        saved_mode  = existing.get("game_mode", "chill") or "chill"
-                        chosen_mode = st.session_state.game_mode or ""
-                        mode_labels = {"chill":"⚡ CHILL","grinder":"🔥 GRINDER","obsessed":"💀 OBSESSED"}
-                        # Block if they picked a mode AND it doesn't match saved mode
-                        if chosen_mode and chosen_mode != saved_mode:
-                            st.error(f"❌ Wrong mode! Your universe **{existing.get('theme','') or DEFAULT_UNIVERSE_NAME}** was created in **{mode_labels.get(saved_mode, saved_mode.upper())}** mode. Please select that mode to continue.")
-                            st.stop()
-                        saved_theme = existing.get("theme", "") or DEFAULT_UNIVERSE_NAME
-                        with st.spinner(f"🌌 Welcome back, {clean_name}! Loading your universe..."):
-                            result = resolve_universe(saved_theme)
-                        if not result["safe"]:
-                            result = {"safe": True, "data": DEFAULT_UNIVERSE.copy()}
-                        st.session_state.user_name    = clean_name
-                        st.session_state.password_hash = pass_hash
-                        st.session_state.world_data   = result["data"]
-                        st.session_state.vibe_color   = result["data"].get("color", "#FFD700")
-                        st.session_state.user_theme   = saved_theme
-                        st.session_state.game_mode    = saved_mode
-                        db_apply(existing)
-                        st.session_state.world_data   = result["data"]
-                        st.session_state.vibe_color   = result["data"].get("color", "#FFD700")
-                        st.session_state.user_theme   = saved_theme
-                        st.session_state.password_hash = pass_hash
-                        _mode_kw = existing.get("game_mode","chill") or "chill"
-                        _theme_kw = (saved_theme or "infinitepower").lower().strip().replace(" ","_")[:30]
-                        _skw = f"{clean_name.lower()}_{_theme_kw}_{_mode_kw}"
-                        st.toast(f"DEBUG: Setting query params for {clean_name}", icon="🔍")
-                        st.query_params["u"] = clean_name.lower()
-                        st.query_params["t"] = (st.session_state.user_theme or "").strip()
-                        st.query_params["m"] = (st.session_state.game_mode or "chill").strip()
-                        st.session_state.gw_page = 1
-                        st.toast(f"✅ Welcome back, {clean_name}! Progress loaded.", icon="🌌")
-                        st.rerun()
-                    else:
-                        # ── Name exists but no password yet — claim with this password
-                        saved_theme = existing.get("theme", "") or display_name
-                        with st.spinner(f"🌌 Loading {saved_theme.upper()}..."):
-                            result = resolve_universe(saved_theme)
-                        if not result["safe"]:
-                            result = {"safe": True, "data": DEFAULT_UNIVERSE.copy()}
-                        st.session_state.user_name    = clean_name
-                        st.session_state.password_hash = pass_hash
-                        st.session_state.world_data   = result["data"]
-                        st.session_state.vibe_color   = result["data"].get("color", "#FFD700")
-                        st.session_state.user_theme   = saved_theme
-                        db_apply(existing)
-                        st.session_state.world_data   = result["data"]
-                        st.session_state.vibe_color   = result["data"].get("color", "#FFD700")
-                        st.session_state.user_theme   = saved_theme
-                        st.session_state.password_hash = pass_hash
-                        db_save(clean_name, saved_theme)
-                        st.rerun()
-                else:
-                    # ── BRAND NEW PLAYER ───────────────────────────────────────
-                    if theme_val:
-                        check = filter_universe_input(theme_val)
-                        if not check["safe"]:
-                            st.error(f"⚠️ {check['reason']}"); st.stop()
-                        theme_val = check["cleaned"]; display_name = theme_val
-                    with st.spinner(f"🌌 Loading {display_name.upper()}..."):
-                        result = resolve_universe(theme_val)
-                    if not result["safe"]:
-                        st.error(f"⚠️ {result['reason']}"); st.stop()
-                    st.session_state.user_name    = clean_name
-                    st.session_state.password_hash = pass_hash
-                    st.session_state.user_email   = email_input.strip() if email_input.strip() else ""
-                    st.session_state.world_data   = result["data"]
-                    st.session_state.vibe_color   = result["data"].get("color", "#FFD700")
-                    st.session_state.user_theme   = display_name
-                    st.session_state.universe_achievements = result["data"].get("lore_achievements", [])
-                    st.session_state.universe_ach_loaded = True
-                    apply_welcome_bonus()
-                    db_save(clean_name, display_name)
-                    _mode_kn = st.session_state.get("game_mode","chill") or "chill"
-                    _theme_kn = (display_name or "infinitepower").lower().strip().replace(" ","_")[:30]
-                    _skn = f"{clean_name.lower()}_{_theme_kn}_{_mode_kn}"
-                    st.toast(f"DEBUG: Setting query params for {clean_name}", icon="🔍")
-                    st.query_params["u"]  = clean_name.lower()
-                    st.query_params["t"] = (st.session_state.user_theme or "").strip()
-                    st.query_params["m"] = (st.session_state.game_mode or "chill").strip()
-                    st.rerun()
-
-    # ── 7 FIDGET SPINNERS (base64 embedded) ──
-    import base64 as _b64
-    _SPINNER_B64 = "PCFET0NUWVBFIGh0bWw+PGh0bWw+PGhlYWQ+PG1ldGEgY2hhcnNldD0idXRmLTgiPgo8c3R5bGU+CkBpbXBvcnQgdXJsKCdodHRwczovL2ZvbnRzLmdvb2dsZWFwaXMuY29tL2NzczI/ZmFtaWx5PU9yYml0cm9uOndnaHRANzAwJmRpc3BsYXk9c3dhcCcpOwoqe2JveC1zaXppbmc6Ym9yZGVyLWJveDttYXJnaW46MDtwYWRkaW5nOjA7fQpodG1sLGJvZHl7d2lkdGg6MTAwJTtiYWNrZ3JvdW5kOnRyYW5zcGFyZW50O292ZXJmbG93LXg6aGlkZGVuO292ZXJmbG93LXk6aGlkZGVuO30KI3Jvd3tkaXNwbGF5OmZsZXg7ZmxleC1kaXJlY3Rpb246cm93O2p1c3RpZnktY29udGVudDpzcGFjZS1iZXR3ZWVuO2FsaWduLWl0ZW1zOmZsZXgtZW5kO3dpZHRoOjEwMCU7cGFkZGluZzoxMHB4IDZweCA2cHg7fQouc2xvdHtkaXNwbGF5OmZsZXg7ZmxleC1kaXJlY3Rpb246Y29sdW1uO2FsaWduLWl0ZW1zOmNlbnRlcjtnYXA6M3B4O2ZsZXg6MTttaW4td2lkdGg6MDt9Ci5zbGJse2ZvbnQtZmFtaWx5Ok9yYml0cm9uLG1vbm9zcGFjZTtmb250LXNpemU6N3B4O2xldHRlci1zcGFjaW5nOjFweDt0ZXh0LXRyYW5zZm9ybTp1cHBlcmNhc2U7Y29sb3I6cmdiYSgyNTUsMjU1LDI1NSwwLjM4KTt0ZXh0LWFsaWduOmNlbnRlcjt3aGl0ZS1zcGFjZTpub3dyYXA7b3ZlcmZsb3c6aGlkZGVuO3RleHQtb3ZlcmZsb3c6ZWxsaXBzaXM7bWF4LXdpZHRoOjEwMCU7fQouc3JwbXtmb250LWZhbWlseTpPcmJpdHJvbixtb25vc3BhY2U7Zm9udC1zaXplOjdweDtsZXR0ZXItc3BhY2luZzowLjhweDttaW4taGVpZ2h0OjExcHg7dGV4dC1hbGlnbjpjZW50ZXI7d2hpdGUtc3BhY2U6bm93cmFwO30KLm5idG57cGFkZGluZzo1cHggN3B4O2ZvbnQtc2l6ZTo3cHg7Zm9udC1mYW1pbHk6T3JiaXRyb24sbW9ub3NwYWNlO2JvcmRlci1yYWRpdXM6NXB4O2N1cnNvcjpwb2ludGVyO2xldHRlci1zcGFjaW5nOjFweDtib3JkZXI6MS41cHggc29saWQ7YmFja2dyb3VuZDpyZ2JhKDAsMCwwLDAuNyk7dHJhbnNpdGlvbjphbGwgMC4xMnM7bWFyZ2luLXRvcDoycHg7dGV4dC10cmFuc2Zvcm06dXBwZXJjYXNlO3doaXRlLXNwYWNlOm5vd3JhcDttYXgtd2lkdGg6MTAwJTt9Ci5uYnRuOmhvdmVye3RyYW5zZm9ybTpzY2FsZSgxLjEpO2ZpbHRlcjpicmlnaHRuZXNzKDEuNyk7fQoubmJ0bjphY3RpdmV7dHJhbnNmb3JtOnNjYWxlKDAuOSk7fQouZXRsYmx7Zm9udC1zaXplOjdweDtjb2xvcjpyZ2JhKDI1NSwyNTUsMjU1LDAuMTUpO2ZvbnQtZmFtaWx5Ok9yYml0cm9uLG1vbm9zcGFjZTt0ZXh0LWFsaWduOmNlbnRlcjttYXJnaW4tdG9wOjFweDt9Cjwvc3R5bGU+PC9oZWFkPjxib2R5Pgo8ZGl2IGlkPSJyb3ciPjwvZGl2Pgo8c2NyaXB0Pgp2YXIgREY9WwogIHtpZDonZjAnLHN6OjYwLGxibDonU09MQVIgRkxBUkUnLGlnOnRydWUsIG52OjUuMCxidjowLCAgIGJsOjQsc2g6J2Ryb3AnLHA6WycjRkY2NjAwJywnI0ZGMjIwMCcsJyNGRkQ3MDAnLCcjRkY4ODAwJ10sZ3c6JyNGRjQ0MDAnLHJtOicjRkZENzAwJyxoYjonI0ZGRicsdHI6MTAsYnRuOidJR05JVEUnfSwKICB7aWQ6J2YxJyxzejo2MCxsYmw6J1ZPSUQgU1RPUk0nLCBpZzpmYWxzZSwgICAgIGJ2OjAuNDgsYmw6NixzaDond2luZycscDpbJyM4ODAwRkYnLCcjNDQwMENDJywnI0NDMDBGRicsJyNGRjQ0RkYnXSxndzonI0FBMDBGRicscm06JyNGRjg4RkYnLGhiOicjRkZGJyx0cjoxMn0sCiAge2lkOidmMicsc3o6NjAsbGJsOidNQVRSSVggQ09SRScsaWc6ZmFsc2UsICAgICBidjowLjQzLGJsOjMsc2g6J2NyeXMnLHA6WycjMDBGRjQ0JywnIzAwQ0MzMycsJyMwMEZGODgnLCcjQUFGRkNDJ10sZ3c6JyMwMEZGNDQnLHJtOicjODhGRkJCJyxoYjonIzExMScsdHI6OX0sCiAge2lkOidmMycsc3o6NjQsbGJsOidOT1ZBIFBVTFNFJywgaWc6dHJ1ZSwgbnY6Ni41LGJ2OjAsICAgYmw6NSxzaDonYmxhZCcscDpbJyMwMENDRkYnLCcjMDA4OEZGJywnIzAwRkZFRScsJyM4OERERkYnXSxndzonIzAwQ0NGRicscm06JyNBQUVFRkYnLGhiOicjMDAzJyx0cjoxMixidG46J1dBUlAgRFJJVkUnfSwKICB7aWQ6J2Y0Jyxzejo2MCxsYmw6J1RJVEFOIFdBUlAnLCBpZzpmYWxzZSwgICAgIGJ2OjAuNTUsYmw6NyxzaDonZmFuJywgcDpbJyNGRkQ3MDAnLCcjRkY0NDAwJywnI0ZGODgwMCcsJyNGRkVFQUEnXSxndzonI0ZGRDcwMCcscm06JyNGRjQ0MDAnLGhiOicjMjEwJyx0cjoxNH0sCiAge2lkOidmNScsc3o6NjAsbGJsOidDSEFPUyBGTFVYJywgaWc6ZmFsc2UsICAgICBidjowLjQ0LGJsOjQsc2g6J2Ryb3AnLHA6WycjRkYwMDQ0JywnI0ZGNDQwMCcsJyNGRjAwODgnLCcjRkY4ODAwJ10sZ3c6JyNGRjAwNDQnLHJtOicjRkY4OEFBJyxoYjonI0ZGRicsdHI6MTB9LAogIHtpZDonZjYnLHN6OjY4LGxibDonU0lOR1VMQVJJVFknLGlnOnRydWUsIG52OjkuMCxidjowLCAgIGJsOjgsc2g6J2ZhbicsIHA6WycjRkZGJywnI0ZGRDcwMCcsJyNGRjIyMDAnLCcjRkZBQTAwJ10sZ3c6JyNGRkZGRkYnLHJtOicjRkZENzAwJyxoYjonIzAwMCcsdHI6MjIsYnRuOidPQkxJVEVSQVRFJ30sCl07CnZhciBTVD17fSxUUj17fTsKdmFyIHJvdz1kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgncm93Jyk7CkRGLmZvckVhY2goZnVuY3Rpb24oc3ApewogIFNUW3NwLmlkXT17YTpNYXRoLnJhbmRvbSgpKjYuMjgsdjpzcC5pZz8wOnNwLmJ2K01hdGgucmFuZG9tKCkqMC4wNixkZzpmYWxzZSxsQTowLGxUOjB9O1RSW3NwLmlkXT1bXTsKICB2YXIgc2xvdD1kb2N1bWVudC5jcmVhdGVFbGVtZW50KCdkaXYnKTtzbG90LmNsYXNzTmFtZT0nc2xvdCc7CiAgdmFyIGN2PWRvY3VtZW50LmNyZWF0ZUVsZW1lbnQoJ2NhbnZhcycpO2N2LmlkPSdjXycrc3AuaWQ7Y3Yud2lkdGg9c3Auc3oqMjtjdi5oZWlnaHQ9c3Auc3oqMjtjdi5zdHlsZS5jc3NUZXh0PSdjdXJzb3I6Z3JhYjtib3JkZXItcmFkaXVzOjUwJTtkaXNwbGF5OmJsb2NrO21heC13aWR0aDoxMDAlOyc7CiAgdmFyIGxiPWRvY3VtZW50LmNyZWF0ZUVsZW1lbnQoJ2RpdicpO2xiLmNsYXNzTmFtZT0nc2xibCc7bGIudGV4dENvbnRlbnQ9c3AubGJsOwogIHZhciBybT1kb2N1bWVudC5jcmVhdGVFbGVtZW50KCdkaXYnKTtybS5pZD0ncl8nK3NwLmlkO3JtLmNsYXNzTmFtZT0nc3JwbSc7cm0uc3R5bGUuY29sb3I9c3AuZ3c7CiAgc2xvdC5hcHBlbmRDaGlsZChjdik7c2xvdC5hcHBlbmRDaGlsZChsYik7c2xvdC5hcHBlbmRDaGlsZChybSk7CiAgaWYoc3AuaWcpe3ZhciBidG49ZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgnYnV0dG9uJyk7YnRuLmNsYXNzTmFtZT0nbmJ0bic7YnRuLnRleHRDb250ZW50PXNwLmJ0bjtidG4uc3R5bGUuYm9yZGVyQ29sb3I9c3AuZ3c7YnRuLnN0eWxlLmNvbG9yPXNwLmd3O2J0bi5vbmNsaWNrPShmdW5jdGlvbihzaWQsbnYpe3JldHVybiBmdW5jdGlvbigpe1NUW3NpZF0udj1udjtzaGsoKTt9O30pKHNwLmlkLHNwLm52KTtzbG90LmFwcGVuZENoaWxkKGJ0bik7fQogIGVsc2V7dmFyIGVsPWRvY3VtZW50LmNyZWF0ZUVsZW1lbnQoJ2RpdicpO2VsLmNsYXNzTmFtZT0nZXRsYmwnO2VsLnRleHRDb250ZW50PSfiiJ4gQVVUTyc7ZWwuc3R5bGUuY29sb3I9c3AuZ3crJzQ0JztzbG90LmFwcGVuZENoaWxkKGVsKTt9CiAgcm93LmFwcGVuZENoaWxkKHNsb3QpOwogIGZ1bmN0aW9uIGdhKGUsYzIpe3ZhciByMj1jMi5nZXRCb3VuZGluZ0NsaWVudFJlY3QoKTtyZXR1cm4gTWF0aC5hdGFuMigoZS5jbGllbnRZfHwoZS50b3VjaGVzJiZlLnRvdWNoZXNbMF0uY2xpZW50WSl8fDApLXIyLnRvcC1yMi5oZWlnaHQvMiwoZS5jbGllbnRYfHwoZS50b3VjaGVzJiZlLnRvdWNoZXNbMF0uY2xpZW50WCl8fDApLXIyLmxlZnQtcjIud2lkdGgvMik7fQogIGN2LmFkZEV2ZW50TGlzdGVuZXIoJ21vdXNlZG93bicsZnVuY3Rpb24oZSl7dmFyIHM9U1Rbc3AuaWRdO3MuZGc9dHJ1ZTtzLmxBPWdhKGUsY3YpO3MubFQ9cGVyZm9ybWFuY2Uubm93KCk7Y3Yuc3R5bGUuY3Vyc29yPSdncmFiYmluZyc7fSk7CiAgd2luZG93LmFkZEV2ZW50TGlzdGVuZXIoJ21vdXNlbW92ZScsKGZ1bmN0aW9uKHNpZCl7cmV0dXJuIGZ1bmN0aW9uKGUpe3ZhciBzPVNUW3NpZF07aWYoIXMuZGcpcmV0dXJuO3ZhciBub3c9cGVyZm9ybWFuY2Uubm93KCksYzI9ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2NfJytzaWQpO3ZhciBhPWdhKGUsYzIpLGQ9YS1zLmxBO2lmKGQ+TWF0aC5QSSlkLT02LjI4O2lmKGQ8LU1hdGguUEkpZCs9Ni4yODtzLnY9ZC9NYXRoLm1heChub3ctcy5sVCwxKSoyMDtzLmErPWQ7cy5sQT1hO3MubFQ9bm93O307fSkoc3AuaWQpKTsKICB3aW5kb3cuYWRkRXZlbnRMaXN0ZW5lcignbW91c2V1cCcsKGZ1bmN0aW9uKHNpZCl7cmV0dXJuIGZ1bmN0aW9uKCl7U1Rbc2lkXS5kZz1mYWxzZTtkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnY18nK3NpZCkuc3R5bGUuY3Vyc29yPSdncmFiJzt9O30pKHNwLmlkKSk7CiAgY3YuYWRkRXZlbnRMaXN0ZW5lcigndG91Y2hzdGFydCcsZnVuY3Rpb24oZSl7dmFyIHM9U1Rbc3AuaWRdO3MuZGc9dHJ1ZTtzLmxBPWdhKGUsY3YpO3MubFQ9cGVyZm9ybWFuY2Uubm93KCk7ZS5wcmV2ZW50RGVmYXVsdCgpO30se3Bhc3NpdmU6ZmFsc2V9KTsKICB3aW5kb3cuYWRkRXZlbnRMaXN0ZW5lcigndG91Y2htb3ZlJywoZnVuY3Rpb24oc2lkKXtyZXR1cm4gZnVuY3Rpb24oZSl7dmFyIHM9U1Rbc2lkXTtpZighcy5kZylyZXR1cm47dmFyIG5vdz1wZXJmb3JtYW5jZS5ub3coKSxjMj1kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnY18nK3NpZCk7dmFyIGE9Z2EoZSxjMiksZD1hLXMubEE7aWYoZD5NYXRoLlBJKWQtPTYuMjg7aWYoZDwtTWF0aC5QSSlkKz02LjI4O3Mudj1kL01hdGgubWF4KG5vdy1zLmxULDEpKjIwO3MuYSs9ZDtzLmxBPWE7cy5sVD1ub3c7ZS5wcmV2ZW50RGVmYXVsdCgpO307fSkoc3AuaWQpLHtwYXNzaXZlOmZhbHNlfSk7CiAgd2luZG93LmFkZEV2ZW50TGlzdGVuZXIoJ3RvdWNoZW5kJywoZnVuY3Rpb24oc2lkKXtyZXR1cm4gZnVuY3Rpb24oKXtTVFtzaWRdLmRnPWZhbHNlO307fSkoc3AuaWQpKTsKfSk7CnZhciBzaGFrZU49MDsKZnVuY3Rpb24gc2hrKCl7c2hha2VOPTE0O3ZhciB1PWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdyb3cnKTsoZnVuY3Rpb24gZigpe2lmKHNoYWtlTjw9MCl7dS5zdHlsZS50cmFuc2Zvcm09Jyc7cmV0dXJuO311LnN0eWxlLnRyYW5zZm9ybT0ndHJhbnNsYXRlKCcrKE1hdGgucmFuZG9tKCktLjUpKnNoYWtlTiouNisncHgsJysoTWF0aC5yYW5kb20oKS0uNSkqc2hha2VOKi4zKydweCknO3NoYWtlTi0tO3JlcXVlc3RBbmltYXRpb25GcmFtZShmKTt9KSgpO30KZnVuY3Rpb24gZHJhdyhzcCxhbmdsZSx2ZWwpewogIHZhciBjdj1kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnY18nK3NwLmlkKTtpZighY3YpcmV0dXJuOwogIHZhciBjdHg9Y3YuZ2V0Q29udGV4dCgnMmQnKSxzej1zcC5zeixjeD1zeixjeT1zeixyPXN6LTQsc3BkPU1hdGguYWJzKHZlbCk7CiAgY3R4LmNsZWFyUmVjdCgwLDAsc3oqMixzeioyKTsKICBpZihzcGQ+MC4wNSl7dmFyIGdnPWN0eC5jcmVhdGVSYWRpYWxHcmFkaWVudChjeCxjeSxyLGN4LGN5LHIrNCtzcGQqMyk7Z2cuYWRkQ29sb3JTdG9wKDAsc3AuZ3crJzY2Jyk7Z2cuYWRkQ29sb3JTdG9wKDEsc3AuZ3crJzAwJyk7Y3R4LmJlZ2luUGF0aCgpO2N0eC5hcmMoY3gsY3kscis0K3NwZCozLDAsTWF0aC5QSSoyKTtjdHguZmlsbFN0eWxlPWdnO2N0eC5maWxsKCk7fQogIHZhciB0cj1UUltzcC5pZF07dHIucHVzaChhbmdsZSk7aWYodHIubGVuZ3RoPnNwLnRyKXRyLnNoaWZ0KCk7CiAgaWYoc3BkPjAuMTImJnRyLmxlbmd0aD4yKXtmb3IodmFyIHRpPTA7dGk8dHIubGVuZ3RoLTE7dGkrKyl7dmFyIGZyYWM9dGkvdHIubGVuZ3RoO2Zvcih2YXIgYmk9MDtiaTxzcC5ibDtiaSsrKXt2YXIgYmEyPXRyW3RpXSsoYmkqNi4yOC9zcC5ibCk7Y3R4LnNhdmUoKTtjdHgudHJhbnNsYXRlKGN4LGN5KTtjdHgucm90YXRlKGJhMik7Y3R4Lmdsb2JhbEFscGhhPWZyYWMqMC4xNSpNYXRoLm1pbihzcGQqMS41LDEpO2N0eC5iZWdpblBhdGgoKTtjdHguZWxsaXBzZShyKi4zOCwwLHIqLjM0LHIqLjE0LDAsMCxNYXRoLlBJKjIpO2N0eC5maWxsU3R5bGU9c3AucFswXTtjdHguZmlsbCgpO2N0eC5yZXN0b3JlKCk7fX1jdHguZ2xvYmFsQWxwaGE9MTt9CiAgZm9yKHZhciBpPTA7aTxzcC5ibDtpKyspe3ZhciBiYT1hbmdsZSsoaSo2LjI4L3NwLmJsKTtjdHguc2F2ZSgpO2N0eC50cmFuc2xhdGUoY3gsY3kpO2N0eC5yb3RhdGUoYmEpO3ZhciBnPWN0eC5jcmVhdGVMaW5lYXJHcmFkaWVudCgwLC1yKi4wOCxyKi44MixyKi4wOCk7Zy5hZGRDb2xvclN0b3AoMCxzcC5wWzBdKTtnLmFkZENvbG9yU3RvcCguNDUsc3AucFsxJXNwLnAubGVuZ3RoXSk7Zy5hZGRDb2xvclN0b3AoLjc1LHNwLnBbMiVzcC5wLmxlbmd0aF0pO2cuYWRkQ29sb3JTdG9wKDEsc3AucFszJXNwLnAubGVuZ3RoXSsnMjInKTtjdHguZmlsbFN0eWxlPWc7Y3R4LmJlZ2luUGF0aCgpOwogIGlmKHNwLnNoPT09J2Ryb3AnKXtjdHguZWxsaXBzZShyKi40MiwwLHIqLjQyLHIqLjE5LDAsMCxNYXRoLlBJKjIpO31lbHNlIGlmKHNwLnNoPT09J3dpbmcnKXtjdHgubW92ZVRvKDAsMCk7Y3R4LmJlemllckN1cnZlVG8ociouMiwtciouMjgsciouNywtciouMjIsciouODIsMCk7Y3R4LmJlemllckN1cnZlVG8ociouNyxyKi4yMixyKi4yLHIqLjI4LDAsMCk7Y3R4LmNsb3NlUGF0aCgpO31lbHNlIGlmKHNwLnNoPT09J2NyeXMnKXtjdHgubW92ZVRvKHIqLjA4LDApO2N0eC5saW5lVG8ociouMzgsLXIqLjIyKTtjdHgubGluZVRvKHIqLjgyLDApO2N0eC5saW5lVG8ociouMzgsciouMjIpO2N0eC5jbG9zZVBhdGgoKTt9ZWxzZSBpZihzcC5zaD09PSdibGFkJyl7Y3R4Lm1vdmVUbygwLC1yKi4wNSk7Y3R4LmxpbmVUbyhyKi43OCwtciouMTIpO2N0eC5saW5lVG8ociouODIsMCk7Y3R4LmxpbmVUbyhyKi43OCxyKi4xMik7Y3R4LmxpbmVUbygwLHIqLjA1KTtjdHguY2xvc2VQYXRoKCk7fWVsc2V7Y3R4LmVsbGlwc2UociouNDAsMCxyKi40MCxyKi4yMiwwLDAsTWF0aC5QSSoyKTt9CiAgY3R4LmZpbGwoKTtjdHguc3Ryb2tlU3R5bGU9c3AucFswXSsnODgnO2N0eC5saW5lV2lkdGg9MTtjdHguc3Ryb2tlKCk7CiAgaWYoc3BkPjAuMil7Y3R4Lmdsb2JhbEFscGhhPU1hdGgubWluKChzcGQtLjIpKi40LC40KTtjdHguZmlsbFN0eWxlPXNwLnJtO2N0eC5maWxsKCk7Y3R4Lmdsb2JhbEFscGhhPTE7fWN0eC5yZXN0b3JlKCk7fQogIGN0eC5iZWdpblBhdGgoKTtjdHguYXJjKGN4LGN5LHIsMCxNYXRoLlBJKjIpO2N0eC5zdHJva2VTdHlsZT1zcC5ybSsoc3BkPi4yMj8nQkInOicyMicpO2N0eC5saW5lV2lkdGg9c3BkPi40PzI6MS4yO2N0eC5zdHJva2UoKTsKICBpZihzcGQ+MC4zKXt2YXIgcGM9TWF0aC5taW4oTWF0aC5mbG9vcihzcGQqNCksMTApO2Zvcih2YXIgcGk9MDtwaTxwYztwaSsrKXt2YXIgcGE9YW5nbGUqMy4yK3BpKjIuMCtwZXJmb3JtYW5jZS5ub3coKSouMDAxNTt2YXIgcHI9ciooLjYrTWF0aC5yYW5kb20oKSouMjgpO2N0eC5iZWdpblBhdGgoKTtjdHguYXJjKGN4K01hdGguY29zKHBhKSpwcixjeStNYXRoLnNpbihwYSkqcHIsMStNYXRoLnJhbmRvbSgpKjEuMywwLE1hdGguUEkqMik7Y3R4LmZpbGxTdHlsZT1zcC5wW3BpJXNwLnAubGVuZ3RoXTtjdHguZ2xvYmFsQWxwaGE9LjUrTWF0aC5yYW5kb20oKSouMztjdHguZmlsbCgpO2N0eC5nbG9iYWxBbHBoYT0xO319CiAgdmFyIGhnPWN0eC5jcmVhdGVSYWRpYWxHcmFkaWVudChjeC1yKi4wNCxjeS1yKi4wNCwxLGN4LGN5LHIqLjE4KTtoZy5hZGRDb2xvclN0b3AoMCwnI2ZmZicpO2hnLmFkZENvbG9yU3RvcCguNCxzcC5wWzBdKTtoZy5hZGRDb2xvclN0b3AoMSxzcC5oYik7Y3R4LmJlZ2luUGF0aCgpO2N0eC5hcmMoY3gsY3ksciouMTgsMCxNYXRoLlBJKjIpO2N0eC5maWxsU3R5bGU9aGc7Y3R4LmZpbGwoKTtjdHguYmVnaW5QYXRoKCk7Y3R4LmFyYyhjeCxjeSxyKi4wNiwwLE1hdGguUEkqMik7Y3R4LmZpbGxTdHlsZT0ncmdiYSgyNTUsMjU1LDI1NSwwLjQ1KSc7Y3R4LmZpbGwoKTsKICB2YXIgcmU9ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3JfJytzcC5pZCk7aWYocmUpe3ZhciBydj1NYXRoLmFicyh2ZWwqNjAvKE1hdGguUEkqMikqNjApO2lmKHJ2Pjgpe3JlLnRleHRDb250ZW50PU1hdGgucm91bmQocnYpLnRvTG9jYWxlU3RyaW5nKCkrJyBSUE0nO3JlLnN0eWxlLmNvbG9yPXJ2PjkwMDA/JyNGRjAwMDAnOnJ2PjQwMDA/JyNGRjg4MDAnOnJ2PjEyMDA/JyNGRkQ3MDAnOnNwLmd3O31lbHNle3JlLnRleHRDb250ZW50PXNwLmlnPydSRUFEWSc6J+KIniBFVEVSTkFMJztyZS5zdHlsZS5jb2xvcj0ncmdiYSgyNTUsMjU1LDI1NSwwLjE2KSc7fX0KfQp2YXIgQUY9MC45OTk5OTMsTkY9MC45OTg2OwpmdW5jdGlvbiBsb29wKCl7REYuZm9yRWFjaChmdW5jdGlvbihzcCl7dmFyIHM9U1Rbc3AuaWRdO2lmKCFzLmRnKXtzLnYqPXNwLmlnP05GOkFGO2lmKE1hdGguYWJzKHMudik8c3AuYnYpcy52PXNwLmlnPzA6c3AuYnY7fXMuYSs9cy52O2RyYXcoc3Ascy5hLHMudik7fSk7cmVxdWVzdEFuaW1hdGlvbkZyYW1lKGxvb3ApO30KbG9vcCgpOwo8L3NjcmlwdD48L2JvZHk+PC9odG1sPg=="
-    try:
-        components.html(_b64.b64decode(_SPINNER_B64).decode("utf-8"), height=500)
-    except:
-        # Fallback inline spinners if b64 fails
-        components.html("""<style>body{margin:0;background:transparent;display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:20px;padding:20px;}</style>
-<div style="text-align:center;font-family:monospace;color:#FFD700;font-size:14px;padding:20px">
-🌀 SOLAR FLARE &nbsp;&nbsp; 🌀 VOID STORM &nbsp;&nbsp; 🌀 MATRIX CORE<br><br>
-⚡ NOVA PULSE &nbsp;&nbsp; ⚡ TITAN WARP &nbsp;&nbsp; ☢️ HYPER NUKE &nbsp;&nbsp; 💥 OMEGA NUKE
-</div>""", height=100)
-    st.stop()
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# MAIN APP SETUP
-# ─────────────────────────────────────────────────────────────────────────────
-# ── ENSURE QUERY PARAMS ARE ALWAYS SET WHEN LOGGED IN ──
-if st.session_state.user_name and not st.query_params.get("u"):
-    st.query_params["u"] = st.session_state.user_name.lower().strip()
-    st.query_params["t"] = (st.session_state.get("user_theme", "") or "").strip()
-    st.query_params["m"] = (st.session_state.get("game_mode", "chill") or "chill").strip()
-
-MODE   = st.session_state.game_mode or "chill"
-wd     = st.session_state.world_data
-BG     = st.session_state.get("bg_color","#ffffff")
-RAW_C  = st.session_state.vibe_color
-C      = readable_color(RAW_C, BG)
-TEXT   = text_on(BG)
-MUTED  = "#444444" if is_light(BG) else "#cccccc"
-currency = wd.get("currency","Credits")
-
-if st.session_state.get("first_session", False):
-    st.session_state.first_session = False
-    st.session_state.spins_left = max(st.session_state.get("spins_left",0), 1)
-    st.session_state.spinner_available = True
-
-_ch = C.lstrip('#')
-try: CR, CG, CB = int(_ch[0:2],16), int(_ch[2:4],16), int(_ch[4:6],16)
-except: CR, CG, CB = 255, 215, 0
-
-st.markdown(f"""<style>
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap');
-html,body,[data-testid="stAppViewContainer"]{{background:{BG if BG and BG != "#ffffff" else "#0a0010"}!important;color:{TEXT}!important;font-family:'Space Mono',monospace;}}
-[data-testid="stHeader"],[data-testid="stToolbar"]{{background:transparent!important;}}
-[data-testid="stSidebar"]{{background:#111111!important;}}
-[data-testid="stSidebar"] *{{color:#ffffff!important;}}
-[data-testid="stSidebar"] div.stButton>button{{border:2px solid {C}!important;background:#1a1a1a!important;color:#ffffff!important;font-family:'Bebas Neue',sans-serif!important;font-size:16px!important;letter-spacing:2px!important;padding:10px 16px!important;border-radius:10px!important;animation:none!important;width:100%!important;margin-bottom:6px!important;}}
-#MainMenu,footer{{visibility:hidden;}}
-input,textarea{{background:#ffffff!important;color:#000000!important;caret-color:#000000!important;border:2px solid {C}!important;border-radius:10px!important;font-family:'Space Mono',monospace!important;font-size:14px!important;padding:10px 14px!important;}}
-input::placeholder,textarea::placeholder{{color:#666666!important;}}
-label,.stTextInput label{{color:{TEXT}!important;font-family:'Space Mono',monospace!important;font-size:11px!important;letter-spacing:2px!important;}}
-[data-testid="stSidebar"] input{{border:1px solid transparent!important;border-radius:6px!important;background:#ffffff!important;color:#000000!important;box-shadow:none!important;padding:8px 10px!important;outline:none!important;}}
-[data-testid="stSidebar"] input:focus{{border:1px solid transparent!important;box-shadow:none!important;outline:none!important;}}
-@keyframes titan-pulse{{0%{{box-shadow:0 0 20px {C},inset 0 0 10px {C};border-color:{C};}}50%{{box-shadow:0 0 80px {C},inset 0 0 40px {C};border-color:#ffffff;}}100%{{box-shadow:0 0 20px {C},inset 0 0 10px {C};border-color:{C};}}}}
-div.stButton>button{{border:2px solid {C}!important;background:#000000!important;color:#ffffff!important;font-family:'Bebas Neue',sans-serif!important;font-size:13px!important;letter-spacing:2px!important;padding:4px 12px!important;border-radius:10px!important;animation:titan-pulse 2.5s infinite ease-in-out!important;width:100%!important;text-transform:uppercase;transition:transform 0.3s;margin-bottom:6px;}}
-div.stButton>button:hover{{transform:scale(1.02);}}
-.metric-card,.shop-card,.ach-card,.monster-card,.secret-card{{background:#111111!important;border:2px solid {C}!important;border-radius:14px!important;padding:18px!important;margin-bottom:12px!important;color:#ffffff!important;}}
-.metric-card *,.shop-card *,.ach-card *,.monster-card *,.secret-card *{{color:#ffffff!important;}}
-@keyframes blink{{0%,100%{{opacity:0.4}}50%{{opacity:1}}}}
 </style>""", unsafe_allow_html=True)
+
+    components.html("""<canvas id="portalBg" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;"></canvas>
+<script>
+var cv=document.getElementById('portalBg'),c=cv.getContext('2d');
+function resize(){cv.width=window.innerWidth*2;cv.height=window.innerHeight*2;c.scale(2,2);}
+resize();window.addEventListener('resize',resize);
+var W=window.innerWidth,H=window.innerHeight;
+var cx=W/2,cy=H/2;
+var maxR=Math.min(W,H)*0.48;
+var rings=[];
+for(var i=0;i<14;i++){
+  var r=maxR*(0.15+i*0.063);
+  rings.push({r:r,segments:6+i*4,width:1+Math.sin(i*0.7)*1.5+1.5,speed:0.0004+i*0.00008,dir:i%2===0?1:-1,hue:270+i*22,sat:65+i*2,gap:0.015+i*0.005});
+}
+var sparks=[];
+for(var i=0;i<120;i++){
+  sparks.push({angle:Math.random()*Math.PI*2,dist:40+Math.random()*(maxR-20),speed:0.001+Math.random()*0.003,dir:Math.random()>0.5?1:-1,size:0.5+Math.random()*2,hue:Math.random()*360,pulse:Math.random()*6.28,pulseSpeed:0.02+Math.random()*0.04,trail:[]});
+}
+var bolts=[];
+for(var i=0;i<8;i++){
+  bolts.push({fromRing:Math.floor(Math.random()*10),toRing:Math.floor(Math.random()*10)+2,angle:Math.random()*Math.PI*2,life:0,maxLife:60+Math.random()*120,hue:250+Math.random()*80,active:false,nextSpawn:Math.floor(Math.random()*200)});
+}
+var geometric=[];
+for(var i=0;i<4;i++){
+  geometric.push({sides:3+i,r:maxR*(0.25+i*0.18),speed:0.0002*(i%2===0?1:-1),hue:40+i*70,alpha:0.08+i*0.02});
+}
+var pulseWaves=[];
+var t=0;
+function frame(){
+  t++;
+  W=window.innerWidth;H=window.innerHeight;cx=W/2;cy=H/2;
+  c.globalCompositeOperation='source-over';
+  c.fillStyle='rgba(0,0,2,0.18)';
+  c.fillRect(0,0,W,H);
+  var depth=c.createRadialGradient(cx,cy,0,cx,cy,maxR*1.2);
+  depth.addColorStop(0,'rgba(20,0,50,'+(0.04+Math.sin(t*0.002)*0.02)+')');
+  depth.addColorStop(0.3,'rgba(10,0,30,'+(0.03+Math.sin(t*0.003)*0.015)+')');
+  depth.addColorStop(0.6,'rgba(5,0,15,0.02)');
+  depth.addColorStop(1,'rgba(0,0,0,0)');
+  c.fillStyle=depth;c.fillRect(0,0,W,H);
+  for(var i=geometric.length-1;i>=0;i--){
+    var g=geometric[i];
+    var ga=t*g.speed;
+    c.save();c.translate(cx,cy);c.rotate(ga);
+    c.beginPath();
+    for(var s=0;s<g.sides;s++){
+      var a2=s*Math.PI*2/g.sides-Math.PI/2;
+      var px=Math.cos(a2)*g.r,py=Math.sin(a2)*g.r;
+      if(s===0)c.moveTo(px,py);else c.lineTo(px,py);
+    }
+    c.closePath();
+    var gpulse=g.alpha*(0.6+Math.sin(t*0.003+i)*0.4);
+    c.strokeStyle='hsla('+((g.hue+t*0.015)%360)+',50%,50%,'+gpulse+')';
+    c.lineWidth=0.8;c.stroke();
+    for(var s=0;s<g.sides;s++){
+      var a2=s*Math.PI*2/g.sides-Math.PI/2;
+      var px=Math.cos(a2)*g.r,py=Math.sin(a2)*g.r;
+      c.beginPath();c.arc(px,py,2,0,6.28);
+      c.fillStyle='hsla('+((g.hue+t*0.015)%360)+',70%,70%,'+(gpulse*2)+')';
+      c.fill();
+    }
+    c.restore();
+  }
+  for(var i=0;i<rings.length;i++){
+    var ring=rings[i];
+    var baseAngle=t*ring.speed*ring.dir;
+    var segArc=(Math.PI*2/ring.segments)*(1-ring.gap);
+    var gapArc=(Math.PI*2/ring.segments)*ring.gap;
+    var ringPulse=0.4+Math.sin(t*0.003+i*0.6)*0.35;
+    for(var s=0;s<ring.segments;s++){
+      var sAngle=baseAngle+s*(segArc+gapArc);
+      var segBright=ringPulse*(0.5+Math.sin(t*0.005+s*0.9+i*0.4)*0.5);
+      var hue2=(ring.hue+t*0.015+s*2)%360;
+      c.beginPath();c.arc(cx,cy,ring.r,sAngle,sAngle+segArc);
+      c.strokeStyle='hsla('+hue2+','+ring.sat+'%,55%,'+segBright*0.65+')';
+      c.lineWidth=ring.width;c.stroke();
+      if(segBright>0.5){
+        c.beginPath();c.arc(cx,cy,ring.r,sAngle,sAngle+segArc);
+        c.strokeStyle='hsla('+hue2+','+ring.sat+'%,75%,'+(segBright-0.5)*0.35+')';
+        c.lineWidth=ring.width+6;c.stroke();
+      }
+      if(segBright>0.7&&ring.width>2){
+        var midA=sAngle+segArc/2;
+        var sx2=cx+Math.cos(midA)*ring.r,sy2=cy+Math.sin(midA)*ring.r;
+        var nodeGlow=c.createRadialGradient(sx2,sy2,0,sx2,sy2,8);
+        nodeGlow.addColorStop(0,'hsla('+hue2+',80%,80%,'+(segBright-0.7)*0.6+')');
+        nodeGlow.addColorStop(1,'rgba(0,0,0,0)');
+        c.fillStyle=nodeGlow;c.fillRect(sx2-8,sy2-8,16,16);
+      }
+    }
+  }
+  for(var i=0;i<sparks.length;i++){
+    var sp=sparks[i];
+    sp.angle+=sp.speed*sp.dir;sp.pulse+=sp.pulseSpeed;
+    var sparkBright=0.3+Math.sin(sp.pulse)*0.5;
+    var sx2=cx+Math.cos(sp.angle)*sp.dist,sy2=cy+Math.sin(sp.angle)*sp.dist;
+    sp.trail.push({x:sx2,y:sy2,a:sparkBright});
+    if(sp.trail.length>6)sp.trail.shift();
+    for(var j=0;j<sp.trail.length;j++){
+      var tr=sp.trail[j];var ta=tr.a*(j/sp.trail.length)*0.4;
+      c.beginPath();c.arc(tr.x,tr.y,sp.size*(j/sp.trail.length),0,6.28);
+      c.fillStyle='hsla('+((sp.hue+t*0.02)%360)+',70%,65%,'+ta+')';c.fill();
+    }
+    c.beginPath();c.arc(sx2,sy2,sp.size,0,6.28);
+    c.fillStyle='hsla('+((sp.hue+t*0.02)%360)+',80%,70%,'+sparkBright*0.7+')';c.fill();
+  }
+  for(var i=0;i<bolts.length;i++){
+    var b=bolts[i];
+    if(!b.active){b.nextSpawn--;if(b.nextSpawn<=0){b.active=true;b.life=0;b.angle=Math.random()*Math.PI*2;b.fromRing=Math.floor(Math.random()*8);b.toRing=b.fromRing+2+Math.floor(Math.random()*4);if(b.toRing>=rings.length)b.toRing=rings.length-1;b.hue=250+Math.random()*80;}continue;}
+    b.life++;if(b.life>b.maxLife){b.active=false;b.nextSpawn=80+Math.floor(Math.random()*300);continue;}
+    var bAlpha=b.life<10?b.life/10:b.life>b.maxLife-15?(b.maxLife-b.life)/15:1;bAlpha*=0.4;
+    var r1=rings[b.fromRing].r,r2=rings[Math.min(b.toRing,rings.length-1)].r;
+    var ba=b.angle+Math.sin(t*0.005)*0.1;
+    var x1=cx+Math.cos(ba)*r1,y1=cy+Math.sin(ba)*r1;
+    c.beginPath();c.moveTo(x1,y1);
+    for(var s=1;s<=6;s++){
+      var frac=s/6;var midR=r1+(r2-r1)*frac;var jitter=(Math.random()-0.5)*12;
+      c.lineTo(cx+Math.cos(ba+jitter*0.01)*midR+jitter,cy+Math.sin(ba+jitter*0.01)*midR+jitter*0.5);
+    }
+    c.strokeStyle='hsla('+b.hue+',80%,70%,'+bAlpha+')';c.lineWidth=1.5;c.stroke();
+    c.strokeStyle='hsla('+b.hue+',90%,90%,'+(bAlpha*0.5)+')';c.lineWidth=4;c.stroke();
+  }
+  if(t%120<3){pulseWaves.push({r:30,maxR:maxR*1.1,speed:2.5,alpha:0.2,hue:(270+t*0.1)%360});}
+  for(var i=pulseWaves.length-1;i>=0;i--){
+    var pw=pulseWaves[i];pw.r+=pw.speed;pw.alpha*=0.985;
+    if(pw.r>pw.maxR||pw.alpha<0.005){pulseWaves.splice(i,1);continue;}
+    c.beginPath();c.arc(cx,cy,pw.r,0,6.28);
+    c.strokeStyle='hsla('+pw.hue+',70%,60%,'+pw.alpha+')';c.lineWidth=2;c.stroke();
+  }
+  var hexR=28;
+  c.save();c.translate(cx,cy);c.rotate(t*0.0008);
+  for(var h=0;h<3;h++){
+    var hr=hexR*(1+h*0.5);var ha=(0.12-h*0.03)*(0.6+Math.sin(t*0.004+h)*0.4);
+    c.beginPath();
+    for(var i=0;i<6;i++){var a2=i*Math.PI/3-Math.PI/6+h*0.1;if(i===0)c.moveTo(Math.cos(a2)*hr,Math.sin(a2)*hr);else c.lineTo(Math.cos(a2)*hr,Math.sin(a2)*hr);}
+    c.closePath();c.strokeStyle='hsla('+((40+h*30+t*0.01)%360)+',70%,60%,'+ha+')';c.lineWidth=1;c.stroke();
+  }
+  c.restore();
+  var coreGlow=c.createRadialGradient(cx,cy,0,cx,cy,50);
+  coreGlow.addColorStop(0,'rgba(255,255,255,'+(0.04+Math.sin(t*0.004)*0.02)+')');
+  coreGlow.addColorStop(0.3,'rgba(255,215,0,'+(0.03+Math.sin(t*0.005)*0.015)+')');
+  coreGlow.addColorStop(0.6,'rgba(120,0,255,'+(0.02+Math.sin(t*0.003)*0.01)+')');
+  coreGlow.addColorStop(1,'rgba(0,0,0,0)');
+  c.fillStyle=coreGlow;c.beginPath();c.arc(cx,cy,50,0,6.28);c.fill();
+  var outerAura=c.createRadialGradient(cx,cy,maxR*0.8,cx,cy,maxR*1.3);
+  outerAura.addColorStop(0,'rgba(120,0,255,'+(0.015+Math.sin(t*0.002)*0.008)+')');
+  outerAura.addColorStop(0.4,'rgba(255,0,180,'+(0.01+Math.sin(t*0.003)*0.005)+')');
+  outerAura.addColorStop(0.7,'rgba(0,100,255,'+(0.008+Math.sin(t*0.004)*0.004)+')');
+  outerAura.addColorStop(1,'rgba(0,0,0,0)');
+  c.fillStyle=outerAura;c.beginPath();c.arc(cx,cy,maxR*1.3,0,6.28);c.fill();
+  requestAnimationFrame(frame);
+}
+c.fillStyle='#000';c.fillRect(0,0,W,H);
+frame();
+</script>""", height=0)
+
+    components.html("""<canvas id="portalBg" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;"></canvas>
+<script>
+var cv=document.getElementById('portalBg'),c=cv.getContext('2d');
+function resize(){cv.width=window.innerWidth*2;cv.height=window.innerHeight*2;c.scale(2,2);}
+resize();window.addEventListener('resize',resize);
+var W=window.innerWidth,H=window.innerHeight;
+var cx=W/2,cy=H/2;
+var maxR=Math.min(W,H)*0.48;
+var rings=[];
+for(var i=0;i<14;i++){
+  var r=maxR*(0.15+i*0.063);
+  rings.push({r:r,segments:6+i*4,width:1+Math.sin(i*0.7)*1.5+1.5,speed:0.0004+i*0.00008,dir:i%2===0?1:-1,hue:270+i*22,sat:65+i*2,gap:0.015+i*0.005});
+}
+var sparks=[];
+for(var i=0;i<120;i++){
+  sparks.push({angle:Math.random()*Math.PI*2,dist:40+Math.random()*(maxR-20),speed:0.001+Math.random()*0.003,dir:Math.random()>0.5?1:-1,size:0.5+Math.random()*2,hue:Math.random()*360,pulse:Math.random()*6.28,pulseSpeed:0.02+Math.random()*0.04,trail:[]});
+}
+var bolts=[];
+for(var i=0;i<8;i++){
+  bolts.push({fromRing:Math.floor(Math.random()*10),toRing:Math.floor(Math.random()*10)+2,angle:Math.random()*Math.PI*2,life:0,maxLife:60+Math.random()*120,hue:250+Math.random()*80,active:false,nextSpawn:Math.floor(Math.random()*200)});
+}
+var geometric=[];
+for(var i=0;i<4;i++){
+  geometric.push({sides:3+i,r:maxR*(0.25+i*0.18),speed:0.0002*(i%2===0?1:-1),hue:40+i*70,alpha:0.08+i*0.02});
+}
+var pulseWaves=[];
+var t=0;
+function frame(){
+  t++;
+  W=window.innerWidth;H=window.innerHeight;cx=W/2;cy=H/2;
+  c.globalCompositeOperation='source-over';
+  c.fillStyle='rgba(0,0,2,0.18)';
+  c.fillRect(0,0,W,H);
+  var depth=c.createRadialGradient(cx,cy,0,cx,cy,maxR*1.2);
+  depth.addColorStop(0,'rgba(20,0,50,'+(0.04+Math.sin(t*0.002)*0.02)+')');
+  depth.addColorStop(0.3,'rgba(10,0,30,'+(0.03+Math.sin(t*0.003)*0.015)+')');
+  depth.addColorStop(0.6,'rgba(5,0,15,0.02)');
+  depth.addColorStop(1,'rgba(0,0,0,0)');
+  c.fillStyle=depth;c.fillRect(0,0,W,H);
+  for(var i=geometric.length-1;i>=0;i--){
+    var g=geometric[i];
+    var ga=t*g.speed;
+    c.save();c.translate(cx,cy);c.rotate(ga);
+    c.beginPath();
+    for(var s=0;s<g.sides;s++){
+      var a2=s*Math.PI*2/g.sides-Math.PI/2;
+      var px=Math.cos(a2)*g.r,py=Math.sin(a2)*g.r;
+      if(s===0)c.moveTo(px,py);else c.lineTo(px,py);
+    }
+    c.closePath();
+    var gpulse=g.alpha*(0.6+Math.sin(t*0.003+i)*0.4);
+    c.strokeStyle='hsla('+((g.hue+t*0.015)%360)+',50%,50%,'+gpulse+')';
+    c.lineWidth=0.8;c.stroke();
+    for(var s=0;s<g.sides;s++){
+      var a2=s*Math.PI*2/g.sides-Math.PI/2;
+      var px=Math.cos(a2)*g.r,py=Math.sin(a2)*g.r;
+      c.beginPath();c.arc(px,py,2,0,6.28);
+      c.fillStyle='hsla('+((g.hue+t*0.015)%360)+',70%,70%,'+(gpulse*2)+')';
+      c.fill();
+    }
+    c.restore();
+  }
+  for(var i=0;i<rings.length;i++){
+    var ring=rings[i];
+    var baseAngle=t*ring.speed*ring.dir;
+    var segArc=(Math.PI*2/ring.segments)*(1-ring.gap);
+    var gapArc=(Math.PI*2/ring.segments)*ring.gap;
+    var ringPulse=0.4+Math.sin(t*0.003+i*0.6)*0.35;
+    for(var s=0;s<ring.segments;s++){
+      var sAngle=baseAngle+s*(segArc+gapArc);
+      var segBright=ringPulse*(0.5+Math.sin(t*0.005+s*0.9+i*0.4)*0.5);
+      var hue2=(ring.hue+t*0.015+s*2)%360;
+      c.beginPath();c.arc(cx,cy,ring.r,sAngle,sAngle+segArc);
+      c.strokeStyle='hsla('+hue2+','+ring.sat+'%,55%,'+segBright*0.65+')';
+      c.lineWidth=ring.width;c.stroke();
+      if(segBright>0.5){
+        c.beginPath();c.arc(cx,cy,ring.r,sAngle,sAngle+segArc);
+        c.strokeStyle='hsla('+hue2+','+ring.sat+'%,75%,'+(segBright-0.5)*0.35+')';
+        c.lineWidth=ring.width+6;c.stroke();
+      }
+      if(segBright>0.7&&ring.width>2){
+        var midA=sAngle+segArc/2;
+        var sx2=cx+Math.cos(midA)*ring.r,sy2=cy+Math.sin(midA)*ring.r;
+        var nodeGlow=c.createRadialGradient(sx2,sy2,0,sx2,sy2,8);
+        nodeGlow.addColorStop(0,'hsla('+hue2+',80%,80%,'+(segBright-0.7)*0.6+')');
+        nodeGlow.addColorStop(1,'rgba(0,0,0,0)');
+        c.fillStyle=nodeGlow;c.fillRect(sx2-8,sy2-8,16,16);
+      }
+    }
+  }
+  for(var i=0;i<sparks.length;i++){
+    var sp=sparks[i];
+    sp.angle+=sp.speed*sp.dir;sp.pulse+=sp.pulseSpeed;
+    var sparkBright=0.3+Math.sin(sp.pulse)*0.5;
+    var sx2=cx+Math.cos(sp.angle)*sp.dist,sy2=cy+Math.sin(sp.angle)*sp.dist;
+    sp.trail.push({x:sx2,y:sy2,a:sparkBright});
+    if(sp.trail.length>6)sp.trail.shift();
+    for(var j=0;j<sp.trail.length;j++){
+      var tr=sp.trail[j];var ta=tr.a*(j/sp.trail.length)*0.4;
+      c.beginPath();c.arc(tr.x,tr.y,sp.size*(j/sp.trail.length),0,6.28);
+      c.fillStyle='hsla('+((sp.hue+t*0.02)%360)+',70%,65%,'+ta+')';c.fill();
+    }
+    c.beginPath();c.arc(sx2,sy2,sp.size,0,6.28);
+    c.fillStyle='hsla('+((sp.hue+t*0.02)%360)+',80%,70%,'+sparkBright*0.7+')';c.fill();
+  }
+  for(var i=0;i<bolts.length;i++){
+    var b=bolts[i];
+    if(!b.active){b.nextSpawn--;if(b.nextSpawn<=0){b.active=true;b.life=0;b.angle=Math.random()*Math.PI*2;b.fromRing=Math.floor(Math.random()*8);b.toRing=b.fromRing+2+Math.floor(Math.random()*4);if(b.toRing>=rings.length)b.toRing=rings.length-1;b.hue=250+Math.random()*80;}continue;}
+    b.life++;if(b.life>b.maxLife){b.active=false;b.nextSpawn=80+Math.floor(Math.random()*300);continue;}
+    var bAlpha=b.life<10?b.life/10:b.life>b.maxLife-15?(b.maxLife-b.life)/15:1;bAlpha*=0.4;
+    var r1=rings[b.fromRing].r,r2=rings[Math.min(b.toRing,rings.length-1)].r;
+    var ba=b.angle+Math.sin(t*0.005)*0.1;
+    var x1=cx+Math.cos(ba)*r1,y1=cy+Math.sin(ba)*r1;
+    c.beginPath();c.moveTo(x1,y1);
+    for(var s=1;s<=6;s++){
+      var frac=s/6;var midR=r1+(r2-r1)*frac;var jitter=(Math.random()-0.5)*12;
+      c.lineTo(cx+Math.cos(ba+jitter*0.01)*midR+jitter,cy+Math.sin(ba+jitter*0.01)*midR+jitter*0.5);
+    }
+    c.strokeStyle='hsla('+b.hue+',80%,70%,'+bAlpha+')';c.lineWidth=1.5;c.stroke();
+    c.strokeStyle='hsla('+b.hue+',90%,90%,'+(bAlpha*0.5)+')';c.lineWidth=4;c.stroke();
+  }
+  if(t%120<3){pulseWaves.push({r:30,maxR:maxR*1.1,speed:2.5,alpha:0.2,hue:(270+t*0.1)%360});}
+  for(var i=pulseWaves.length-1;i>=0;i--){
+    var pw=pulseWaves[i];pw.r+=pw.speed;pw.alpha*=0.985;
+    if(pw.r>pw.maxR||pw.alpha<0.005){pulseWaves.splice(i,1);continue;}
+    c.beginPath();c.arc(cx,cy,pw.r,0,6.28);
+    c.strokeStyle='hsla('+pw.hue+',70%,60%,'+pw.alpha+')';c.lineWidth=2;c.stroke();
+  }
+  var hexR=28;
+  c.save();c.translate(cx,cy);c.rotate(t*0.0008);
+  for(var h=0;h<3;h++){
+    var hr=hexR*(1+h*0.5);var ha=(0.12-h*0.03)*(0.6+Math.sin(t*0.004+h)*0.4);
+    c.beginPath();
+    for(var i=0;i<6;i++){var a2=i*Math.PI/3-Math.PI/6+h*0.1;if(i===0)c.moveTo(Math.cos(a2)*hr,Math.sin(a2)*hr);else c.lineTo(Math.cos(a2)*hr,Math.sin(a2)*hr);}
+    c.closePath();c.strokeStyle='hsla('+((40+h*30+t*0.01)%360)+',70%,60%,'+ha+')';c.lineWidth=1;c.stroke();
+  }
+  c.restore();
+  var coreGlow=c.createRadialGradient(cx,cy,0,cx,cy,50);
+  coreGlow.addColorStop(0,'rgba(255,255,255,'+(0.04+Math.sin(t*0.004)*0.02)+')');
+  coreGlow.addColorStop(0.3,'rgba(255,215,0,'+(0.03+Math.sin(t*0.005)*0.015)+')');
+  coreGlow.addColorStop(0.6,'rgba(120,0,255,'+(0.02+Math.sin(t*0.003)*0.01)+')');
+  coreGlow.addColorStop(1,'rgba(0,0,0,0)');
+  c.fillStyle=coreGlow;c.beginPath();c.arc(cx,cy,50,0,6.28);c.fill();
+  var outerAura=c.createRadialGradient(cx,cy,maxR*0.8,cx,cy,maxR*1.3);
+  outerAura.addColorStop(0,'rgba(120,0,255,'+(0.015+Math.sin(t*0.002)*0.008)+')');
+  outerAura.addColorStop(0.4,'rgba(255,0,180,'+(0.01+Math.sin(t*0.003)*0.005)+')');
+  outerAura.addColorStop(0.7,'rgba(0,100,255,'+(0.008+Math.sin(t*0.004)*0.004)+')');
+  outerAura.addColorStop(1,'rgba(0,0,0,0)');
+  c.fillStyle=outerAura;c.beginPath();c.arc(cx,cy,maxR*1.3,0,6.28);c.fill();
+  requestAnimationFrame(frame);
+}
+c.fillStyle='#000';c.fillRect(0,0,W,H);
+frame();
+</script>""", height=0)
+
 
 
 # ─── SIDEBAR ───
