@@ -1337,38 +1337,38 @@ if st.session_state.user_name is None:
   }
 }
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap');
-html,body,[data-testid="stAppViewContainer"],[data-testid="stApp"]{background:#000005!important;color:white!important;}
+html,body,[data-testid="stAppViewContainer"],[data-testid="stApp"]{background:#050008!important;color:white!important;}
 [data-testid="stHeader"],[data-testid="stToolbar"],[data-testid="stDecoration"],#MainMenu,footer{display:none!important;}
 .block-container{padding:0 1rem 2rem!important;max-width:100%!important;}
 
 /* ═══════════════════════ BACKGROUND — LIVING NEBULA ═══════════════════════ */
 [data-testid="stAppViewContainer"]{
 background:
-  radial-gradient(ellipse 100% 80% at 50% -10%, rgba(0,255,200,0.25) 0%,transparent 50%),
-  radial-gradient(ellipse 80% 60% at 5% 15%,   rgba(255,0,120,0.55) 0%,transparent 40%),
-  radial-gradient(ellipse 70% 55% at 95% 10%,  rgba(0,180,255,0.50) 0%,transparent 40%),
-  radial-gradient(ellipse 60% 50% at 50% 105%, rgba(120,0,255,0.55) 0%,transparent 45%),
-  radial-gradient(ellipse 50% 45% at 85% 65%,  rgba(255,100,0,0.35) 0%,transparent 40%),
-  radial-gradient(ellipse 55% 40% at 15% 75%,  rgba(0,255,120,0.30) 0%,transparent 40%),
-  radial-gradient(ellipse 45% 35% at 60% 40%,  rgba(255,0,200,0.30) 0%,transparent 35%),
-  radial-gradient(ellipse 40% 30% at 30% 30%,  rgba(0,100,255,0.40) 0%,transparent 35%),
-  radial-gradient(ellipse 35% 25% at 70% 80%,  rgba(255,200,0,0.25) 0%,transparent 30%),
-  radial-gradient(ellipse 30% 20% at 40% 60%,  rgba(0,255,255,0.20) 0%,transparent 30%),
-  #000005!important;
+  radial-gradient(ellipse 110% 80% at 50% -10%, rgba(157,0,255,0.80)  0%,transparent 50%),
+  radial-gradient(ellipse 80%  60% at 5%  15%,  rgba(120,0,220,0.90)  0%,transparent 40%),
+  radial-gradient(ellipse 70%  55% at 95% 10%,  rgba(204,0,255,0.70)  0%,transparent 40%),
+  radial-gradient(ellipse 90%  70% at 50% 110%, rgba(100,0,200,0.85)  0%,transparent 50%),
+  radial-gradient(ellipse 55%  50% at 85% 65%,  rgba(180,0,255,0.55)  0%,transparent 40%),
+  radial-gradient(ellipse 60%  45% at 15% 75%,  rgba(80,0,180,0.65)   0%,transparent 40%),
+  radial-gradient(ellipse 45%  40% at 55% 40%,  rgba(255,0,200,0.35)  0%,transparent 35%),
+  radial-gradient(ellipse 40%  35% at 30% 30%,  rgba(140,0,255,0.60)  0%,transparent 35%),
+  radial-gradient(ellipse 35%  30% at 70% 80%,  rgba(200,0,255,0.45)  0%,transparent 30%),
+  radial-gradient(ellipse 30%  25% at 50% 50%,  rgba(238,136,255,0.25) 0%,transparent 30%),
+  #050008!important;
 animation:nebula-shift 16s ease-in-out infinite alternate!important;
 }
 @keyframes nebula-shift{
-  0%  {filter:brightness(0.55) saturate(1.6) hue-rotate(0deg);}
-  10% {filter:brightness(0.90) saturate(2.2) hue-rotate(15deg);}
-  20% {filter:brightness(1.20) saturate(2.8) hue-rotate(-10deg);}
-  30% {filter:brightness(0.80) saturate(2.0) hue-rotate(25deg);}
-  40% {filter:brightness(1.40) saturate(3.0) hue-rotate(-20deg);}
-  50% {filter:brightness(1.10) saturate(2.5) hue-rotate(10deg);}
-  60% {filter:brightness(1.50) saturate(3.2) hue-rotate(-15deg);}
-  70% {filter:brightness(0.95) saturate(2.3) hue-rotate(20deg);}
-  80% {filter:brightness(1.30) saturate(2.9) hue-rotate(-5deg);}
-  90% {filter:brightness(0.70) saturate(1.8) hue-rotate(12deg);}
-  100%{filter:brightness(0.60) saturate(1.5) hue-rotate(-8deg);}
+  0%  {filter:brightness(0.55) saturate(2.0) hue-rotate(0deg);}
+  10% {filter:brightness(0.85) saturate(2.6) hue-rotate(-8deg);}
+  20% {filter:brightness(1.20) saturate(3.0) hue-rotate(5deg);}
+  30% {filter:brightness(0.90) saturate(2.4) hue-rotate(-12deg);}
+  40% {filter:brightness(1.40) saturate(3.2) hue-rotate(8deg);}
+  50% {filter:brightness(1.10) saturate(2.8) hue-rotate(-5deg);}
+  60% {filter:brightness(1.50) saturate(3.4) hue-rotate(10deg);}
+  70% {filter:brightness(0.95) saturate(2.6) hue-rotate(-8deg);}
+  80% {filter:brightness(1.30) saturate(3.0) hue-rotate(4deg);}
+  90% {filter:brightness(0.75) saturate(2.2) hue-rotate(-6deg);}
+  100%{filter:brightness(0.65) saturate(1.8) hue-rotate(3deg);}
 }
 
 /* ═══════════════════════ STARS — MULTICOLOR PULSING ═══════════════════════ */
