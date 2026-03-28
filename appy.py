@@ -1336,23 +1336,27 @@ html,body,[data-testid="stAppViewContainer"],[data-testid="stApp"]{background:#0
 .block-container{padding:0 1rem 2rem!important;max-width:100%!important;}
 [data-testid="stAppViewContainer"]{
 background:
-  radial-gradient(ellipse 90% 70% at 15% 10%,  rgba(120,0,255,0.80) 0%,transparent 50%),
-  radial-gradient(ellipse 80% 65% at 88% 8%,   rgba(255,0,200,0.65) 0%,transparent 50%),
-  radial-gradient(ellipse 70% 60% at 50% 105%, rgba(0,200,255,0.65) 0%,transparent 55%),
-  radial-gradient(ellipse 60% 55% at 92% 60%,  rgba(255,140,0,0.50) 0%,transparent 50%),
-  radial-gradient(ellipse 65% 50% at 8%  70%,  rgba(0,255,120,0.45) 0%,transparent 50%),
-  radial-gradient(ellipse 55% 45% at 55% 45%,  rgba(255,0,80,0.40)  0%,transparent 45%),
-  radial-gradient(ellipse 45% 40% at 30% 80%,  rgba(0,80,255,0.50)  0%,transparent 45%),
-  radial-gradient(ellipse 40% 35% at 70% 20%,  rgba(200,255,0,0.35) 0%,transparent 45%),
+  radial-gradient(ellipse 120% 80% at 50% -20%, rgba(0,180,255,0.70) 0%,transparent 45%),
+  radial-gradient(ellipse 80% 60% at 10% 20%,  rgba(0,60,255,0.80) 0%,transparent 40%),
+  radial-gradient(ellipse 70% 55% at 90% 15%,  rgba(0,200,255,0.65) 0%,transparent 40%),
+  radial-gradient(ellipse 90% 70% at 50% 110%, rgba(0,100,255,0.70) 0%,transparent 50%),
+  radial-gradient(ellipse 50% 50% at 80% 60%,  rgba(0,255,200,0.40) 0%,transparent 40%),
+  radial-gradient(ellipse 60% 45% at 20% 70%,  rgba(0,150,255,0.55) 0%,transparent 40%),
+  radial-gradient(ellipse 40% 40% at 65% 35%,  rgba(0,220,255,0.50) 0%,transparent 35%),
+  radial-gradient(ellipse 35% 30% at 35% 50%,  rgba(0,80,255,0.45)  0%,transparent 35%),
+  radial-gradient(circle 300px at 50% 50%,      rgba(0,0,0,0.0) 0%,   rgba(0,0,20,0.95) 100%),
   #000510!important;
 animation:cosmic-epic 12s ease-in-out infinite alternate!important;
 }
 @keyframes cosmic-epic{
-  0%  {filter:brightness(0.70) saturate(1.2) hue-rotate(0deg);}
-  25% {filter:brightness(1.20) saturate(1.8) hue-rotate(20deg);}
-  50% {filter:brightness(1.10) saturate(1.6) hue-rotate(-15deg);}
-  75% {filter:brightness(1.30) saturate(2.0) hue-rotate(10deg);}
-  100%{filter:brightness(0.80) saturate(1.3) hue-rotate(-5deg);}
+  0%  {filter:brightness(0.60) saturate(1.4) hue-rotate(0deg);}
+  15% {filter:brightness(1.00) saturate(2.0) hue-rotate(-10deg);}
+  30% {filter:brightness(1.30) saturate(2.5) hue-rotate(5deg);}
+  45% {filter:brightness(0.90) saturate(1.8) hue-rotate(-5deg);}
+  60% {filter:brightness(1.40) saturate(2.8) hue-rotate(8deg);}
+  75% {filter:brightness(1.10) saturate(2.2) hue-rotate(-8deg);}
+  90% {filter:brightness(1.50) saturate(3.0) hue-rotate(12deg);}
+  100%{filter:brightness(0.70) saturate(1.5) hue-rotate(-3deg);}
 }
 [data-testid="stAppViewContainer"]::before{
   content:'';position:fixed;top:0;left:0;width:100%;height:100%;
@@ -1362,12 +1366,12 @@ animation:cosmic-epic 12s ease-in-out infinite alternate!important;
     radial-gradient(2px 2px at 35% 38%, rgba(255,255,255,0.7) 0%,transparent 100%),
     radial-gradient(1px 1px at 48% 88%, rgba(0,220,255,0.8)   0%,transparent 100%),
     radial-gradient(1px 1px at 57% 12%, rgba(255,255,255,0.9) 0%,transparent 100%),
-    radial-gradient(2px 2px at 67% 55%, rgba(255,180,0,0.7)   0%,transparent 100%),
+    radial-gradient(2px 2px at 67% 55%, rgba(0,200,255,0.8)   0%,transparent 100%),
     radial-gradient(1px 1px at 73% 82%, rgba(255,255,255,0.8) 0%,transparent 100%),
-    radial-gradient(1px 1px at 82% 28%, rgba(200,100,255,0.7) 0%,transparent 100%),
+    radial-gradient(1px 1px at 82% 28%, rgba(0,150,255,0.8) 0%,transparent 100%),
     radial-gradient(2px 2px at 91% 65%, rgba(255,255,255,0.9) 0%,transparent 100%),
     radial-gradient(1px 1px at 15% 45%, rgba(0,255,160,0.7)   0%,transparent 100%),
-    radial-gradient(1px 1px at 42% 60%, rgba(255,80,80,0.6)   0%,transparent 100%),
+    radial-gradient(1px 1px at 42% 60%, rgba(0,255,200,0.7)   0%,transparent 100%),
     radial-gradient(2px 2px at 78% 10%, rgba(255,255,255,0.8) 0%,transparent 100%),
     radial-gradient(1px 1px at 95% 40%, rgba(120,200,255,0.7) 0%,transparent 100%),
     radial-gradient(1px 1px at 30% 95%, rgba(255,255,255,0.6) 0%,transparent 100%);
@@ -1375,15 +1379,17 @@ animation:cosmic-epic 12s ease-in-out infinite alternate!important;
   animation:stars-twinkle 4s ease-in-out infinite alternate;
 }
 @keyframes stars-twinkle{
-  0%  {opacity:0.3;}
-  50% {opacity:1.0;}
-  100%{opacity:0.5;}
+  0%  {opacity:0.2;filter:hue-rotate(0deg);}
+  25% {opacity:1.0;filter:hue-rotate(15deg);}
+  50% {opacity:0.4;filter:hue-rotate(-10deg);}
+  75% {opacity:0.9;filter:hue-rotate(20deg);}
+  100%{opacity:0.5;filter:hue-rotate(0deg);}
 }
 [data-testid="stAppViewContainer"]::after{
   content:'';position:fixed;top:0;left:0;width:100%;height:100%;
   background:
-    repeating-linear-gradient(0deg,  transparent, transparent 59px, rgba(120,0,255,0.04) 60px),
-    repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(0,200,255,0.04) 60px);
+    repeating-linear-gradient(0deg,  transparent, transparent 59px, rgba(0,180,255,0.06) 60px),
+    repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(0,100,255,0.06) 60px);
   pointer-events:none;z-index:0;
   animation:grid-pulse 6s ease-in-out infinite alternate;
 }
@@ -1427,9 +1433,9 @@ animation:cosmic-epic 12s ease-in-out infinite alternate!important;
 .stTextInput>div>div>input:focus{border-color:#FFD700!important;box-shadow:0 0 20px rgba(255,215,0,0.25)!important;}
 .stTextInput label{font-family:Space Mono,monospace!important;font-size:11px!important;letter-spacing:3px!important;color:#ffffff!important;text-transform:uppercase!important;}
 div.stButton>button{
-  background:linear-gradient(135deg,#7B68EE,#FF00FF,#00FFFF)!important;
-  background-size:300% 300%!important;
-  border:none!important;
+  background:linear-gradient(135deg,#00D4FF,#0088FF,#00EEFF,#0066FF,#00CCFF)!important;
+  background-size:400% 400%!important;
+  border:2px solid #00D4FF!important;
   color:#ffffff!important;
   font-family:Bebas Neue,sans-serif!important;
   font-size:24px!important;
@@ -1437,26 +1443,29 @@ div.stButton>button{
   padding:18px!important;
   border-radius:14px!important;
   width:100%!important;
-  text-shadow:0 0 12px rgba(255,255,255,0.9)!important;
-  box-shadow:0 0 30px rgba(123,0,255,0.5),0 0 60px rgba(255,0,128,0.3),inset 0 0 20px rgba(255,255,255,0.08)!important;
+  text-shadow:0 0 15px rgba(0,212,255,0.9),0 0 30px rgba(0,150,255,0.5)!important;
+  box-shadow:0 0 30px rgba(0,180,255,0.6),0 0 60px rgba(0,100,255,0.3),inset 0 0 20px rgba(0,200,255,0.08)!important;
   transition:all 0.3s!important;
   margin-top:12px!important;
-  animation:btn-cosmic 5s ease-in-out infinite alternate,btn-glow-pulse 2s ease-in-out infinite alternate!important;
+  animation:btn-electric 3s ease-in-out infinite alternate,btn-electric-glow 2s ease-in-out infinite alternate!important;
 }
-@keyframes btn-cosmic{
-  0%  {background-position:0% 50%;  box-shadow:0 0 30px rgba(123,0,255,0.6),0 0 60px rgba(255,0,128,0.3);}
-  33% {background-position:100% 0%; box-shadow:0 0 40px rgba(255,0,128,0.7),0 0 80px rgba(255,100,0,0.4);}
-  66% {background-position:50% 100%;box-shadow:0 0 35px rgba(0,200,255,0.6),0 0 70px rgba(0,255,150,0.3);}
-  100%{background-position:0% 50%;  box-shadow:0 0 30px rgba(200,0,255,0.6),0 0 60px rgba(0,150,255,0.4);}
+@keyframes btn-electric{
+  0%  {background-position:0% 50%;  box-shadow:0 0 30px rgba(0,180,255,0.7),0 0 60px rgba(0,100,255,0.3);}
+  25% {background-position:100% 0%; box-shadow:0 0 50px rgba(0,220,255,0.9),0 0 100px rgba(0,150,255,0.5);}
+  50% {background-position:50% 100%;box-shadow:0 0 40px rgba(0,200,255,0.8),0 0 80px rgba(0,130,255,0.4);}
+  75% {background-position:0% 50%;  box-shadow:0 0 60px rgba(0,240,255,1.0),0 0 120px rgba(0,180,255,0.6);}
+  100%{background-position:100% 50%;box-shadow:0 0 35px rgba(0,190,255,0.7),0 0 70px rgba(0,120,255,0.4);}
 }
-@keyframes btn-glow-pulse{
+@keyframes btn-electric-glow{
   0%  {filter:brightness(1.0) saturate(1.2);}
-  100%{filter:brightness(1.35) saturate(1.6);}
+  50% {filter:brightness(1.4) saturate(1.8);}
+  100%{filter:brightness(1.1) saturate(1.4);}
 }
 div.stButton>button:hover{
-  transform:scale(1.04) translateY(-2px)!important;
-  filter:brightness(1.5) saturate(1.8)!important;
-  box-shadow:0 0 70px rgba(255,0,200,0.9),0 0 130px rgba(0,200,255,0.5),inset 0 0 30px rgba(255,255,255,0.15)!important;
+  transform:scale(1.06) translateY(-3px)!important;
+  filter:brightness(1.6) saturate(2.0)!important;
+  box-shadow:0 0 80px rgba(0,220,255,1.0),0 0 160px rgba(0,150,255,0.7),0 0 240px rgba(0,100,255,0.4),inset 0 0 40px rgba(0,255,255,0.15)!important;
+  border-color:#00FFFF!important;
 }
 
 </style>
@@ -2693,11 +2702,11 @@ elif view == "spinner":
         </script>""", height=80)
     elif can_spin:
         st.markdown(f"""<div style='text-align:center;padding:14px;background:#080f08;border:2px solid #00FF44;border-radius:14px;margin:4px 0'>
-            <div style='font-family:Bebas Neue,sans-serif;font-size:26px;color:#00FF44;letter-spacing:3px'>{spins_left} SPIN(S) READY</div>
+            <div style='font-family:Bebas Neue,sans-serif;font-size:26px;color:#00FF44;letter-spacing:3px'>✅ {spins_left} SPIN(S) READY</div>
         </div>""", unsafe_allow_html=True)
     else:
         st.markdown(f"""<div style='text-align:center;padding:14px;background:#0a0a0a;border:2px solid #333;border-radius:14px;margin:4px 0'>
-            <div style='font-family:Bebas Neue,sans-serif;font-size:26px;color:#555;letter-spacing:3px'>COMPLETE A MISSION TO EARN SPINS</div>
+            <div style='font-family:Bebas Neue,sans-serif;font-size:26px;color:#555;letter-spacing:3px'>🔒 COMPLETE A MISSION TO EARN SPINS</div>
         </div>""", unsafe_allow_html=True)
 
     prize_labels = json.dumps([p["label"] for p in SPINNER_PRIZES])
@@ -2769,7 +2778,7 @@ if(autoLand >= 0){{
     else{{
       spinning = false;
       var res = document.getElementById('result');
-      res.textContent = emojis[autoLand] + ' ' + labels[autoLand] + ' - YOURS!';
+      res.textContent = emojis[autoLand] + ' ' + labels[autoLand] + ' — YOURS!';
       res.style.color = colors[autoLand];
       res.style.opacity = '1';
       requestAnimationFrame(doIdle);
@@ -2781,11 +2790,11 @@ if(autoLand >= 0){{
 </script>""", height=540)
 
     if _is_animating:
-        if st.button("CLAIM MY PRIZE", key="claim_spin_prize", use_container_width=True):
+        if st.button("🎁 CLAIM MY PRIZE", key="claim_spin_prize", use_container_width=True):
             st.session_state.spinner_landing_index = -1
             st.rerun()
     elif can_spin:
-        if st.button("SPIN IT", key="python_spin_btn", use_container_width=True):
+        if st.button("🎰 SPIN IT ⚡", key="python_spin_btn", use_container_width=True):
             _now_s = _dt.datetime.now()
             _last_s = st.session_state.get("last_spin_time")
             _spin_ok = True
@@ -2820,9 +2829,9 @@ if(autoLand >= 0){{
             else:
                 st.error("Cooldown not finished!")
     elif spins_left > 0 and on_cooldown:
-        st.button(f"COOLDOWN - {cooldown_secs_left//3600}h {(cooldown_secs_left%3600)//60}m", key="python_spin_btn_locked", disabled=True, use_container_width=True)
+        st.button(f"🔒 COOLDOWN — {cooldown_secs_left//3600}h {(cooldown_secs_left%3600)//60}m", key="python_spin_btn_locked", disabled=True, use_container_width=True)
     else:
-        st.button("NO SPINS - COMPLETE A MISSION", key="python_spin_btn_empty", disabled=True, use_container_width=True)
+        st.button("🔒 NO SPINS — COMPLETE A MISSION", key="python_spin_btn_empty", disabled=True, use_container_width=True)
 
     if st.session_state.get("spinner_result") and not _is_animating:
         p  = st.session_state.spinner_result
@@ -2835,10 +2844,9 @@ if(autoLand >= 0){{
                         letter-spacing:4px;margin-bottom:8px'>{p["prize"]["label"]}</div>
             <div style='font-family:Space Mono,monospace;font-size:13px;color:#fff'>{p["msg"]}</div>
         </div>""", unsafe_allow_html=True)
-        if st.button("DISMISS", key="dismiss_spin_result"):
+        if st.button("✅ DISMISS", key="dismiss_spin_result"):
             st.session_state.spinner_result = None
             st.rerun()
-
 
 elif view == "abilities":
     st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>🛡️ YOUR ABILITIES</h2>", unsafe_allow_html=True)
