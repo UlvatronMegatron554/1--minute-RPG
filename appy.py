@@ -1564,6 +1564,370 @@ c.fillStyle='#000';c.fillRect(0,0,W,H);
 frame();
 </script>""", height=0)
 
+    st.markdown("""
+<div class="scanline-wrap"><div class="scanline"></div></div>
+<div class="star-field"></div>
+<div class="top-badge">⚡ 30-Second RPG Study System · Any Universe · Zero Limits</div>
+<div class="gw-main-title">30 SECOND<br>INFINITEVERSE</div>
+<div class="gw-subtitle">Infiniteverse · Study RPG · Unlock Your Power</div>
+<div class="features-row">
+    <div class="feature-pill"><span>🎮</span>Pick ANY Universe</div>
+    <div class="feature-pill"><span>⏱</span>30-Second Missions</div>
+    <div class="feature-pill"><span>💰</span>Earn Real Rewards</div>
+    <div class="feature-pill"><span>🔥</span>Study Like a Champion</div>
+    <div class="feature-pill"><span>🌈</span>Fully Customizable</div>
+    <div class="feature-pill"><span>⚡</span>Powered by AI</div>
+</div>
+<div class="stats-ticker">
+    <div class="stat-item"><div class="stat-num">∞</div><div class="stat-label">Universes</div></div>
+    <div class="stat-item"><div class="stat-num">30s</div><div class="stat-label">To Start</div></div>
+    <div class="stat-item"><div class="stat-num">100%</div><div class="stat-label">Free</div></div>
+    <div class="stat-item"><div class="stat-num">0</div><div class="stat-label">Excuses</div></div>
+</div>
+<div class="gw-divider"></div>
+""", unsafe_allow_html=True)
+
+    _, col, _ = st.columns([1, 2, 1])
+    with col:
+        if st.button("⚡ HOW IT WORKS", key="info_toggle"):
+            st.session_state.info_open = not st.session_state.get("info_open", False)
+        if st.session_state.get("info_open", False):
+            st.markdown("<div style='background:rgba(0,0,0,0.85);border:2px solid #FFD700;border-radius:20px;padding:28px;margin-top:12px;color:#fff;font-family:Space Mono,monospace;font-size:12px;line-height:2.2'>🌌 <b style='color:#FFD700'>Pick any universe</b> — AI builds it instantly.<br>⏱ <b style='color:#FFD700'>Study 30 seconds</b> — get paid.<br>📸 <b style='color:#FFD700'>Upload proof</b> — no proof = no coins.</div>", unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True)
+        _gw_page = st.session_state.get("gw_page", 1)
+
+        if _gw_page == 3:
+            st.markdown("<div style='font-family:Bebas Neue,sans-serif;font-size:18px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:8px'>⚡ CHOOSE YOUR MODE</div>", unsafe_allow_html=True)
+            mode_col1, mode_col2, mode_col3 = st.columns(3)
+            with mode_col1:
+                st.markdown("""<div class='mode-card'><span class='mode-emoji'>⚡</span><div class='mode-name'>CHILL</div><div class='mode-desc'>Missions. Currency. Level up.</div></div>""", unsafe_allow_html=True)
+                if st.button("⚡ CHILL", key="mode_chill", use_container_width=True):
+                    st.session_state.game_mode = "chill"
+            with mode_col2:
+                st.markdown("""<div class='mode-card'><span class='mode-emoji'>🔥</span><div class='mode-name'>GRINDER</div><div class='mode-desc'>Adds Battles, Abilities, Monster Hatching.</div></div>""", unsafe_allow_html=True)
+                if st.button("🔥 GRINDER", key="mode_grinder", use_container_width=True):
+                    st.session_state.game_mode = "grinder"
+            with mode_col3:
+                st.markdown("""<div class='mode-card'><span class='mode-emoji'>💀</span><div class='mode-name'>OBSESSED</div><div class='mode-desc'>EVERYTHING. Full chaos. No limits.</div></div>""", unsafe_allow_html=True)
+                if st.button("💀 OBSESSED", key="mode_obsessed", use_container_width=True):
+                    st.session_state.game_mode = "obsessed"
+            if st.session_state.game_mode:
+                mode_labels = {"chill":"⚡ CHILL","grinder":"🔥 GRINDER","obsessed":"💀 OBSESSED"}
+                st.success(f"MODE: {mode_labels[st.session_state.game_mode]} ✅")
+
+        if _gw_page == 1:
+            st.markdown("<div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:20px'>WHO ARE YOU?</div>", unsafe_allow_html=True)
+            _c1, _c2 = st.columns(2)
+            with _c1:
+                if st.button("🌌 NEW PLAYER  Create my account", key="gw_new", use_container_width=True):
+                    st.session_state.gw_page = 2; st.rerun()
+            with _c2:
+                if st.button("⚡ RETURNING PLAYER  Load my progress", key="gw_returning", use_container_width=True):
+                    st.session_state.gw_page = 4; st.rerun()
+            name_input = ""; email_input = ""; pass_input = ""; theme_input = ""
+            st.stop()
+
+        elif _gw_page == 2:
+            st.markdown("<div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:16px'>STEP 1 OF 2 — YOUR ACCOUNT</div>", unsafe_allow_html=True)
+            email_input = st.text_input("📧 Email", placeholder="Your email — we never spam.", key="gw_email")
+            pass_input  = st.text_input("🔑 Password", placeholder="Create a password", type="password", key="gw_pass")
+            name_input = ""; theme_input = ""
+            st.markdown("<br>", unsafe_allow_html=True)
+            _nb1, _nb2 = st.columns([1, 4])
+            with _nb1:
+                if st.button("← Back", key="gw_back2"):
+                    st.session_state.gw_page = 1; st.rerun()
+            with _nb2:
+                if st.button("NEXT ⚡", key="gw_next", use_container_width=True):
+                    if not st.session_state.get("gw_email","").strip():
+                        st.error("Enter your email.")
+                    elif not st.session_state.get("gw_pass","").strip():
+                        st.error("Enter a password.")
+                    else:
+                        st.session_state.gw_page = 3; st.rerun()
+            st.stop()
+
+        elif _gw_page == 3:
+            email_input = st.session_state.get("gw_email", "")
+            pass_input  = st.session_state.get("gw_pass", "")
+            st.markdown("<div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:16px'>STEP 2 OF 2 — YOUR UNIVERSE</div>", unsafe_allow_html=True)
+            name_input  = st.text_input("⚡ Champion Name", placeholder="What are you called?", key="gw_name")
+            theme_input = st.text_input("🌌 Your Universe", placeholder="Leave empty for INFINITE POWER · or type: Naruto, F1, Nike...", key="gw_theme")
+            _bc, _ = st.columns([1,4])
+            with _bc:
+                if st.button("← Back", key="gw_back"):
+                    st.session_state.gw_page = 2; st.rerun()
+
+        elif _gw_page == 4:
+            if not st.session_state.get("ret_saves_found"):
+                st.markdown("<div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:8px'>WELCOME BACK, CHAMPION</div>", unsafe_allow_html=True)
+                ret_email = st.text_input("📧 Your Email", placeholder="The email you signed up with", key="gw_ret_email")
+                _rb1, _rb2 = st.columns([1, 4])
+                with _rb1:
+                    if st.button("← Back", key="gw_back_ret"):
+                        st.session_state.gw_page = 1; st.rerun()
+                with _rb2:
+                    if st.button("🔍 FIND MY SAVES", key="gw_find_saves", use_container_width=True):
+                        if not ret_email.strip():
+                            st.error("Enter your email.")
+                        else:
+                            _clean_ret_email = ret_email.strip().lower().strip("_")
+                            _sb = get_supabase()
+                            _all_saves = []
+                            if _sb:
+                                try:
+                                    _lr = _sb.table("players").select("*").execute()
+                                    for _row in (_lr.data or []):
+                                        _re = _row.get("email","").lower().strip().strip("_")
+                                        if _re == _clean_ret_email:
+                                            _all_saves.append(_row)
+                                except: pass
+                            if not _all_saves:
+                                st.error("❌ No account found with that email.")
+                            else:
+                                if len(_all_saves) == 1:
+                                    _sv = _all_saves[0]
+                                    _sv_theme = _sv.get("theme","") or DEFAULT_UNIVERSE_NAME
+                                    _sv_name  = _sv.get("user_name","")
+                                    with st.spinner(f"🌌 Loading {_sv_theme}..."):
+                                        _result = resolve_universe(_sv_theme)
+                                    if not _result or not _result.get("safe"):
+                                        _result = {"safe":True,"data":DEFAULT_UNIVERSE.copy()}
+                                    _rdata = _result["data"]
+                                    _saved_color = _sv.get("vibe_color","")
+                                    if _saved_color and re.match(r"^#[0-9A-Fa-f]{6}$", _saved_color):
+                                        _rdata["color"] = _saved_color
+                                    db_apply(_sv)
+                                    st.session_state.user_name   = _sv_name
+                                    st.session_state.game_mode   = _sv.get("game_mode","chill") or "chill"
+                                    st.session_state.world_data  = _rdata
+                                    st.session_state.vibe_color  = _rdata.get("color","#FFD700")
+                                    st.session_state.user_theme  = _sv_theme
+                                    st.query_params["u"] = _sv_name.lower()
+                                    st.query_params["t"] = _sv_theme
+                                    st.query_params["m"] = _sv.get("game_mode","chill") or "chill"
+                                    st.rerun()
+                                else:
+                                    st.session_state.ret_saves_found = _all_saves
+                                    st.session_state.ret_name = _all_saves[0].get("user_name","")
+                                    st.rerun()
+
+                with st.expander("🤔 Forgot your Champion Name?"):
+                    _lookup_email = st.text_input("📧 Email:", key="lookup_email")
+                    if st.button("🔎 FIND MY NAME", key="find_name_btn", use_container_width=True):
+                        if not _lookup_email.strip():
+                            st.error("Enter your email.")
+                        else:
+                            _sb2 = get_supabase()
+                            _found = []
+                            if _sb2:
+                                try:
+                                    _lr = _sb2.table("players").select("user_name,theme,game_mode,email").neq("email","").execute()
+                                    _found = [r for r in (_lr.data or []) if r.get("email","").lower().strip().strip("_") == _lookup_email.strip().lower()]
+                                except: pass
+                            if not _found:
+                                st.warning("❌ No account found.")
+                            else:
+                                for _f in _found:
+                                    st.markdown(f"<div style='background:#0a0a0a;border:2px solid rgba(255,215,0,0.4);border-radius:12px;padding:12px;margin:4px 0;color:#fff;font-family:Space Mono,monospace;font-size:11px'>🌌 {(_f.get('theme','') or 'INFINITE POWER').upper()}<br>👤 <b style='color:#FFD700'>{_f.get('user_name','').upper()}</b></div>", unsafe_allow_html=True)
+
+                with st.expander("🔑 Forgot your Password?"):
+                    import secrets as _sec2, hashlib as _hl2r
+                    _rp_email = st.text_input("Email:", key="ret_reset_email")
+                    if st.button("Send Reset Code", key="ret_send_reset", use_container_width=True):
+                        if not _rp_email.strip():
+                            st.error("Enter your email.")
+                        else:
+                            _sbr0 = get_supabase()
+                            _found_r = []
+                            if _sbr0:
+                                try:
+                                    _lr0 = _sbr0.table("players").select("*").neq("email","").execute()
+                                    _found_r = [r for r in (_lr0.data or []) if r.get("email","").lower().strip().strip("_") == _rp_email.strip().lower()]
+                                except: pass
+                            if not _found_r:
+                                st.error("No account found.")
+                            else:
+                                _tok = _sec2.token_hex(3).upper()
+                                _tok_hash = _hl2r.sha256(_tok.encode()).hexdigest()
+                                _expiry_r = (_dt.datetime.utcnow() + _dt.timedelta(minutes=30)).isoformat()
+                                _rp_name_found = _found_r[0].get("user_name","")
+                                _sbr = get_supabase()
+                                if _sbr:
+                                    try: _sbr.table("players").update({"reset_token":_tok_hash,"reset_expiry":_expiry_r}).eq("user_name",_rp_name_found).execute()
+                                    except: pass
+                                if send_reset_email(_rp_email.strip(), _rp_name_found, _tok):
+                                    st.success("✅ Code sent!")
+                                    st.session_state.ret_reset_pending = _rp_name_found
+                                else:
+                                    st.error("Could not send email.")
+                    if st.session_state.get("ret_reset_pending"):
+                        _rc_code  = st.text_input("Reset Code:", key="ret_code_input")
+                        _rc_pass  = st.text_input("New Password:", key="ret_new_pass", type="password")
+                        _rc_pass2 = st.text_input("Confirm:", key="ret_new_pass2", type="password")
+                        if st.button("Reset My Password", key="ret_do_reset", use_container_width=True):
+                            import hashlib as _hl3r, datetime as _dtt2r
+                            if not _rc_code.strip() or not _rc_pass.strip():
+                                st.error("Fill in all fields.")
+                            elif _rc_pass.strip() != _rc_pass2.strip():
+                                st.error("Passwords do not match.")
+                            else:
+                                _c_hash = _hl3r.sha256(_rc_code.strip().upper().encode()).hexdigest()
+                                _row_r  = db_load(st.session_state.ret_reset_pending)
+                                if not _row_r or _row_r.get("reset_token","") != _c_hash:
+                                    st.error("Wrong code.")
+                                elif _row_r.get("reset_expiry","") < _dtt2r.datetime.utcnow().isoformat():
+                                    st.error("Code expired.")
+                                else:
+                                    _new_h = _hl3r.sha256(_rc_pass.strip().encode()).hexdigest()
+                                    _sbr2 = get_supabase()
+                                    if _sbr2:
+                                        try: _sbr2.table("players").update({"password_hash":_new_h,"reset_token":"","reset_expiry":""}).eq("user_name",st.session_state.ret_reset_pending.lower()).execute()
+                                        except: pass
+                                    st.session_state.ret_reset_pending = None
+                                    st.success("Password reset!")
+
+                name_input = ""; email_input = ""; pass_input = ""; theme_input = ""
+                st.stop()
+
+            else:
+                _saves = st.session_state.ret_saves_found
+                _ret_name = st.session_state.get("ret_name","")
+                st.markdown("<div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:16px'>CHOOSE YOUR UNIVERSE</div>", unsafe_allow_html=True)
+                mode_icons = {"chill":"⚡","grinder":"🔥","obsessed":"💀"}
+                for i, _sv in enumerate(_saves):
+                    _sv_theme = _sv.get("theme","") or "INFINITE POWER"
+                    _sv_mode  = _sv.get("game_mode","chill") or "chill"
+                    _sv_lv    = _sv.get("level",1)
+                    _sv_miss  = _sv.get("total_missions",0)
+                    _sv_str   = _sv.get("study_streak",0)
+                    _sv_gold  = _sv.get("gold",0)
+                    _icon     = mode_icons.get(_sv_mode,"⚡")
+                    st.markdown(f"<div style='background:#0a0a1a;border:2px solid rgba(255,215,0,0.3);border-radius:16px;padding:18px 20px;margin-bottom:8px'><div style='font-family:Bebas Neue,sans-serif;font-size:24px;color:#FFD700;letter-spacing:3px'>{_icon} {_sv_theme.upper()}</div><div style='font-family:Space Mono,monospace;font-size:11px;color:#888;margin-top:4px'>{_sv_mode.upper()} · Lv {_sv_lv} · {_sv_miss} missions · 🔥 {_sv_str} streak · {_sv_gold:.0f} gold</div></div>", unsafe_allow_html=True)
+                    if st.button(f"▶ ENTER — {_sv_theme.upper()}", key=f"enter_save_{i}_{_sv_theme[:10]}", use_container_width=True):
+                        with st.spinner(f"🌌 Loading {_sv_theme}..."):
+                            _result = resolve_universe(_sv_theme)
+                        if not _result["safe"]:
+                            _result = {"safe":True,"data":DEFAULT_UNIVERSE.copy()}
+                        _rdata = _result["data"]
+                        _saved_color = _sv.get("vibe_color","")
+                        if _saved_color and re.match(r"^#[0-9A-Fa-f]{6}$", _saved_color):
+                            _rdata["color"] = _saved_color
+                        db_apply(_sv)
+                        st.session_state.user_name     = _ret_name
+                        st.session_state.game_mode     = _sv_mode
+                        st.session_state.world_data    = _rdata
+                        st.session_state.vibe_color    = _rdata.get("color","#FFD700")
+                        st.session_state.user_theme    = _sv_theme
+                        st.session_state.ret_saves_found = None
+                        st.toast(f"✅ Welcome back! {_sv_theme} loaded.", icon="🌌")
+                        st.rerun()
+                if st.button("← Back", key="gw_back_saves"):
+                    st.session_state.ret_saves_found = None
+                    st.session_state.gw_page = 4
+                    st.rerun()
+                name_input = ""; email_input = ""; pass_input = ""; theme_input = ""
+                st.stop()
+
+        else:
+            name_input = ""; email_input = ""; pass_input = ""; theme_input = ""
+
+        st.markdown("<br>", unsafe_allow_html=True)
+        if st.button("⚡ ENTER THE INFINITEVERSE ⚡", key="gw_enter", use_container_width=True):
+            if not name_input.strip():
+                st.error("Enter your champion name to begin.")
+            elif not pass_input.strip():
+                st.error("Create a password to protect your account.")
+            elif not email_input.strip() and st.session_state.get("gw_page", 1) != 4:
+                st.error("Enter your email.")
+            elif not st.session_state.game_mode:
+                st.error("Choose CHILL, GRINDER, or OBSESSED to continue.")
+            else:
+                import hashlib as _hl
+                clean_name  = name_input.strip()
+                pass_hash   = _hl.sha256(pass_input.strip().encode()).hexdigest()
+                theme_val   = theme_input.strip()
+                display_name = theme_val if theme_val else DEFAULT_UNIVERSE_NAME
+                existing = db_load(clean_name, theme_val.strip() if theme_val.strip() else "", st.session_state.game_mode or "")
+                if not existing:
+                    existing = db_load(clean_name)
+                if existing:
+                    stored_hash = existing.get("password_hash", "")
+                    if stored_hash and stored_hash != pass_hash:
+                        st.error("🔒 Wrong password or name already taken.")
+                        st.stop()
+                    elif stored_hash == pass_hash:
+                        saved_theme = existing.get("theme", "") or DEFAULT_UNIVERSE_NAME
+                        saved_mode  = existing.get("game_mode", "chill") or "chill"
+                        with st.spinner(f"🌌 Welcome back, {clean_name}!"):
+                            result = resolve_universe(saved_theme)
+                        if not result["safe"]:
+                            result = {"safe": True, "data": DEFAULT_UNIVERSE.copy()}
+                        _rdata2 = result["data"]
+                        _sc2 = existing.get("vibe_color","")
+                        if _sc2 and re.match(r"^#[0-9A-Fa-f]{6}$", _sc2):
+                            _rdata2["color"] = _sc2
+                        db_apply(existing)
+                        st.session_state.user_name    = clean_name
+                        st.session_state.password_hash = pass_hash
+                        st.session_state.world_data   = _rdata2
+                        st.session_state.vibe_color   = _rdata2.get("color", "#FFD700")
+                        st.session_state.user_theme   = saved_theme
+                        st.session_state.game_mode    = saved_mode
+                        st.query_params["u"] = clean_name.lower()
+                        st.query_params["t"] = saved_theme
+                        st.query_params["m"] = saved_mode
+                        st.session_state.gw_page = 1
+                        st.toast(f"✅ Welcome back, {clean_name}!", icon="🌌")
+                        st.rerun()
+                    else:
+                        saved_theme = existing.get("theme", "") or display_name
+                        with st.spinner(f"🌌 Loading {saved_theme.upper()}..."):
+                            result = resolve_universe(saved_theme)
+                        if not result["safe"]:
+                            result = {"safe": True, "data": DEFAULT_UNIVERSE.copy()}
+                        db_apply(existing)
+                        st.session_state.user_name    = clean_name
+                        st.session_state.password_hash = pass_hash
+                        st.session_state.world_data   = result["data"]
+                        st.session_state.vibe_color   = result["data"].get("color", "#FFD700")
+                        st.session_state.user_theme   = saved_theme
+                        db_save(clean_name, saved_theme)
+                        st.rerun()
+                else:
+                    if theme_val:
+                        check = filter_universe_input(theme_val)
+                        if not check["safe"]:
+                            st.error(f"⚠️ {check['reason']}"); st.stop()
+                        theme_val = check["cleaned"]; display_name = theme_val
+                    with st.spinner(f"🌌 Loading {display_name.upper()}..."):
+                        result = resolve_universe(theme_val)
+                    if not result["safe"]:
+                        st.error(f"⚠️ {result['reason']}"); st.stop()
+                    st.session_state.user_name    = clean_name
+                    st.session_state.password_hash = pass_hash
+                    st.session_state.user_email   = email_input.strip() if email_input.strip() else ""
+                    st.session_state.world_data   = result["data"]
+                    st.session_state.vibe_color   = result["data"].get("color", "#FFD700")
+                    st.session_state.user_theme   = display_name
+                    st.session_state.universe_achievements = result["data"].get("lore_achievements", [])
+                    st.session_state.universe_ach_loaded = True
+                    apply_welcome_bonus()
+                    db_save(clean_name, display_name)
+                    st.query_params["u"] = clean_name.lower()
+                    st.query_params["t"] = display_name
+                    st.query_params["m"] = st.session_state.get("game_mode","chill") or "chill"
+                    st.rerun()
+
+    import base64 as _b64
+    _SPINNER_B64 = "PCFET0NUWVBFIGh0bWw+PGh0bWw+PGhlYWQ+PG1ldGEgY2hhcnNldD0idXRmLTgiPgo8c3R5bGU+CkBpbXBvcnQgdXJsKCdodHRwczovL2ZvbnRzLmdvb2dsZWFwaXMuY29tL2NzczI/ZmFtaWx5PU9yYml0cm9uOndnaHRANzAwJmRpc3BsYXk9c3dhcCcpOwoqe2JveC1zaXppbmc6Ym9yZGVyLWJveDttYXJnaW46MDtwYWRkaW5nOjA7fQpodG1sLGJvZHl7d2lkdGg6MTAwJTtiYWNrZ3JvdW5kOnRyYW5zcGFyZW50O292ZXJmbG93LXg6aGlkZGVuO292ZXJmbG93LXk6aGlkZGVuO30KI3Jvd3tkaXNwbGF5OmZsZXg7ZmxleC1kaXJlY3Rpb246cm93O2p1c3RpZnktY29udGVudDpzcGFjZS1iZXR3ZWVuO2FsaWduLWl0ZW1zOmZsZXgtZW5kO3dpZHRoOjEwMCU7cGFkZGluZzoxMHB4IDZweCA2cHg7fQouc2xvdHtkaXNwbGF5OmZsZXg7ZmxleC1kaXJlY3Rpb246Y29sdW1uO2FsaWduLWl0ZW1zOmNlbnRlcjtnYXA6M3B4O2ZsZXg6MTttaW4td2lkdGg6MDt9Ci5zbGJse2ZvbnQtZmFtaWx5Ok9yYml0cm9uLG1vbm9zcGFjZTtmb250LXNpemU6N3B4O2xldHRlci1zcGFjaW5nOjFweDt0ZXh0LXRyYW5zZm9ybTp1cHBlcmNhc2U7Y29sb3I6cmdiYSgyNTUsMjU1LDI1NSwwLjM4KTt0ZXh0LWFsaWduOmNlbnRlcjt3aGl0ZS1zcGFjZTpub3dyYXA7b3ZlcmZsb3c6aGlkZGVuO3RleHQtb3ZlcmZsb3c6ZWxsaXBzaXM7bWF4LXdpZHRoOjEwMCU7fQouc3JwbXtmb250LWZhbWlseTpPcmJpdHJvbixtb25vc3BhY2U7Zm9udC1zaXplOjdweDtsZXR0ZXItc3BhY2luZzowLjhweDttaW4taGVpZ2h0OjExcHg7dGV4dC1hbGlnbjpjZW50ZXI7d2hpdGUtc3BhY2U6bm93cmFwO30KLm5idG57cGFkZGluZzo1cHggN3B4O2ZvbnQtc2l6ZTo3cHg7Zm9udC1mYW1pbHk6T3JiaXRyb24sbW9ub3NwYWNlO2JvcmRlci1yYWRpdXM6NXB4O2N1cnNvcjpwb2ludGVyO2xldHRlci1zcGFjaW5nOjFweDtib3JkZXI6MS41cHggc29saWQ7YmFja2dyb3VuZDpyZ2JhKDAsMCwwLDAuNyk7dHJhbnNpdGlvbjphbGwgMC4xMnM7bWFyZ2luLXRvcDoycHg7dGV4dC10cmFuc2Zvcm06dXBwZXJjYXNlO3doaXRlLXNwYWNlOm5vd3JhcDttYXgtd2lkdGg6MTAwJTt9Ci5uYnRuOmhvdmVye3RyYW5zZm9ybTpzY2FsZSgxLjEpO2ZpbHRlcjpicmlnaHRuZXNzKDEuNyk7fQoubmJ0bjphY3RpdmV7dHJhbnNmb3JtOnNjYWxlKDAuOSk7fQouZXRsYmx7Zm9udC1zaXplOjdweDtjb2xvcjpyZ2JhKDI1NSwyNTUsMjU1LDAuMTUpO2ZvbnQtZmFtaWx5Ok9yYml0cm9uLG1vbm9zcGFjZTt0ZXh0LWFsaWduOmNlbnRlcjttYXJnaW4tdG9wOjFweDt9Cjwvc3R5bGU+PC9oZWFkPjxib2R5Pgo8ZGl2IGlkPSJyb3ciPjwvZGl2Pgo8c2NyaXB0Pgp2YXIgREY9WwogIHtpZDonZjAnLHN6OjYwLGxibDonU09MQVIgRkxBUkUnLGlnOnRydWUsIG52OjUuMCxidjowLCAgIGJsOjQsc2g6J2Ryb3AnLHA6WycjRkY2NjAwJywnI0ZGMjIwMCcsJyNGRkQ3MDAnLCcjRkY4ODAwJ10sZ3c6JyNGRjQ0MDAnLHJtOicjRkZENzAwJyxoYjonI0ZGRicsdHI6MTAsYnRuOidJR05JVEUnfSwKICB7aWQ6J2YxJyxzejo2MCxsYmw6J1ZPSUQgU1RPUk0nLCBpZzpmYWxzZSwgICAgIGJ2OjAuNDgsYmw6NixzaDond2luZycscDpbJyM4ODAwRkYnLCcjNDQwMENDJywnI0NDMDBGRicsJyNGRjQ0RkYnXSxndzonI0FBMDBGRicscm06JyNGRjg4RkYnLGhiOicjRkZGJyx0cjoxMn0sCiAge2lkOidmMicsc3o6NjAsbGJsOidNQVRSSVggQ09SRScsaWc6ZmFsc2UsICAgICBidjowLjQzLGJsOjMsc2g6J2NyeXMnLHA6WycjMDBGRjQ0JywnIzAwQ0MzMycsJyMwMEZGODgnLCcjQUFGRkNDJ10sZ3c6JyMwMEZGNDQnLHJtOicjODhGRkJCJyxoYjonIzExMScsdHI6OX0sCiAge2lkOidmMycsc3o6NjQsbGJsOidOT1ZBIFBVTFNFJywgaWc6dHJ1ZSwgbnY6Ni41LGJ2OjAsICAgYmw6NSxzaDonYmxhZCcscDpbJyMwMENDRkYnLCcjMDA4OEZGJywnIzAwRkZFRScsJyM4OERERkYnXSxndzonIzAwQ0NGRicscm06JyNBQUVFRkYnLGhiOicjMDAzJyx0cjoxMixidG46J1dBUlAgRFJJVkUnfSwKICB7aWQ6J2Y0Jyxzejo2MCxsYmw6J1RJVEFOIFdBUlAnLCBpZzpmYWxzZSwgICAgIGJ2OjAuNTUsYmw6NyxzaDonZmFuJywgcDpbJyNGRkQ3MDAnLCcjRkY0NDAwJywnI0ZGODgwMCcsJyNGRkVFQUEnXSxndzonI0ZGRDcwMCcscm06JyNGRjQ0MDAnLGhiOicjMjEwJyx0cjoxNH0sCiAge2lkOidmNScsc3o6NjAsbGJsOidDSEFPUyBGTFVYJywgaWc6ZmFsc2UsICAgICBidjowLjQ0LGJsOjQsc2g6J2Ryb3AnLHA6WycjRkYwMDQ0JywnI0ZGNDQwMCcsJyNGRjAwODgnLCcjRkY4ODAwJ10sZ3c6JyNGRjAwNDQnLHJtOicjRkY4OEFBJyxoYjonI0ZGRicsdHI6MTB9LAogIHtpZDonZjYnLHN6OjY4LGxibDonU0lOR1VMQVJJVFknLGlnOnRydWUsIG52OjkuMCxidjowLCAgIGJsOjgsc2g6J2ZhbicsIHA6WycjRkZGJywnI0ZGRDcwMCcsJyNGRjIyMDAnLCcjRkZBQTAwJ10sZ3c6JyNGRkZGRkYnLHJtOicjRkZENzAwJyxoYjonIzAwMCcsdHI6MjIsYnRuOidPQkxJVEVSQVRFJ30sCl07CnZhciBTVD17fSxUUj17fTsKdmFyIHJvdz1kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgncm93Jyk7CkRGLmZvckVhY2goZnVuY3Rpb24oc3ApewogIFNUW3NwLmlkXT17YTpNYXRoLnJhbmRvbSgpKjYuMjgsdjpzcC5pZz8wOnNwLmJ2K01hdGgucmFuZG9tKCkqMC4wNixkZzpmYWxzZSxsQTowLGxUOjB9O1RSW3NwLmlkXT1bXTsKICB2YXIgc2xvdD1kb2N1bWVudC5jcmVhdGVFbGVtZW50KCdkaXYnKTtzbG90LmNsYXNzTmFtZT0nc2xvdCc7CiAgdmFyIGN2PWRvY3VtZW50LmNyZWF0ZUVsZW1lbnQoJ2NhbnZhcycpO2N2LmlkPSdjXycrc3AuaWQ7Y3Yud2lkdGg9c3Auc3oqMjtjdi5oZWlnaHQ9c3Auc3oqMjtjdi5zdHlsZS5jc3NUZXh0PSdjdXJzb3I6Z3JhYjtib3JkZXItcmFkaXVzOjUwJTtkaXNwbGF5OmJsb2NrO21heC13aWR0aDoxMDAlOyc7CiAgdmFyIGxiPWRvY3VtZW50LmNyZWF0ZUVsZW1lbnQoJ2RpdicpO2xiLmNsYXNzTmFtZT0nc2xibCc7bGIudGV4dENvbnRlbnQ9c3AubGJsOwogIHZhciBybT1kb2N1bWVudC5jcmVhdGVFbGVtZW50KCdkaXYnKTtybS5pZD0ncl8nK3NwLmlkO3JtLmNsYXNzTmFtZT0nc3JwbSc7cm0uc3R5bGUuY29sb3I9c3AuZ3c7CiAgc2xvdC5hcHBlbmRDaGlsZChjdik7c2xvdC5hcHBlbmRDaGlsZChsYik7c2xvdC5hcHBlbmRDaGlsZChybSk7CiAgaWYoc3AuaWcpe3ZhciBidG49ZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgnYnV0dG9uJyk7YnRuLmNsYXNzTmFtZT0nbmJ0bic7YnRuLnRleHRDb250ZW50PXNwLmJ0bjtidG4uc3R5bGUuYm9yZGVyQ29sb3I9c3AuZ3c7YnRuLnN0eWxlLmNvbG9yPXNwLmd3O2J0bi5vbmNsaWNrPShmdW5jdGlvbihzaWQsbnYpe3JldHVybiBmdW5jdGlvbigpe1NUW3NpZF0udj1udjtzaGsoKTt9O30pKHNwLmlkLHNwLm52KTtzbG90LmFwcGVuZENoaWxkKGJ0bik7fQogIGVsc2V7dmFyIGVsPWRvY3VtZW50LmNyZWF0ZUVsZW1lbnQoJ2RpdicpO2VsLmNsYXNzTmFtZT0nZXRsYmwnO2VsLnRleHRDb250ZW50PSfiiJ4gQVVUTyc7ZWwuc3R5bGUuY29sb3I9c3AuZ3crJzQ0JztzbG90LmFwcGVuZENoaWxkKGVsKTt9CiAgcm93LmFwcGVuZENoaWxkKHNsb3QpOwogIGZ1bmN0aW9uIGdhKGUsYzIpe3ZhciByMj1jMi5nZXRCb3VuZGluZ0NsaWVudFJlY3QoKTtyZXR1cm4gTWF0aC5hdGFuMigoZS5jbGllbnRZfHwoZS50b3VjaGVzJiZlLnRvdWNoZXNbMF0uY2xpZW50WSl8fDApLXIyLnRvcC1yMi5oZWlnaHQvMiwoZS5jbGllbnRYfHwoZS50b3VjaGVzJiZlLnRvdWNoZXNbMF0uY2xpZW50WCl8fDApLXIyLmxlZnQtcjIud2lkdGgvMik7fQogIGN2LmFkZEV2ZW50TGlzdGVuZXIoJ21vdXNlZG93bicsZnVuY3Rpb24oZSl7dmFyIHM9U1Rbc3AuaWRdO3MuZGc9dHJ1ZTtzLmxBPWdhKGUsY3YpO3MubFQ9cGVyZm9ybWFuY2Uubm93KCk7Y3Yuc3R5bGUuY3Vyc29yPSdncmFiYmluZyc7fSk7CiAgd2luZG93LmFkZEV2ZW50TGlzdGVuZXIoJ21vdXNlbW92ZScsKGZ1bmN0aW9uKHNpZCl7cmV0dXJuIGZ1bmN0aW9uKGUpe3ZhciBzPVNUW3NpZF07aWYoIXMuZGcpcmV0dXJuO3ZhciBub3c9cGVyZm9ybWFuY2Uubm93KCksYzI9ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2NfJytzaWQpO3ZhciBhPWdhKGUsYzIpLGQ9YS1zLmxBO2lmKGQ+TWF0aC5QSSlkLT02LjI4O2lmKGQ8LU1hdGguUEkpZCs9Ni4yODtzLnY9ZC9NYXRoLm1heChub3ctcy5sVCwxKSoyMDtzLmErPWQ7cy5sQT1hO3MubFQ9bm93O307fSkoc3AuaWQpKTsKICB3aW5kb3cuYWRkRXZlbnRMaXN0ZW5lcignbW91c2V1cCcsKGZ1bmN0aW9uKHNpZCl7cmV0dXJuIGZ1bmN0aW9uKCl7U1Rbc2lkXS5kZz1mYWxzZTtkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnY18nK3NpZCkuc3R5bGUuY3Vyc29yPSdncmFiJzt9O30pKHNwLmlkKSk7CiAgY3YuYWRkRXZlbnRMaXN0ZW5lcigndG91Y2hzdGFydCcsZnVuY3Rpb24oZSl7dmFyIHM9U1Rbc3AuaWRdO3MuZGc9dHJ1ZTtzLmxBPWdhKGUsY3YpO3MubFQ9cGVyZm9ybWFuY2Uubm93KCk7ZS5wcmV2ZW50RGVmYXVsdCgpO30se3Bhc3NpdmU6ZmFsc2V9KTsKICB3aW5kb3cuYWRkRXZlbnRMaXN0ZW5lcigndG91Y2htb3ZlJywoZnVuY3Rpb24oc2lkKXtyZXR1cm4gZnVuY3Rpb24oZSl7dmFyIHM9U1Rbc2lkXTtpZighcy5kZylyZXR1cm47dmFyIG5vdz1wZXJmb3JtYW5jZS5ub3coKSxjMj1kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnY18nK3NpZCk7dmFyIGE9Z2EoZSxjMiksZD1hLXMubEE7aWYoZD5NYXRoLlBJKWQtPTYuMjg7aWYoZDwtTWF0aC5QSSlkKz02LjI4O3Mudj1kL01hdGgubWF4KG5vdy1zLmxULDEpKjIwO3MuYSs9ZDtzLmxBPWE7cy5sVD1ub3c7ZS5wcmV2ZW50RGVmYXVsdCgpO307fSkoc3AuaWQpLHtwYXNzaXZlOmZhbHNlfSk7CiAgd2luZG93LmFkZEV2ZW50TGlzdGVuZXIoJ3RvdWNoZW5kJywoZnVuY3Rpb24oc2lkKXtyZXR1cm4gZnVuY3Rpb24oKXtTVFtzaWRdLmRnPWZhbHNlO307fSkoc3AuaWQpKTsKfSk7CnZhciBzaGFrZU49MDsKZnVuY3Rpb24gc2hrKCl7c2hha2VOPTE0O3ZhciB1PWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdyb3cnKTsoZnVuY3Rpb24gZigpe2lmKHNoYWtlTjw9MCl7dS5zdHlsZS50cmFuc2Zvcm09Jyc7cmV0dXJuO311LnN0eWxlLnRyYW5zZm9ybT0ndHJhbnNsYXRlKCcrKE1hdGgucmFuZG9tKCktLjUpKnNoYWtlTiouNisncHgsJysoTWF0aC5yYW5kb20oKS0uNSkqc2hha2VOKi4zKydweCknO3NoYWtlTi0tO3JlcXVlc3RBbmltYXRpb25GcmFtZShmKTt9KSgpO30KZnVuY3Rpb24gZHJhdyhzcCxhbmdsZSx2ZWwpewogIHZhciBjdj1kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnY18nK3NwLmlkKTtpZighY3YpcmV0dXJuOwogIHZhciBjdHg9Y3YuZ2V0Q29udGV4dCgnMmQnKSxzej1zcC5zeixjeD1zeixjeT1zeixyPXN6LTQsc3BkPU1hdGguYWJzKHZlbCk7CiAgY3R4LmNsZWFyUmVjdCgwLDAsc3oqMixzeioyKTsKICBpZihzcGQ+MC4wNSl7dmFyIGdnPWN0eC5jcmVhdGVSYWRpYWxHcmFkaWVudChjeCxjeSxyLGN4LGN5LHIrNCtzcGQqMyk7Z2cuYWRkQ29sb3JTdG9wKDAsc3AuZ3crJzY2Jyk7Z2cuYWRkQ29sb3JTdG9wKDEsc3AuZ3crJzAwJyk7Y3R4LmJlZ2luUGF0aCgpO2N0eC5hcmMoY3gsY3kscis0K3NwZCozLDAsTWF0aC5QSSoyKTtjdHguZmlsbFN0eWxlPWdnO2N0eC5maWxsKCk7fQogIHZhciB0cj1UUltzcC5pZF07dHIucHVzaChhbmdsZSk7aWYodHIubGVuZ3RoPnNwLnRyKXRyLnNoaWZ0KCk7CiAgaWYoc3BkPjAuMTImJnRyLmxlbmd0aD4yKXtmb3IodmFyIHRpPTA7dGk8dHIubGVuZ3RoLTE7dGkrKyl7dmFyIGZyYWM9dGkvdHIubGVuZ3RoO2Zvcih2YXIgYmk9MDtiaTxzcC5ibDtiaSsrKXt2YXIgYmEyPXRyW3RpXSsoYmkqNi4yOC9zcC5ibCk7Y3R4LnNhdmUoKTtjdHgudHJhbnNsYXRlKGN4LGN5KTtjdHgucm90YXRlKGJhMik7Y3R4Lmdsb2JhbEFscGhhPWZyYWMqMC4xNSpNYXRoLm1pbihzcGQqMS41LDEpO2N0eC5iZWdpblBhdGgoKTtjdHguZWxsaXBzZShyKi4zOCwwLHIqLjM0LHIqLjE0LDAsMCxNYXRoLlBJKjIpO2N0eC5maWxsU3R5bGU9c3AucFswXTtjdHguZmlsbCgpO2N0eC5yZXN0b3JlKCk7fX1jdHguZ2xvYmFsQWxwaGE9MTt9CiAgZm9yKHZhciBpPTA7aTxzcC5ibDtpKyspe3ZhciBiYT1hbmdsZSsoaSo2LjI4L3NwLmJsKTtjdHguc2F2ZSgpO2N0eC50cmFuc2xhdGUoY3gsY3kpO2N0eC5yb3RhdGUoYmEpO3ZhciBnPWN0eC5jcmVhdGVMaW5lYXJHcmFkaWVudCgwLC1yKi4wOCxyKi44MixyKi4wOCk7Zy5hZGRDb2xvclN0b3AoMCxzcC5wWzBdKTtnLmFkZENvbG9yU3RvcCguNDUsc3AucFsxJXNwLnAubGVuZ3RoXSk7Zy5hZGRDb2xvclN0b3AoLjc1LHNwLnBbMiVzcC5wLmxlbmd0aF0pO2cuYWRkQ29sb3JTdG9wKDEsc3AucFszJXNwLnAubGVuZ3RoXSsnMjInKTtjdHguZmlsbFN0eWxlPWc7Y3R4LmJlZ2luUGF0aCgpOwogIGlmKHNwLnNoPT09J2Ryb3AnKXtjdHguZWxsaXBzZShyKi40MiwwLHIqLjQyLHIqLjE5LDAsMCxNYXRoLlBJKjIpO31lbHNlIGlmKHNwLnNoPT09J3dpbmcnKXtjdHgubW92ZVRvKDAsMCk7Y3R4LmJlemllckN1cnZlVG8ociouMiwtciouMjgsciouNywtciouMjIsciouODIsMCk7Y3R4LmJlemllckN1cnZlVG8ociouNyxyKi4yMixyKi4yLHIqLjI4LDAsMCk7Y3R4LmNsb3NlUGF0aCgpO31lbHNlIGlmKHNwLnNoPT09J2NyeXMnKXtjdHgubW92ZVRvKHIqLjA4LDApO2N0eC5saW5lVG8ociouMzgsLXIqLjIyKTtjdHgubGluZVRvKHIqLjgyLDApO2N0eC5saW5lVG8ociouMzgsciouMjIpO2N0eC5jbG9zZVBhdGgoKTt9ZWxzZSBpZihzcC5zaD09PSdibGFkJyl7Y3R4Lm1vdmVUbygwLC1yKi4wNSk7Y3R4LmxpbmVUbyhyKi43OCwtciouMTIpO2N0eC5saW5lVG8ociouODIsMCk7Y3R4LmxpbmVUbyhyKi43OCxyKi4xMik7Y3R4LmxpbmVUbygwLHIqLjA1KTtjdHguY2xvc2VQYXRoKCk7fWVsc2V7Y3R4LmVsbGlwc2UociouNDAsMCxyKi40MCxyKi4yMiwwLDAsTWF0aC5QSSoyKTt9CiAgY3R4LmZpbGwoKTtjdHguc3Ryb2tlU3R5bGU9c3AucFswXSsnODgnO2N0eC5saW5lV2lkdGg9MTtjdHguc3Ryb2tlKCk7CiAgaWYoc3BkPjAuMil7Y3R4Lmdsb2JhbEFscGhhPU1hdGgubWluKChzcGQtLjIpKi40LC40KTtjdHguZmlsbFN0eWxlPXNwLnJtO2N0eC5maWxsKCk7Y3R4Lmdsb2JhbEFscGhhPTE7fWN0eC5yZXN0b3JlKCk7fQogIGN0eC5iZWdpblBhdGgoKTtjdHguYXJjKGN4LGN5LHIsMCxNYXRoLlBJKjIpO2N0eC5zdHJva2VTdHlsZT1zcC5ybSsoc3BkPi4yMj8nQkInOicyMicpO2N0eC5saW5lV2lkdGg9c3BkPi40PzI6MS4yO2N0eC5zdHJva2UoKTsKICBpZihzcGQ+MC4zKXt2YXIgcGM9TWF0aC5taW4oTWF0aC5mbG9vcihzcGQqNCksMTApO2Zvcih2YXIgcGk9MDtwaTxwYztwaSsrKXt2YXIgcGE9YW5nbGUqMy4yK3BpKjIuMCtwZXJmb3JtYW5jZS5ub3coKSouMDAxNTt2YXIgcHI9ciooLjYrTWF0aC5yYW5kb20oKSouMjgpO2N0eC5iZWdpblBhdGgoKTtjdHguYXJjKGN4K01hdGguY29zKHBhKSpwcixjeStNYXRoLnNpbihwYSkqcHIsMStNYXRoLnJhbmRvbSgpKjEuMywwLE1hdGguUEkqMik7Y3R4LmZpbGxTdHlsZT1zcC5wW3BpJXNwLnAubGVuZ3RoXTtjdHguZ2xvYmFsQWxwaGE9LjUrTWF0aC5yYW5kb20oKSouMztjdHguZmlsbCgpO2N0eC5nbG9iYWxBbHBoYT0xO319CiAgdmFyIGhnPWN0eC5jcmVhdGVSYWRpYWxHcmFkaWVudChjeC1yKi4wNCxjeS1yKi4wNCwxLGN4LGN5LHIqLjE4KTtoZy5hZGRDb2xvclN0b3AoMCwnI2ZmZicpO2hnLmFkZENvbG9yU3RvcCguNCxzcC5wWzBdKTtoZy5hZGRDb2xvclN0b3AoMSxzcC5oYik7Y3R4LmJlZ2luUGF0aCgpO2N0eC5hcmMoY3gsY3ksciouMTgsMCxNYXRoLlBJKjIpO2N0eC5maWxsU3R5bGU9aGc7Y3R4LmZpbGwoKTtjdHguYmVnaW5QYXRoKCk7Y3R4LmFyYyhjeCxjeSxyKi4wNiwwLE1hdGguUEkqMik7Y3R4LmZpbGxTdHlsZT0ncmdiYSgyNTUsMjU1LDI1NSwwLjQ1KSc7Y3R4LmZpbGwoKTsKICB2YXIgcmU9ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3JfJytzcC5pZCk7aWYocmUpe3ZhciBydj1NYXRoLmFicyh2ZWwqNjAvKE1hdGguUEkqMikqNjApO2lmKHJ2Pjgpe3JlLnRleHRDb250ZW50PU1hdGgucm91bmQocnYpLnRvTG9jYWxlU3RyaW5nKCkrJyBSUE0nO3JlLnN0eWxlLmNvbG9yPXJ2PjkwMDA/JyNGRjAwMDAnOnJ2PjQwMDA/JyNGRjg4MDAnOnJ2PjEyMDA/JyNGRkQ3MDAnOnNwLmd3O31lbHNle3JlLnRleHRDb250ZW50PXNwLmlnPydSRUFEWSc7cmUuc3R5bGUuY29sb3I9J3JnYmEoMjU1LDI1NSwyNTUsMC4xNiknO319Cn0KdmFyIEFGPTAuOTk5OTkzLE5GPTAuOTk4NjsKZnVuY3Rpb24gbG9vcCgpe0RGLmZvckVhY2goZnVuY3Rpb24oc3Ape3ZhciBzPVNUW3NwLmlkXTtpZighcy5kZyl7cy52Kj1zcC5pZz9ORjpBRjtpZihNYXRoLmFicyhzLnYpPHNwLmJ2KXMudj1zcC5pZz8wOnNwLmJ2O31zLmErPXMudjtkcmF3KHNwLHMuYSxzLnYpO30pO3JlcXVlc3RBbmltYXRpb25GcmFtZShsb29wKTt9Cmxvb3AoKTsKPC9zY3JpcHQ+PC9ib2R5PjwvaHRtbD4="
+    try:
+        components.html(_b64.b64decode(_SPINNER_B64).decode("utf-8"), height=500)
+    except:
+        pass
+    st.stop()
+
+
 
 
 
