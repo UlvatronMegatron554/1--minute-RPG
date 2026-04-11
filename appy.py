@@ -1275,7 +1275,7 @@ if "gold" not in st.session_state:
         "universe_achievements": [], "universe_ach_loaded": False,
         "welcome_bonus_applied": False, "battle_subject_chosen": False,
         "last_spin_time": None, "spin_awarded_this_view": False,
-        "last_auto_save": None, "password_hash": "", "leaderboard_visible": True, "user_email": "", "gw_page": 1, "ret_saves_found": None, "ret_pass_hash": "", "ret_name": "", "ret_single_save": None,
+        "last_auto_save": None, "password_hash": "", "leaderboard_visible": True, "user_email": "", "gw_page": 1, "ret_saves_found": None, "ret_pass_hash": "", "ret_name": "", "ret_single_save": None, "sidebar_color": "#0a0a1a",
     })
 
 
@@ -1886,6 +1886,9 @@ st.markdown(f"""<style>
 html, body, [data-testid="stAppViewContainer"], [data-testid="stApp"] {{
     background-color: {BG} !important;
 }}
+[data-testid="stSidebar"] > div:first-child {{
+    background-color: {st.session_state.get("sidebar_color", "#0a0a1a")} !important;
+}}
 [data-testid="stHeader"], [data-testid="stToolbar"], [data-testid="stDecoration"], #MainMenu, footer {{
     display: none !important;
 }}
@@ -1992,6 +1995,16 @@ with st.sidebar:
     st.markdown("<p style='color:#ffffff;font-weight:bold'>🌈 THEME COLOR</p>", unsafe_allow_html=True)
     new_tc = st.color_picker("", value=st.session_state.vibe_color, key="theme_picker", label_visibility="collapsed")
     if new_tc != st.session_state.vibe_color: st.session_state.vibe_color = new_tc; st.rerun()
+    st.markdown("<p style='color:#ffffff;font-weight:bold'>📌 SIDEBAR COLOR</p>", unsafe_allow_html=True)
+    new_sc = st.color_picker("", value=st.session_state.get("sidebar_color","#0a0a1a"), key="sidebar_picker", label_visibility="collapsed")
+    if new_sc != st.session_state.get("sidebar_color","#0a0a1a"): st.session_state.sidebar_color = new_sc; st.rerun()
+    st.markdown("<br>", unsafe_allow_html=True)
+    if st.button("🔄 RESET COLORS TO DEFAULT", key="reset_colors_btn", use_container_width=True):
+        _wd = st.session_state.get("world_data", {})
+        st.session_state.vibe_color = _wd.get("color", "#FFD700")
+        st.session_state.bg_color = "#ffffff"
+        st.session_state.sidebar_color = "#0a0a1a"
+        st.rerun()
     if st.button("💾 SAVE NOW", key="manual_save"):
         db_save(st.session_state.user_name, st.session_state.user_theme)
         st.success("✅ Saved!")
