@@ -1275,7 +1275,7 @@ if "gold" not in st.session_state:
         "universe_achievements": [], "universe_ach_loaded": False,
         "welcome_bonus_applied": False, "battle_subject_chosen": False,
         "last_spin_time": None, "spin_awarded_this_view": False,
-        "last_auto_save": None, "password_hash": "", "leaderboard_visible": True, "user_email": "", "gw_page": 1, "ret_saves_found": None, "ret_pass_hash": "", "ret_name": "",
+        "last_auto_save": None, "password_hash": "", "leaderboard_visible": True, "user_email": "", "gw_page": 1, "ret_saves_found": None, "ret_pass_hash": "", "ret_name": "", "ret_single_save": None,
     })
 
 
@@ -1597,7 +1597,53 @@ frame();
                     st.session_state.gw_page = 2; st.rerun()
 
         elif _gw_page == 4:
-            if not st.session_state.get("ret_saves_found"):
+            if st.session_state.get("ret_single_save") and not st.session_state.get("ret_saves_found"):
+                _sv = st.session_state.ret_single_save
+                _sv_theme = _sv.get("theme","") or DEFAULT_UNIVERSE_NAME
+                _sv_name = _sv.get("user_name","")
+                st.markdown(f"<div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:8px'>WELCOME BACK, {_sv_name.upper()}</div>", unsafe_allow_html=True)
+                st.markdown(f"<div style='font-family:Space Mono,monospace;font-size:12px;color:#888;text-align:center;margin-bottom:16px'>Universe: {_sv_theme.upper()}</div>", unsafe_allow_html=True)
+                _ret_pass = st.text_input("🔑 Enter your password:", type="password", key="ret_pass_check")
+                _rb1, _rb2 = st.columns([1, 4])
+                with _rb1:
+                    if st.button("← Back", key="gw_back_ret_pass"):
+                        st.session_state.ret_single_save = None
+                        st.session_state.gw_page = 4
+                        st.rerun()
+                with _rb2:
+                    if st.button("⚡ ENTER", key="ret_pass_submit", use_container_width=True):
+                        import hashlib as _hl_ret
+                        if not _ret_pass.strip():
+                            st.error("Enter your password.")
+                        else:
+                            _ret_hash = _hl_ret.sha256(_ret_pass.strip().encode()).hexdigest()
+                            _stored_hash = _sv.get("password_hash", "")
+                            if _stored_hash and _ret_hash != _stored_hash:
+                                st.error("🔒 Wrong password.")
+                            else:
+                                with st.spinner(f"🌌 Loading {_sv_theme}..."):
+                                    _result = resolve_universe(_sv_theme)
+                                if not _result or not _result.get("safe"):
+                                    _result = {"safe": True, "data": DEFAULT_UNIVERSE.copy()}
+                                _rdata = _result["data"]
+                                _saved_color = _sv.get("vibe_color","")
+                                if _saved_color and re.match(r"^#[0-9A-Fa-f]{6}$", _saved_color):
+                                    _rdata["color"] = _saved_color
+                                db_apply(_sv)
+                                st.session_state.user_name = _sv_name
+                                st.session_state.game_mode = _sv.get("game_mode","chill") or "chill"
+                                st.session_state.world_data = _rdata
+                                st.session_state.vibe_color = _rdata.get("color","#FFD700")
+                                st.session_state.user_theme = _sv_theme
+                                st.session_state.ret_single_save = None
+                                st.query_params["u"] = _sv_name.lower()
+                                st.query_params["t"] = _sv_theme
+                                st.query_params["m"] = _sv.get("game_mode","chill") or "chill"
+                                st.rerun()
+                name_input = ""; email_input = ""; pass_input = ""; theme_input = ""
+                st.stop()
+
+            elif not st.session_state.get("ret_saves_found"):
                 st.markdown("<div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:8px'>WELCOME BACK, CHAMPION</div>", unsafe_allow_html=True)
                 ret_email = st.text_input("📧 Your Email", placeholder="The email you signed up with", key="gw_ret_email")
                 _rb1, _rb2 = st.columns([1, 4])
@@ -1624,26 +1670,7 @@ frame();
                                 st.error("❌ No account found with that email.")
                             else:
                                 if len(_all_saves) == 1:
-                                    _sv = _all_saves[0]
-                                    _sv_theme = _sv.get("theme","") or DEFAULT_UNIVERSE_NAME
-                                    _sv_name  = _sv.get("user_name","")
-                                    with st.spinner(f"🌌 Loading {_sv_theme}..."):
-                                        _result = resolve_universe(_sv_theme)
-                                    if not _result or not _result.get("safe"):
-                                        _result = {"safe":True,"data":DEFAULT_UNIVERSE.copy()}
-                                    _rdata = _result["data"]
-                                    _saved_color = _sv.get("vibe_color","")
-                                    if _saved_color and re.match(r"^#[0-9A-Fa-f]{6}$", _saved_color):
-                                        _rdata["color"] = _saved_color
-                                    db_apply(_sv)
-                                    st.session_state.user_name   = _sv_name
-                                    st.session_state.game_mode   = _sv.get("game_mode","chill") or "chill"
-                                    st.session_state.world_data  = _rdata
-                                    st.session_state.vibe_color  = _rdata.get("color","#FFD700")
-                                    st.session_state.user_theme  = _sv_theme
-                                    st.query_params["u"] = _sv_name.lower()
-                                    st.query_params["t"] = _sv_theme
-                                    st.query_params["m"] = _sv.get("game_mode","chill") or "chill"
+                                    st.session_state.ret_single_save = _all_saves[0]
                                     st.rerun()
                                 else:
                                     st.session_state.ret_saves_found = _all_saves
@@ -1743,22 +1770,9 @@ frame();
                     _icon     = mode_icons.get(_sv_mode,"⚡")
                     st.markdown(f"<div style='background:#0a0a1a;border:2px solid rgba(255,215,0,0.3);border-radius:16px;padding:18px 20px;margin-bottom:8px'><div style='font-family:Bebas Neue,sans-serif;font-size:24px;color:#FFD700;letter-spacing:3px'>{_icon} {_sv_theme.upper()}</div><div style='font-family:Space Mono,monospace;font-size:11px;color:#888;margin-top:4px'>{_sv_mode.upper()} · Lv {_sv_lv} · {_sv_miss} missions · 🔥 {_sv_str} streak · {_sv_gold:.0f} gold</div></div>", unsafe_allow_html=True)
                     if st.button(f"▶ ENTER — {_sv_theme.upper()}", key=f"enter_save_{i}_{_sv_theme[:10]}", use_container_width=True):
-                        with st.spinner(f"🌌 Loading {_sv_theme}..."):
-                            _result = resolve_universe(_sv_theme)
-                        if not _result["safe"]:
-                            _result = {"safe":True,"data":DEFAULT_UNIVERSE.copy()}
-                        _rdata = _result["data"]
-                        _saved_color = _sv.get("vibe_color","")
-                        if _saved_color and re.match(r"^#[0-9A-Fa-f]{6}$", _saved_color):
-                            _rdata["color"] = _saved_color
-                        db_apply(_sv)
-                        st.session_state.user_name     = _ret_name
-                        st.session_state.game_mode     = _sv_mode
-                        st.session_state.world_data    = _rdata
-                        st.session_state.vibe_color    = _rdata.get("color","#FFD700")
-                        st.session_state.user_theme    = _sv_theme
+                        st.session_state.ret_single_save = _sv
+                        st.session_state.ret_name = _sv.get("user_name","")
                         st.session_state.ret_saves_found = None
-                        st.toast(f"✅ Welcome back! {_sv_theme} loaded.", icon="🌌")
                         st.rerun()
                 if st.button("← Back", key="gw_back_saves"):
                     st.session_state.ret_saves_found = None
