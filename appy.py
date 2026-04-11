@@ -2009,11 +2009,23 @@ with st.sidebar:
         db_save(st.session_state.user_name, st.session_state.user_theme)
         st.success("✅ Saved!")
     st.write("---")
-    st.markdown("<p style='color:#ffffff;font-weight:bold'>🚨 RESET</p>", unsafe_allow_html=True)
-    reset_input = st.text_input("Type RESET to confirm:", key="reset_confirm_input", placeholder="RESET")
-    if st.button("🚨 RESET ALL", key="reset_btn"):
-        if reset_input.strip().upper() == "RESET": st.session_state.clear(); st.rerun()
-        else: st.error("Type RESET first.")
+    st.markdown("<p style='color:#FF2222;font-weight:bold'>💀 DELETE ACCOUNT</p>", unsafe_allow_html=True)
+    st.markdown("<p style='color:#888;font-size:10px;font-family:Space Mono,monospace'>This permanently deletes your account and ALL progress from the database. This cannot be undone.</p>", unsafe_allow_html=True)
+    delete_input = st.text_input("Type exactly: I WANT TO DELETE MY ACCOUNT FOREVER", key="delete_confirm_input", placeholder="Type the full phrase above")
+    if st.button("💀 DELETE MY ACCOUNT PERMANENTLY", key="delete_btn"):
+        if delete_input.strip() == "I WANT TO DELETE MY ACCOUNT FOREVER":
+            _del_name = st.session_state.get("user_name","")
+            _del_sb = get_supabase()
+            if _del_sb and _del_name:
+                try:
+                    _del_sb.table("players").delete().eq("user_name", _del_name.lower().strip()).execute()
+                except:
+                    pass
+            st.query_params.clear()
+            st.session_state.clear()
+            st.rerun()
+        else:
+            st.error("Type the exact phrase: I WANT TO DELETE MY ACCOUNT FOREVER")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
