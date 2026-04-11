@@ -1597,65 +1597,24 @@ frame();
                     st.session_state.gw_page = 2; st.rerun()
 
         elif _gw_page == 4:
-            if st.session_state.get("ret_single_save") and not st.session_state.get("ret_saves_found"):
-                _sv = st.session_state.ret_single_save
-                _sv_theme = _sv.get("theme","") or DEFAULT_UNIVERSE_NAME
-                _sv_name = _sv.get("user_name","")
-                st.markdown(f"<div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:8px'>WELCOME BACK, {_sv_name.upper()}</div>", unsafe_allow_html=True)
-                st.markdown(f"<div style='font-family:Space Mono,monospace;font-size:12px;color:#888;text-align:center;margin-bottom:16px'>Universe: {_sv_theme.upper()}</div>", unsafe_allow_html=True)
-                _ret_pass = st.text_input("🔑 Enter your password:", type="password", key="ret_pass_check")
-                _rb1, _rb2 = st.columns([1, 4])
-                with _rb1:
-                    if st.button("← Back", key="gw_back_ret_pass"):
-                        st.session_state.ret_single_save = None
-                        st.session_state.gw_page = 4
-                        st.rerun()
-                with _rb2:
-                    if st.button("⚡ ENTER", key="ret_pass_submit", use_container_width=True):
-                        import hashlib as _hl_ret
-                        if not _ret_pass.strip():
-                            st.error("Enter your password.")
-                        else:
-                            _ret_hash = _hl_ret.sha256(_ret_pass.strip().encode()).hexdigest()
-                            _stored_hash = _sv.get("password_hash", "")
-                            if _stored_hash and _ret_hash != _stored_hash:
-                                st.error("🔒 Wrong password.")
-                            else:
-                                with st.spinner(f"🌌 Loading {_sv_theme}..."):
-                                    _result = resolve_universe(_sv_theme)
-                                if not _result or not _result.get("safe"):
-                                    _result = {"safe": True, "data": DEFAULT_UNIVERSE.copy()}
-                                _rdata = _result["data"]
-                                _saved_color = _sv.get("vibe_color","")
-                                if _saved_color and re.match(r"^#[0-9A-Fa-f]{6}$", _saved_color):
-                                    _rdata["color"] = _saved_color
-                                db_apply(_sv)
-                                st.session_state.user_name = _sv_name
-                                st.session_state.game_mode = _sv.get("game_mode","chill") or "chill"
-                                st.session_state.world_data = _rdata
-                                st.session_state.vibe_color = _rdata.get("color","#FFD700")
-                                st.session_state.user_theme = _sv_theme
-                                st.session_state.ret_single_save = None
-                                st.query_params["u"] = _sv_name.lower()
-                                st.query_params["t"] = _sv_theme
-                                st.query_params["m"] = _sv.get("game_mode","chill") or "chill"
-                                st.rerun()
-                name_input = ""; email_input = ""; pass_input = ""; theme_input = ""
-                st.stop()
-
-            elif not st.session_state.get("ret_saves_found"):
+            if not st.session_state.get("ret_saves_found"):
                 st.markdown("<div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:8px'>WELCOME BACK, CHAMPION</div>", unsafe_allow_html=True)
                 ret_email = st.text_input("📧 Your Email", placeholder="The email you signed up with", key="gw_ret_email")
+                ret_pass = st.text_input("🔑 Your Password", placeholder="Enter your password", type="password", key="gw_ret_pass")
                 _rb1, _rb2 = st.columns([1, 4])
                 with _rb1:
                     if st.button("← Back", key="gw_back_ret"):
                         st.session_state.gw_page = 1; st.rerun()
                 with _rb2:
-                    if st.button("🔍 FIND MY SAVES", key="gw_find_saves", use_container_width=True):
+                    if st.button("⚡ LOAD MY UNIVERSE", key="gw_find_saves", use_container_width=True):
                         if not ret_email.strip():
                             st.error("Enter your email.")
+                        elif not ret_pass.strip():
+                            st.error("Enter your password.")
                         else:
+                            import hashlib as _hl_ret
                             _clean_ret_email = ret_email.strip().lower().strip("_")
+                            _ret_hash = _hl_ret.sha256(ret_pass.strip().encode()).hexdigest()
                             _sb = get_supabase()
                             _all_saves = []
                             if _sb:
@@ -1669,13 +1628,37 @@ frame();
                             if not _all_saves:
                                 st.error("❌ No account found with that email.")
                             else:
-                                if len(_all_saves) == 1:
-                                    st.session_state.ret_single_save = _all_saves[0]
-                                    st.rerun()
+                                _first_save = _all_saves[0]
+                                _stored_hash = _first_save.get("password_hash", "")
+                                if _stored_hash and _ret_hash != _stored_hash:
+                                    st.error("🔒 Wrong password.")
                                 else:
-                                    st.session_state.ret_saves_found = _all_saves
-                                    st.session_state.ret_name = _all_saves[0].get("user_name","")
-                                    st.rerun()
+                                    if len(_all_saves) == 1:
+                                        _sv = _all_saves[0]
+                                        _sv_theme = _sv.get("theme","") or DEFAULT_UNIVERSE_NAME
+                                        _sv_name = _sv.get("user_name","")
+                                        with st.spinner(f"🌌 Loading {_sv_theme}..."):
+                                            _result = resolve_universe(_sv_theme)
+                                        if not _result or not _result.get("safe"):
+                                            _result = {"safe":True,"data":DEFAULT_UNIVERSE.copy()}
+                                        _rdata = _result["data"]
+                                        _saved_color = _sv.get("vibe_color","")
+                                        if _saved_color and re.match(r"^#[0-9A-Fa-f]{6}$", _saved_color):
+                                            _rdata["color"] = _saved_color
+                                        db_apply(_sv)
+                                        st.session_state.user_name = _sv_name
+                                        st.session_state.game_mode = _sv.get("game_mode","chill") or "chill"
+                                        st.session_state.world_data = _rdata
+                                        st.session_state.vibe_color = _rdata.get("color","#FFD700")
+                                        st.session_state.user_theme = _sv_theme
+                                        st.query_params["u"] = _sv_name.lower()
+                                        st.query_params["t"] = _sv_theme
+                                        st.query_params["m"] = _sv.get("game_mode","chill") or "chill"
+                                        st.rerun()
+                                    else:
+                                        st.session_state.ret_saves_found = _all_saves
+                                        st.session_state.ret_name = _all_saves[0].get("user_name","")
+                                        st.rerun()
 
                 with st.expander("🤔 Forgot your Champion Name?"):
                     _lookup_email = st.text_input("📧 Email:", key="lookup_email")
