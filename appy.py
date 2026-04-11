@@ -110,31 +110,31 @@ PROCEED with normal universe generation ONLY if the theme passes this check.
 # UNIVERSE SECRETS DATABASE
 # ─────────────────────────────────────────────────────────────────────────────
 UNIVERSE_SECRETS = [
+    "🧠 BRAIN BREAK: Your brain is constantly hallucinating. What you see right now is a 0.1 second old prediction. You have never seen the present moment.",
+    "🔮 NOTHING IS SOLID: The chair you are sitting on is not solid. The atoms repel each other electromagnetically creating the illusion of solidity.",
+    "🧬 YOU ARE MOSTLY EMPTY: You are 99.9999999% empty space. The atoms that make you up are almost entirely nothing. You are basically a ghost.",
+    "⚡ SPEED OF THOUGHT: Your brain makes decisions up to 10 SECONDS before you are consciously aware of making them. Free will might be an illusion.",
+    "🌌 MULTIVERSE IS MATH: The equations of quantum mechanics predict ALL possible outcomes simultaneously. Every decision spawns a parallel universe.",
+    "💥 YOUR MEMORY IS FICTION: Every time you remember something, you are reconstructing it. Every reconstruction changes it slightly.",
+    "🔬 QUANTUM HORROR: Particles that have interacted remain connected FOREVER across any distance. Changing one instantly affects the other.",
+    "🧠 PLACEBO IS REAL MEDICINE: Placebo surgery — where surgeons cut open patients, do nothing, and sew them back up — has the same results as real surgery for certain conditions.",
+    "🤖 YOU ARE PROGRAMMABLE: Scientists have successfully implanted false memories into mice. Human memory works the same way.",
+    "💀 DEATH PARADOX: The cells in your body are completely replaced every 7-10 years. Are you the same person you were a decade ago?",
+    "🕳️ TIME IS FAKE: According to Einstein, time literally slows down the faster you move. Astronauts on the ISS age slightly slower than us. Time travel is real.",
+    "🌀 MANDELA EFFECT EXPLAINED: Your brain fills in gaps in your vision. There is a blind spot in each eye. You have never seen a complete image.",
+    "🔮 PHYSICS IS LYING: If you removed all empty space from every atom in every human on Earth, all 8 billion of us would fit inside a sugar cube.",
+    "🔥 FIRE ISN'T A THING: Fire is not matter. It has no mass. It is a chemical reaction — pure energy made visible.",
+    "⏰ BIOLOGICAL HORROR: You have a second brain in your gut. It has 100 million neurons. It makes decisions independently.",
+    "💫 SCALE DESTROYER: A teaspoon of neutron star material weighs 10 billion tons. One teaspoon. 10 BILLION TONS.",
+    "⚡ TIMELINE SHOCK: Cleopatra lived closer in time to the Moon landing than to the construction of the Great Pyramid. Let that sink in.",
+    "🌊 THE SUN IS DELAYED: The light hitting your face right now left the Sun 8 minutes ago. You are always seeing the past.",
+    "🌍 EARTH IS FAKE ROUND: Earth is not a sphere. It bulges at the equator. Maps have been lying to you.",
+    "🧲 IMPOSSIBLE MATERIAL: Aerogel is 99.8% air. It can support 4,000 times its own weight.",
+    "🕊️ BIRDS ARE DINOSAURS: When you look at a bird, you are looking at a living dinosaur. Birds are the direct descendants of theropod dinosaurs.",
+    "🌿 TREES ARE ONE ORGANISM: The Pando aspen grove in Utah is a single organism. It is 80,000 years old. It is the largest living thing on Earth.",
     "🤯 WAIT WHAT: You cannot hum while holding your nose closed. Try it. You literally just tried it.",
     "💀 REALITY CHECK: The CIA once tried to weaponize cats as spies. They spent $20 million. The first cat was immediately hit by a taxi.",
     "🌌 EXISTENCE CRISIS: There are more possible iterations of a game of chess than atoms in the observable universe. Every game ever played is essentially unique.",
-    "🧠 BRAIN BREAK: Your brain is constantly hallucinating. What you see right now is a 0.1 second old prediction. You have never seen the present moment.",
-    "⚡ TIMELINE SHOCK: Cleopatra lived closer in time to the Moon landing than to the construction of the Great Pyramid. Let that sink in.",
-    "🔮 PHYSICS IS LYING: If you removed all empty space from every atom in every human on Earth, all 8 billion of us would fit inside a sugar cube.",
-    "💫 SCALE DESTROYER: A teaspoon of neutron star material weighs 10 billion tons. One teaspoon. 10 BILLION TONS.",
-    "🕳️ TIME IS FAKE: According to Einstein, time literally slows down the faster you move. Astronauts on the ISS age slightly slower than us. Time travel is real.",
-    "🧬 YOU ARE MOSTLY EMPTY: You are 99.9999999% empty space. The atoms that make you up are almost entirely nothing. You are basically a ghost.",
-    "🌊 THE SUN IS DELAYED: The light hitting your face right now left the Sun 8 minutes ago. You are always seeing the past.",
-    "🔥 FIRE ISN'T A THING: Fire is not matter. It has no mass. It is a chemical reaction — pure energy made visible.",
-    "🌍 EARTH IS FAKE ROUND: Earth is not a sphere. It bulges at the equator. Maps have been lying to you.",
-    "💥 YOUR MEMORY IS FICTION: Every time you remember something, you are reconstructing it. Every reconstruction changes it slightly.",
-    "🧲 IMPOSSIBLE MATERIAL: Aerogel is 99.8% air. It can support 4,000 times its own weight.",
-    "⏰ BIOLOGICAL HORROR: You have a second brain in your gut. It has 100 million neurons. It makes decisions independently.",
-    "🌀 MANDELA EFFECT EXPLAINED: Your brain fills in gaps in your vision. There is a blind spot in each eye. You have never seen a complete image.",
-    "🔬 QUANTUM HORROR: Particles that have interacted remain connected FOREVER across any distance. Changing one instantly affects the other.",
-    "🕊️ BIRDS ARE DINOSAURS: When you look at a bird, you are looking at a living dinosaur. Birds are the direct descendants of theropod dinosaurs.",
-    "🌿 TREES ARE ONE ORGANISM: The Pando aspen grove in Utah is a single organism. It is 80,000 years old. It is the largest living thing on Earth.",
-    "🤖 YOU ARE PROGRAMMABLE: Scientists have successfully implanted false memories into mice. Human memory works the same way.",
-    "💀 DEATH PARADOX: The cells in your body are completely replaced every 7-10 years. Are you the same person you were a decade ago?",
-    "⚡ SPEED OF THOUGHT: Your brain makes decisions up to 10 SECONDS before you are consciously aware of making them. Free will might be an illusion.",
-    "🌌 MULTIVERSE IS MATH: The equations of quantum mechanics predict ALL possible outcomes simultaneously. Every decision spawns a parallel universe.",
-    "🧠 PLACEBO IS REAL MEDICINE: Placebo surgery — where surgeons cut open patients, do nothing, and sew them back up — has the same results as real surgery for certain conditions.",
-    "🔮 NOTHING IS SOLID: The chair you are sitting on is not solid. The atoms repel each other electromagnetically creating the illusion of solidity.",
 ]
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -229,6 +229,7 @@ let questions=[],qI=0,lives=3,wrongs=0,qTimer=0,qMax=25,aLocked=false;
 let parts=[],beams=[],dmgNums=[];
 const P={{hp:100,maxHp:100,power:0,evo:0,streak:0,total:0,x:160,y:270,shake:0,hit:false,color:COL}};
 const E={{hp:100,maxHp:100,phase:0,x:620,y:270,shake:0,hit:false,color:CFG.enemy_color||'#CC2222'}};
+const INTENSITY=Math.min(3, 1 + (CFG.battles_fought||0) * 0.15);
 function lh(hex,a){{const c=parseInt(hex.replace('#',''),16),r=Math.min(255,((c>>16)&255)+a*255),g=Math.min(255,((c>>8)&255)+a*255),b=Math.min(255,(c&255)+a*255);return '#'+[r,g,b].map(v=>Math.floor(v).toString(16).padStart(2,'0')).join('');}}
 function dk(hex,a){{const c=parseInt(hex.replace('#',''),16),r=Math.max(0,((c>>16)&255)-a*255),g=Math.max(0,((c>>8)&255)-a*255),b=Math.max(0,(c&255)-a*255);return '#'+[r,g,b].map(v=>Math.floor(v).toString(16).padStart(2,'0')).join('');}}
 function ap(x,y,col,n,spd,r,life){{for(let i=0;i<n;i++){{const a=Math.random()*6.28,s=spd*(0.4+Math.random()*0.8);parts.push({{x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,col,r:r*(0.5+Math.random()),life,ml:life}});}}}}
@@ -415,7 +416,7 @@ function onOk(){{
   P.streak++;P.total++;P.power=Math.min(100,P.power+22);
   const dmg=15+P.evo*5+Math.floor(Math.random()*10)+(P.streak>=3?15:0);
   E.hp=Math.max(0,E.hp-dmg);E.hit=true;E.shake=12;setTimeout(()=>E.hit=false,380);
-  ab(P.x,P.y-30,E.x,E.y-30,COL,6+P.evo*2,24);ap(E.x,E.y-30,COL,20+P.evo*4,4,6,28);
+  ab(P.x,P.y-30,E.x,E.y-30,COL,(6+P.evo*2)*INTENSITY,24);ap(E.x,E.y-30,COL,Math.floor((20+P.evo*4)*INTENSITY),4*INTENSITY,6*INTENSITY,28);
   dn(E.x,E.y-60,'-'+dmg,COL,true);
   const nt=P.evo+1;const evos=CFG.evolutions||[];
   if(nt<evos.length&&P.total>0&&P.total%3===0&&Math.floor(P.total/3)===nt){{evolve(nt);}}
@@ -428,7 +429,7 @@ function onNo(){{
   const dmg=10+E.phase*8+Math.floor(Math.random()*8);
   P.hp=Math.max(0,P.hp-dmg);P.hit=true;P.shake=14;setTimeout(()=>P.hit=false,380);
   if(wrongs>=3){{lives--;wrongs=0;}}
-  ab(E.x,E.y-30,P.x,P.y-30,E.color,5,20);ap(P.x,P.y-30,'#FF2222',15,3,5,26);
+  ab(E.x,E.y-30,P.x,P.y-30,E.color,5*INTENSITY,20);ap(P.x,P.y-30,'#FF2222',Math.floor(15*INTENSITY),3*INTENSITY,5*INTENSITY,26);
   dn(P.x,P.y-60,'-'+dmg,'#FF2222',false);
   if(lives<=0)setTimeout(lose,700);
 }}
@@ -579,26 +580,37 @@ CHARACTER ART TIER — TIER IS: {tier}
 - PREMIUM tier: Mark with "tier":"premium" — detailed and polished. Layered outfit colors, signature weapon, expressive features, good shading colors. Clearly better than Free.
 - ELITE tier: Mark with "tier":"elite" — LEGENDARY quality. Every detail perfect. Iconic signature look, cape if the character has one, aura, exact weapon, exact color combos from the source material. Maximum expression and detail.
 
- — READ CAREFULLY:
-Each question MUST be a real {subject} education question (actual math, science, history, etc.)
-BUT written with {universe} lore as the creative wrapper. The LORE is the flavor, the EDUCATION is the substance.
+ — READ CAREFULLY — THIS IS THE MOST IMPORTANT PART:
 
-GOOD EXAMPLE (Naruto + Math):
-"Naruto ran 15km every day during his 3-year training arc. How many total kilometres did he run?"
-Choices: A: 1,095km  B: 10,950km  C: 16,425km  D: 5,475km  Answer: C  (15×365×3)
+You are writing questions for mission round #{difficulty}. Each round must feel MORE engaging, MORE lore-intensive, and MORE epic than the last.
 
-GOOD EXAMPLE (Dragon Ball + Science):
-"Goku's power level doubles every time he trains for 6 months. If he starts at 9,000, what's his power after 2 years?"
-Choices: A: 36,000  B: 72,000  C: 144,000  D: 288,000  Answer: C  (doubles 4 times)
+VOICE RULE: Write every question IN THE VOICE of {universe}. If it's One Piece, write like a pirate adventure narrator. If it's Dragon Ball, write with power-scaling intensity. If it's Harry Potter, write with magical wonder. The universe's personality IS the question's personality. Do NOT use generic "In the {universe} world..." framing.
 
-BAD EXAMPLE (pure lore trivia — DO NOT DO THIS):
-"What is the name of Naruto's signature move?" — this tests pop culture, not education
+Each question MUST be a real {subject} education question (actual math, science, history, etc.) BUT the lore isn't just a wrapper — the lore IS the question setup. The story leads naturally into the problem.
 
-Make every question:
-- Genuinely solve-able with real {subject} knowledge/skill
-- Beautifully written with lore context that makes it feel epic and motivated
-- Progressively harder through the set
-- Written with energy — make the student FEEL the universe while solving real problems"""
+PERFECT EXAMPLE (One Piece + Geography):
+"After Zoro cut down Captain Morgan and joined Luffy's crew at Shells Town, they set sail — 1,000 nautical miles due east from the coast of Japan, pushed 15° south by the Grand Line current. Based on Japan's eastern coastline coordinates, which real-world island chain would the Going Merry reach first?"
+Choices: A: Mariana Islands  B: Marshall Islands  C: Midway Atoll  D: Hawaiian Islands  Answer: A
+
+PERFECT EXAMPLE (Dragon Ball + Physics):
+"Goku charges a Kamehameha for exactly 4.5 seconds. The energy beam travels at 2/3 the speed of light and strikes Frieza's ship orbiting 900,000 km away. How long after firing does the beam take to reach the ship? (Speed of light = 300,000 km/s)"
+Choices: A: 3.5s  B: 4.5s  C: 5.0s  D: 6.0s  Answer: B  (900000 / 200000 = 4.5)
+
+BAD EXAMPLE — TOO GENERIC (DO NOT DO THIS):
+"In the Naruto world, what is 15 × 8?" — boring, no lore depth, no story
+
+BAD EXAMPLE — TOO SIMPLE (DO NOT DO THIS):
+"Zoro travels 1000m east. What country would he land in?" — no story setup, no adventure, no engagement
+
+RULES FOR EVERY QUESTION:
+- The story setup should be 1-2 sentences of actual lore events, character names, locations, and actions
+- The math/science/history problem emerges NATURALLY from the story — not tacked on
+- Characters should DO things, GO places, FIGHT enemies, USE abilities — active voice, dramatic energy
+- Each question in the set should be progressively harder AND more lore-intensive
+- The student should feel like they're IN the universe while solving real problems
+- Make them WANT to read the question, not skip to the answers
+
+Make {q_count} questions total. Make them INCREDIBLE."""
     try:
         resp = client.messages.create(model="claude-sonnet-4-5",max_tokens=2400 if tier=="Elite" else 1800,messages=[{"role":"user","content":prompt}])
         raw = resp.content[0].text.strip().replace("```json","").replace("```","").strip()
@@ -615,16 +627,31 @@ Make every question:
 # ─────────────────────────────────────────────────────────────────────────────
 # ADDICTION PSYCHOLOGY — REWARD SYSTEMS
 # ─────────────────────────────────────────────────────────────────────────────
-def variable_reward(base: float) -> tuple:
+def variable_reward(base: float, total_missions: int = 0) -> tuple:
+    if total_missions >= 20:
+        floor_mult, ceil_mult = 10, 200
+        jackpot_chance, epic_chance, great_chance = 0.06, 0.15, 0.32
+    elif total_missions >= 11:
+        floor_mult, ceil_mult = 5, 100
+        jackpot_chance, epic_chance, great_chance = 0.05, 0.14, 0.30
+    elif total_missions >= 6:
+        floor_mult, ceil_mult = 1, 50
+        jackpot_chance, epic_chance, great_chance = 0.05, 0.13, 0.29
+    elif total_missions >= 3:
+        floor_mult, ceil_mult = 0.5, 30
+        jackpot_chance, epic_chance, great_chance = 0.04, 0.12, 0.28
+    else:
+        floor_mult, ceil_mult = 0.3, 20
+        jackpot_chance, epic_chance, great_chance = 0.04, 0.12, 0.28
     roll = random.random()
-    if roll < 0.04:
-        mult = random.randint(8, 20)
+    if roll < jackpot_chance:
+        mult = random.randint(ceil_mult // 2, ceil_mult)
         return base * mult, "💥 JACKPOT", f"{mult}× MULTIPLIER — THE UNIVERSE REWARDS YOU", None
-    elif roll < 0.12:
-        mult = random.randint(4, 7)
+    elif roll < epic_chance:
+        mult = random.randint(ceil_mult // 5, ceil_mult // 2)
         return base * mult, "🌟 EPIC REWARD", f"{mult}× — An extraordinary surge of power!", None
-    elif roll < 0.28:
-        mult = random.randint(2, 3)
+    elif roll < great_chance:
+        mult = random.randint(max(2, int(floor_mult)), max(3, ceil_mult // 8))
         near_miss = "So close to EPIC! 🌟 One tier away..." if random.random() < 0.5 else None
         return base * mult, "⚡ GREAT PULL", f"{mult}× — You felt it in your soul.", near_miss
     elif roll < 0.55:
@@ -633,7 +660,7 @@ def variable_reward(base: float) -> tuple:
     else:
         mult = round(random.uniform(0.3, 0.7), 1)
         near_miss_options = [
-            f"Only {mult}×... but you were ONE ROLL from a 20× JACKPOT 💥",
+            f"Only {mult}×... but you were ONE ROLL from a {ceil_mult}× JACKPOT 💥",
             f"Low pull this time... but the JACKPOT probability just went UP 📈",
             f"{mult}×... frustrating. But that makes the next big pull feel INCREDIBLE.",
             f"The wheel was 0.3° from EPIC. Literally. Spin again. 🎰",
@@ -722,12 +749,16 @@ def generate_story_chapter(theme, chapter, prev_story, client):
     try:
         is_milestone = (chapter % 5 == 0)
         prompt = f"""Universe: "{theme}". Chapter {chapter}.
-Previous: {prev_story[-200:] if prev_story else "Beginning."}
+Previous chapter: {prev_story[-300:] if prev_story else "Beginning."}
+
 STRICT RULES — VIOLATING ANY = FAILURE:
 - MAXIMUM 3 sentences. If you write 4+ sentences you have FAILED.
 - Each sentence MAX 25 words.
-- {"TWIST: One shocking revelation that changes everything." if is_milestone else "CLIFFHANGER: End on something impossible and unresolved."}
-- Use SPECIFIC {theme} character names, locations, powers.
+- This is chapter {chapter}. It must be MORE shocking, MORE intense, and MORE dramatic than everything before it.
+- {"TWIST: One revelation that makes the reader question everything they thought they knew about this universe. Reference events from previous chapters and flip them." if is_milestone else "CLIFFHANGER: Something impossible just happened. It contradicts what was established before. End mid-catastrophe."}
+- Use SPECIFIC {theme} character names, locations, powers, and lore.
+- Write IN THE VOICE of {theme} — match the tone, energy, and style of the source material.
+- Reference what happened in the previous chapter and ESCALATE from it.
 - End with ... (three dots, mandatory)
 - No titles. No labels. Raw text only."""
 
@@ -2206,6 +2237,7 @@ if st.session_state.get("battle_state") == "ready" or view == "battle":
             st.session_state.view = "main"; st.session_state.battle_state = None; st.rerun()
         st.stop()
 
+    cfg["battles_fought"] = st.session_state.get("battles_fought", 0)
     cfg_clean = {k:v for k,v in cfg.items() if k != "client"}
     game_html = _build_game_html(cfg_clean, C)
     st.markdown(f"""<div style='border:2px solid {C}33;border-radius:12px;overflow:hidden;margin:8px 0;'><div style='background:rgba(0,0,0,0.8);padding:6px 16px;font-family:Bebas Neue,sans-serif;font-size:13px;color:{C};letter-spacing:3px;display:flex;justify-content:space-between;'><span>⚔️ {(cfg.get("arena_name","BATTLE")).upper()}</span><span style='color:#888;font-size:10px'>CORRECT = ATTACK · 3 WRONG = DEFEAT</span></div></div>""", unsafe_allow_html=True)
@@ -2923,7 +2955,7 @@ if view == "main":
             uploaded = st.file_uploader("PROOF OF LABOR:", key="proof_upload")
             if uploaded and st.button("⚡ SUBMIT FOR JUDGMENT", key="submit_proof"):
                 base_gold = st.session_state.pending_gold
-                earned, rarity_label, rarity_msg, near_miss = variable_reward(base_gold)
+                earned, rarity_label, rarity_msg, near_miss = variable_reward(base_gold, st.session_state.get("total_missions", 0))
                 earned = round(earned, 1)
                 new_streak, streak_msg, is_new_day = update_streak()
                 spins = get_spins_for_tier(st.session_state.get("sub_tier","Free"))
@@ -2964,7 +2996,11 @@ if view == "main":
                 if "loot_log" not in st.session_state: st.session_state.loot_log = []
                 st.session_state.loot_log.append({"name": loot["name"], "rarity": loot["rarity"], "color": loot.get("color","#FFD700"), "source": "Mission"})
                 st.session_state.unclaimed_boxes = st.session_state.get('unclaimed_boxes', 0) + 1
-                secret = random.choice(UNIVERSE_SECRETS)
+                _secrets_seen_count = len(st.session_state.get("secret_queue", []))
+                if _secrets_seen_count < len(UNIVERSE_SECRETS):
+                    secret = UNIVERSE_SECRETS[_secrets_seen_count]
+                else:
+                    secret = random.choice(UNIVERSE_SECRETS)
                 if "secret_queue" not in st.session_state: st.session_state.secret_queue = []
                 st.session_state.secret_queue.append(secret)
                 st.session_state.secrets_seen = len(st.session_state.secret_queue)
