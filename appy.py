@@ -1433,8 +1433,7 @@ div.stButton>button:hover{
 <div class="gw-divider"></div>
 """, unsafe_allow_html=True)
 
-    st.markdown("""
-<canvas id="portalBg" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:0;pointer-events:none;"></canvas>
+    components.html("""<canvas id="portalBg" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:0;pointer-events:none;"></canvas>
 <script>
 (function(){
 var cv=document.getElementById('portalBg');
@@ -1524,7 +1523,7 @@ c.fillStyle='#000';c.fillRect(0,0,W,H);
 frame();
 })();
 </script>
-""", unsafe_allow_html=True)
+""", height=800)
 
     _, col, _ = st.columns([1, 2, 1])
     with col:
