@@ -230,6 +230,9 @@ let parts=[],beams=[],dmgNums=[];
 const P={{hp:100,maxHp:100,power:0,evo:0,streak:0,total:0,x:160,y:270,shake:0,hit:false,color:COL}};
 const E={{hp:100,maxHp:100,phase:0,x:620,y:270,shake:0,hit:false,color:CFG.enemy_color||'#CC2222'}};
 const INTENSITY=Math.min(3, 1 + (CFG.battles_fought||0) * 0.15);
+var playerImg=null,enemyImg=null;
+if(CFG.player_portrait_url){{playerImg=new Image();playerImg.crossOrigin='anonymous';playerImg.src=CFG.player_portrait_url;}}
+if(CFG.enemy_portrait_url){{enemyImg=new Image();enemyImg.crossOrigin='anonymous';enemyImg.src=CFG.enemy_portrait_url;}}
 function lh(hex,a){{const c=parseInt(hex.replace('#',''),16),r=Math.min(255,((c>>16)&255)+a*255),g=Math.min(255,((c>>8)&255)+a*255),b=Math.min(255,(c&255)+a*255);return '#'+[r,g,b].map(v=>Math.floor(v).toString(16).padStart(2,'0')).join('');}}
 function dk(hex,a){{const c=parseInt(hex.replace('#',''),16),r=Math.max(0,((c>>16)&255)-a*255),g=Math.max(0,((c>>8)&255)-a*255),b=Math.max(0,(c&255)-a*255);return '#'+[r,g,b].map(v=>Math.floor(v).toString(16).padStart(2,'0')).join('');}}
 function ap(x,y,col,n,spd,r,life){{for(let i=0;i<n;i++){{const a=Math.random()*6.28,s=spd*(0.4+Math.random()*0.8);parts.push({{x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,col,r:r*(0.5+Math.random()),life,ml:life}});}}}}
@@ -269,7 +272,9 @@ function drChar(x,y,col,evo,isEnemy,hit,shake){{
   if(evo>0){{const ar=28+evo*11;const ag=ctx.createRadialGradient(0,0,4,0,0,ar);ag.addColorStop(0,col+'88');ag.addColorStop(1,'transparent');ctx.fillStyle=ag;ctx.beginPath();ctx.arc(0,0,ar,0,6.28);ctx.fill();}}
   ctx.scale(s,s);
   const vis=isEnemy?(CFG.enemy_visual||{{}}):(CFG.player_visual||{{}});
-  if(vis&&vis.hair_color){{drCustom(col,evo,t,vis);}}
+  if(!isEnemy&&playerImg&&playerImg.complete){{ctx.drawImage(playerImg,-40,-70,80,120);}}
+  else if(isEnemy&&enemyImg&&enemyImg.complete){{ctx.drawImage(enemyImg,-40,-70,80,120);}}
+  else if(vis&&vis.hair_color){{drCustom(col,evo,t,vis);}}
   else if(MODE==='FIGHTER')drFighter(col,evo,t,isEnemy);
   else if(MODE==='RPG')drRPG(col,evo,t);
   else if(MODE==='PLATFORM')drPlatform(col,evo);
@@ -1075,21 +1080,32 @@ def generate_universe_banner(theme: str, color: str) -> str | None:
     )
     return generate_image(prompt, cache_key, width=1024, height=384)
 
-def generate_character_portrait(theme: str, vis: dict, is_enemy: bool = False) -> str | None:
-    """Generate a character portrait for battle screen."""
+def generate_character_portrait(theme: str, vis: dict, is_enemy: bool = False, tier: str = "Premium") -> str | None:
+    """Generate a character portrait for battle screen. Elite = highest quality, Premium = good."""
     role = "villain boss enemy" if is_enemy else "hero protagonist player character"
     hair = vis.get("hair_color", "#000"), vis.get("hair_style", "short")
     outfit = vis.get("outfit_color", "#000")
     weapon = vis.get("weapon", "none")
     build = vis.get("body_build", "average")
-    cache_key = f"char_{theme.lower().replace(' ','_')[:30]}_{'enemy' if is_enemy else 'player'}"
-    prompt = (
-        f"Full body character portrait of the {role} from '{theme}'. "
-        f"{build} build, {hair[1]} {hair[0]} hair, {outfit} outfit, wielding {weapon}. "
-        f"Anime/game art style, ultra detailed, dramatic lighting, transparent background, "
-        f"professional illustration, no text"
-    )
-    return generate_image(prompt, cache_key, width=512, height=768)
+    cache_key = f"char_{theme.lower().replace(' ','_')[:30]}_{'enemy' if is_enemy else 'player'}_{tier.lower()}"
+    if tier == "Elite":
+        prompt = (
+            f"Masterpiece full body character portrait of the iconic {role} from '{theme}'. "
+            f"EXACTLY matching the original source material design. "
+            f"{build} build, {hair[1]} {hair[0]} hair, {outfit} outfit, wielding {weapon}. "
+            f"Perfect anime/game art style matching '{theme}' aesthetic, ultra detailed face and eyes, "
+            f"dramatic cinematic lighting, dynamic action pose, glowing aura effects, "
+            f"professional AAA game illustration, studio quality, 8K detail, no text, dark background"
+        )
+        return generate_image(prompt, cache_key, width=512, height=768)
+    else:
+        prompt = (
+            f"Full body character portrait of the {role} from '{theme}'. "
+            f"{build} build, {hair[1]} {hair[0]} hair, {outfit} outfit, wielding {weapon}. "
+            f"Clean anime/game art style, good detail, solid lighting, "
+            f"professional illustration, no text, dark background"
+        )
+        return generate_image(prompt, cache_key, width=384, height=576)
 
 def generate_achievement_badge(achievement_name: str, theme: str, color: str) -> str | None:
     """Generate a badge image for an achievement."""
@@ -1996,6 +2012,10 @@ with st.sidebar:
         st.session_state.sub_tier = "Elite"; st.session_state.sub_multiplier = 3; st.success("💀 ELITE STATUS SECURED!"); st.balloons(); time.sleep(1); st.rerun()
     if code == "1TR5LG89D" and st.session_state.sub_tier not in ("Elite","Premium"):
         st.session_state.sub_tier = "Premium"; st.session_state.sub_multiplier = 2; st.success("⚡ PREMIUM STATUS SECURED!"); st.balloons(); time.sleep(1); st.rerun()
+    if code == "CREATOR-ULVA-INFINITE" and st.session_state.sub_tier != "Elite":
+        st.session_state.sub_tier = "Elite"; st.session_state.sub_multiplier = 3; st.success("👑 CREATOR MODE — PERMANENT ELITE ACTIVATED!"); st.balloons(); time.sleep(1); st.rerun()
+    if code == "CREATOR-ULVA-PREMIUM" and st.session_state.sub_tier == "Free":
+        st.session_state.sub_tier = "Premium"; st.session_state.sub_multiplier = 2; st.success("👑 CREATOR MODE — PERMANENT PREMIUM ACTIVATED!"); st.balloons(); time.sleep(1); st.rerun()
     st.write("---")
     if st.button("🚪 QUIT", key="nav_quit", use_container_width=True):
             db_save(st.session_state.user_name, st.session_state.user_theme)
@@ -2238,6 +2258,19 @@ if st.session_state.get("battle_state") == "ready" or view == "battle":
         st.stop()
 
     cfg["battles_fought"] = st.session_state.get("battles_fought", 0)
+    _battle_tier = st.session_state.get("sub_tier", "Free")
+    if _battle_tier in ("Premium", "Elite") and cfg.get("universe"):
+        _p_vis = cfg.get("player_visual", {})
+        _e_vis = cfg.get("enemy_visual", {})
+        if _p_vis and not cfg.get("player_portrait_url"):
+            _p_url = generate_character_portrait(cfg["universe"], _p_vis, is_enemy=False, tier=_battle_tier)
+            if _p_url:
+                cfg["player_portrait_url"] = _p_url
+        if _e_vis and not cfg.get("enemy_portrait_url"):
+            _e_url = generate_character_portrait(cfg["universe"], _e_vis, is_enemy=True, tier=_battle_tier)
+            if _e_url:
+                cfg["enemy_portrait_url"] = _e_url
+        st.session_state.battle_config = cfg
     cfg_clean = {k:v for k,v in cfg.items() if k != "client"}
     game_html = _build_game_html(cfg_clean, C)
     st.markdown(f"""<div style='border:2px solid {C}33;border-radius:12px;overflow:hidden;margin:8px 0;'><div style='background:rgba(0,0,0,0.8);padding:6px 16px;font-family:Bebas Neue,sans-serif;font-size:13px;color:{C};letter-spacing:3px;display:flex;justify-content:space-between;'><span>⚔️ {(cfg.get("arena_name","BATTLE")).upper()}</span><span style='color:#888;font-size:10px'>CORRECT = ATTACK · 3 WRONG = DEFEAT</span></div></div>""", unsafe_allow_html=True)
