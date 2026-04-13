@@ -2006,16 +2006,18 @@ with st.sidebar:
         </div>
     </div>""", unsafe_allow_html=True)
     st.write("---")
-    st.markdown("<p style='color:#ffffff;font-weight:bold'>👑 ELITE CODE</p>", unsafe_allow_html=True)
+    st.markdown("<p style='color:#ffffff;font-weight:bold'>👑 PREMIUM / ELITE CODE</p>", unsafe_allow_html=True)
     code = st.text_input("Protocol Code:", type="password", key="elite_code")
     if code == "4RJ1TV51Z" and st.session_state.sub_tier != "Elite":
         st.session_state.sub_tier = "Elite"; st.session_state.sub_multiplier = 3; st.success("💀 ELITE STATUS SECURED!"); st.balloons(); time.sleep(1); st.rerun()
     if code == "1TR5LG89D" and st.session_state.sub_tier not in ("Elite","Premium"):
         st.session_state.sub_tier = "Premium"; st.session_state.sub_multiplier = 2; st.success("⚡ PREMIUM STATUS SECURED!"); st.balloons(); time.sleep(1); st.rerun()
     if code == "CREATOR-ULVA-INFINITE" and st.session_state.sub_tier != "Elite":
-        st.session_state.sub_tier = "Elite"; st.session_state.sub_multiplier = 3; st.success("👑 CREATOR MODE — PERMANENT ELITE ACTIVATED!"); st.balloons(); time.sleep(1); st.rerun()
-    if code == "CREATOR-ULVA-PREMIUM" and st.session_state.sub_tier == "Free":
-        st.session_state.sub_tier = "Premium"; st.session_state.sub_multiplier = 2; st.success("👑 CREATOR MODE — PERMANENT PREMIUM ACTIVATED!"); st.balloons(); time.sleep(1); st.rerun()
+        st.session_state.sub_tier = "Elite"; st.session_state.sub_multiplier = 3; st.success("👑 CREATOR MODE — ELITE ACTIVATED!"); st.balloons(); time.sleep(1); st.rerun()
+    if code == "CREATOR-ULVA-PREMIUM" and st.session_state.sub_tier != "Premium":
+        st.session_state.sub_tier = "Premium"; st.session_state.sub_multiplier = 2; st.success("👑 CREATOR MODE — PREMIUM ACTIVATED!"); st.balloons(); time.sleep(1); st.rerun()
+    if code == "CREATOR-ULVA-FREE" and st.session_state.sub_tier != "Free":
+        st.session_state.sub_tier = "Free"; st.session_state.sub_multiplier = 1; st.success("👑 CREATOR MODE — FREE TIER ACTIVATED!"); time.sleep(1); st.rerun()
     st.write("---")
     if st.button("🚪 QUIT", key="nav_quit", use_container_width=True):
             db_save(st.session_state.user_name, st.session_state.user_theme)
