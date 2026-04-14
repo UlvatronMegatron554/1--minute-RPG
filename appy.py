@@ -1080,18 +1080,19 @@ def generate_universe_banner(theme: str, color: str) -> str | None:
     )
     return generate_image(prompt, cache_key, width=1024, height=384)
 
-def generate_character_portrait(theme: str, vis: dict, is_enemy: bool = False, tier: str = "Premium") -> str | None:
+def generate_character_portrait(theme: str, vis: dict, is_enemy: bool = False, tier: str = "Premium", char_name: str = "") -> str | None:
     """Generate a character portrait for battle screen. Elite = highest quality, Premium = good."""
     role = "villain boss enemy" if is_enemy else "hero protagonist player character"
     hair = vis.get("hair_color", "#000"), vis.get("hair_style", "short")
     outfit = vis.get("outfit_color", "#000")
     weapon = vis.get("weapon", "none")
     build = vis.get("body_build", "average")
+    name_part = f"'{char_name}' " if char_name else ""
     cache_key = f"char_{theme.lower().replace(' ','_')[:30]}_{'enemy' if is_enemy else 'player'}_{tier.lower()}"
     if tier == "Elite":
         prompt = (
-            f"Masterpiece full body character portrait of the iconic {role} from '{theme}'. "
-            f"EXACTLY matching the original source material design. "
+            f"Masterpiece full body character portrait of {name_part}the iconic {role} from '{theme}'. "
+            f"EXACTLY matching the original source material design — accurate face, hair, outfit, weapon. "
             f"{build} build, {hair[1]} {hair[0]} hair, {outfit} outfit, wielding {weapon}. "
             f"Perfect anime/game art style matching '{theme}' aesthetic, ultra detailed face and eyes, "
             f"dramatic cinematic lighting, dynamic action pose, glowing aura effects, "
@@ -1100,9 +1101,9 @@ def generate_character_portrait(theme: str, vis: dict, is_enemy: bool = False, t
         return generate_image(prompt, cache_key, width=512, height=768)
     else:
         prompt = (
-            f"Full body character portrait of the {role} from '{theme}'. "
+            f"Full body character portrait of {name_part}the {role} from '{theme}'. "
             f"{build} build, {hair[1]} {hair[0]} hair, {outfit} outfit, wielding {weapon}. "
-            f"Clean anime/game art style, good detail, solid lighting, "
+            f"Clean anime/game art style, good detail, solid lighting, accurate to source material, "
             f"professional illustration, no text, dark background"
         )
         return generate_image(prompt, cache_key, width=384, height=576)
@@ -2224,9 +2225,7 @@ if st.session_state.get("battle_state") == "ready" or view == "battle":
 
     cfg = st.session_state.get("battle_config")
     if cfg is None or cfg.get("universe") != theme:
-        client2 = get_claude_client()
-        with st.spinner(f"⚔️ Generating {theme} battle..."):
-            cfg = generate_battle_config(theme, "Mathematics", tier_now, client2)
+        cfg = {"universe": theme, "mode": detect_game_mode(theme), "arena_name": f"{theme} Arena", "questions": [], "player_visual": {}, "enemy_visual": {}}
         st.session_state.battle_config = cfg
 
     if not st.session_state.get("battle_subject_chosen"):
@@ -2265,11 +2264,11 @@ if st.session_state.get("battle_state") == "ready" or view == "battle":
         _p_vis = cfg.get("player_visual", {})
         _e_vis = cfg.get("enemy_visual", {})
         if _p_vis and not cfg.get("player_portrait_url"):
-            _p_url = generate_character_portrait(cfg["universe"], _p_vis, is_enemy=False, tier=_battle_tier)
+            _p_url = generate_character_portrait(cfg["universe"], _p_vis, is_enemy=False, tier=_battle_tier, char_name=cfg.get("player_title",""))
             if _p_url:
                 cfg["player_portrait_url"] = _p_url
         if _e_vis and not cfg.get("enemy_portrait_url"):
-            _e_url = generate_character_portrait(cfg["universe"], _e_vis, is_enemy=True, tier=_battle_tier)
+            _e_url = generate_character_portrait(cfg["universe"], _e_vis, is_enemy=True, tier=_battle_tier, char_name=cfg.get("enemy_name",""))
             if _e_url:
                 cfg["enemy_portrait_url"] = _e_url
         st.session_state.battle_config = cfg
