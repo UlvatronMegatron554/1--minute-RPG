@@ -507,27 +507,6 @@ var allQ=CFG.questions||[];questions=allQ.slice().sort(function(){{return Math.r
 if(!questions.length)questions=[{{q:'What is 2+2?',choices:['A: 3','B: 4','C: 5','D: 6'],answer:'B',hint:'math'}}];
 setTimeout(function(){{STATE='B';showQ();}},2800);
 loop();
-if(autoLand >= 0) {{
-  spinning = true;
-  var targetAngle = (2*Math.PI) - (autoLand + 0.5) * arc;
-  var extra = targetAngle + (6 + Math.random()*4) * 2 * Math.PI;
-  var dur = 4000;
-  var startT = performance.now(), startA = angle;
-  (function autoAnim(now) {{
-    var el = now - startT, p = Math.min(el/dur, 1);
-    var ease = 1 - Math.pow(1-p, 4);
-    angle = startA + extra * ease;
-    draw(angle);
-    if(p < 1) requestAnimationFrame(autoAnim);
-    else {{
-      spinning = false;
-      var res = document.getElementById('result');
-      res.textContent = emojis[autoLand] + ' ' + labels[autoLand];
-      res.style.color = colors[autoLand];
-      requestAnimationFrame(idle);
-    }}
-  }})(performance.now());
-}}
 </script></body></html>"""
 
 
