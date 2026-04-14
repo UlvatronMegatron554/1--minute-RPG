@@ -298,7 +298,7 @@ function drChar(x,y,col,evo,isEnemy,hit,shake){{try{{
   else drDefault(col,evo,t);
   if(hit){{ctx.fillStyle='rgba(255,50,50,0.45)';ctx.beginPath();ctx.arc(0,-20,38,0,6.28);ctx.fill();}}
   ctx.restore();
-}}catch(e){{ctx.restore();ctx.fillStyle=col||'#FF0000';ctx.beginPath();ctx.arc(x,y,20,0,6.28);ctx.fill();}}}}
+}}catch(e){{ctx.restore();ctx.save();ctx.translate(x,y);if(isEnemy)ctx.scale(-1,1);ctx.scale(0.9,0.9);try{{drDefault(col,evo,FC*0.06);}}catch(e2){{ctx.fillStyle=col||'#FF0000';ctx.beginPath();ctx.arc(0,0,20,0,6.28);ctx.fill();}}if(hit){{ctx.fillStyle='rgba(255,50,50,0.45)';ctx.beginPath();ctx.arc(0,-20,38,0,6.28);ctx.fill();}}ctx.restore();}}}}
 function drCustom(col,evo,t,vis){{
   const hc=vis.hair_color||col;const sc2=vis.skin_color||'#FFCC88';const oc=vis.outfit_color||col;
   const oc2=vis.outfit_secondary||dk(oc,0.2);const wc=vis.weapon_color||'#C0C0C0';const ec2=vis.eye_color||'#000';const ac=vis.aura_color||col;
