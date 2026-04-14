@@ -2253,6 +2253,188 @@ if st.session_state.get("battle_state") == "ready" or view == "battle":
                     with st.spinner(f"⚔️ Generating {sub} questions..."):
                         cfg = generate_battle_config(theme, sub, tier_now, get_claude_client())
                     st.session_state.battle_config = cfg; st.session_state.battle_subject_chosen = True; st.rerun()
+        # ── UPLOAD STUDY MATERIAL ──────────────────────────────────────
+        st.markdown(f"<div style='margin-top:20px;padding-top:16px;border-top:1px solid {C}22'></div>", unsafe_allow_html=True)
+        st.markdown(f"<p style='text-align:center;color:{C};font-family:Bebas Neue,sans-serif;font-size:18px;letter-spacing:3px'>📄 OR UPLOAD YOUR STUDY MATERIAL</p>", unsafe_allow_html=True)
+        st.markdown(f"<p style='text-align:center;color:#888;font-family:Space Mono,monospace;font-size:11px'>Upload notes, a textbook page, or paste text — AI generates battle questions from YOUR material</p>", unsafe_allow_html=True)
+
+        _upload_tab1, _upload_tab2 = st.tabs(["📄 Upload File", "📋 Paste Text"])
+
+        with _upload_tab1:
+            _uploaded_material = st.file_uploader("Upload notes, screenshot, or document:", type=["txt", "png", "jpg", "jpeg", "webp"], key="battle_material_upload")
+            if _uploaded_material and st.button("⚔️ GENERATE QUESTIONS FROM FILE", key="battle_from_upload", use_container_width=True):
+                _file_content = ""
+                _is_image = _uploaded_material.type and _uploaded_material.type.startswith("image")
+
+                if _is_image:
+                    import base64 as _b64_upload
+                    _img_bytes = _uploaded_material.read()
+                    _img_b64 = _b64_upload.b64encode(_img_bytes).decode("utf-8")
+                    _media_type = _uploaded_material.type or "image/png"
+
+                    with st.spinner("⚔️ Reading your material and generating questions..."):
+                        try:
+                            _upload_client = get_claude_client()
+                            _tier_upl = st.session_state.get("sub_tier", "Free")
+                            _tier_q_upl = 8 if _tier_upl == "Elite" else (6 if _tier_upl == "Premium" else 4)
+                            _upload_resp = _upload_client.messages.create(
+                                model="claude-sonnet-4-5",
+                                max_tokens=2000,
+                                messages=[{"role": "user", "content": [
+                                    {"type": "image", "source": {"type": "base64", "media_type": _media_type, "data": _img_b64}},
+                                    {"type": "text", "text": f"""Look at this study material image. Extract the key concepts, facts, and information.
+
+Then generate {_tier_q_upl} quiz questions based ONLY on what you see in this image.
+
+DIFFICULTY MIX:
+- 70% EASY (mental recall, 1 sentence, give "time":20)
+- 20% MEDIUM (requires thinking, give "time":45)
+- 10% HARD (deep understanding, give "time":180)
+
+Return ONLY valid JSON (no markdown):
+{{"questions":[{{"q":"question text","choices":["A: opt","B: opt","C: opt","D: opt"],"answer":"B","hint":"hint","time":20}}]}}
+
+Make questions test real understanding of the material, not just surface recall. Keep question text short — max 2 sentences."""}
+                                ]}]
+                            )
+                            _raw_upl = _upload_resp.content[0].text.strip().replace("```json","").replace("```","").strip()
+                            _upl_data = json.loads(_raw_upl)
+                            _upl_questions = _upl_data.get("questions", [])
+                        except Exception:
+                            _upl_questions = []
+
+                else:
+                    _file_content = _uploaded_material.read().decode("utf-8", errors="ignore")[:4000]
+
+                    with st.spinner("⚔️ Reading your material and generating questions..."):
+                        try:
+                            _upload_client = get_claude_client()
+                            _tier_upl = st.session_state.get("sub_tier", "Free")
+                            _tier_q_upl = 8 if _tier_upl == "Elite" else (6 if _tier_upl == "Premium" else 4)
+                            _upload_resp = _upload_client.messages.create(
+                                model="claude-sonnet-4-5",
+                                max_tokens=2000,
+                                messages=[{"role": "user", "content": f"""Here is the student's study material:
+
+---
+{_file_content}
+---
+
+Generate {_tier_q_upl} quiz questions based ONLY on this material.
+
+DIFFICULTY MIX:
+- 70% EASY (mental recall, 1 sentence, give "time":20)
+- 20% MEDIUM (requires thinking, give "time":45)
+- 10% HARD (deep understanding, give "time":180)
+
+Return ONLY valid JSON (no markdown):
+{{"questions":[{{"q":"question text","choices":["A: opt","B: opt","C: opt","D: opt"],"answer":"B","hint":"hint","time":20}}]}}
+
+Make questions test real understanding of the material. Keep question text short — max 2 sentences."""}]
+                            )
+                            _raw_upl = _upload_resp.content[0].text.strip().replace("```json","").replace("```","").strip()
+                            _upl_data = json.loads(_raw_upl)
+                            _upl_questions = _upl_data.get("questions", [])
+                        except Exception:
+                            _upl_questions = []
+
+                if _upl_questions:
+                    _upl_mode = detect_game_mode(st.session_state.user_theme)
+                    _upl_cfg = {
+                        "mode": _upl_mode,
+                        "arena_name": "STUDY MATERIAL ARENA",
+                        "arena_desc": "Questions from your own notes.",
+                        "arena_colors": ["#0a0020", "#001030", "#000a18"],
+                        "player_title": "Champion",
+                        "player_attacks": ["Study Strike", "Knowledge Blast", "Brain Surge", "Recall Rush", "Final Answer"],
+                        "enemy_name": "Your Material",
+                        "enemy_title": "The Test",
+                        "enemy_color": "#CC2222",
+                        "enemy_attacks": ["Confusion Wave", "Brain Fog", "Time Pressure"],
+                        "enemy_phases": ["Phase 1", "Phase 2 — HARDER", "Final Phase"],
+                        "win_quote": "You mastered your own material!",
+                        "lose_quote": "Review your notes and try again.",
+                        "player_visual": {},
+                        "enemy_visual": {},
+                        "questions": _upl_questions,
+                        "evolutions": ["Student", "Scholar", "Expert", "Master", "Genius", "Legend"],
+                        "subject": "My Material",
+                        "universe": st.session_state.user_theme,
+                        "tier": st.session_state.get("sub_tier", "Free"),
+                    }
+                    st.session_state.battle_config = _upl_cfg
+                    st.session_state.battle_subject_chosen = True
+                    st.rerun()
+                else:
+                    st.error("Couldn't generate questions from that file. Try a clearer image or text file.")
+
+        with _upload_tab2:
+            _pasted_text = st.text_area("Paste your study notes here:", placeholder="Paste any text — lecture notes, textbook passages, definitions, formulas...", height=150, key="battle_paste_text")
+            if _pasted_text.strip() and st.button("⚔️ GENERATE QUESTIONS FROM TEXT", key="battle_from_paste", use_container_width=True):
+                _paste_content = _pasted_text.strip()[:4000]
+
+                with st.spinner("⚔️ Generating questions from your notes..."):
+                    try:
+                        _paste_client = get_claude_client()
+                        _tier_paste = st.session_state.get("sub_tier", "Free")
+                        _tier_q_paste = 8 if _tier_paste == "Elite" else (6 if _tier_paste == "Premium" else 4)
+                        _paste_resp = _paste_client.messages.create(
+                            model="claude-sonnet-4-5",
+                            max_tokens=2000,
+                            messages=[{"role": "user", "content": f"""Here is the student's study material:
+
+---
+{_paste_content}
+---
+
+Generate {_tier_q_paste} quiz questions based ONLY on this material.
+
+DIFFICULTY MIX:
+- 70% EASY (mental recall, 1 sentence, give "time":20)
+- 20% MEDIUM (requires thinking, give "time":45)
+- 10% HARD (deep understanding, give "time":180)
+
+Return ONLY valid JSON (no markdown):
+{{"questions":[{{"q":"question text","choices":["A: opt","B: opt","C: opt","D: opt"],"answer":"B","hint":"hint","time":20}}]}}
+
+Make questions test real understanding of the material. Keep question text short — max 2 sentences."""}]
+                        )
+                        _raw_paste = _paste_resp.content[0].text.strip().replace("```json","").replace("```","").strip()
+                        _paste_data = json.loads(_raw_paste)
+                        _paste_questions = _paste_data.get("questions", [])
+                    except Exception:
+                        _paste_questions = []
+
+                if _paste_questions:
+                    _paste_mode = detect_game_mode(st.session_state.user_theme)
+                    _paste_cfg = {
+                        "mode": _paste_mode,
+                        "arena_name": "STUDY NOTES ARENA",
+                        "arena_desc": "Questions from your own notes.",
+                        "arena_colors": ["#0a0020", "#001030", "#000a18"],
+                        "player_title": "Champion",
+                        "player_attacks": ["Study Strike", "Knowledge Blast", "Brain Surge", "Recall Rush", "Final Answer"],
+                        "enemy_name": "Your Notes",
+                        "enemy_title": "The Test",
+                        "enemy_color": "#CC2222",
+                        "enemy_attacks": ["Confusion Wave", "Brain Fog", "Time Pressure"],
+                        "enemy_phases": ["Phase 1", "Phase 2 — HARDER", "Final Phase"],
+                        "win_quote": "You mastered your own notes!",
+                        "lose_quote": "Review your notes and try again.",
+                        "player_visual": {},
+                        "enemy_visual": {},
+                        "questions": _paste_questions,
+                        "evolutions": ["Student", "Scholar", "Expert", "Master", "Genius", "Legend"],
+                        "subject": "My Notes",
+                        "universe": st.session_state.user_theme,
+                        "tier": st.session_state.get("sub_tier", "Free"),
+                    }
+                    st.session_state.battle_config = _paste_cfg
+                    st.session_state.battle_subject_chosen = True
+                    st.rerun()
+                else:
+                    st.error("Couldn't generate questions from that text. Try pasting more content.")
+
         st.markdown("---")
         if st.button("⬅ Back", key="battle_back"):
             st.session_state.view = "main"; st.session_state.battle_state = None; st.rerun()
