@@ -867,6 +867,7 @@ def db_save(user_name: str, theme: str):
             "universe_achievements": json.dumps(st.session_state.get("universe_achievements", [])),
             "hatched_monsters": json.dumps(st.session_state.get("hatched_monsters", [])),
             "custom_flashcards": json.dumps(st.session_state.get("custom_flashcards", [])),
+            "universe_abilities": json.dumps(st.session_state.get("universe_abilities", [])),
             "sub_tier": st.session_state.get("sub_tier", "Free"),
             "sub_multiplier": int(st.session_state.get("sub_multiplier", 1)),
             "shield_bought": bool(st.session_state.get("shield_bought", False)),
@@ -956,6 +957,8 @@ def db_apply(row: dict):
     except: st.session_state.hatched_monsters = []
     try: st.session_state.custom_flashcards = json.loads(row.get("custom_flashcards", "[]"))
     except: st.session_state.custom_flashcards = []
+    try: st.session_state.universe_abilities = json.loads(row.get("universe_abilities", "[]"))
+    except: st.session_state.universe_abilities = []
     st.session_state.secrets_seen = len(st.session_state.secret_queue)
     st.session_state.opening_story_shown = len(st.session_state.story_log) > 0
     st.session_state.password_hash = row.get("password_hash", "")
@@ -1318,7 +1321,7 @@ if "gold" not in st.session_state:
         "unlocked_achievements": set(),
         "battles_fought": 0, "battles_won": 0,
         "eggs_hatched": 0, "legendary_hatched": False,
-        "incubator_eggs": 0, "hatched_monsters": [], "custom_flashcards": [],
+        "incubator_eggs": 0, "hatched_monsters": [], "custom_flashcards": [], "universe_abilities": [],
         "secrets_seen": 0,
         "shield_bought": False, "booster_bought": False,
         "battle_state": None, "current_battle": None, "egg_warmth": {},
@@ -2979,14 +2982,13 @@ elif view == "abilities":
     st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>🛡️ YOUR ABILITIES</h2>", unsafe_allow_html=True)
     shield_owned  = st.session_state.get("shield_bought", False)
     booster_owned = st.session_state.get("booster_bought", False)
-    tier_now_ab   = st.session_state.get("sub_tier", "Free")
 
-    # SHIELD
+    st.markdown(f"<h3 style='font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:3px;margin-bottom:8px'>⚡ CORE ABILITIES</h3>", unsafe_allow_html=True)
+
     s_bc  = C if shield_owned else "#333"
     s_sc  = "#00FF44" if shield_owned else "#FF4444"
     s_st  = "✅ ACTIVE" if shield_owned else "❌ NOT OWNED"
     s_how = "Win from the 🎰 Spinner or complete a battle" if not shield_owned else ""
-    s_study = f"<div style='margin-top:8px;padding:8px 10px;background:rgba(0,255,100,0.08);border-left:3px solid #00FF44;border-radius:4px;font-family:Space Mono,monospace;font-size:11px;color:#00FF88'>📚 STUDY BENEFIT: Negates any currency debt earned that session. Keeps your balance safe on bad runs.</div>"
     st.markdown(f"""<div class='metric-card' style='border-color:{s_bc}'>
         <div style='display:flex;align-items:flex-start;gap:16px'>
             <div style='font-size:48px'>🛡️</div>
@@ -2994,18 +2996,15 @@ elif view == "abilities":
                 <div style='font-family:Bebas Neue,sans-serif;font-size:26px;color:{C};letter-spacing:3px'>{wd.get("shield_name","Shield")}</div>
                 <div style='font-size:12px;color:#aaaaaa;margin:4px 0;font-style:italic'>{wd.get("shield_flavor","Protects from harm.")}</div>
                 <div style='font-size:12px;color:{s_sc};font-family:Space Mono,monospace;margin-top:4px'>{s_st}{(" — "+s_how) if s_how else ""}</div>
-                {s_study}
+                <div style='margin-top:8px;padding:8px 10px;background:rgba(0,255,100,0.08);border-left:3px solid #00FF44;border-radius:4px;font-family:Space Mono,monospace;font-size:11px;color:#00FF88'>📚 STUDY BENEFIT: Negates any currency debt earned that session.</div>
             </div>
         </div>
     </div>""", unsafe_allow_html=True)
 
-    # BOOSTER
     b_bc  = C if booster_owned else "#333"
     b_sc  = "#00FF44" if booster_owned else "#FF4444"
     b_st  = "✅ ACTIVE — 3× CURRENCY ON EVERY MISSION" if booster_owned else "❌ NOT OWNED"
     b_how = "Win from the 🎰 Spinner or complete a battle" if not booster_owned else ""
-    b_mult = f"+{int((st.session_state.sub_multiplier*3-1)*100)}% more" if booster_owned else "3× multiplier when activated"
-    b_study = f"<div style='margin-top:8px;padding:8px 10px;background:rgba(255,140,0,0.08);border-left:3px solid #FF8800;border-radius:4px;font-family:Space Mono,monospace;font-size:11px;color:#FFAA44'>📚 STUDY BENEFIT: Every mission reward is tripled. Earn 3× currency, 3× XP progress, 3× closer to leveling up. Stack with Premium/Elite for maximum gain.</div>"
     st.markdown(f"""<div class='metric-card' style='border-color:{b_bc}'>
         <div style='display:flex;align-items:flex-start;gap:16px'>
             <div style='font-size:48px'>🚀</div>
@@ -3013,12 +3012,120 @@ elif view == "abilities":
                 <div style='font-family:Bebas Neue,sans-serif;font-size:26px;color:{C};letter-spacing:3px'>{wd.get("booster_name","Booster")}</div>
                 <div style='font-size:12px;color:#aaaaaa;margin:4px 0;font-style:italic'>{wd.get("booster_flavor","Moves at impossible speed.")}</div>
                 <div style='font-size:12px;color:{b_sc};font-family:Space Mono,monospace;margin-top:4px'>{b_st}{(" — "+b_how) if b_how else ""}</div>
-                {b_study}
+                <div style='margin-top:8px;padding:8px 10px;background:rgba(255,140,0,0.08);border-left:3px solid #FF8800;border-radius:4px;font-family:Space Mono,monospace;font-size:11px;color:#FFAA44'>📚 STUDY BENEFIT: Every mission reward is tripled. Stack with Premium/Elite.</div>
             </div>
         </div>
     </div>""", unsafe_allow_html=True)
+
+    st.markdown(f"<h3 style='font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:3px;margin-top:24px;margin-bottom:8px'>🌌 {st.session_state.user_theme.upper()} STUDY ABILITIES</h3>", unsafe_allow_html=True)
+    st.markdown(f"<p style='font-family:Space Mono,monospace;font-size:11px;color:#888;margin-bottom:12px'>Special powers from your universe that help you study. Unlock them through missions and battles.</p>", unsafe_allow_html=True)
+
+    _abilities = st.session_state.get("universe_abilities", [])
+    _theme_ab = st.session_state.user_theme or "Infinite Power"
+    _total_m_ab = st.session_state.get("total_missions", 0)
+    _battles_ab = st.session_state.get("battles_fought", 0)
+    _streak_ab = st.session_state.get("study_streak", 0)
+
+    if not _abilities:
+        _ab_client = get_claude_client()
+        if _ab_client:
+            try:
+                _ab_resp = _ab_client.messages.create(
+                    model="claude-sonnet-4-5",
+                    max_tokens=1500,
+                    messages=[{"role": "user", "content": f"""Universe: "{_theme_ab}"
+
+Generate 8 study-themed abilities for this universe. Each ability should:
+- Be named after a specific move, item, technique, or concept from {_theme_ab}
+- Have a study benefit (what it does for the student's learning)
+- Have an unlock condition (missions completed, battles won, streak days, level reached, etc.)
+- Have an emoji icon
+- Have a flavor text that sounds like it belongs in {_theme_ab}
+
+RULES:
+- Use SPECIFIC {_theme_ab} lore — character names, techniques, items, locations
+- Mix the unlock conditions: some easy (3 missions), some medium (10 battles), some hard (20-day streak)
+- Each ability's study benefit should be DIFFERENT — focus boost, memory aid, speed reading, review power, etc.
+- If {_theme_ab} is too generic or vague, use cool universal study-themed names instead
+
+Return ONLY valid JSON (no markdown):
+[{{"name":"emoji + ability name","flavor":"1 sentence in-universe description","study_benefit":"What it does for studying","unlock_type":"missions|battles|streak|level","unlock_value":5}}]
+
+Generate exactly 8 abilities."""}]
+                )
+                _raw_ab = re.sub(r"```(?:json)?", "", _ab_resp.content[0].text.strip()).strip().rstrip("`")
+                _abilities = json.loads(_raw_ab)
+                if isinstance(_abilities, list) and len(_abilities) > 0:
+                    st.session_state.universe_abilities = _abilities[:10]
+                    db_save(st.session_state.user_name, st.session_state.user_theme)
+            except Exception:
+                pass
+
+    if not _abilities:
+        _abilities = [
+            {"name": "🧠 Focus Surge", "flavor": f"Channel the energy of {_theme_ab} to sharpen your mind.", "study_benefit": "Doubles XP from your next 3 missions.", "unlock_type": "missions", "unlock_value": 3},
+            {"name": "⏰ Time Dilation", "flavor": f"Bend time itself like the legends of {_theme_ab}.", "study_benefit": "Adds 30 bonus seconds to every mission timer.", "unlock_type": "missions", "unlock_value": 8},
+            {"name": "📖 Lore Memory", "flavor": f"The ancient knowledge of {_theme_ab} flows through you.", "study_benefit": "Story chapters reveal study tips hidden in the lore.", "unlock_type": "streak", "unlock_value": 5},
+            {"name": "⚔️ Battle Instinct", "flavor": f"Every fight in {_theme_ab} sharpened your reflexes.", "study_benefit": "Battle questions show hints after 10 seconds.", "unlock_type": "battles", "unlock_value": 5},
+            {"name": "💰 Fortune Aura", "flavor": f"The {_theme_ab} universe favors the dedicated.", "study_benefit": "Minimum reward multiplier increased to 2×.", "unlock_type": "missions", "unlock_value": 15},
+            {"name": "🔥 Streak Flame", "flavor": f"An unbreakable fire forged by {_theme_ab} discipline.", "study_benefit": "Streak shield auto-activates — protects 1 missed day per week.", "unlock_type": "streak", "unlock_value": 14},
+            {"name": "🥚 Hatch Accelerator", "flavor": f"Incubator technology perfected by {_theme_ab} engineers.", "study_benefit": "All eggs start at 50% warmth instead of random.", "unlock_type": "battles", "unlock_value": 10},
+            {"name": "👑 Infinite Mastery", "flavor": f"You have transcended {_theme_ab}. Nothing can stop you.", "study_benefit": "All rewards permanently boosted by 50%.", "unlock_type": "level", "unlock_value": 25},
+        ]
+        st.session_state.universe_abilities = _abilities
+
+    for _ab in _abilities:
+        _ab_name    = _ab.get("name", "🌟 Unknown Ability")
+        _ab_flavor  = _ab.get("flavor", "A mysterious power.")
+        _ab_benefit = _ab.get("study_benefit", "Enhances your studies.")
+        _ab_type    = _ab.get("unlock_type", "missions")
+        _ab_val     = _ab.get("unlock_value", 5)
+
+        if _ab_type == "missions":
+            _ab_unlocked = _total_m_ab >= _ab_val
+            _ab_progress = min(_total_m_ab, _ab_val)
+            _ab_req_text = f"{_ab_progress}/{_ab_val} missions"
+        elif _ab_type == "battles":
+            _ab_unlocked = _battles_ab >= _ab_val
+            _ab_progress = min(_battles_ab, _ab_val)
+            _ab_req_text = f"{_ab_progress}/{_ab_val} battles"
+        elif _ab_type == "streak":
+            _ab_unlocked = _streak_ab >= _ab_val
+            _ab_progress = min(_streak_ab, _ab_val)
+            _ab_req_text = f"{_ab_progress}/{_ab_val} day streak"
+        elif _ab_type == "level":
+            _ab_lv = st.session_state.get("level", 1)
+            _ab_unlocked = _ab_lv >= _ab_val
+            _ab_progress = min(_ab_lv, _ab_val)
+            _ab_req_text = f"Level {_ab_progress}/{_ab_val}"
+        else:
+            _ab_unlocked = False; _ab_progress = 0; _ab_req_text = f"??? / {_ab_val}"
+
+        _ab_border       = C if _ab_unlocked else "#333"
+        _ab_status_color = "#00FF44" if _ab_unlocked else "#FF4444"
+        _ab_status_text  = "✅ UNLOCKED" if _ab_unlocked else f"🔒 {_ab_req_text}"
+        _ab_pct          = min(1.0, _ab_progress / max(_ab_val, 1))
+        _ab_bar_fill     = int(_ab_pct * 15)
+        _ab_bar          = "█" * _ab_bar_fill + "░" * (15 - _ab_bar_fill)
+        _ab_opacity      = "1.0" if _ab_unlocked else "0.5"
+
+        st.markdown(f"""<div style='background:#0a0a1a;border:2px solid {_ab_border};border-radius:14px;padding:16px 20px;margin:8px 0;opacity:{_ab_opacity}'>
+            <div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:6px'>
+                <span style='font-family:Bebas Neue,sans-serif;font-size:20px;color:{C if _ab_unlocked else "#666"};letter-spacing:2px'>{_ab_name}</span>
+                <span style='font-family:Space Mono,monospace;font-size:10px;color:{_ab_status_color}'>{_ab_status_text}</span>
+            </div>
+            <div style='font-family:Space Mono,monospace;font-size:11px;color:#aaa;font-style:italic;margin-bottom:6px'>{_ab_flavor}</div>
+            <div style='font-family:Space Mono,monospace;font-size:11px;color:{"#00FF88" if _ab_unlocked else "#555"};margin-bottom:6px;padding:6px 8px;background:{"rgba(0,255,100,0.08)" if _ab_unlocked else "rgba(255,255,255,0.03)"};border-left:3px solid {"#00FF44" if _ab_unlocked else "#333"};border-radius:4px'>📚 {_ab_benefit}</div>
+            {"" if _ab_unlocked else f"<div style='font-family:Space Mono,monospace;font-size:10px;color:{C};margin-top:4px'>{_ab_bar} {int(_ab_pct*100)}%</div>"}
+        </div>""", unsafe_allow_html=True)
+
+    st.markdown("---")
+    if st.button("🔄 REGENERATE ABILITIES", key="regen_abilities"):
+        st.session_state.universe_abilities = []
+        st.rerun()
+
     st.markdown(f"""<div style='text-align:center;padding:14px;background:#111;border:1px solid {C}22;border-radius:12px;margin-top:8px'>
-        <div style='font-family:Space Mono,monospace;font-size:11px;color:#666'>Win abilities from the 🎰 Spinner · Or purchase Elite/Premium for permanent boosts</div>
+        <div style='font-family:Space Mono,monospace;font-size:11px;color:#666'>Win core abilities from the 🎰 Spinner · Unlock universe abilities through missions, battles, and streaks</div>
     </div>""", unsafe_allow_html=True)
 
 elif view == "boxes":
