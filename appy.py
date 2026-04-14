@@ -230,6 +230,18 @@ let parts=[],beams=[],dmgNums=[];
 const P={{hp:100,maxHp:100,power:0,evo:0,streak:0,total:0,x:160,y:270,shake:0,hit:false,color:COL}};
 const E={{hp:100,maxHp:100,phase:0,x:620,y:270,shake:0,hit:false,color:CFG.enemy_color||'#CC2222'}};
 const INTENSITY=Math.min(3, 1 + (CFG.battles_fought||0) * 0.15);
+const SND={{ctx:null,
+  init(){{if(!this.ctx)try{{this.ctx=new(window.AudioContext||window.webkitAudioContext)()}}catch(e){{}}}},
+  play(f,d,t,v){{try{{this.init();const o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type=t||'sine';o.frequency.setValueAtTime(f,this.ctx.currentTime);g.gain.setValueAtTime(v||0.25,this.ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.01,this.ctx.currentTime+d);o.connect(g);g.connect(this.ctx.destination);o.start();o.stop(this.ctx.currentTime+d)}}catch(e){{}}}},
+  theme:MODE==='FIGHTER'?{{b:180,t:'square',m:1.2}}:MODE==='RPG'?{{b:400,t:'sine',m:1.0}}:MODE==='SHOOTER'?{{b:500,t:'sawtooth',m:0.8}}:MODE==='COSMIC'?{{b:300,t:'triangle',m:1.1}}:MODE==='MAGIC'?{{b:450,t:'sine',m:1.0}}:MODE==='SPORTS'?{{b:350,t:'square',m:0.9}}:MODE==='BRAWL'?{{b:200,t:'square',m:1.3}}:MODE==='PLATFORM'?{{b:520,t:'sine',m:0.7}}:{{b:380,t:'sine',m:1.0}},
+  correct(){{const b=this.theme.b,t=this.theme.t;this.play(b*2.2,0.08,t,0.2);setTimeout(()=>this.play(b*2.8,0.12,'sine',0.18),60)}},
+  wrong(){{const b=this.theme.b;this.play(b*0.5,0.25,'sawtooth',0.15);setTimeout(()=>this.play(b*0.4,0.3,'sawtooth',0.1),100)}},
+  hit(){{const b=this.theme.b,t=this.theme.t;this.play(b*2,0.06,t,0.18);this.play(b*3,0.1,'sine',0.12)}},
+  miss(){{const b=this.theme.b;this.play(b*0.6,0.2,'square',0.12);this.play(b*0.45,0.3,'sawtooth',0.08)}},
+  evo(){{const b=this.theme.b;[1,1.25,1.5,1.75,2,2.5,3].forEach((m,i)=>setTimeout(()=>this.play(b*m,0.18,'sine',0.22),i*70))}},
+  victory(){{const b=this.theme.b;[1,1.25,1.5,2].forEach((m,i)=>setTimeout(()=>this.play(b*m,0.35,'sine',0.25),i*180));setTimeout(()=>{{[2,2.5,3,4].forEach((m,i)=>setTimeout(()=>this.play(b*m,0.2,'triangle',0.15),i*100))}},800)}},
+  defeat(){{const b=this.theme.b;[1.5,1.2,1,0.8,0.6].forEach((m,i)=>setTimeout(()=>this.play(b*m,0.4,'sawtooth',0.12),i*220))}}
+}};
 var playerImg=null,enemyImg=null;
 if(CFG.player_portrait_url){{playerImg=new Image();playerImg.crossOrigin='anonymous';playerImg.src=CFG.player_portrait_url;}}
 if(CFG.enemy_portrait_url){{enemyImg=new Image();enemyImg.crossOrigin='anonymous';enemyImg.src=CFG.enemy_portrait_url;}}
@@ -421,6 +433,7 @@ function onOk(){{
   P.streak++;P.total++;P.power=Math.min(100,P.power+22);
   const dmg=15+P.evo*5+Math.floor(Math.random()*10)+(P.streak>=3?15:0);
   E.hp=Math.max(0,E.hp-dmg);E.hit=true;E.shake=12;setTimeout(()=>E.hit=false,380);
+  SND.correct();SND.hit();
   ab(P.x,P.y-30,E.x,E.y-30,COL,(6+P.evo*2)*INTENSITY,24);ap(E.x,E.y-30,COL,Math.floor((20+P.evo*4)*INTENSITY),4*INTENSITY,6*INTENSITY,28);
   dn(E.x,E.y-60,'-'+dmg,COL,true);
   const nt=P.evo+1;const evos=CFG.evolutions||[];
@@ -433,6 +446,7 @@ function onNo(){{
   P.streak=0;wrongs++;
   const dmg=10+E.phase*8+Math.floor(Math.random()*8);
   P.hp=Math.max(0,P.hp-dmg);P.hit=true;P.shake=14;setTimeout(()=>P.hit=false,380);
+  SND.wrong();SND.miss();
   if(wrongs>=3){{lives--;wrongs=0;}}
   ab(E.x,E.y-30,P.x,P.y-30,E.color,5*INTENSITY,20);ap(P.x,P.y-30,'#FF2222',Math.floor(15*INTENSITY),3*INTENSITY,5*INTENSITY,26);
   dn(P.x,P.y-60,'-'+dmg,'#FF2222',false);
@@ -440,10 +454,12 @@ function onNo(){{
 }}
 function evolve(idx){{
   STATE='EV';evolveT=0;P.evo=idx;ap(P.x,P.y,COL,60,8,10,60);ap(P.x,P.y,'#FFD700',30,6,7,48);
+  SND.evo();
   setTimeout(()=>{{STATE='B';showQ();}},1800);
 }}
 function win(){{
   STATE='WIN';document.getElementById('questions').style.display='none';
+  SND.victory();
   for(let i=0;i<8;i++)setTimeout(()=>ap(Math.random()*W,Math.random()*H,COL,20,5,8,50),i*100);
   const xp=50+P.evo*20+P.total*10,gold=20+P.evo*8+P.total*4;
   const res=document.getElementById('result');res.style.display='flex';
@@ -452,6 +468,7 @@ function win(){{
 }}
 function lose(){{
   STATE='LOSE';document.getElementById('questions').style.display='none';
+  SND.defeat();
   ap(P.x,P.y,'#FF2222',50,6,8,60);
   const res=document.getElementById('result');res.style.display='flex';
   res.innerHTML=`<div style="font-size:50px;margin-bottom:10px">💀</div><div style="font-family:Orbitron,monospace;font-size:34px;color:#FF2222;letter-spacing:4px;margin-bottom:6px">DEFEATED</div><div style="color:#FF8888;font-family:'Space Mono',monospace;font-size:13px;margin-bottom:10px">${{CFG.lose_quote||'Train harder.'}}</div>`;
@@ -747,6 +764,28 @@ def apply_welcome_bonus():
         return True
     return False
 
+def share_card_html(title: str, subtitle: str, stats: list, theme_color: str, universe: str, player: str) -> str:
+    """Generate a shareable results card."""
+    stats_html = ""
+    for stat in stats:
+        sc = stat.get("color", theme_color)
+        sv = stat["value"]; sl = stat["label"]
+        stats_html += f"<div style='text-align:center;min-width:70px'><div style='font-family:Bebas Neue,sans-serif;font-size:24px;color:{sc}'>{sv}</div><div style='font-family:Space Mono,monospace;font-size:8px;color:#888;letter-spacing:1px'>{sl}</div></div>"
+    return (f"<div id='shareCard' style='background:linear-gradient(135deg,#0a0a1a 0%,#1a0a2e 40%,#0a0020 100%);"
+            f"border:3px solid {theme_color};border-radius:20px;padding:28px;text-align:center;max-width:420px;"
+            f"margin:12px auto;box-shadow:0 0 50px {theme_color}44;position:relative;overflow:hidden'>"
+            f"<div style='position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,{theme_color},transparent)'></div>"
+            f"<div style='font-family:Space Mono,monospace;font-size:9px;color:{theme_color};letter-spacing:4px;margin-bottom:4px'>30 SECOND INFINITEVERSE</div>"
+            f"<div style='font-family:Bebas Neue,sans-serif;font-size:14px;color:#888;letter-spacing:2px;margin-bottom:12px'>{universe.upper()}</div>"
+            f"<div style='font-size:40px;margin-bottom:4px'>{title}</div>"
+            f"<div style='font-family:Bebas Neue,sans-serif;font-size:26px;color:{theme_color};letter-spacing:4px;margin-bottom:4px'>{subtitle}</div>"
+            f"<div style='font-family:Space Mono,monospace;font-size:11px;color:#aaa;margin-bottom:16px'>by <b style='color:{theme_color}'>{player.upper()}</b></div>"
+            f"<div style='display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-bottom:16px'>{stats_html}</div>"
+            f"<div style='font-family:Space Mono,monospace;font-size:9px;color:#555;letter-spacing:1px'>screenshot this · flex on your friends</div>"
+            f"<div style='position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,{theme_color},transparent)'></div>"
+            f"</div>")
+
+
 def loot_box_html(item_name: str, rarity: str, color: str) -> str:
     rarity_colors = {"JACKPOT":"#FFD700","EPIC":"#AA44FF","GREAT":"#4488FF","SOLID":"#44FF88","LOW":"#888888"}
     rc = rarity_colors.get(rarity.upper().split()[0], "#FFD700")
@@ -824,6 +863,22 @@ def hatch_egg(theme):
 # ─────────────────────────────────────────────────────────────────────────────
 # API + JSON HELPERS
 # ─────────────────────────────────────────────────────────────────────────────
+def play_app_sound(sound_type: str):
+    """Play a short synthesized sound in the browser via Web Audio API."""
+    sounds = {
+        "coin": "s.play(680,0.08,'sine',0.25);setTimeout(()=>s.play(880,0.12,'sine',0.2),70);setTimeout(()=>s.play(1100,0.15,'sine',0.18),140)",
+        "levelup": "[440,550,660,880,1100].forEach((f,i)=>setTimeout(()=>s.play(f,0.2,'sine',0.22),i*90))",
+        "jackpot": "[440,550,660,880].forEach((f,i)=>setTimeout(()=>s.play(f,0.25,'triangle',0.25),i*120));setTimeout(()=>[880,1100,1320,1760].forEach((f,i)=>setTimeout(()=>s.play(f,0.15,'sine',0.2),i*80)),600)",
+        "hatch": "s.play(300,0.15,'sine',0.2);setTimeout(()=>s.play(450,0.15,'sine',0.2),120);setTimeout(()=>s.play(600,0.2,'sine',0.22),240);setTimeout(()=>s.play(900,0.3,'triangle',0.18),400)",
+        "spin": "[200,300,400,500,600,700,800].forEach((f,i)=>setTimeout(()=>s.play(f,0.06,'square',0.12),i*50))",
+        "secret": "s.play(200,0.4,'triangle',0.15);setTimeout(()=>s.play(400,0.3,'sine',0.18),200);setTimeout(()=>s.play(600,0.4,'triangle',0.12),500)",
+        "streak": "s.play(440,0.1,'sine',0.2);setTimeout(()=>s.play(660,0.1,'sine',0.2),100);setTimeout(()=>s.play(880,0.2,'sine',0.22),200)",
+        "error": "s.play(200,0.2,'sawtooth',0.15);setTimeout(()=>s.play(150,0.3,'sawtooth',0.1),150)",
+    }
+    js_code = sounds.get(sound_type, sounds["coin"])
+    components.html(f"""<script>(function(){{try{{var AC=window.AudioContext||window.webkitAudioContext;var c=new AC();var s={{play:function(f,d,t,v){{var o=c.createOscillator(),g=c.createGain();o.type=t;o.frequency.setValueAtTime(f,c.currentTime);g.gain.setValueAtTime(v,c.currentTime);g.gain.exponentialRampToValueAtTime(0.01,c.currentTime+d);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+d);}}}};{js_code}}}catch(e){{}}}})();</script>""", height=0)
+
+
 def get_claude_client():
     try: return anthropic.Anthropic(api_key=st.secrets["ANTHROPIC_KEY"])
     except Exception: return None
@@ -2763,6 +2818,7 @@ elif view == "incubator":
                 st.session_state.incubator_eggs -= 1; st.session_state.eggs_hatched += 1
                 reward = int(5*monster["reward_mult"]); st.session_state.gold += reward
                 if monster["rarity"] == "Legendary": st.session_state.legendary_hatched = True; st.balloons()
+                play_app_sound("hatch")
                 st.session_state.hatched_monsters.append(monster)
                 new_warmth = {i-1:v for i,v in st.session_state.egg_warmth.items() if i>0}
                 st.session_state.egg_warmth = new_warmth
@@ -2940,6 +2996,7 @@ if(autoLand >= 0){{
                         st.session_state.booster_bought = True
                 elif _pt == "story_twist":
                     st.session_state.story_twist_pending = True
+                play_app_sound("spin")
                 db_save(st.session_state.user_name, st.session_state.user_theme)
                 st.rerun()
             else:
@@ -3447,6 +3504,7 @@ if view == "main":
                 st.session_state.secret_queue.append(secret)
                 st.session_state.secrets_seen = len(st.session_state.secret_queue)
                 st.session_state.show_secret = secret
+                play_app_sound("secret")
                 st.session_state.spinner_available = True
                 client = get_claude_client()
                 prev = " ".join(st.session_state.story_log[-2:]) if st.session_state.story_log else ""
@@ -3456,6 +3514,7 @@ if view == "main":
                 st.session_state.battle_state = "ready"
                 st.session_state.incubator_eggs += 1
                 near_miss_display = f" · 🎯 {near_miss}" if near_miss else ""
+                play_app_sound("coin")
                 st.balloons()
                 st.success(f"✅ {rarity_label}! +{earned:.1f} {currency} · 🔥 {new_streak}-day streak · +{spins} spins{near_miss_display}")
                 time.sleep(1); st.rerun()    # ── MISSION TIMER — side buttons small, center button big ─────────────────
