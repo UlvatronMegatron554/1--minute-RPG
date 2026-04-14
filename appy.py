@@ -2198,20 +2198,6 @@ if st.session_state.get("battle_state") == "ready" or view == "battle":
     theme    = st.session_state.user_theme or "Infinite Power"
     tier_now = st.session_state.get("sub_tier","Free")
     _battle_mode = st.session_state.get("game_mode","chill")
-    if _battle_mode == "chill":
-        st.markdown(f"""<div style='text-align:center;padding:40px;background:#0a0a1a;
-            border:2px solid #FF8800;border-radius:20px;margin:20px 0'>
-            <div style='font-size:48px'>⚔️</div>
-            <div style='font-family:Bebas Neue,sans-serif;font-size:32px;color:#FF8800;
-                letter-spacing:4px;margin:12px 0'>BATTLES LOCKED IN CHILL MODE</div>
-            <div style='font-family:Space Mono,monospace;font-size:13px;color:#aaa;line-height:1.8'>
-                Battles are available in 🔥 GRINDER and 💀 OBSESSED modes.<br>
-                Create a new universe with one of those modes to unlock battles.
-            </div>
-        </div>""", unsafe_allow_html=True)
-        if st.button("← Back to Mission Hub", key="battle_back_chill"):
-            st.session_state.view = "main"; st.rerun()
-        st.stop()
 
     if st.session_state.get("battle_box_pending") and st.session_state.get("battle_box_item"):
         item = st.session_state.battle_box_item
@@ -3467,7 +3453,7 @@ if view == "main":
                 st.session_state.story_chapter += 1
                 new_chapter = generate_story_chapter(st.session_state.user_theme, st.session_state.story_chapter, prev, client)
                 st.session_state.story_log.append(new_chapter)
-                if MODE in ("grinder","obsessed"): st.session_state.battle_state = "ready"
+                st.session_state.battle_state = "ready"
                 st.session_state.incubator_eggs += 1
                 near_miss_display = f" · 🎯 {near_miss}" if near_miss else ""
                 st.balloons()
