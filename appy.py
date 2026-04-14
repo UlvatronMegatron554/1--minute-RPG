@@ -408,8 +408,8 @@ function drHUD(){{
 function showQ(){{
   if(qI>=questions.length){{win();return;}}
   const q=questions[qI];const d=document.getElementById('questions');d.style.display='block';
-  qTimer=qMax;aLocked=false;
-  d.innerHTML=`<div class="qbox"><div class="qhdr"><span class="qlbl">Q${{qI+1}}/${{questions.length}} · ${{subject}}</span><span style="font-size:13px">${{'❤️'.repeat(lives)+'🖤'.repeat(3-lives)}}</span></div><div class="tbar" id="tb"></div><div class="qtxt">${{q.q}}</div><div class="choices">${{q.choices.map((c2,i)=>`<button class="ch" onclick="ans(${{i}},'${{String.fromCharCode(65+i)}}')">${{c2}}</button>`).join('')}}</div></div>`;
+  qMax=q.time||25;qTimer=qMax;aLocked=false;
+  d.innerHTML=`<div class="qbox"><div class="qhdr"><span class="qlbl">Q${{qI+1}}/${{questions.length}} · ${{subject}} · ${{qMax}}s</span><span style="font-size:13px">${{'❤️'.repeat(lives)+'🖤'.repeat(3-lives)}}</span></div><div class="tbar" id="tb"></div><div class="qtxt">${{q.q}}</div><div class="choices">${{q.choices.map((c2,i)=>`<button class="ch" onclick="ans(${{i}},'${{String.fromCharCode(65+i)}}')">${{c2}}</button>`).join('')}}</div></div>`;
 }}
 function ans(idx,letter){{
   if(aLocked)return;aLocked=true;const q=questions[qI];const ok=(letter===q.answer);
@@ -545,14 +545,14 @@ def detect_game_mode(universe: str) -> str:
 
 def _fallback_config(universe: str, mode: str, subject: str, q_count: int) -> dict:
     questions = [
-        {"q":f"In the {universe} world: What is 15 × 8?","choices":["A: 100","B: 112","C: 120","D: 130"],"answer":"C","hint":"15×8"},
-        {"q":"A hero runs 5km in 25 min. Speed in km/h?","choices":["A: 10","B: 12","C: 15","D: 8"],"answer":"B","hint":"d/t×60"},
-        {"q":"What is the square root of 144?","choices":["A: 11","B: 12","C: 13","D: 14"],"answer":"B","hint":"12×12"},
-        {"q":"Solve: 3x + 6 = 21. What is x?","choices":["A: 3","B: 4","C: 5","D: 6"],"answer":"C","hint":"subtract 6, divide by 3"},
-        {"q":"What is 20% of 350?","choices":["A: 60","B: 70","C: 80","D: 90"],"answer":"B","hint":"350÷5"},
-        {"q":"What is 7² + 5²?","choices":["A: 74","B: 70","C: 84","D: 64"],"answer":"A","hint":"49+25"},
-        {"q":"A triangle has angles 90° and 45°. Third angle?","choices":["A: 30°","B: 45°","C: 60°","D: 55°"],"answer":"B","hint":"sum=180"},
-        {"q":"What is 2³ × 3²?","choices":["A: 48","B: 54","C: 64","D: 72"],"answer":"D","hint":"8×9"},
+        {"q":f"In the {universe} world: What is 15 × 8?","choices":["A: 100","B: 112","C: 120","D: 130"],"answer":"C","hint":"15×8","time":20},
+        {"q":"A hero runs 5km in 25 min. Speed in km/h?","choices":["A: 10","B: 12","C: 15","D: 8"],"answer":"B","hint":"d/t×60","time":45},
+        {"q":"What is the square root of 144?","choices":["A: 11","B: 12","C: 13","D: 14"],"answer":"B","hint":"12×12","time":20},
+        {"q":"Solve: 3x + 6 = 21. What is x?","choices":["A: 3","B: 4","C: 5","D: 6"],"answer":"C","hint":"subtract 6, divide by 3","time":45},
+        {"q":"What is 20% of 350?","choices":["A: 60","B: 70","C: 80","D: 90"],"answer":"B","hint":"350÷5","time":20},
+        {"q":"What is 7² + 5²?","choices":["A: 74","B: 70","C: 84","D: 64"],"answer":"A","hint":"49+25","time":20},
+        {"q":"A triangle has angles 90° and 45°. Third angle?","choices":["A: 30°","B: 45°","C: 60°","D: 55°"],"answer":"B","hint":"sum=180","time":20},
+        {"q":"What is 2³ × 3²?","choices":["A: 48","B: 54","C: 64","D: 72"],"answer":"D","hint":"8×9","time":45},
     ]
     return {"mode":mode,"arena_name":f"The {universe} Arena","arena_desc":"A legendary battlefield forged from pure determination.","arena_colors":["#111122","#222244","#333366"],"player_title":"Champion","player_attacks":["Power Blast","Energy Wave","Ultimate Strike","Final Form Attack","Infinite Force"],"enemy_name":f"{universe} Boss","enemy_title":"The Final Obstacle","enemy_color":"#CC2222","enemy_attacks":["Dark Blast","Shadow Strike","Void Wave"],"enemy_phases":["Phase 1","Phase 2 — ENRAGED","Final Phase — ULTIMATE"],"win_quote":"Victory belongs to those who never stop learning!","lose_quote":"The enemy grows stronger. Study more and return.","questions":questions[:q_count]}
 
@@ -607,15 +607,25 @@ BAD EXAMPLE — TOO GENERIC (DO NOT DO THIS):
 BAD EXAMPLE — TOO SIMPLE (DO NOT DO THIS):
 "Zoro travels 1000m east. What country would he land in?" — no story setup, no adventure, no engagement
 
-RULES FOR EVERY QUESTION:
-- The story setup should be 1-2 sentences of actual lore events, character names, locations, and actions
-- The math/science/history problem emerges NATURALLY from the story — not tacked on
-- Characters should DO things, GO places, FIGHT enemies, USE abilities — active voice, dramatic energy
-- Each question in the set should be progressively harder AND more lore-intensive
-- The student should feel like they're IN the universe while solving real problems
-- Make them WANT to read the question, not skip to the answers
+DIFFICULTY MIX (CRITICAL — follow this exactly):
+- 70% of questions = EASY. Solvable in 15 seconds with mental math. Short setup (1 sentence lore + 1 sentence question). Give these "time":20
+- 20% of questions = MEDIUM. Requires a bit of thought, maybe one written step. Give these "time":45
+- 10% of questions = HARD. These are the brain-exercisers — multi-step, challenging, rewarding to solve. Give these "time":180
+- Shuffle them — don't put all hard ones at the end. Mix easy-easy-medium-easy-hard-easy-medium etc.
 
-Make {q_count} questions total. Make them INCREDIBLE."""
+EVERY question object MUST include a "time" field (integer, seconds). Example:
+{{"q":"Luffy ate 3 plates of meat with 8 pieces each. How many pieces total?","choices":["A: 18","B: 24","C: 28","D: 32"],"answer":"B","hint":"3x8","time":20}}
+
+RULES FOR EVERY QUESTION:
+- Lore setup should be 1 sentence max for EASY, 1-2 sentences for MEDIUM/HARD
+- The problem emerges NATURALLY from the story — not tacked on
+- Characters should DO things, GO places, FIGHT enemies, USE abilities
+- EASY = mental math, quick recall, simple facts. Fun and fast.
+- MEDIUM = one calculation step, moderate thinking
+- HARD = multi-step, deeper analysis, the kind that makes you feel smart when you get it right
+- The student should feel like they're IN the universe while solving real problems
+
+Make {q_count} questions total. Make them fun — the easy ones should feel like a reward, the hard ones should feel like a boss fight."""
     try:
         resp = client.messages.create(model="claude-sonnet-4-5",max_tokens=2400 if tier=="Elite" else 1800,messages=[{"role":"user","content":prompt}])
         raw = resp.content[0].text.strip().replace("```json","").replace("```","").strip()
@@ -856,6 +866,7 @@ def db_save(user_name: str, theme: str):
             "unlocked_achievements": json.dumps(list(st.session_state.get("unlocked_achievements", set()))),
             "universe_achievements": json.dumps(st.session_state.get("universe_achievements", [])),
             "hatched_monsters": json.dumps(st.session_state.get("hatched_monsters", [])),
+            "custom_flashcards": json.dumps(st.session_state.get("custom_flashcards", [])),
             "sub_tier": st.session_state.get("sub_tier", "Free"),
             "sub_multiplier": int(st.session_state.get("sub_multiplier", 1)),
             "shield_bought": bool(st.session_state.get("shield_bought", False)),
@@ -943,6 +954,8 @@ def db_apply(row: dict):
     except: st.session_state.universe_achievements = []
     try: st.session_state.hatched_monsters = json.loads(row.get("hatched_monsters", "[]"))
     except: st.session_state.hatched_monsters = []
+    try: st.session_state.custom_flashcards = json.loads(row.get("custom_flashcards", "[]"))
+    except: st.session_state.custom_flashcards = []
     st.session_state.secrets_seen = len(st.session_state.secret_queue)
     st.session_state.opening_story_shown = len(st.session_state.story_log) > 0
     st.session_state.password_hash = row.get("password_hash", "")
@@ -1305,7 +1318,7 @@ if "gold" not in st.session_state:
         "unlocked_achievements": set(),
         "battles_fought": 0, "battles_won": 0,
         "eggs_hatched": 0, "legendary_hatched": False,
-        "incubator_eggs": 0, "hatched_monsters": [],
+        "incubator_eggs": 0, "hatched_monsters": [], "custom_flashcards": [],
         "secrets_seen": 0,
         "shield_bought": False, "booster_bought": False,
         "battle_state": None, "current_battle": None, "egg_warmth": {},
@@ -2036,6 +2049,7 @@ with st.sidebar:
     if st.button("💬 FEEDBACK",      key="nav_feedback"): st.session_state.view = "feedback";   st.rerun()
     if st.button("🏆 LEADERBOARD",   key="nav_leader"):   st.session_state.view = "leaderboard"; st.rerun()
     if st.button("📦 MY BOXES",       key="nav_boxes"):   st.session_state.view = "boxes";      st.rerun()
+    if st.button("📝 FLASHCARDS",     key="nav_flash"):   st.session_state.view = "flashcards"; st.rerun()
     if MODE in ("grinder","obsessed"):
         if st.button("🏆 ACHIEVEMENTS", key="nav_ach"):  st.session_state.view = "achievements"; st.rerun()
         if st.button("🥚 INCUBATOR",    key="nav_inc"):  st.session_state.view = "incubator";    st.rerun()
@@ -3086,6 +3100,125 @@ elif view == "leaderboard":
                 unsafe_allow_html=True
             )
 
+
+elif view == "flashcards":
+    st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>📝 MY FLASHCARDS</h2>", unsafe_allow_html=True)
+    st.markdown(f"<p style='text-align:center;font-family:Space Mono,monospace;font-size:12px;color:#aaa'>Create your own study cards. Use them in battle or review them here.</p>", unsafe_allow_html=True)
+
+    cards = st.session_state.get("custom_flashcards", [])
+
+    with st.expander("➕ CREATE NEW CARD", expanded=len(cards) == 0):
+        _fc_q = st.text_area("Question:", placeholder="Type your question here...", height=80, key="fc_question")
+        _fc_cols = st.columns(2)
+        with _fc_cols[0]:
+            _fc_a = st.text_input("A:", placeholder="Choice A", key="fc_a")
+            _fc_b = st.text_input("B:", placeholder="Choice B", key="fc_b")
+        with _fc_cols[1]:
+            _fc_c = st.text_input("C:", placeholder="Choice C", key="fc_c")
+            _fc_d = st.text_input("D:", placeholder="Choice D", key="fc_d")
+        _fc_answer = st.selectbox("Correct answer:", ["A", "B", "C", "D"], key="fc_correct")
+        _fc_diff = st.selectbox("Difficulty:", ["Easy (20s)", "Medium (45s)", "Hard (180s)"], key="fc_diff")
+        _diff_time = {"Easy (20s)": 20, "Medium (45s)": 45, "Hard (180s)": 180}.get(_fc_diff, 20)
+
+        if st.button("✅ SAVE CARD", key="fc_save", use_container_width=True):
+            if not _fc_q.strip():
+                st.error("Write a question first!")
+            elif not all([_fc_a.strip(), _fc_b.strip(), _fc_c.strip(), _fc_d.strip()]):
+                st.error("Fill in all 4 choices!")
+            else:
+                new_card = {
+                    "q": _fc_q.strip(),
+                    "choices": [f"A: {_fc_a.strip()}", f"B: {_fc_b.strip()}", f"C: {_fc_c.strip()}", f"D: {_fc_d.strip()}"],
+                    "answer": _fc_answer,
+                    "hint": "custom",
+                    "time": _diff_time,
+                }
+                st.session_state.custom_flashcards.append(new_card)
+                db_save(st.session_state.user_name, st.session_state.user_theme)
+                st.success(f"✅ Card #{len(st.session_state.custom_flashcards)} saved!")
+                st.rerun()
+
+    st.markdown(f"""<div style='background:#111;border:2px solid {C}44;border-radius:14px;padding:16px 20px;margin:16px 0;text-align:center'>
+        <div style='font-family:Bebas Neue,sans-serif;font-size:28px;color:{C}'>{len(cards)} CARDS CREATED</div>
+        <div style='font-family:Space Mono,monospace;font-size:11px;color:#888;margin-top:4px'>You need at least 4 cards to battle with them</div>
+    </div>""", unsafe_allow_html=True)
+
+    if len(cards) >= 4:
+        if st.button("⚔️ BATTLE WITH MY FLASHCARDS", key="fc_battle", use_container_width=True):
+            _fc_cfg = {
+                "mode": detect_game_mode(st.session_state.user_theme),
+                "arena_name": "FLASHCARD ARENA",
+                "arena_desc": "Your own questions. Your own challenge.",
+                "arena_colors": ["#0a0020", "#001030", "#000a18"],
+                "player_title": "Champion",
+                "player_attacks": ["Study Strike", "Knowledge Blast", "Brain Surge", "Recall Rush", "Final Answer"],
+                "enemy_name": "The Exam",
+                "enemy_title": "Your Ultimate Test",
+                "enemy_color": "#CC2222",
+                "enemy_attacks": ["Confusion Wave", "Brain Fog", "Time Pressure"],
+                "enemy_phases": ["Phase 1", "Phase 2 — HARDER", "Final Phase"],
+                "win_quote": "You conquered your own material!",
+                "lose_quote": "Review your cards and try again.",
+                "player_visual": {},
+                "enemy_visual": {},
+                "questions": cards.copy(),
+                "evolutions": ["Student", "Scholar", "Expert", "Master", "Genius", "Legend", "Transcendent", "Omniscient", "INFINITE MIND"],
+                "subject": "My Flashcards",
+                "universe": st.session_state.user_theme,
+                "tier": st.session_state.get("sub_tier", "Free"),
+            }
+            st.session_state.battle_config = _fc_cfg
+            st.session_state.battle_subject_chosen = True
+            st.session_state.view = "battle"
+            st.rerun()
+
+    if cards:
+        st.markdown(f"<h3 style='font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:3px;margin-top:24px'>YOUR CARDS</h3>", unsafe_allow_html=True)
+
+        _study_mode = st.session_state.get("fc_study_mode", False)
+        if st.button("🔄 " + ("EXIT STUDY MODE" if _study_mode else "STUDY MODE — FLIP CARDS"), key="fc_study_toggle"):
+            st.session_state.fc_study_mode = not _study_mode
+            st.rerun()
+
+        for idx, card in enumerate(cards):
+            _time_label = f"{card.get('time', 25)}s"
+            _diff_color = "#00FF44" if card.get("time", 25) <= 20 else ("#FF8800" if card.get("time", 25) <= 45 else "#FF2222")
+
+            if _study_mode:
+                _revealed = st.session_state.get(f"fc_reveal_{idx}", False)
+                st.markdown(f"""<div style='background:#0a0a1a;border:2px solid {C}44;border-radius:14px;padding:16px 20px;margin:8px 0'>
+                    <div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:8px'>
+                        <span style='font-family:Bebas Neue,sans-serif;font-size:14px;color:{C};letter-spacing:2px'>CARD #{idx+1}</span>
+                        <span style='font-family:Space Mono,monospace;font-size:10px;color:{_diff_color}'>{_time_label}</span>
+                    </div>
+                    <div style='font-family:Space Mono,monospace;font-size:13px;color:#fff;line-height:1.6;margin-bottom:10px'>{card["q"]}</div>
+                    <div style='font-family:Space Mono,monospace;font-size:11px;color:#aaa;line-height:1.8'>{"<br>".join(card["choices"])}</div>
+                </div>""", unsafe_allow_html=True)
+                _b1, _b2 = st.columns([1, 1])
+                with _b1:
+                    if st.button("👁 REVEAL ANSWER" if not _revealed else f"✅ Answer: {card['answer']}", key=f"fc_rev_{idx}"):
+                        st.session_state[f"fc_reveal_{idx}"] = not _revealed
+                        st.rerun()
+            else:
+                st.markdown(f"""<div style='background:#0a0a1a;border:1px solid {C}33;border-radius:12px;padding:14px 18px;margin:6px 0'>
+                    <div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:6px'>
+                        <span style='font-family:Bebas Neue,sans-serif;font-size:14px;color:{C};letter-spacing:2px'>CARD #{idx+1}</span>
+                        <span style='font-family:Space Mono,monospace;font-size:10px;color:{_diff_color}'>{_time_label} · Answer: {card["answer"]}</span>
+                    </div>
+                    <div style='font-family:Space Mono,monospace;font-size:12px;color:#fff;margin-bottom:6px'>{card["q"]}</div>
+                    <div style='font-family:Space Mono,monospace;font-size:10px;color:#666'>{" | ".join(card["choices"])}</div>
+                </div>""", unsafe_allow_html=True)
+                if st.button(f"🗑 Delete Card #{idx+1}", key=f"fc_del_{idx}"):
+                    st.session_state.custom_flashcards.pop(idx)
+                    db_save(st.session_state.user_name, st.session_state.user_theme)
+                    st.rerun()
+
+        st.markdown("---")
+        if st.button("🗑 DELETE ALL CARDS", key="fc_delete_all"):
+            st.session_state.custom_flashcards = []
+            db_save(st.session_state.user_name, st.session_state.user_theme)
+            st.success("All cards deleted.")
+            st.rerun()
 
 elif view == "feedback":
     st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>💬 FEEDBACK PORTAL</h2>", unsafe_allow_html=True)
