@@ -886,7 +886,6 @@ def get_claude_client():
 # ─────────────────────────────────────────────────────────────────────────────
 # SUPABASE — PERSISTENT DATABASE
 # ─────────────────────────────────────────────────────────────────────────────
-@st.cache_resource
 def get_supabase():
     if not SUPABASE_AVAILABLE: return None
     try:
