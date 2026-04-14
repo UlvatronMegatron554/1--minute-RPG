@@ -277,7 +277,7 @@ function drBG(){{
     ctx.fillStyle='#ffffff08';ctx.fillRect(0,H*0.72,W,H*0.28);
   }}
 }}
-function drChar(x,y,col,evo,isEnemy,hit,shake){{
+function drChar(x,y,col,evo,isEnemy,hit,shake){{try{{
   const ox=x+(shake?(Math.random()-0.5)*shake:0);const oy=y+(shake?(Math.random()-0.5)*shake*0.3:0);
   const t=FC*0.06,idle=Math.sin(t+(isEnemy?1.5:0))*3;
   ctx.save();ctx.translate(ox,oy+idle);if(isEnemy)ctx.scale(-1,1);const s=0.9+evo*0.07;
@@ -298,7 +298,7 @@ function drChar(x,y,col,evo,isEnemy,hit,shake){{
   else drDefault(col,evo,t);
   if(hit){{ctx.fillStyle='rgba(255,50,50,0.45)';ctx.beginPath();ctx.arc(0,-20,38,0,6.28);ctx.fill();}}
   ctx.restore();
-}}
+}}catch(e){{ctx.restore();ctx.fillStyle=col||'#FF0000';ctx.beginPath();ctx.arc(x,y,20,0,6.28);ctx.fill();}}}}
 function drCustom(col,evo,t,vis){{
   const hc=vis.hair_color||col;const sc2=vis.skin_color||'#FFCC88';const oc=vis.outfit_color||col;
   const oc2=vis.outfit_secondary||dk(oc,0.2);const wc=vis.weapon_color||'#C0C0C0';const ec2=vis.eye_color||'#000';const ac=vis.aura_color||col;
@@ -420,7 +420,7 @@ function drHUD(){{
 function showQ(){{
   if(qI>=questions.length){{win();return;}}
   const q=questions[qI];const d=document.getElementById('questions');d.style.display='block';
-  qMax=q.time||25;qTimer=qMax;aLocked=false;
+  qMax=(typeof q.time==='number'&&q.time>0)?q.time:25;qTimer=qMax;aLocked=false;
   d.innerHTML=`<div class="qbox"><div class="qhdr"><span class="qlbl">Q${{qI+1}}/${{questions.length}} · ${{subject}} · ${{qMax}}s</span><span style="font-size:13px">${{'❤️'.repeat(lives)+'🖤'.repeat(3-lives)}}</span></div><div class="tbar" id="tb"></div><div class="qtxt">${{q.q}}</div><div class="choices">${{q.choices.map((c2,i)=>`<button class="ch" onclick="ans(${{i}},'${{String.fromCharCode(65+i)}}')">${{c2}}</button>`).join('')}}</div></div>`;
 }}
 function ans(idx,letter){{
