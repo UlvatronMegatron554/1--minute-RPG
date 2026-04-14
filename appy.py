@@ -300,8 +300,9 @@ function drChar(x,y,col,evo,isEnemy,hit,shake){{try{{
   ctx.restore();
 }}catch(e){{ctx.restore();ctx.save();ctx.translate(x,y);if(isEnemy)ctx.scale(-1,1);ctx.scale(0.9,0.9);try{{drDefault(col,evo,FC*0.06);}}catch(e2){{ctx.fillStyle=col||'#FF0000';ctx.beginPath();ctx.arc(0,0,20,0,6.28);ctx.fill();}}if(hit){{ctx.fillStyle='rgba(255,50,50,0.45)';ctx.beginPath();ctx.arc(0,-20,38,0,6.28);ctx.fill();}}ctx.restore();}}}}
 function drCustom(col,evo,t,vis){{
-  const hc=vis.hair_color||col;const sc2=vis.skin_color||'#FFCC88';const oc=vis.outfit_color||col;
-  const oc2=vis.outfit_secondary||dk(oc,0.2);const wc=vis.weapon_color||'#C0C0C0';const ec2=vis.eye_color||'#000';const ac=vis.aura_color||col;
+  function _hx(v,fb){{if(typeof v==='string'&&/^#[0-9A-Fa-f]{{6}}$/.test(v))return v;return fb||col;}}
+  const hc=_hx(vis.hair_color,col);const sc2=_hx(vis.skin_color,'#FFCC88');const oc=_hx(vis.outfit_color,col);
+  const oc2=_hx(vis.outfit_secondary,dk(oc,0.2));const wc=_hx(vis.weapon_color,'#C0C0C0');const ec2=_hx(vis.eye_color,'#000000');const ac=_hx(vis.aura_color,col);
   const bb=vis.body_build||'average';const hs=vis.hair_style||'short';const wp=vis.weapon||'fists';
   const bw=bb==='muscular'?1.3:bb==='large'?1.4:bb==='slim'?0.85:bb==='tiny'?0.7:1.0;
   const _tier=vis.tier||'free';
