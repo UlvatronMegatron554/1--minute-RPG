@@ -230,6 +230,7 @@ let parts=[],beams=[],dmgNums=[];
 const P={{hp:100,maxHp:100,power:0,evo:0,streak:0,total:0,x:160,y:270,shake:0,hit:false,color:COL}};
 const E={{hp:100,maxHp:100,phase:0,x:620,y:270,shake:0,hit:false,color:CFG.enemy_color||'#CC2222'}};
 const INTENSITY=Math.min(3, 1 + (CFG.battles_fought||0) * 0.15);
+const MODE=CFG.mode||'AUTO';
 const SND={{ctx:null,
   init(){{if(!this.ctx)try{{this.ctx=new(window.AudioContext||window.webkitAudioContext)()}}catch(e){{}}}},
   play(f,d,t,v){{try{{this.init();const o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type=t||'sine';o.frequency.setValueAtTime(f,this.ctx.currentTime);g.gain.setValueAtTime(v||0.25,this.ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.01,this.ctx.currentTime+d);o.connect(g);g.connect(this.ctx.destination);o.start();o.stop(this.ctx.currentTime+d)}}catch(e){{}}}},
@@ -253,7 +254,6 @@ function dn(x,y,v,col,big){{dmgNums.push({{x,y,v,col,big,life:50,ml:50}});}}
 function upParts(){{parts=parts.filter(p=>{{p.x+=p.vx;p.y+=p.vy;p.vy+=0.18;p.life--;return p.life>0;}});beams=beams.filter(b=>{{b.life--;return b.life>0;}});}}
 function drParts(){{parts.forEach(p=>{{const a=p.life/p.ml;ctx.globalAlpha=a;ctx.beginPath();ctx.arc(p.x,p.y,p.r*a,0,6.28);ctx.fillStyle=p.col;ctx.fill();}});beams.forEach(b=>{{const a=b.life/b.ml;ctx.globalAlpha=a*0.9;ctx.beginPath();ctx.moveTo(b.x1,b.y1);ctx.lineTo(b.x2,b.y2);ctx.strokeStyle=b.col;ctx.lineWidth=b.w*a;ctx.lineCap='round';ctx.stroke();ctx.globalAlpha=a*0.4;ctx.lineWidth=b.w*a*0.35;ctx.strokeStyle='#fff';ctx.stroke();}});ctx.globalAlpha=1;}}
 function drDmgNums(){{dmgNums=dmgNums.filter(d=>{{d.y-=1.5;d.life--;const a=d.life/d.ml;ctx.globalAlpha=a;ctx.font=(d.big?'bold 20px':'bold 14px')+' Orbitron,monospace';ctx.fillStyle=d.col;ctx.textAlign='center';ctx.fillText(d.v,d.x,d.y);ctx.globalAlpha=1;ctx.textAlign='left';return d.life>0;}});}}
-const MODE=CFG.mode||'AUTO';
 const BGC=CFG.arena_colors||['{bg0}','{bg1}','#000'];
 function drBG(){{
   const t=FC*0.008;
