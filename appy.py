@@ -1644,7 +1644,14 @@ frame();
         if st.button("⚡ HOW IT WORKS", key="info_toggle"):
             st.session_state.info_open = not st.session_state.get("info_open", False)
         if st.session_state.get("info_open", False):
-            st.markdown("<div style='background:rgba(0,0,0,0.85);border:2px solid #FFD700;border-radius:20px;padding:28px;margin-top:12px;color:#fff;font-family:Space Mono,monospace;font-size:12px;line-height:2.2'>🌌 <b style='color:#FFD700'>Pick any universe</b> — AI builds it instantly.<br>⏱ <b style='color:#FFD700'>Study 30 seconds</b> — get paid.<br>📸 <b style='color:#FFD700'>Upload proof</b> — no proof = no coins.</div>", unsafe_allow_html=True)
+            st.markdown("""<div style='background:rgba(0,0,0,0.92);border:2px solid #FFD700;border-radius:20px;padding:28px;margin-top:12px;color:#fff;font-family:Space Mono,monospace;font-size:12px;line-height:2.4'>
+                <b style='color:#FFD700;font-size:14px;letter-spacing:2px'>🌌 HOW IT WORKS — 4 SIMPLE STEPS</b><br><br>
+                <b style='color:#FFD700'>1. PICK YOUR UNIVERSE</b> — Choose any game, anime, sport, movie, or hobby. AI builds a custom world around it instantly.<br><br>
+                <b style='color:#FFD700'>2. START A STUDY MISSION</b> — Hit START MISSION. A timer begins. <b>Study YOUR OWN material</b> — textbook, notes, homework, flashcards — while it runs. The app tracks your study time, not what you study.<br><br>
+                <b style='color:#FFD700'>3. UPLOAD PROOF</b> — When time is up, screenshot or photograph what you studied and upload it. No proof = no rewards.<br><br>
+                <b style='color:#FFD700'>4. GET REWARDED</b> — Earn currency, XP, loot boxes, spinner spins, story chapters, secrets, and more. Level up. Battle bosses with quiz questions. Hatch creatures. Compete on the leaderboard.<br><br>
+                <span style='color:#888;font-size:10px'>Think of it like a study tracker with RPG rewards. You study whatever YOU need to study. The app makes it addictive.</span>
+            </div>""", unsafe_allow_html=True)
         st.markdown("<br>", unsafe_allow_html=True)
         _gw_page = st.session_state.get("gw_page", 1)
 
