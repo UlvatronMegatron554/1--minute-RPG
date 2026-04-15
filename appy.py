@@ -1710,6 +1710,31 @@ frame();
                     st.session_state.gw_page = 2; st.rerun()
 
         elif _gw_page == 4:
+            # ── Handle selected save from multi-save list ──
+            _pending_save = st.session_state.get("ret_single_save")
+            if _pending_save:
+                st.session_state.ret_single_save = None
+                _sv = _pending_save
+                _sv_theme = _sv.get("theme","") or DEFAULT_UNIVERSE_NAME
+                _sv_name = _sv.get("user_name","")
+                with st.spinner(f"🌌 Loading {_sv_theme}..."):
+                    _result = resolve_universe(_sv_theme)
+                if not _result or not _result.get("safe"):
+                    _result = {"safe":True,"data":DEFAULT_UNIVERSE.copy()}
+                _rdata = _result["data"]
+                _saved_color = _sv.get("vibe_color","")
+                if _saved_color and re.match(r"^#[0-9A-Fa-f]{6}$", _saved_color):
+                    _rdata["color"] = _saved_color
+                db_apply(_sv)
+                st.session_state.user_name = _sv_name
+                st.session_state.game_mode = _sv.get("game_mode","chill") or "chill"
+                st.session_state.world_data = _rdata
+                st.session_state.vibe_color = _rdata.get("color","#FFD700")
+                st.session_state.user_theme = _sv_theme
+                st.query_params["u"] = _sv_name.lower()
+                st.query_params["t"] = _sv_theme
+                st.query_params["m"] = _sv.get("game_mode","chill") or "chill"
+                st.rerun()
             if not st.session_state.get("ret_saves_found"):
                 st.markdown("<div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:#FFD700;text-align:center;letter-spacing:4px;margin-bottom:8px'>WELCOME BACK, CHAMPION</div>", unsafe_allow_html=True)
                 ret_email = st.text_input("📧 Your Email", placeholder="The email you signed up with", key="gw_ret_email")
