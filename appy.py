@@ -572,6 +572,21 @@ def generate_battle_config(universe: str, subject: str, tier: str, client, diffi
     prompt = f"""You are a game designer for "30 Second Infiniteverse".
 Universe: "{universe}" | Game Mode: {mode} | Subject: {subject} | Tier: {tier}
 
+⚠️ CRITICAL — SUBJECT IS: {subject} ⚠️
+EVERY question MUST test knowledge of {subject}. NOT math. NOT science. NOT random trivia.
+If the subject is History — ask about historical events, dates, wars, treaties, civilizations, leaders.
+If the subject is English — ask about grammar, vocabulary, literature, writing, authors.
+If the subject is Geography — ask about countries, capitals, rivers, continents, maps.
+If the subject is Biology — ask about cells, DNA, evolution, anatomy, ecosystems.
+If the subject is Chemistry — ask about elements, reactions, bonds, molecules, the periodic table.
+If the subject is Physics — ask about forces, motion, energy, waves, thermodynamics.
+If the subject is Economics — ask about supply/demand, GDP, markets, inflation, trade.
+If the subject is Computer Science — ask about algorithms, data structures, programming, logic.
+If the subject is Psychology — ask about behavior, cognition, disorders, experiments, theories.
+If the subject is Art & Music — ask about composers, movements, techniques, famous works.
+The {universe} lore is the WRAPPER. The {subject} content is the CORE.
+If a question could be answered without knowing {subject}, it is WRONG. Redo it.
+
 Return ONLY valid JSON (no markdown):
 {{"mode":"{mode}","arena_name":"short name","arena_desc":"1 sentence","arena_colors":["#h1","#h2","#h3"],"player_title":"title","player_attacks":["A1","A2","A3","A4","A5"],"enemy_name":"enemy","enemy_title":"rank","enemy_color":"#hex","enemy_attacks":["E1","E2","E3"],"enemy_phases":["P1","P2","P3"],"win_quote":"quote","lose_quote":"quote","player_visual":{{"hair_color":"#hex","hair_style":"spiky/long/short/bald/mohawk/afro/flowing","skin_color":"#hex","outfit_color":"#hex","outfit_secondary":"#hex","weapon":"sword/dual_sword/triple_sword/gun/staff/fists/bow/scythe/wand/ball/none","weapon_color":"#hex","eye_color":"#hex","cape":false,"aura_color":"#hex","body_build":"slim/average/muscular/large"}},"enemy_visual":{{"hair_color":"#hex","hair_style":"...","skin_color":"#hex","outfit_color":"#hex","outfit_secondary":"#hex","weapon":"...","weapon_color":"#hex","eye_color":"#hex","cape":false,"aura_color":"#hex","body_build":"..."}},"questions":[{{"q":"question with {universe} flavor","choices":["A: opt","B: opt","C: opt","D: opt"],"answer":"B","hint":"hint"}}]}}
 
