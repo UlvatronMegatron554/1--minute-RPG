@@ -419,7 +419,7 @@ function drHUD(){{
   if(P.streak>=2){{ctx.fillStyle='#FFD700';ctx.font='bold 11px Orbitron,monospace';ctx.textAlign='center';ctx.fillText('🔥 '+P.streak+' STREAK',W/2,18);ctx.textAlign='left';}}
 }}
 function showQ(){{
-  if(qI>=questions.length){{win();return;}}
+  if(qI>=questions.length){{if(P.total>0&&E.hp<=0)win();else if(P.total===0)lose();else if(E.hp>0)lose();else win();return;}}
   const q=questions[qI];const d=document.getElementById('questions');d.style.display='block';
   qMax=(typeof q.time==='number'&&q.time>0)?q.time:25;qTimer=qMax;aLocked=false;
   d.innerHTML=`<div class="qbox"><div class="qhdr"><span class="qlbl">Q${{qI+1}}/${{questions.length}} · ${{subject}} · ${{qMax}}s</span><span style="font-size:13px">${{'❤️'.repeat(lives)+'🖤'.repeat(3-lives)}}</span></div><div class="tbar" id="tb"></div><div class="qtxt">${{q.q}}</div><div class="choices">${{q.choices.map((c2,i)=>`<button class="ch" onclick="ans(${{i}},'${{String.fromCharCode(65+i)}}')">${{c2}}</button>`).join('')}}</div></div>`;
@@ -1398,10 +1398,6 @@ if "gold" not in st.session_state:
 # ─────────────────────────────────────────────────────────────────────────────
 # ── AUTO-RELOAD ON REFRESH via query params ──────────────────────────────────
 if st.session_state.user_name is None:
-    if st.session_state.get("_just_quit"):
-        st.session_state._just_quit = False
-        st.query_params.clear()
-        st.stop()
     _qp_name = st.query_params.get("u", "")
     _qp_theme = st.query_params.get("t", "")
     _qp_mode = st.query_params.get("m", "")
@@ -2043,6 +2039,17 @@ html, body, [data-testid="stAppViewContainer"], [data-testid="stApp"] {{
     display: none !important;
 }}
 .block-container {{ max-width: 1000px !important; }}
+.block-container p, .block-container span, .block-container div,
+.block-container li, .block-container td, .block-container th,
+.block-container label {{
+    color: {TEXT} !important;
+}}
+.block-container h1, .block-container h2, .block-container h3 {{
+    color: {C} !important;
+}}
+[data-testid="stMarkdownContainer"] p {{
+    color: {TEXT} !important;
+}}
 .metric-card {{
     background: linear-gradient(135deg, #0a0a1a, #1a0a2e);
     border: 2px solid {C}66;
@@ -2124,28 +2131,27 @@ with st.sidebar:
     st.write("---")
     if st.button("🚪 QUIT", key="nav_quit", use_container_width=True):
             db_save(st.session_state.user_name, st.session_state.user_theme)
-            st.query_params.clear()
             for _k in list(st.session_state.keys()):
                 del st.session_state[_k]
-            st.session_state._just_quit = True
+            st.query_params.clear()
             st.rerun()
-    if st.button("🚀 MISSION HUB",   key="nav_hub"):      st.session_state.view = "main";       st.rerun()
+    if st.button("🚀 MISSION HUB",   key="nav_hub"):      st.session_state.view = "main";       st.session_state.battle_state = None; st.session_state.battle_subject_chosen = False; st.rerun()
     if st.button("⚔️ BATTLE",        key="nav_battle"):   st.session_state.view = "battle";     st.rerun()
-    if st.button("🎰 SPINNER",       key="nav_spin"):     st.session_state.view = "spinner";    st.session_state.spin_awarded_this_view = False; st.rerun()
-    if st.button("🛒 SHOP",          key="nav_shop"):     st.session_state.view = "shop";       st.rerun()
-    if st.button("📖 STORY",         key="nav_story"):    st.session_state.view = "story";      st.rerun()
-    if st.button("🔮 SECRETS",       key="nav_secrets"):  st.session_state.view = "secrets";    st.rerun()
-    if st.button("🛡️ ABILITIES",    key="nav_abilities"): st.session_state.view = "abilities";  st.rerun()
-    if st.button("💬 FEEDBACK",      key="nav_feedback"): st.session_state.view = "feedback";   st.rerun()
-    if st.button("🏆 LEADERBOARD",   key="nav_leader"):   st.session_state.view = "leaderboard"; st.rerun()
-    if st.button("📦 MY BOXES",       key="nav_boxes"):   st.session_state.view = "boxes";      st.rerun()
-    if st.button("📝 FLASHCARDS",     key="nav_flash"):   st.session_state.view = "flashcards"; st.rerun()
+    if st.button("🎰 SPINNER",       key="nav_spin"):     st.session_state.view = "spinner";    st.session_state.battle_state = None; st.session_state.battle_subject_chosen = False; st.session_state.spin_awarded_this_view = False; st.rerun()
+    if st.button("🛒 SHOP",          key="nav_shop"):     st.session_state.view = "shop";       st.session_state.battle_state = None; st.session_state.battle_subject_chosen = False; st.rerun()
+    if st.button("📖 STORY",         key="nav_story"):    st.session_state.view = "story";      st.session_state.battle_state = None; st.session_state.battle_subject_chosen = False; st.rerun()
+    if st.button("🔮 SECRETS",       key="nav_secrets"):  st.session_state.view = "secrets";    st.session_state.battle_state = None; st.session_state.battle_subject_chosen = False; st.rerun()
+    if st.button("🛡️ ABILITIES",    key="nav_abilities"): st.session_state.view = "abilities";  st.session_state.battle_state = None; st.session_state.battle_subject_chosen = False; st.rerun()
+    if st.button("💬 FEEDBACK",      key="nav_feedback"): st.session_state.view = "feedback";   st.session_state.battle_state = None; st.session_state.battle_subject_chosen = False; st.rerun()
+    if st.button("🏆 LEADERBOARD",   key="nav_leader"):   st.session_state.view = "leaderboard"; st.session_state.battle_state = None; st.session_state.battle_subject_chosen = False; st.rerun()
+    if st.button("📦 MY BOXES",       key="nav_boxes"):   st.session_state.view = "boxes";      st.session_state.battle_state = None; st.session_state.battle_subject_chosen = False; st.rerun()
+    if st.button("📝 FLASHCARDS",     key="nav_flash"):   st.session_state.view = "flashcards"; st.session_state.battle_state = None; st.session_state.battle_subject_chosen = False; st.rerun()
     if MODE in ("grinder","obsessed"):
-        if st.button("🏆 ACHIEVEMENTS", key="nav_ach"):  st.session_state.view = "achievements"; st.rerun()
-        if st.button("🥚 INCUBATOR",    key="nav_inc"):  st.session_state.view = "incubator";    st.rerun()
+        if st.button("🏆 ACHIEVEMENTS", key="nav_ach"):  st.session_state.view = "achievements"; st.session_state.battle_state = None; st.session_state.battle_subject_chosen = False; st.rerun()
+        if st.button("🥚 INCUBATOR",    key="nav_inc"):  st.session_state.view = "incubator";    st.session_state.battle_state = None; st.session_state.battle_subject_chosen = False; st.rerun()
     if MODE == "obsessed":
-        if st.button("📖 MANUAL",    key="nav_manual"):  st.session_state.view = "manual";  st.rerun()
-        if st.button("💳 PLANS",     key="nav_plans"):   st.session_state.view = "plans";   st.rerun()
+        if st.button("📖 MANUAL",    key="nav_manual"):  st.session_state.view = "manual";  st.session_state.battle_state = None; st.session_state.battle_subject_chosen = False; st.rerun()
+        if st.button("💳 PLANS",     key="nav_plans"):   st.session_state.view = "plans";   st.session_state.battle_state = None; st.session_state.battle_subject_chosen = False; st.rerun()
     st.write("---")
     st.markdown("<p style='color:#ffffff;font-weight:bold'>🎨 BACKGROUND</p>", unsafe_allow_html=True)
     new_bg = st.color_picker("", value=st.session_state.get("bg_color","#ffffff"), key="bg_picker", label_visibility="collapsed")
@@ -2378,7 +2384,7 @@ if st.session_state.get("battle_state") == "ready" or view == "battle":
         _upload_tab1, _upload_tab2 = st.tabs(["📄 Upload File", "📋 Paste Text"])
 
         with _upload_tab1:
-            _uploaded_material = st.file_uploader("Upload notes, screenshot, or document:", type=["txt", "png", "jpg", "jpeg", "webp"], key="battle_material_upload")
+            _uploaded_material = st.file_uploader("Upload notes, screenshot, or document:", type=["txt", "png", "jpg", "jpeg", "webp", "pdf", "docx", "doc", "csv", "md"], key="battle_material_upload")
             if _uploaded_material and st.button("⚔️ GENERATE QUESTIONS FROM FILE", key="battle_from_upload", use_container_width=True):
                 _file_content = ""
                 _is_image = _uploaded_material.type and _uploaded_material.type.startswith("image")
@@ -3510,8 +3516,37 @@ if view == "main":
         _, col, _ = st.columns([1,2,1])
         with col:
             st.info(f"Upload proof of work to claim **{st.session_state.pending_gold:.1f} {currency}** + a 🔮 Universe Secret + 📖 Story Chapter + 🎁 Loot Box")
-            uploaded = st.file_uploader("PROOF OF LABOR:", key="proof_upload")
+            uploaded = st.file_uploader("PROOF OF LABOR:", type=["png", "jpg", "jpeg", "webp", "pdf", "docx", "doc", "txt", "csv", "md"], key="proof_upload")
             if uploaded and st.button("⚡ SUBMIT FOR JUDGMENT", key="submit_proof"):
+                # ── AI PROOF CHECK ────────────────────────────────────
+                _proof_legit = True
+                _proof_msg = ""
+                if uploaded.type and uploaded.type.startswith("image"):
+                    try:
+                        import base64 as _b64_proof
+                        _proof_bytes = uploaded.read()
+                        uploaded.seek(0)
+                        _proof_b64 = _b64_proof.b64encode(_proof_bytes).decode("utf-8")
+                        _proof_media = uploaded.type or "image/png"
+                        _proof_client = get_claude_client()
+                        if _proof_client:
+                            _proof_resp = _proof_client.messages.create(
+                                model="claude-sonnet-4-5",
+                                max_tokens=100,
+                                messages=[{"role": "user", "content": [
+                                    {"type": "image", "source": {"type": "base64", "media_type": _proof_media, "data": _proof_b64}},
+                                    {"type": "text", "text": "Is this image of actual study material, notes, textbook, homework, flashcards, or academic work? Reply ONLY with YES or NO followed by a 5-word reason."}
+                                ]}]
+                            )
+                            _proof_answer = _proof_resp.content[0].text.strip().upper()
+                            if _proof_answer.startswith("NO"):
+                                _proof_legit = False
+                                _proof_msg = _proof_resp.content[0].text.strip()
+                    except Exception:
+                        _proof_legit = True
+                if not _proof_legit:
+                    st.error(f"❌ PROOF REJECTED — That doesn't look like study material. Upload a screenshot of real notes, textbook, or homework. ({_proof_msg})")
+                    st.stop()
                 base_gold = st.session_state.pending_gold
                 earned, rarity_label, rarity_msg, near_miss = variable_reward(base_gold, st.session_state.get("total_missions", 0))
                 earned = round(earned, 1)
