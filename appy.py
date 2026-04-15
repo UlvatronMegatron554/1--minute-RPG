@@ -1211,6 +1211,7 @@ CRITICAL RULES:
 1. ATOMIC SPECIFICITY: If given a CHARACTER — use THAT character's EXACT moves, weapons, colors. Zoro = green hair, 3 swords. Tanjiro = water breathing, checkered haori. Kobe = fadeaway, #24.
 2. NEVER be generic. EVERY field must drip with universe-specific detail.
 3. CURRENCY RULE: Use the exact in-universe currency (One Piece=Berries, Naruto=Ryo, Dragon Ball=Zeni, Harry Potter=Galleons, Star Wars=Galactic Credits, Pokemon=PokeDollars, Minecraft=Emeralds).
+4. HYBRID/MASHUP RULE: If the theme combines TWO OR MORE universes (e.g. "One Piece and Minecraft", "Naruto x Dragon Ball", "Harry Potter meets Star Wars"), you MUST BLEND BOTH equally. Do NOT just pick one and ignore the other. Combine their currencies (e.g. "Emerald Berries"), mix their abilities (e.g. "Haki Pickaxe"), blend their aesthetics, locations, and characters. The result should feel like a TRUE fusion — not one universe with a cameo from the other. Every field should reference BOTH sources. The description should capture the SOUL of the mashup.
 
 Return ONLY a single raw JSON object. No markdown.
 
