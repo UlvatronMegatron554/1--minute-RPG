@@ -200,13 +200,13 @@ def _build_game_html(cfg: dict, color: str) -> str:
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Mono:wght@400;700&display=swap');
 *{{margin:0;padding:0;box-sizing:border-box;}}
 body{{background:#000;overflow:hidden;font-family:'Space Mono',monospace;}}
-#wrap{{position:relative;width:820px;height:480px;margin:0 auto;}}
+#wrap{{position:relative;width:100%;max-width:820px;height:480px;margin:0 auto;}}
 #gc{{display:block;}}
-#questions{{position:absolute;bottom:0;left:0;width:820px;pointer-events:all;display:none;}}
-.qbox{{background:rgba(0,0,0,0.96);border-top:2px solid {col};padding:10px 14px;}}
-.qtxt{{font-family:Orbitron,monospace;font-size:12px;color:#fff;margin-bottom:8px;line-height:1.5;}}
+#questions{{position:absolute;bottom:0;left:0;width:100%;pointer-events:all;display:none;}}
+.qbox{{background:rgba(0,0,0,0.96);border-top:2px solid {col};padding:8px 10px;max-height:220px;overflow-y:auto;}}
+.qtxt{{font-family:Orbitron,monospace;font-size:11px;color:#fff;margin-bottom:8px;line-height:1.5;word-wrap:break-word;overflow-wrap:break-word;max-height:80px;overflow-y:auto;}}
 .choices{{display:grid;grid-template-columns:1fr 1fr;gap:5px;}}
-.ch{{padding:7px 10px;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.18);border-radius:7px;cursor:pointer;font-size:11px;color:#fff;font-family:'Space Mono',monospace;transition:all 0.12s;text-align:left;}}
+.ch{{padding:6px 8px;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.18);border-radius:7px;cursor:pointer;font-size:10px;color:#fff;font-family:'Space Mono',monospace;transition:all 0.12s;text-align:left;word-wrap:break-word;overflow-wrap:break-word;}}
 .ch:hover{{background:{col}33;border-color:{col};transform:scale(1.02);}}
 .ch.ok{{background:#00FF4422;border-color:#00FF44;}}
 .ch.no{{background:#FF222222;border-color:#FF2222;}}
@@ -2186,6 +2186,26 @@ if _banner_url:
     st.markdown(f"<img src='{_banner_url}' style='width:100%;height:180px;object-fit:cover;border-radius:14px;margin-bottom:12px;box-shadow:0 0 30px {C}44'>", unsafe_allow_html=True)
 st.markdown(f"""<h1 style='font-family:Bebas Neue,sans-serif;color:{C};text-shadow:0 0 40px {C};font-size:clamp(48px,10vw,100px);text-align:center;letter-spacing:6px;margin-bottom:0'>{st.session_state.user_theme.upper()}</h1><p style='text-align:center;font-size:15px;color:#ffffff;margin-top:4px'>{wd.get("description","A realm of infinite power.")}</p>""", unsafe_allow_html=True)
 st.markdown("---")
+if not st.session_state.get("onboarding_dismissed", False):
+    st.markdown(f"""<div style='background:linear-gradient(135deg,#0a0a2e,#1a0020);border:3px solid {C};border-radius:20px;padding:28px;margin:12px 0;box-shadow:0 0 40px {C}33'>
+        <div style='font-family:Bebas Neue,sans-serif;font-size:28px;color:{C};letter-spacing:4px;text-align:center;margin-bottom:16px'>🌌 WELCOME TO THE INFINITEVERSE</div>
+        <div style='font-family:Space Mono,monospace;font-size:12px;color:#fff;line-height:2.4'>
+            <b style='color:{C}'>⏱ STEP 1 — START A MISSION</b><br>
+            Click START MISSION below. A timer starts (30 seconds or more).<br>
+            <b style='color:#FFD700'>While the timer runs — study YOUR OWN material.</b> Open your textbook, notes, flashcards, or homework. The app tracks your time, not what you study.<br><br>
+            <b style='color:{C}'>📸 STEP 2 — UPLOAD PROOF</b><br>
+            When the bar hits 100%, the Tribunal appears. Upload a screenshot or photo of what you studied. No proof = no coins.<br><br>
+            <b style='color:{C}'>💰 STEP 3 — GET REWARDED</b><br>
+            You earn {currency}, XP, loot boxes, spinner spins, story chapters, and universe secrets. Every mission makes you stronger.<br><br>
+            <b style='color:{C}'>⚔️ STEP 4 — BATTLE</b><br>
+            Click BATTLE in the sidebar. Pick a subject and grade level. Answer quiz questions to defeat the boss. Correct = you attack. Wrong = the boss attacks you.<br><br>
+            <b style='color:{C}'>🎮 EVERYTHING ELSE</b><br>
+            🎰 SPINNER — spin for prizes after missions · 🥚 INCUBATOR — hatch eggs into creatures · 📖 STORY — your universe storyline grows with each mission · 🔮 SECRETS — learn mind-blowing facts · 🛒 SHOP — spend currency on real rewards
+        </div>
+    </div>""", unsafe_allow_html=True)
+    if st.button("✅ GOT IT — LET'S GO!", key="dismiss_onboarding", use_container_width=True):
+        st.session_state.onboarding_dismissed = True
+        st.rerun()
 # Generate banner in background if not cached (non-blocking)
 if not _banner_url and st.session_state.user_theme and REPLICATE_AVAILABLE:
     import threading
@@ -2285,25 +2305,32 @@ if st.session_state.get("battle_state") == "ready" or view == "battle":
         st.markdown(f"<p style='text-align:center;color:#aaa;font-family:Space Mono,monospace;font-size:12px'>Arena: <b>{cfg.get('arena_name','?')}</b> · Mode: <b style='color:{C}'>{cfg.get('mode','?')}</b></p>", unsafe_allow_html=True)
         st.markdown("<p style='text-align:center;color:#fff;font-size:13px;font-family:Space Mono,monospace'>Pick your subject — correct answers = power attacks. Wrong = enemy hits back.</p>", unsafe_allow_html=True)
 
-        if tier_now in ("Premium","Elite"):
-            st.markdown(f"<p style='text-align:center;color:{C};font-family:Bebas Neue,sans-serif;font-size:16px;letter-spacing:3px'>👑 {tier_now.upper()}: TYPE ANY SUBJECT</p>", unsafe_allow_html=True)
+        st.markdown(f"<p style='text-align:center;color:{C};font-family:Bebas Neue,sans-serif;font-size:16px;letter-spacing:3px'>✏️ TYPE ANY SUBJECT</p>", unsafe_allow_html=True)
+        if True:
             _, custom_col, _ = st.columns([1,2,1])
             with custom_col:
                 custom_subject = st.text_input("Type your subject:", placeholder="e.g. Calculus 1, AP Biology, Organic Chemistry...", key="custom_subject_input")
                 if st.button("⚔️ START WITH CUSTOM SUBJECT", key="custom_subj_go"):
                     if custom_subject.strip():
                         with st.spinner(f"⚔️ Generating {custom_subject.strip()} questions..."):
-                            cfg = generate_battle_config(theme, custom_subject.strip(), tier_now, get_claude_client())
+                            cfg = generate_battle_config(theme, f"{custom_subject.strip()} ({st.session_state.get('_battle_grade','High School (9th-12th)')})", tier_now, get_claude_client())
                         st.session_state.battle_config = cfg; st.session_state.battle_subject_chosen = True; st.rerun()
             st.markdown("<p style='text-align:center;color:#888;font-size:11px'>— or pick preset —</p>", unsafe_allow_html=True)
 
+        st.markdown(f"<p style='text-align:center;color:{C};font-family:Bebas Neue,sans-serif;font-size:16px;letter-spacing:3px;margin-top:12px'>📚 PICK YOUR GRADE LEVEL</p>", unsafe_allow_html=True)
+        _grade_options = ["Middle School (6th-8th)", "High School (9th-12th)", "College / University", "Advanced / Graduate"]
+        _, _gc, _ = st.columns([1,2,1])
+        with _gc:
+            _grade_level = st.selectbox("Grade Level:", _grade_options, index=1, key="battle_grade_level", label_visibility="collapsed")
+        st.session_state._battle_grade = _grade_level
+        st.markdown(f"<p style='text-align:center;color:{C};font-family:Bebas Neue,sans-serif;font-size:16px;letter-spacing:3px;margin-top:16px'>⚔️ PICK YOUR SUBJECT</p>", unsafe_allow_html=True)
         subjects = ["Mathematics","Science","History","English","Geography","Biology","Chemistry","Physics","Economics","Computer Science","Psychology","Art & Music"]
         cols2 = st.columns(4)
         for i, sub in enumerate(subjects):
             with cols2[i % 4]:
                 if st.button(sub, key=f"subj_{i}"):
                     with st.spinner(f"⚔️ Generating {sub} questions..."):
-                        cfg = generate_battle_config(theme, sub, tier_now, get_claude_client())
+                        cfg = generate_battle_config(theme, f"{sub} ({st.session_state.get('_battle_grade','High School (9th-12th)')})", tier_now, get_claude_client())
                     st.session_state.battle_config = cfg; st.session_state.battle_subject_chosen = True; st.rerun()
         # ── UPLOAD STUDY MATERIAL ──────────────────────────────────────
         st.markdown(f"<div style='margin-top:20px;padding-top:16px;border-top:1px solid {C}22'></div>", unsafe_allow_html=True)
