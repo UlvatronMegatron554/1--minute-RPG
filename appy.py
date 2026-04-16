@@ -1398,7 +1398,12 @@ if "gold" not in st.session_state:
 # ─────────────────────────────────────────────────────────────────────────────
 # ── AUTO-RELOAD ON REFRESH via query params ──────────────────────────────────
 if st.session_state.user_name is None:
-    _qp_name = st.query_params.get("u", "")
+    if st.session_state.get("_logged_out"):
+        st.session_state._logged_out = False
+        st.query_params.clear()
+        _qp_name = ""
+    else:
+        _qp_name = st.query_params.get("u", "")
     _qp_theme = st.query_params.get("t", "")
     _qp_mode = st.query_params.get("m", "")
     if _qp_name:
@@ -2131,8 +2136,8 @@ with st.sidebar:
     st.write("---")
     if st.button("🚪 QUIT", key="nav_quit", use_container_width=True):
             db_save(st.session_state.user_name, st.session_state.user_theme)
-            for _k in list(st.session_state.keys()):
-                del st.session_state[_k]
+            st.session_state.user_name = None
+            st.session_state._logged_out = True
             st.query_params.clear()
             st.rerun()
     if st.button("🚀 MISSION HUB",   key="nav_hub"):      st.session_state.view = "main";       st.session_state.battle_state = None; st.session_state.battle_subject_chosen = False; st.rerun()
@@ -2774,7 +2779,7 @@ if view == "main":
             st.session_state.micro_timer_seconds = _custom_val
             timer = _custom_val
         else:
-            st.markdown(f"<div style='text-align:center;font-family:Bebas Neue,sans-serif;font-size:14px;color:#555;letter-spacing:2px;margin-bottom:4px'>TIMER: {timer}s &nbsp;·&nbsp; min 30s &nbsp;·&nbsp; max 5min · Pass tribunal to unlock custom</div>", unsafe_allow_html=True)
+            st.markdown(f"<div style='text-align:center;font-family:Bebas Neue,sans-serif;font-size:14px;color:#555;letter-spacing:2px;margin-bottom:4px'>TIMER: {timer}s &nbsp;·&nbsp; min 30s &nbsp;·&nbsp; max 5min · Pass tribunal to unlock custom timer</div>", unsafe_allow_html=True)
         st.markdown('<div class="mission-timer-row">', unsafe_allow_html=True)
         col_m, col_s, col_p = st.columns([1, _cw, 1])
         with col_m:
