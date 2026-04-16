@@ -937,6 +937,9 @@ def db_save(user_name: str, theme: str):
             "password_hash": st.session_state.get("password_hash", ""),
             "leaderboard_visible": bool(st.session_state.get("leaderboard_visible", True)),
             "email": str(st.session_state.get("user_email", "") or "").lower().strip(),
+            "study_type": st.session_state.get("study_type"),
+            "quiz_completed": bool(st.session_state.get("quiz_completed", False)),
+            "quiz_answers": json.dumps(st.session_state.get("quiz_answers", {})),
         }
         # save_key = name_universe_mode (unique per combo)
         _mode  = st.session_state.get("game_mode", "chill") or "chill"
@@ -1013,6 +1016,10 @@ def db_apply(row: dict):
     st.session_state.password_hash = row.get("password_hash", "")
     st.session_state.leaderboard_visible = bool(row.get("leaderboard_visible", True))
     st.session_state.user_email = row.get("email", "")
+    st.session_state.study_type = row.get("study_type")
+    st.session_state.quiz_completed = bool(row.get("quiz_completed", False))
+    try: st.session_state.quiz_answers = json.loads(row.get("quiz_answers", "{}"))
+    except: st.session_state.quiz_answers = {}
     st.session_state.tribunal_due_time = None
     st.session_state.pending_gold = 0.0
     st.session_state.pending_xp = 0
@@ -1444,6 +1451,7 @@ if "gold" not in st.session_state:
         "welcome_bonus_applied": False, "battle_subject_chosen": False,
         "last_spin_time": None, "spin_awarded_this_view": False,
         "last_auto_save": None, "password_hash": "", "leaderboard_visible": True, "user_email": "", "gw_page": 1, "ret_saves_found": None, "ret_pass_hash": "", "ret_name": "", "ret_single_save": None, "sidebar_color": "#0a0a1a",
+        "study_type": None, "quiz_completed": False, "quiz_answers": {},
     })
 
 
@@ -2089,6 +2097,162 @@ frame();
 
 
 
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ONBOARDING STUDY TYPE QUIZ (Phase 1 of personalization system)
+# ─────────────────────────────────────────────────────────────────────────────
+if st.session_state.user_name and not st.session_state.get("quiz_completed", False):
+    _C_quiz = st.session_state.get("vibe_color", "#FFD700")
+    _BG_quiz = st.session_state.get("bg_color", "#ffffff")
+
+    st.markdown(f"""<style>
+    html, body, [data-testid="stAppViewContainer"], [data-testid="stApp"] {{
+        background-color: {_BG_quiz} !important;
+    }}
+    [data-testid="stSidebar"] {{ display: none !important; }}
+    [data-testid="stHeader"], [data-testid="stToolbar"] {{ display: none !important; }}
+    .quiz-card {{
+        background: linear-gradient(135deg, #0a0a2e, #1a0040);
+        border: 3px solid {_C_quiz};
+        border-radius: 20px;
+        padding: 32px;
+        margin: 20px auto;
+        max-width: 700px;
+        box-shadow: 0 0 60px {_C_quiz}44;
+    }}
+    .quiz-q {{
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 28px;
+        color: {_C_quiz};
+        letter-spacing: 3px;
+        text-align: center;
+        margin-bottom: 20px;
+    }}
+    .quiz-progress {{
+        font-family: 'Space Mono', monospace;
+        font-size: 12px;
+        color: #aaa;
+        text-align: center;
+        margin-bottom: 8px;
+        letter-spacing: 2px;
+    }}
+    </style>""", unsafe_allow_html=True)
+
+    _q_step = st.session_state.get("quiz_step", 0)
+    _quiz_questions = [
+        {
+            "q": "How long can you usually focus before getting distracted?",
+            "options": [
+                {"label": "Under 5 minutes", "value": "very_short", "icon": "⚡"},
+                {"label": "5-15 minutes", "value": "short", "icon": "🎯"},
+                {"label": "15-45 minutes", "value": "medium", "icon": "🔥"},
+                {"label": "45+ minutes (I lock in)", "value": "long", "icon": "💀"},
+            ],
+            "key": "focus_length"
+        },
+        {
+            "q": "Be honest — do you procrastinate?",
+            "options": [
+                {"label": "Constantly, it's a problem", "value": "always", "icon": "😩"},
+                {"label": "Sometimes, depends on the task", "value": "sometimes", "icon": "🤔"},
+                {"label": "Rarely, I'm pretty disciplined", "value": "rarely", "icon": "💪"},
+                {"label": "Never, I'm a machine", "value": "never", "icon": "🤖"},
+            ],
+            "key": "procrastination"
+        },
+        {
+            "q": "What's your study goal?",
+            "options": [
+                {"label": "Pass my classes / not fail", "value": "pass", "icon": "📚"},
+                {"label": "Get good grades", "value": "good_grades", "icon": "🎓"},
+                {"label": "Master the material deeply", "value": "mastery", "icon": "🧠"},
+                {"label": "Grinding for a specific exam/cert", "value": "exam", "icon": "🏆"},
+            ],
+            "key": "goal"
+        },
+        {
+            "q": "How do you handle long study sessions?",
+            "options": [
+                {"label": "I burn out fast", "value": "burnout", "icon": "🔋"},
+                {"label": "I need breaks every 20-30 min", "value": "breaks", "icon": "⏸"},
+                {"label": "I can do an hour easily", "value": "hour", "icon": "⚡"},
+                {"label": "I can grind for hours straight", "value": "marathon", "icon": "💀"},
+            ],
+            "key": "endurance"
+        },
+        {
+            "q": "What motivates you most?",
+            "options": [
+                {"label": "Quick wins and rewards", "value": "rewards", "icon": "🎁"},
+                {"label": "Visible progress over time", "value": "progress", "icon": "📈"},
+                {"label": "Beating others / competition", "value": "competition", "icon": "🏆"},
+                {"label": "Mastering something hard", "value": "mastery", "icon": "👑"},
+            ],
+            "key": "motivation"
+        },
+    ]
+
+    if _q_step < len(_quiz_questions):
+        _q = _quiz_questions[_q_step]
+        st.markdown(f"<div class='quiz-progress'>QUESTION {_q_step + 1} OF {len(_quiz_questions)}</div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='quiz-card'><div class='quiz-q'>{_q['q']}</div></div>", unsafe_allow_html=True)
+
+        _, _qcol, _ = st.columns([1, 2, 1])
+        with _qcol:
+            for _opt in _q['options']:
+                if st.button(f"{_opt['icon']} {_opt['label']}", key=f"quiz_{_q['key']}_{_opt['value']}", use_container_width=True):
+                    if "quiz_answers" not in st.session_state:
+                        st.session_state.quiz_answers = {}
+                    st.session_state.quiz_answers[_q['key']] = _opt['value']
+                    st.session_state.quiz_step = _q_step + 1
+                    st.rerun()
+        st.stop()
+    else:
+        _ans = st.session_state.get("quiz_answers", {})
+        _score = 0
+        _focus_map = {"very_short": 0, "short": 1, "medium": 2, "long": 3}
+        _proc_map = {"always": 0, "sometimes": 1, "rarely": 2, "never": 3}
+        _end_map = {"burnout": 0, "breaks": 1, "hour": 2, "marathon": 3}
+        _score += _focus_map.get(_ans.get("focus_length", "short"), 1)
+        _score += _proc_map.get(_ans.get("procrastination", "sometimes"), 1)
+        _score += _end_map.get(_ans.get("endurance", "breaks"), 1)
+
+        if _score <= 2:
+            _study_type = "sprouter"
+            _type_name = "🐢 THE SPROUTER"
+            _type_desc = "You're starting your journey. Short bursts. Frequent rewards. Build the habit one tiny step at a time."
+        elif _score <= 5:
+            _study_type = "climber"
+            _type_name = "🎯 THE CLIMBER"
+            _type_desc = "You're building momentum. Balanced sessions. Steady progress. You're forming real discipline."
+        elif _score <= 7:
+            _study_type = "grinder"
+            _type_name = "🔥 THE GRINDER"
+            _type_desc = "You're locked in. Longer sessions. Bigger challenges. You eat focus for breakfast."
+        else:
+            _study_type = "beast"
+            _type_name = "👑 THE BEAST"
+            _type_desc = "You're a machine. Marathon sessions. Maximum rewards. Most people can't do what you do."
+
+        st.session_state.study_type = _study_type
+        st.session_state.quiz_completed = True
+
+        st.markdown(f"""<div class='quiz-card' style='text-align:center'>
+            <div style='font-family:Space Mono,monospace;font-size:11px;color:#aaa;letter-spacing:3px;margin-bottom:8px'>YOUR STUDY TYPE</div>
+            <div style='font-family:Bebas Neue,sans-serif;font-size:48px;color:{_C_quiz};letter-spacing:5px;margin-bottom:12px'>{_type_name}</div>
+            <div style='font-family:Space Mono,monospace;font-size:14px;color:#fff;line-height:1.8;max-width:500px;margin:0 auto 20px'>{_type_desc}</div>
+            <div style='font-family:Space Mono,monospace;font-size:11px;color:#888;margin-top:16px'>The app will adapt to who you are. You can change this later in settings.</div>
+        </div>""", unsafe_allow_html=True)
+
+        _, _cc, _ = st.columns([1, 2, 1])
+        with _cc:
+            if st.button(f"⚡ ENTER AS {_type_name}", key="finish_quiz", use_container_width=True):
+                db_save(st.session_state.user_name, st.session_state.user_theme)
+                st.session_state.quiz_step = 0
+                st.balloons()
+                st.rerun()
+        st.stop()
 
 
 # ─────────────────────────────────────────────────────────────────────────────
