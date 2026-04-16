@@ -1813,7 +1813,9 @@ frame();
                             st.error("Enter your password.")
                         else:
                             import hashlib as _hl_ret
-                            _input_email_lower = ret_email.strip().lower()
+                            _raw_input = ret_email.strip().lower()
+                            # Auto-fix common typos: commas instead of periods, missing dots before "com"
+                            _input_email_lower = _raw_input.replace(",", ".").replace(" ", "").replace("@gmaill", "@gmail").replace("@gmial", "@gmail").replace("@yhaoo", "@yahoo").replace("@yaho", "@yahoo").replace("@hotmial", "@hotmail").replace("@outlok", "@outlook")
                             _ret_hash = _hl_ret.sha256(ret_pass.strip().encode()).hexdigest()
                             _sb = get_supabase()
                             _all_saves = []
@@ -1826,7 +1828,7 @@ frame();
                                         _stored_email_clean = str(_stored_email_raw).lower().strip()
                                         if _stored_email_clean:
                                             _all_emails_in_db.append(_stored_email_clean)
-                                        _input_variants = [_input_email_lower, _input_email_lower.strip("_"), _input_email_lower.replace(" ","")]
+                                        _input_variants = [_input_email_lower, _input_email_lower.strip("_"), _input_email_lower.replace(" ",""), _raw_input, _raw_input.strip("_"), _raw_input.replace(",",".")]
                                         _stored_variants = [_stored_email_clean, _stored_email_clean.strip("_"), _stored_email_clean.replace(" ","")]
                                         _matched = False
                                         for _iv in _input_variants:
