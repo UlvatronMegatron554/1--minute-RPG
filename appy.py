@@ -936,7 +936,7 @@ def db_save(user_name: str, theme: str):
             "updated_at": _dt.datetime.utcnow().isoformat(),
             "password_hash": st.session_state.get("password_hash", ""),
             "leaderboard_visible": bool(st.session_state.get("leaderboard_visible", True)),
-            "email": st.session_state.get("user_email", "").lower().strip().strip("_"),
+            "email": st.session_state.get("user_email", "").lower().strip(),
         }
         # save_key = name_universe_mode (unique per combo)
         _mode  = st.session_state.get("game_mode", "chill") or "chill"
@@ -1813,7 +1813,7 @@ frame();
                             st.error("Enter your password.")
                         else:
                             import hashlib as _hl_ret
-                            _clean_ret_email = ret_email.strip().lower().strip("_")
+                            _clean_ret_email = ret_email.strip().lower()
                             _ret_hash = _hl_ret.sha256(ret_pass.strip().encode()).hexdigest()
                             _sb = get_supabase()
                             _all_saves = []
@@ -1821,10 +1821,12 @@ frame();
                                 try:
                                     _lr = _sb.table("players").select("*").execute()
                                     for _row in (_lr.data or []):
-                                        _re = _row.get("email","").lower().strip().strip("_")
-                                        if _re == _clean_ret_email:
+                                        _re = (_row.get("email","") or "").lower().strip()
+                                        # Match exact OR with underscore-stripped version (legacy data)
+                                        if _re == _clean_ret_email or _re.strip("_") == _clean_ret_email or _re == _clean_ret_email.strip("_"):
                                             _all_saves.append(_row)
-                                except: pass
+                                except Exception as _e:
+                                    pass
                             if not _all_saves:
                                 st.error("❌ No account found with that email.")
                             else:
