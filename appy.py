@@ -936,7 +936,7 @@ def db_save(user_name: str, theme: str):
             "updated_at": _dt.datetime.utcnow().isoformat(),
             "password_hash": st.session_state.get("password_hash", ""),
             "leaderboard_visible": bool(st.session_state.get("leaderboard_visible", True)),
-            "email": st.session_state.get("user_email", "").lower().strip(),
+            "email": str(st.session_state.get("user_email", "") or "").lower().strip(),
         }
         # save_key = name_universe_mode (unique per combo)
         _mode  = st.session_state.get("game_mode", "chill") or "chill"
@@ -1813,22 +1813,42 @@ frame();
                             st.error("Enter your password.")
                         else:
                             import hashlib as _hl_ret
-                            _clean_ret_email = ret_email.strip().lower()
+                            _input_email_lower = ret_email.strip().lower()
                             _ret_hash = _hl_ret.sha256(ret_pass.strip().encode()).hexdigest()
                             _sb = get_supabase()
                             _all_saves = []
+                            _all_emails_in_db = []
                             if _sb:
                                 try:
                                     _lr = _sb.table("players").select("*").execute()
                                     for _row in (_lr.data or []):
-                                        _re = (_row.get("email","") or "").lower().strip()
-                                        # Match exact OR with underscore-stripped version (legacy data)
-                                        if _re == _clean_ret_email or _re.strip("_") == _clean_ret_email or _re == _clean_ret_email.strip("_"):
+                                        _stored_email_raw = _row.get("email","") or ""
+                                        _stored_email_clean = str(_stored_email_raw).lower().strip()
+                                        if _stored_email_clean:
+                                            _all_emails_in_db.append(_stored_email_clean)
+                                        _input_variants = [_input_email_lower, _input_email_lower.strip("_"), _input_email_lower.replace(" ","")]
+                                        _stored_variants = [_stored_email_clean, _stored_email_clean.strip("_"), _stored_email_clean.replace(" ","")]
+                                        _matched = False
+                                        for _iv in _input_variants:
+                                            for _sv2 in _stored_variants:
+                                                if _iv and _sv2 and _iv == _sv2:
+                                                    _matched = True
+                                                    break
+                                            if _matched: break
+                                        if _matched:
                                             _all_saves.append(_row)
                                 except Exception as _e:
-                                    pass
+                                    st.error(f"Database error: {_e}")
                             if not _all_saves:
                                 st.error("❌ No account found with that email.")
+                                with st.expander("🔍 Debug — show me what's in the database"):
+                                    st.write(f"**You entered:** `{_input_email_lower}`")
+                                    st.write(f"**Emails in database ({len(_all_emails_in_db)} total):**")
+                                    if _all_emails_in_db:
+                                        for _de in _all_emails_in_db[:30]:
+                                            st.code(_de)
+                                    else:
+                                        st.write("⚠️ No emails saved in database. Sign up first via NEW PLAYER.")
                             else:
                                 _first_save = _all_saves[0]
                                 _stored_hash = _first_save.get("password_hash", "")
