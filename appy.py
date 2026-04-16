@@ -1203,19 +1203,73 @@ def extract_json(raw_text):
 # ─────────────────────────────────────────────────────────────────────────────
 # LORE PROMPT
 # ─────────────────────────────────────────────────────────────────────────────
-LORE_PROMPT = """You are the ULTIMATE authority on every game, anime, manga, sport, team, brand, movie, show, book, music genre, artist, fashion brand, historical era, cultural phenomenon in human history.
+LORE_PROMPT = """You are the ULTIMATE authority on every game, anime, manga, sport, team, brand, movie, show, book, music genre, artist, fashion brand, historical era, cultural phenomenon in human history. You know every iconic character, every signature move, every legendary item, every brand color, every cultural touchpoint.
 
 Universe: "{theme}"
 
-CRITICAL RULES:
-1. ATOMIC SPECIFICITY: If given a CHARACTER — use THAT character's EXACT moves, weapons, colors. Zoro = green hair, 3 swords. Tanjiro = water breathing, checkered haori. Kobe = fadeaway, #24.
-2. NEVER be generic. EVERY field must drip with universe-specific detail.
-3. CURRENCY RULE: Use the exact in-universe currency (One Piece=Berries, Naruto=Ryo, Dragon Ball=Zeni, Harry Potter=Galleons, Star Wars=Galactic Credits, Pokemon=PokeDollars, Minecraft=Emeralds).
-4. HYBRID/MASHUP RULE: If the theme combines TWO OR MORE universes (e.g. "One Piece and Minecraft", "Naruto x Dragon Ball", "Harry Potter meets Star Wars"), you MUST BLEND BOTH equally. Do NOT just pick one and ignore the other. Combine their currencies (e.g. "Emerald Berries"), mix their abilities (e.g. "Haki Pickaxe"), blend their aesthetics, locations, and characters. The result should feel like a TRUE fusion — not one universe with a cameo from the other. Every field should reference BOTH sources. The description should capture the SOUL of the mashup.
+═══ ABSOLUTE RULES — VIOLATING ANY = FAILURE ═══
 
-Return ONLY a single raw JSON object. No markdown.
+RULE 1 — ATOMIC SPECIFICITY:
+If given a CHARACTER, use THAT character's EXACT details. Zoro = green hair, three swords (Wado Ichimonji, Sandai Kitetsu, Shusui), olive bandana. Tanjiro = water breathing, checkered green-and-black haori, hanafuda earrings. Kobe = #24, fadeaway, Lakers purple-gold. NEVER substitute generic alternatives.
 
-Fields: "currency", "color" (most iconic hex), "shield_name" (exact defensive ability/armor), "booster_name" (exact speed ability), "shield_flavor" (12 words max), "booster_flavor" (12 words max), "description" (12 words max, captures the SOUL), "battle_style" (shooter/turnbased/reaction/rpgclick/survival/rhythm/racing/trivia), "player_visual" (hair_color, hair_style, skin_color, outfit_color, outfit_secondary, weapon, weapon_color, eye_color, cape, cape_color, aura_color, body_build), "enemy_visual" (same), "lore_achievements" (array of 10 objects with name+desc, DIFFERENT conditions — mix currency/battles/streaks/eggs/chapters/spinner/levels/secrets).
+RULE 2 — NEVER GENERIC:
+Every field must be SO specific that someone reading it instantly recognizes the universe. NO vague words like "warrior," "hero," "powerful." Use SPECIFIC names, places, moves, items.
+
+RULE 3 — VIBRANT SIGNATURE COLORS (CRITICAL):
+The "color" field MUST be a VIBRANT, EYE-CATCHING, ICONIC color that screams the universe. NEVER pick muted, brown, gray, beige, or muddy colors unless that is LITERALLY the brand's signature color.
+
+GOOD examples:
+- One Piece = #E8372B (Luffy's red vest, Going Merry sails)
+- Naruto = #FF6600 (Naruto's orange jumpsuit)
+- Dragon Ball = #FF8C00 (Goku's gi orange)
+- Minecraft = #5D9E35 (grass block green — THE signature color)
+- Pokemon = #FFCB05 (Pikachu yellow)
+- Star Wars = #FFE81F (Star Wars logo gold)
+- Harry Potter = #740001 (Gryffindor crimson)
+- NBA = #EE6730 (basketball orange)
+- F1 = #FF1801 (Ferrari red)
+
+BAD examples (NEVER DO THIS):
+- Brown / beige / tan unless the universe is literally about wood, dirt, or coffee
+- Gray / muted tones unless it's a noir/cyberpunk theme
+- Muddy mixed colors when blending two universes — pick the SHARPER of the two signature colors
+
+RULE 4 — HYBRID/MASHUP COLOR RULE:
+If two universes are combined, do NOT average their colors into mud. Pick the MORE VIBRANT of the two signature colors, OR pick a striking color that ties them together.
+- "One Piece + Minecraft" → Pick One Piece red (#E8372B) OR Minecraft green (#5D9E35) — NOT brown
+- "Naruto + Dragon Ball" → Pick orange (#FF6600 or #FF8C00) since both share orange energy
+- "Harry Potter + Star Wars" → Pick Gryffindor crimson (#740001) OR Sith red (#CC0000) — sharp, not muddy
+
+RULE 5 — HYBRID BLENDING (everything else):
+Combine currencies (Emerald Berries, Galactic Galleons), mix abilities (Haki Pickaxe, Force Lightsaber), blend aesthetics. Every field references BOTH sources. NEVER pick one universe and ignore the other.
+
+RULE 6 — CURRENCY MUST BE EXACT:
+One Piece=Berries, Naruto=Ryo, Dragon Ball=Zeni, Harry Potter=Galleons, Star Wars=Galactic Credits, Pokemon=PokeDollars, Minecraft=Emeralds, Zelda=Rupees, Elden Ring=Runes, Halo=CR, GTA=GTA$, Fortnite=V-Bucks, Roblox=Robux, Valorant=VP. For mashups: combine them (Emerald Berries, Pokeryo, Galactic Galleons).
+
+RULE 7 — VISUAL FIELDS MUST BE EXACT HEX:
+Every color field (hair_color, skin_color, outfit_color, outfit_secondary, weapon_color, eye_color, aura_color, cape_color) MUST be a valid 6-digit hex like #FF0000. NEVER use color names like "red" or "green". NEVER use 3-digit hex like #F00. ALWAYS 6 digits with #.
+
+RULE 8 — CHARACTERS MUST MATCH THE UNIVERSE:
+player_visual = the iconic PROTAGONIST/HERO of this universe with their exact look.
+enemy_visual = the iconic VILLAIN/BOSS with their exact look.
+Match canon source material exactly. For Naruto: player=Naruto with blonde spiky hair + orange jumpsuit, enemy=Sasuke or Madara. For Minecraft: player=Steve with brown hair + cyan shirt, enemy=Wither or Ender Dragon. For mashups: blend BOTH universes' protagonists and villains.
+
+═══ OUTPUT FORMAT ═══
+
+Return ONLY a single raw JSON object. NO markdown, NO ```json fences, NO explanation, NO preamble.
+
+Fields:
+- "currency" (exact in-universe currency, MUST follow Rule 6)
+- "color" (most iconic VIBRANT hex, MUST follow Rules 3 and 4)
+- "shield_name" (exact defensive ability/armor from this universe)
+- "booster_name" (exact speed/movement ability from this universe)
+- "shield_flavor" (12 words max, drips with universe lore)
+- "booster_flavor" (12 words max, drips with universe lore)
+- "description" (12 words max, captures the SOUL of this universe)
+- "battle_style" (one of: shooter/turnbased/reaction/rpgclick/survival/rhythm/racing/trivia)
+- "player_visual" (object with: hair_color, hair_style, skin_color, outfit_color, outfit_secondary, weapon, weapon_color, eye_color, cape, cape_color, aura_color, body_build — ALL hex colors valid)
+- "enemy_visual" (same structure as player_visual)
+- "lore_achievements" (array of 10 objects with name+desc, ALL different unlock conditions)
 
 Return: {{"currency":"...","color":"#RRGGBB","shield_name":"...","booster_name":"...","description":"...","shield_flavor":"...","booster_flavor":"...","battle_style":"...","player_visual":{{...}},"enemy_visual":{{...}},"lore_achievements":[...]}}"""
 
