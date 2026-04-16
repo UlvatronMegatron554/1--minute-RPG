@@ -1398,12 +1398,7 @@ if "gold" not in st.session_state:
 # ─────────────────────────────────────────────────────────────────────────────
 # ── AUTO-RELOAD ON REFRESH via query params ──────────────────────────────────
 if st.session_state.user_name is None:
-    if st.session_state.get("_logged_out"):
-        st.session_state._logged_out = False
-        st.query_params.clear()
-        _qp_name = ""
-    else:
-        _qp_name = st.query_params.get("u", "")
+    _qp_name = st.query_params.get("u", "")
     _qp_theme = st.query_params.get("t", "")
     _qp_mode = st.query_params.get("m", "")
     if _qp_name:
@@ -2136,9 +2131,9 @@ with st.sidebar:
     st.write("---")
     if st.button("🚪 QUIT", key="nav_quit", use_container_width=True):
             db_save(st.session_state.user_name, st.session_state.user_theme)
-            st.session_state.user_name = None
-            st.session_state._logged_out = True
             st.query_params.clear()
+            for _k in list(st.session_state.keys()):
+                del st.session_state[_k]
             st.rerun()
     if st.button("🚀 MISSION HUB",   key="nav_hub"):      st.session_state.view = "main";       st.session_state.battle_state = None; st.session_state.battle_subject_chosen = False; st.rerun()
     if st.button("⚔️ BATTLE",        key="nav_battle"):   st.session_state.view = "battle";     st.rerun()
