@@ -14,6 +14,45 @@ try:
 except Exception:
     REPLICATE_AVAILABLE = False
 
+# ── PDF text extraction (for study material uploads) ──
+try:
+    import pypdf as _pypdf_lib
+    PDF_LIB = "pypdf"
+except Exception:
+    try:
+        import PyPDF2 as _pypdf_lib
+        PDF_LIB = "PyPDF2"
+    except Exception:
+        _pypdf_lib = None
+        PDF_LIB = None
+
+def _pdf_extract_text(pdf_bytes: bytes, max_chars: int = 15000) -> str:
+    """Extract text from PDF bytes. Returns empty string on any failure.
+    Caps extracted text to max_chars to avoid overwhelming the Claude prompt."""
+    if not pdf_bytes or _pypdf_lib is None:
+        return ""
+    try:
+        import io as _io_pdf
+        reader = _pypdf_lib.PdfReader(_io_pdf.BytesIO(pdf_bytes))
+        chunks = []
+        total = 0
+        for page in reader.pages:
+            try:
+                page_text = page.extract_text() or ""
+            except Exception:
+                page_text = ""
+            if page_text.strip():
+                chunks.append(page_text.strip())
+                total += len(page_text)
+                if total >= max_chars:
+                    break
+        full = "\n\n".join(chunks).strip()
+        if len(full) > max_chars:
+            full = full[:max_chars] + "\n\n[...PDF truncated...]"
+        return full
+    except Exception:
+        return ""
+
 # ─────────────────────────────────────────────────────────────────────────────
 # 30 SECOND INFINITEVERSE v10.0 — INFINITE ADDICTION EDITION
 # ─────────────────────────────────────────────────────────────────────────────
@@ -3407,7 +3446,16 @@ Make questions test real understanding of the material, not just surface recall.
                             _upl_questions = []
 
                 else:
-                    _file_content = _uploaded_material.read().decode("utf-8", errors="ignore")[:4000]
+                    _raw_bytes_mat = _uploaded_material.read()
+                    if _uploaded_material.type == "application/pdf":
+                        _pdf_text = _pdf_extract_text(_raw_bytes_mat)
+                        if not _pdf_text or len(_pdf_text) < 40:
+                            st.warning("⚠️ Could not read text from this PDF. It may be a scanned image-only PDF. Questions will be generic.")
+                            _file_content = f"Generate general study questions about the subject '{subject}' appropriate for a battle quiz."
+                        else:
+                            _file_content = f"Here is study material the user uploaded (from a PDF):\n\n---\n{_pdf_text}\n---\n\nGenerate questions BASED DIRECTLY ON THIS CONTENT. Each question must test understanding of material present in the text above."
+                    else:
+                        _file_content = _raw_bytes_mat.decode("utf-8", errors="ignore")[:4000]
 
                     with st.spinner("⚔️ Reading your material and generating questions..."):
                         try:
