@@ -1524,6 +1524,7 @@ if "gold" not in st.session_state:
         "last_auto_save": None, "password_hash": "", "leaderboard_visible": True, "user_email": "", "gw_page": 1, "ret_saves_found": None, "ret_pass_hash": "", "ret_name": "", "ret_single_save": None, "sidebar_color": "#0a0a1a",
         "study_type": None, "quiz_completed": False, "quiz_answers": {},
         "mission_goals": [], "mission_goals_text": "", "goal_history": [], "checkpoint_submitted": False, "checkpoint_count": 0,
+        "contract_signed_today": False, "contract_sign_date": None, "contract_signature": "", "total_contracts_signed": 0,
     })
 
 
@@ -2985,6 +2986,102 @@ if view == "main":
     st.markdown(f"""<div style='background:#111;border:1px solid {C}44;border-radius:12px;padding:14px 20px;margin:8px 0 20px'><div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:6px'><span style='font-family:Bebas Neue,sans-serif;font-size:14px;color:{C};letter-spacing:2px'>LEVEL {level_now} → LEVEL {level_now+1}</span><span style='font-family:Space Mono,monospace;font-size:12px;color:#ffffff'>{xp_display}%</span></div><div style='font-family:Space Mono,monospace;font-size:11px;color:{C}'>{xp_bar_str}</div><div style='font-size:10px;color:#888;margin-top:4px;font-family:Space Mono,monospace'>{xp_msg}</div></div>""", unsafe_allow_html=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
+
+    # ── CHAMPION'S CONTRACT — daily commitment signature ─────────────────
+    _today_iso = _dt.date.today().isoformat()
+    _contract_signed = st.session_state.get("contract_signed_today", False)
+    _contract_date = st.session_state.get("contract_sign_date")
+
+    # Reset contract if it's a new day
+    if _contract_date != _today_iso:
+        _contract_signed = False
+        st.session_state.contract_signed_today = False
+        st.session_state.contract_sign_date = None
+        st.session_state.contract_signature = ""
+
+    if not _contract_signed:
+        _st_type = st.session_state.get("study_type", "climber") or "climber"
+        _contract_texts = {
+            "sprouter": {
+                "title": "🌱 THE SPROUTER'S PLEDGE",
+                "body": "I promise to give my honest effort today. Even a small step counts. I will try, and that is enough.",
+                "cta": "I believe in myself.",
+            },
+            "climber": {
+                "title": "🎯 THE CLIMBER'S OATH",
+                "body": "I commit to focused study today. I will push past distractions and stay consistent. Progress over perfection.",
+                "cta": "I will climb higher today.",
+            },
+            "grinder": {
+                "title": "🔥 THE GRINDER'S VOW",
+                "body": "I swear to put in real work today. No shortcuts. No excuses. Every rep counts and I will earn my rewards.",
+                "cta": "The grind never stops.",
+            },
+            "beast": {
+                "title": "👑 THE BEAST'S BLOOD OATH",
+                "body": "I bind myself to absolute discipline today. Weakness is not an option. I will dominate every session and leave nothing on the table.",
+                "cta": "I will be relentless.",
+            },
+        }
+        _ct = _contract_texts.get(_st_type, _contract_texts["climber"])
+        _user_display = (st.session_state.get("user_name", "") or "Champion").upper()
+
+        st.markdown(f"""<div style='background:linear-gradient(135deg,#0a0a1a 0%,#1a0a2e 40%,#0a0020 100%);
+            border:3px solid {C};border-radius:20px;padding:28px;margin:12px 0;
+            box-shadow:0 0 40px {C}33;position:relative;overflow:hidden'>
+            <div style='position:absolute;top:0;left:0;right:0;height:3px;
+                background:linear-gradient(90deg,transparent,{C},transparent)'></div>
+            <div style='font-family:Bebas Neue,sans-serif;font-size:32px;color:{C};
+                letter-spacing:5px;text-align:center;margin-bottom:16px'>{_ct["title"]}</div>
+            <div style='font-family:Space Mono,monospace;font-size:13px;color:#ffffff;
+                line-height:2.0;text-align:center;max-width:500px;margin:0 auto 20px;
+                padding:16px 20px;border:1px solid {C}44;border-radius:12px;
+                background:rgba(255,255,255,0.03)'>
+                "{_ct["body"]}"
+            </div>
+            <div style='font-family:Space Mono,monospace;font-size:11px;color:#888;
+                text-align:center;margin-bottom:4px;letter-spacing:2px'>
+                TYPE YOUR NAME TO SIGN THIS CONTRACT
+            </div>
+        </div>""", unsafe_allow_html=True)
+
+        _, _sig_col, _ = st.columns([1, 2, 1])
+        with _sig_col:
+            _sig_input = st.text_input("✍️ Your Signature:", placeholder=f"Type: {_user_display}", key="contract_sig_input", label_visibility="collapsed")
+            if st.button(f"✍️ I SIGN THIS — {_ct['cta'].upper()}", key="sign_contract", use_container_width=True):
+                if _sig_input.strip().lower() == _user_display.lower():
+                    st.session_state.contract_signed_today = True
+                    st.session_state.contract_sign_date = _today_iso
+                    st.session_state.contract_signature = _sig_input.strip()
+                    st.session_state.total_contracts_signed = st.session_state.get("total_contracts_signed", 0) + 1
+                    play_app_sound("streak")
+                    st.balloons()
+                    st.rerun()
+                elif not _sig_input.strip():
+                    st.error("Type your champion name to sign the contract.")
+                else:
+                    st.error(f"Sign with your exact champion name: {_user_display}")
+
+        st.markdown(f"<div style='font-family:Space Mono,monospace;font-size:9px;color:#555;text-align:center;margin-top:8px'>Signing this contract is a commitment to yourself. Studies show written commitments increase follow-through by 30-40%.</div>", unsafe_allow_html=True)
+
+    else:
+        _sig_name = st.session_state.get("contract_signature", st.session_state.get("user_name", "Champion"))
+        _total_signed = st.session_state.get("total_contracts_signed", 1)
+
+        st.markdown(f"""<div style='background:linear-gradient(90deg,#0a0a1a,#1a0a2e,#0a0a1a);
+            border:2px solid {C}88;border-radius:14px;padding:12px 20px;margin:8px 0;
+            display:flex;justify-content:space-between;align-items:center'>
+            <div>
+                <div style='font-family:Bebas Neue,sans-serif;font-size:14px;color:{C};
+                    letter-spacing:3px'>✍️ CONTRACT SIGNED TODAY</div>
+                <div style='font-family:Space Mono,monospace;font-size:10px;color:#888;
+                    margin-top:2px;font-style:italic'>"{_sig_name}" — committed to study · Contract #{_total_signed}</div>
+            </div>
+            <div style='font-family:Space Mono,monospace;font-size:10px;color:{C};
+                text-align:right'>
+                ✅ BOUND
+            </div>
+        </div>""", unsafe_allow_html=True)
 
     # ── MISSION TIMER + START BUTTON — neat, centered, balanced ──
     tier = st.session_state.sub_tier; mult = st.session_state.sub_multiplier; base = 5.0 * mult
