@@ -533,7 +533,7 @@ function drEvolve(){{
 function upTimer(){{
   const tb=document.getElementById('tb');if(!tb)return;
   qTimer-=1/60;
-  if(qTimer<=0&&!aLocked){{onNo();aLocked=true;document.getElementById('questions').style.display='none';qI++;if(STATE!=='WIN'&&STATE!=='LOSE')setTimeout(()=>{{if(STATE==='B')showQ();}},1100);}}
+  if(qTimer<=0&&!aLocked){{onNo();aLocked=true;document.getElementById('questions').style.display='none';qI++;if(STATE!=='WIN'&&STATE!=='LOSE')setTimeout(()=>{{if(STATE==='B')showMoves();}},1100);}}
   else{{const pct=Math.max(0,qTimer/qMax)*100;tb.style.width=pct+'%';tb.style.background=pct>40?'linear-gradient(90deg,'+COL+','+COL+'88)':'linear-gradient(90deg,#FF2222,#FF4400)';}}
 }}
 function loop(){{
@@ -642,6 +642,9 @@ CHARACTER ART TIER — TIER IS: {tier}
 You are writing questions for mission round #{difficulty}. Each round must feel MORE engaging, MORE lore-intensive, and MORE epic than the last.
 
 VOICE RULE: Write every question IN THE VOICE of {universe}. If it's One Piece, write like a pirate adventure narrator. If it's Dragon Ball, write with power-scaling intensity. If it's Harry Potter, write with magical wonder. The universe's personality IS the question's personality. Do NOT use generic "In the {universe} world..." framing.
+
+DEEP LORE RULE (CRITICAL — DO NOT IGNORE):
+Every question MUST use at LEAST 2 specific character names, locations, or abilities from {universe}. NOT just one throwaway mention. The characters must be DOING something plot-relevant — fighting, exploring, training, discovering. The {subject} question must emerge FROM that action. Example: "As Zoro trains his Santoryu at Kuraigana Island under Mihawk's guidance, he calculates the angle of his 1080 Pound Phoenix slash..." — this uses Zoro, Santoryu, Kuraigana Island, Mihawk, AND 1080 Pound Phoenix. THAT is deep lore integration. A single "Zoro thinks about..." is LAZY and UNACCEPTABLE.
 
 Each question MUST be a real {subject} education question (actual math, science, history, etc.) BUT the lore isn't just a wrapper — the lore IS the question setup. The story leads naturally into the problem.
 
@@ -2979,8 +2982,31 @@ if view == "main":
     _tower_title = _tower_titles.get(min(_tower_level, 14), "Infinite Citadel")
     _tower_next = _tower_titles.get(min(_tower_level + 1, 14), "???")
     _blocks_to_next = max(0, (_tower_level * 10) - _tower_blocks)
-    _tower_html = """ + repr(tower_html) + """.replace("COLVAL", C).replace("BLOCKSVAL", str(_tower_blocks)).replace("LVLVAL", str(_tower_level)).replace("TITLEVAL", _tower_title.upper()).replace("NEXTVAL", _tower_next).replace("BTNVAL", str(_blocks_to_next))
-    components.html(_tower_html, height=185)
+    components.html(f"""<style>*{{margin:0;padding:0;box-sizing:border-box;}}body{{background:transparent;overflow:hidden;}}</style>
+<canvas id="tc" width="1640" height="360"></canvas>
+<script>
+var cv=document.getElementById('tc');var W=cv.parentElement.offsetWidth||820;
+cv.width=W*2;cv.height=360;var c=cv.getContext('2d');c.setTransform(2,0,0,2,0,0);
+var H=180,col='{C}',blocks={_tower_blocks},lvl={_tower_level};
+var sky=c.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#0a0020');sky.addColorStop(0.6,'#1a0040');sky.addColorStop(1,'#0a0a1a');
+c.fillStyle=sky;c.fillRect(0,0,W,H);
+for(var i=0;i<40;i++){{var sx=Math.random()*W,sy=Math.random()*H*0.6;c.fillStyle='rgba(255,255,255,'+(0.3+Math.random()*0.5)+')';c.beginPath();c.arc(sx,sy,0.5+Math.random(),0,6.28);c.fill();}}
+c.fillStyle='#111';c.fillRect(0,H-20,W,20);c.fillStyle='#1a1a2a';c.fillRect(0,H-22,W,4);
+var bw=16,bh=8,gap=1;var maxPerRow=Math.max(3,Math.min(8,3+Math.floor(lvl/2)));
+var totalBlocks=Math.min(blocks,150);var rows=Math.ceil(totalBlocks/maxPerRow);
+var baseX=W/2,baseY=H-24;
+function hx(hex,offset){{var r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);r=Math.min(255,Math.max(0,r+offset));g=Math.min(255,Math.max(0,g+offset));b=Math.min(255,Math.max(0,b+offset));return '#'+[r,g,b].map(function(v){{return v.toString(16).padStart(2,'0')}}).join('');}}
+var placed=0;
+for(var row=0;row<rows&&placed<totalBlocks;row++){{var blocksInRow=Math.min(maxPerRow,totalBlocks-placed);var rowWidth=blocksInRow*(bw+gap);var startX=baseX-rowWidth/2;var y=baseY-row*(bh+gap);
+for(var b2=0;b2<blocksInRow&&placed<totalBlocks;b2++){{var x=startX+b2*(bw+gap);var shade=row%2===0?0:-15;var blockCol=hx(col,shade);c.fillStyle=blockCol;c.fillRect(x,y,bw,bh);c.fillStyle=hx(col,40);c.fillRect(x,y,bw,1.5);c.fillStyle=hx(col,-40);c.fillRect(x,y+bh-1.5,bw,1.5);if(placed>=totalBlocks-5){{c.fillStyle=col+'33';c.fillRect(x-2,y-2,bw+4,bh+4);}}placed++;}}}}
+if(totalBlocks>0){{var flagX=baseX,flagY=baseY-rows*(bh+gap)-2;c.fillStyle='#888';c.fillRect(flagX-1,flagY,2,16);c.fillStyle=col;c.beginPath();c.moveTo(flagX+1,flagY);c.lineTo(flagX+14,flagY+5);c.lineTo(flagX+1,flagY+10);c.fill();}}
+if(lvl>=5){{var ag=c.createRadialGradient(baseX,baseY-rows*(bh+gap)/2,5,baseX,baseY-rows*(bh+gap)/2,60+lvl*5);ag.addColorStop(0,col+'22');ag.addColorStop(1,'transparent');c.fillStyle=ag;c.beginPath();c.arc(baseX,baseY-rows*(bh+gap)/2,60+lvl*5,0,6.28);c.fill();}}
+c.fillStyle=col;c.font='bold 10px monospace';c.textAlign='center';
+c.fillText('{_tower_title.upper()}',W/2,14);
+c.fillStyle='#888';c.font='9px monospace';
+c.fillText('LV '+lvl+' · '+blocks+' BLOCKS · NEXT: {_tower_next}',W/2,28);
+if({_blocks_to_next}>0){{c.fillStyle='#555';c.font='8px monospace';c.fillText({_blocks_to_next}+' more to level up',W/2,40);}}
+</script>""", height=185)
 
     missions_done = st.session_state.get("total_missions",0)  # used by sidebar counter
 
