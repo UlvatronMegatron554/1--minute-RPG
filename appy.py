@@ -253,17 +253,69 @@ const P={{hp:100,maxHp:100,power:0,evo:0,streak:0,total:0,x:160,y:270,shake:0,hi
 const E={{hp:100,maxHp:100,phase:0,x:620,y:270,shake:0,hit:false,color:CFG.enemy_color||'#CC2222'}};
 const INTENSITY=Math.min(3, 1 + (CFG.battles_fought||0) * 0.15);
 const MODE=CFG.mode||'AUTO';
-const SND={{ctx:null,
-  init(){{if(!this.ctx)try{{this.ctx=new(window.AudioContext||window.webkitAudioContext)()}}catch(e){{}}}},
-  play(f,d,t,v){{try{{this.init();const o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type=t||'sine';o.frequency.setValueAtTime(f,this.ctx.currentTime);g.gain.setValueAtTime(v||0.25,this.ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.01,this.ctx.currentTime+d);o.connect(g);g.connect(this.ctx.destination);o.start();o.stop(this.ctx.currentTime+d)}}catch(e){{}}}},
-  theme:MODE==='FIGHTER'?{{b:180,t:'square',m:1.2}}:MODE==='RPG'?{{b:400,t:'sine',m:1.0}}:MODE==='SHOOTER'?{{b:500,t:'sawtooth',m:0.8}}:MODE==='COSMIC'?{{b:300,t:'triangle',m:1.1}}:MODE==='MAGIC'?{{b:450,t:'sine',m:1.0}}:MODE==='SPORTS'?{{b:350,t:'square',m:0.9}}:MODE==='BRAWL'?{{b:200,t:'square',m:1.3}}:MODE==='PLATFORM'?{{b:520,t:'sine',m:0.7}}:{{b:380,t:'sine',m:1.0}},
-  correct(){{const b=this.theme.b,t=this.theme.t;this.play(b*2.2,0.08,t,0.2);setTimeout(()=>this.play(b*2.8,0.12,'sine',0.18),60)}},
-  wrong(){{const b=this.theme.b;this.play(b*0.5,0.25,'sawtooth',0.15);setTimeout(()=>this.play(b*0.4,0.3,'sawtooth',0.1),100)}},
-  hit(){{const b=this.theme.b,t=this.theme.t;this.play(b*2,0.06,t,0.18);this.play(b*3,0.1,'sine',0.12)}},
-  miss(){{const b=this.theme.b;this.play(b*0.6,0.2,'square',0.12);this.play(b*0.45,0.3,'sawtooth',0.08)}},
-  evo(){{const b=this.theme.b;[1,1.25,1.5,1.75,2,2.5,3].forEach((m,i)=>setTimeout(()=>this.play(b*m,0.18,'sine',0.22),i*70))}},
-  victory(){{const b=this.theme.b;[1,1.25,1.5,2].forEach((m,i)=>setTimeout(()=>this.play(b*m,0.35,'sine',0.25),i*180));setTimeout(()=>{{[2,2.5,3,4].forEach((m,i)=>setTimeout(()=>this.play(b*m,0.2,'triangle',0.15),i*100))}},800)}},
-  defeat(){{const b=this.theme.b;[1.5,1.2,1,0.8,0.6].forEach((m,i)=>setTimeout(()=>this.play(b*m,0.4,'sawtooth',0.12),i*220))}}
+const SND={{
+  ctx:null,
+  muted:false,
+  init(){{
+    if(this.ctx) return;
+    try{{
+      this.ctx=new (window.AudioContext||window.webkitAudioContext)();
+      this.muted=(localStorage.getItem('iv_muted')==='1');
+    }}catch(e){{this.ctx=null;}}
+  }},
+  toggle(){{
+    this.muted=!this.muted;
+    try{{localStorage.setItem('iv_muted',this.muted?'1':'0');}}catch(e){{}}
+    return this.muted;
+  }},
+  _tone(freq,dur,type,vol,slideT){{
+    if(!this.ctx||this.muted) return;
+    try{{
+      const o=this.ctx.createOscillator();
+      const g=this.ctx.createGain();
+      o.type=type||'sine';
+      o.frequency.setValueAtTime(freq,this.ctx.currentTime);
+      if(slideT){{o.frequency.exponentialRampToValueAtTime(Math.max(slideT,40),this.ctx.currentTime+dur);}}
+      g.gain.setValueAtTime(vol||0.15,this.ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001,this.ctx.currentTime+dur);
+      o.connect(g);g.connect(this.ctx.destination);
+      o.start();o.stop(this.ctx.currentTime+dur);
+    }}catch(e){{}}
+  }},
+  _noise(dur,vol,filterFreq){{
+    if(!this.ctx||this.muted) return;
+    try{{
+      const bufSize=this.ctx.sampleRate*dur;
+      const buf=this.ctx.createBuffer(1,bufSize,this.ctx.sampleRate);
+      const data=buf.getChannelData(0);
+      for(let i=0;i<bufSize;i++){{data[i]=(Math.random()*2-1)*(1-i/bufSize);}}
+      const src=this.ctx.createBufferSource();
+      src.buffer=buf;
+      const g=this.ctx.createGain();
+      g.gain.setValueAtTime(vol||0.25,this.ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001,this.ctx.currentTime+dur);
+      const f=this.ctx.createBiquadFilter();
+      f.type='lowpass';f.frequency.setValueAtTime(filterFreq||800,this.ctx.currentTime);
+      src.connect(f);f.connect(g);g.connect(this.ctx.destination);
+      src.start();src.stop(this.ctx.currentTime+dur);
+    }}catch(e){{}}
+  }},
+  hit(){{this.init();this._noise(0.08,0.35,1200);this._tone(180,0.12,'square',0.15,80);}},
+  crit(){{this.init();this._noise(0.15,0.5,2000);this._tone(220,0.18,'sawtooth',0.22,60);setTimeout(()=>this._tone(440,0.15,'square',0.15),80);}},
+  miss(){{this.init();this._tone(160,0.22,'sine',0.12,100);this._tone(120,0.22,'sine',0.08,80);}},
+  block(){{this.init();this._noise(0.06,0.3,3000);this._tone(800,0.1,'square',0.12,1200);}},
+  evolve(){{this.init();const n=[262,330,392,523,659];for(let i=0;i<n.length;i++){{setTimeout(()=>this._tone(n[i],0.22,'triangle',0.15),i*70);}}}},
+  victory(){{this.init();const n=[523,659,784,1047];for(let i=0;i<n.length;i++){{setTimeout(()=>this._tone(n[i],0.3,'triangle',0.18),i*120);}}}},
+  defeat(){{this.init();const n=[392,349,294,220];for(let i=0;i<n.length;i++){{setTimeout(()=>this._tone(n[i],0.35,'sine',0.15),i*160);}}}},
+  click(){{this.init();this._tone(600,0.04,'sine',0.08);}},
+  whoosh(){{this.init();this._noise(0.18,0.22,500);}},
+  charge(){{this.init();this._tone(220,0.5,'sawtooth',0.1,880);}},
+  evo(){{this.evolve();}},
+  correct(){{this.hit();}},
+  wrong(){{this.miss();}},
+  play(name){{
+    if(this[name]&&typeof this[name]==='function') this[name]();
+  }}
 }};
 // Custom character images (user uploads — URL or base64 data URI). Higher priority than hardcoded characters.
 var customPlayerImg=null,customEnemyImg=null;
@@ -756,6 +808,7 @@ function showQ(){{
 }}
 function ans(idx,letter){{
   if(aLocked)return;aLocked=true;const q=questions[qI];const ok=(letter===q.answer);
+  try{{if(ok){{if(Math.random()<0.2){{SND.play('crit');}}else{{SND.play('hit');}}}}else{{SND.play('miss');}}}}catch(e){{}}
   document.querySelectorAll('.ch')[idx].classList.add(ok?'ok':'no');
   if(!ok){{const ci=['A','B','C','D'].indexOf(q.answer);if(ci>=0)document.querySelectorAll('.ch')[ci].classList.add('ok');}}
   setTimeout(()=>{{document.getElementById('questions').style.display='none';ok?onOk():onNo();qI++;if(STATE==='B')setTimeout(()=>{{if(STATE==='B')showMoves();}},1100);}},650);
@@ -787,12 +840,12 @@ function onNo(){{
 }}
 function evolve(idx){{
   STATE='EV';evolveT=0;P.evo=idx;ap(P.x,P.y,COL,60,8,10,60);ap(P.x,P.y,'#FFD700',30,6,7,48);
-  SND.evo();
+  try{{SND.play('evolve');}}catch(e){{}}
   setTimeout(()=>{{STATE='B';showMoves();}},1800);
 }}
 function win(){{
   STATE='WIN';document.getElementById('questions').style.display='none';
-  SND.victory();
+  try{{SND.play('victory');}}catch(e){{}}
   for(let i=0;i<8;i++)setTimeout(()=>ap(Math.random()*W,Math.random()*H,COL,20,5,8,50),i*100);
   const xp=50+P.evo*20+P.total*10,gold=20+P.evo*8+P.total*4;
   const res=document.getElementById('result');res.style.display='flex';
@@ -801,7 +854,7 @@ function win(){{
 }}
 function lose(){{
   STATE='LOSE';document.getElementById('questions').style.display='none';
-  SND.defeat();
+  try{{SND.play('defeat');}}catch(e){{}}
   ap(P.x,P.y,'#FF2222',50,6,8,60);
   const res=document.getElementById('result');res.style.display='flex';
   res.innerHTML=`<div style="font-size:50px;margin-bottom:10px">💀</div><div style="font-family:Orbitron,monospace;font-size:34px;color:#FF2222;letter-spacing:4px;margin-bottom:6px">DEFEATED</div><div style="color:#FF8888;font-family:'Space Mono',monospace;font-size:13px;margin-bottom:10px">${{CFG.lose_quote||'Train harder.'}}</div>`;
@@ -3179,13 +3232,15 @@ if st.session_state.get("battle_state") == "ready" or view == "battle":
         st.markdown(f"<p style='text-align:center;color:#aaa;font-family:Space Mono,monospace;font-size:12px'>Arena: <b>{cfg.get('arena_name','?')}</b> · Mode: <b style='color:{C}'>{cfg.get('mode','?')}</b></p>", unsafe_allow_html=True)
         st.markdown("<p style='text-align:center;color:#fff;font-size:13px;font-family:Space Mono,monospace'>Pick your subject — correct answers = power attacks. Wrong = enemy hits back.</p>", unsafe_allow_html=True)
 
-        # ── Custom Character Upload (optional, sits above subject picker) ──
+        # ── Character Display + Custom Image Upload (shown for ALL universes) ──
         _detected_char = detect_character(theme)
         if _detected_char:
             _char_info = CHARACTER_REGISTRY[_detected_char]
-            st.markdown(f"<div style='text-align:center;background:linear-gradient(90deg,{C}22,#0a0a1a,{C}22);border:2px solid {C};border-radius:12px;padding:12px 16px;margin:10px 0'><span style='font-family:Bebas Neue,sans-serif;font-size:17px;color:{C};letter-spacing:3px'>🥊 PLAYING AS: {_char_info['name'].upper()}</span><div style='font-family:Space Mono,monospace;font-size:10px;color:#888;margin-top:4px'>auto-detected from {_char_info['universe']} · you can override below</div></div>", unsafe_allow_html=True)
-        with st.expander("🎨 Use a custom character image instead (optional)", expanded=False):
-            st.markdown("<div style='font-family:Space Mono,monospace;font-size:11px;color:#aaa;margin-bottom:8px'>Paste an image URL or upload a file from your device. This will override the hardcoded character for this battle.</div>", unsafe_allow_html=True)
+            st.markdown(f"<div style='text-align:center;background:linear-gradient(90deg,{C}22,#0a0a1a,{C}22);border:2px solid {C};border-radius:12px;padding:12px 16px;margin:10px 0'><span style='font-family:Bebas Neue,sans-serif;font-size:17px;color:{C};letter-spacing:3px'>🥊 PLAYING AS: {_char_info['name'].upper()}</span><div style='font-family:Space Mono,monospace;font-size:10px;color:#888;margin-top:4px'>auto-detected from {_char_info['universe']} · override with your own image below</div></div>", unsafe_allow_html=True)
+        else:
+            st.markdown(f"<div style='text-align:center;background:#0a0a1a;border:1px dashed {C}66;border-radius:12px;padding:10px 16px;margin:10px 0'><span style='font-family:Space Mono,monospace;font-size:11px;color:#888'>Want a specific character? Upload an image below — your character, any universe.</span></div>", unsafe_allow_html=True)
+        with st.expander("🎨 Upload your own character image (any universe, any character)", expanded=False):
+            st.markdown("<div style='font-family:Space Mono,monospace;font-size:11px;color:#aaa;margin-bottom:8px'>Paste an image URL or upload a file. Your image becomes the fighter in this battle. Works for any universe — upload Zoro in a Germa suit, Goku in a Mario outfit, or anything else.</div>", unsafe_allow_html=True)
             _tab_url, _tab_file = st.tabs(["🌐 Paste URL", "📁 Upload File"])
             with _tab_url:
                 _img_url = st.text_input("Image URL (right-click image → 'Copy image address'):", key="char_upload_url", placeholder="https://example.com/zoro.png")
