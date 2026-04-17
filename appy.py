@@ -3008,8 +3008,12 @@ if view == "main":
                 st.rerun()
 
     else:
-        # ── TIMER IDLE — show controls ────────────────────────────────────
-        # ── TIMER IDLE — show controls ────────────────────────────────────
+        # ── TIMER IDLE — adaptive session picker ─────────────────────
+        _study_type_now = st.session_state.get("study_type", "climber") or "climber"
+        _type_labels = {"sprouter": "🐢 SPROUTER", "climber": "🎯 CLIMBER", "grinder": "🔥 GRINDER", "beast": "👑 BEAST"}
+        _type_label = _type_labels.get(_study_type_now, "🎯 CLIMBER")
+
+        # ── Quick timer (the 30-second hook — always visible) ──
         if st.session_state.get("custom_timer_unlocked", False):
             st.markdown(f"<div style='font-family:Space Mono,monospace;font-size:10px;color:#FFD700;text-align:center;margin-bottom:4px;letter-spacing:1px'>🔓 CUSTOM TIMER UNLOCKED</div>", unsafe_allow_html=True)
             _custom_val = st.number_input("Set your timer (seconds):", min_value=30, max_value=3600, value=timer, step=30, key="custom_timer_input")
@@ -3017,29 +3021,72 @@ if view == "main":
             timer = _custom_val
         else:
             st.markdown(f"<div style='text-align:center;font-family:Bebas Neue,sans-serif;font-size:14px;color:#555;letter-spacing:2px;margin-bottom:4px'>TIMER: {timer}s &nbsp;·&nbsp; min 30s &nbsp;·&nbsp; max 5min · Pass tribunal to unlock custom timer</div>", unsafe_allow_html=True)
+
         st.markdown('<div class="mission-timer-row">', unsafe_allow_html=True)
         col_m, col_s, col_p = st.columns([1, _cw, 1])
         with col_m:
             if st.button("－30s", key="timer_minus", use_container_width=True):
-                st.session_state.micro_timer_seconds = max(30, timer-30); st.rerun()
+                st.session_state.micro_timer_seconds = max(30, timer - 30); st.rerun()
         with col_s:
             if st.button(f"⚡ START {timer}s MISSION ⚡", key="start_mission", use_container_width=True):
                 st.session_state.needs_verification = True
-                st.session_state.pending_gold  = base
-                st.session_state.pending_xp    = st.session_state.get("pending_xp", 0) + int(base * 10)
+                st.session_state.pending_gold = base
+                st.session_state.pending_xp = st.session_state.get("pending_xp", 0) + int(base * 10)
                 st.session_state.tribunal_missions_since = st.session_state.get("tribunal_missions_since", 0) + 1
                 st.session_state.tribunal_seconds_done = st.session_state.get("tribunal_seconds_done", 0) + timer
-                # Set tribunal due time on very first mission only
                 if st.session_state.get("tribunal_seconds_done", 0) >= 240:
                     st.session_state.tribunal_due_time = _dt.datetime.now().isoformat()
-                st.session_state.timer_running  = True
-                st.session_state.timer_start    = _dt.datetime.now().isoformat()
+                st.session_state.timer_running = True
+                st.session_state.timer_start = _dt.datetime.now().isoformat()
                 st.session_state.timer_duration = timer
                 st.rerun()
         with col_p:
             if st.button("＋30s", key="timer_plus", use_container_width=True):
-                st.session_state.micro_timer_seconds = min(300, timer+30); st.rerun()
+                st.session_state.micro_timer_seconds = min(300, timer + 30); st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
+
+        # ── Longer sessions (expandable, adapts to study type) ──
+        _deep_rec = {"sprouter": "Sprint", "climber": "Focused", "grinder": "Deep Work", "beast": "Marathon"}.get(_study_type_now, "Focused")
+        with st.expander(f"🚀 GO DEEPER — Longer Sessions (Recommended: {_deep_rec})", expanded=False):
+            st.markdown(f"<div style='font-family:Space Mono,monospace;font-size:10px;color:#888;text-align:center;letter-spacing:2px;margin-bottom:8px'>YOUR TYPE: <b style='color:{C}'>{_type_label}</b> · ⭐ = BEST FOR YOU</div>", unsafe_allow_html=True)
+
+            _deep_options = [
+                {"label": "🎯 SPRINT", "time": 300, "display": "5 MIN", "desc": "Quick focused burst. Perfect for building habits.", "types": ["sprouter", "climber"]},
+                {"label": "🔥 FOCUSED", "time": 1500, "display": "25 MIN", "desc": "One full Pomodoro. Real deep study.", "types": ["climber", "grinder"]},
+                {"label": "💀 DEEP WORK", "time": 3600, "display": "60 MIN", "desc": "Full hour. Checkpoints at 30min. For serious grinders.", "types": ["grinder", "beast"]},
+                {"label": "👑 MARATHON", "time": 7200, "display": "2 HOURS", "desc": "The ultimate session. Checkpoints every 30-45min.", "types": ["beast"]},
+            ]
+
+            for _d_idx, _d_opt in enumerate(_deep_options):
+                _is_best = (_study_type_now in _d_opt["types"])
+                _star = "⭐ " if _is_best else ""
+                _border = C if _is_best else "#333"
+                _glow = f"box-shadow: 0 0 20px {C}44;" if _is_best else ""
+                _desc_color = "#fff" if _is_best else "#888"
+
+                st.markdown(f"""<div style='background:#0a0a1a;border:2px solid {_border};border-radius:12px;padding:12px 16px;margin:6px 0;{_glow}'>
+                    <div style='display:flex;justify-content:space-between;align-items:center'>
+                        <span style='font-family:Bebas Neue,sans-serif;font-size:18px;color:{C if _is_best else "#aaa"};letter-spacing:2px'>{_star}{_d_opt["label"]}</span>
+                        <span style='font-family:Space Mono,monospace;font-size:12px;color:{C if _is_best else "#666"}'>{_d_opt["display"]}</span>
+                    </div>
+                    <div style='font-family:Space Mono,monospace;font-size:11px;color:{_desc_color};margin-top:4px'>{_d_opt["desc"]}</div>
+                </div>""", unsafe_allow_html=True)
+
+                if st.button(f"START {_d_opt['display']} SESSION", key=f"deep_{_d_idx}", use_container_width=True):
+                    st.session_state.needs_verification = True
+                    st.session_state.pending_gold = base
+                    st.session_state.pending_xp = st.session_state.get("pending_xp", 0) + int(base * 10)
+                    st.session_state.tribunal_missions_since = st.session_state.get("tribunal_missions_since", 0) + 1
+                    st.session_state.tribunal_seconds_done = st.session_state.get("tribunal_seconds_done", 0) + _d_opt['time']
+                    if st.session_state.get("tribunal_seconds_done", 0) >= 240:
+                        st.session_state.tribunal_due_time = _dt.datetime.now().isoformat()
+                    st.session_state.timer_running = True
+                    st.session_state.timer_start = _dt.datetime.now().isoformat()
+                    st.session_state.timer_duration = _d_opt['time']
+                    st.session_state.micro_timer_seconds = _d_opt['time']
+                    st.rerun()
+
+            st.markdown(f"<div style='font-family:Space Mono,monospace;font-size:9px;color:#555;text-align:center;margin-top:8px'>Sessions 60min+ will have checkpoints where you submit progress · Re-take your Study Type quiz in settings anytime</div>", unsafe_allow_html=True)
 
 
 
