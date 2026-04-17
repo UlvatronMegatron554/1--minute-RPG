@@ -265,7 +265,20 @@ const SND={{ctx:null,
   victory(){{const b=this.theme.b;[1,1.25,1.5,2].forEach((m,i)=>setTimeout(()=>this.play(b*m,0.35,'sine',0.25),i*180));setTimeout(()=>{{[2,2.5,3,4].forEach((m,i)=>setTimeout(()=>this.play(b*m,0.2,'triangle',0.15),i*100))}},800)}},
   defeat(){{const b=this.theme.b;[1.5,1.2,1,0.8,0.6].forEach((m,i)=>setTimeout(()=>this.play(b*m,0.4,'sawtooth',0.12),i*220))}}
 }};
-// Path C: image portraits disabled — canvas art only.
+// Custom character images (user uploads — URL or base64 data URI). Higher priority than hardcoded characters.
+var customPlayerImg=null,customEnemyImg=null;
+if(CFG.custom_player_image){{
+  customPlayerImg=new Image();
+  customPlayerImg.crossOrigin='anonymous';
+  customPlayerImg.onerror=function(){{console.error('Custom player image failed to load');customPlayerImg=null;}};
+  customPlayerImg.src=CFG.custom_player_image;
+}}
+if(CFG.custom_enemy_image){{
+  customEnemyImg=new Image();
+  customEnemyImg.crossOrigin='anonymous';
+  customEnemyImg.onerror=function(){{console.error('Custom enemy image failed to load');customEnemyImg=null;}};
+  customEnemyImg.src=CFG.custom_enemy_image;
+}}
 function lh(hex,a){{const c=parseInt(hex.replace('#',''),16),r=Math.min(255,((c>>16)&255)+a*255),g=Math.min(255,((c>>8)&255)+a*255),b=Math.min(255,(c&255)+a*255);return '#'+[r,g,b].map(v=>Math.floor(v).toString(16).padStart(2,'0')).join('');}}
 function dk(hex,a){{const c=parseInt(hex.replace('#',''),16),r=Math.max(0,((c>>16)&255)-a*255),g=Math.max(0,((c>>8)&255)-a*255),b=Math.max(0,(c&255)-a*255);return '#'+[r,g,b].map(v=>Math.floor(v).toString(16).padStart(2,'0')).join('');}}
 function ap(x,y,col,n,spd,r,life){{for(let i=0;i<n;i++){{const a=Math.random()*6.28,s=spd*(0.4+Math.random()*0.8);parts.push({{x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,col,r:r*(0.5+Math.random()),life,ml:life}});}}}}
@@ -304,7 +317,22 @@ function drChar(x,y,col,evo,isEnemy,hit,shake){{try{{
   if(evo>0){{const ar=28+evo*11;const ag=ctx.createRadialGradient(0,0,4,0,0,ar);ag.addColorStop(0,col+'88');ag.addColorStop(1,'transparent');ctx.fillStyle=ag;ctx.beginPath();ctx.arc(0,0,ar,0,6.28);ctx.fill();}}
   ctx.scale(s,s);
   const vis=isEnemy?(CFG.enemy_visual||{{}}):(CFG.player_visual||{{}});
-  if(vis&&vis.hair_color){{drCustom(col,evo,t,vis);}}
+  var _rendered=false;
+  if(!isEnemy&&customPlayerImg&&customPlayerImg.complete&&customPlayerImg.naturalWidth>0){{
+    ctx.drawImage(customPlayerImg,-40,-70,80,120);
+    _rendered=true;
+  }} else if(isEnemy&&customEnemyImg&&customEnemyImg.complete&&customEnemyImg.naturalWidth>0){{
+    ctx.drawImage(customEnemyImg,-40,-70,80,120);
+    _rendered=true;
+  }}
+  if(!_rendered){{
+    var _cid=isEnemy?CFG.enemy_character_id:CFG.player_character_id;
+    if(_cid&&typeof drawHardcoded==='function'){{
+      drawHardcoded(_cid,evo,t,isEnemy);
+    }} else if(vis&&vis.hair_color){{
+      drCustom(col,evo,t,vis);
+    }}
+  }}
   else if(MODE==='FIGHTER')drFighter(col,evo,t,isEnemy);
   else if(MODE==='RPG')drRPG(col,evo,t);
   else if(MODE==='PLATFORM')drPlatform(col,evo);
@@ -517,6 +545,177 @@ function drDefault(col,evo,t){{
   const ec=evo>=3?'#FF4400':evo>=1?'#00FFFF':'#333';
   [[-8,-32,6,6],[8,-32,6,6]].forEach(([ex,ey,r1,r2])=>{{ctx.fillStyle='rgba(255,255,255,0.9)';ctx.beginPath();ctx.ellipse(ex*s,ey*s,r1*s,r2*s,0,0,6.28);ctx.fill();ctx.fillStyle=ec;ctx.beginPath();ctx.ellipse(ex*s,ey*s,r1*s*0.5,r2*s*0.5,0,0,6.28);ctx.fill();}});
 }}
+// ═══════════════════════════════════════════════════════════════════════════
+// HARDCODED CHARACTERS — Luffy, Zoro, Mario, Naruto, Sonic, Superman
+// ═══════════════════════════════════════════════════════════════════════════
+function drawHardcoded(id,evo,t,isEnemy){{
+  if(id==='luffy') drawLuffy(evo,t);
+  else if(id==='zoro') drawZoro(evo,t);
+  else if(id==='mario') drawMario(evo,t);
+  else if(id==='naruto') drawNaruto(evo,t);
+  else if(id==='sonic') drawSonic(evo,t);
+  else if(id==='superman') drawSuperman(evo,t);
+}}
+
+function drawLuffy(evo,t){{
+  if(evo>=1&&evo<3){{for(var i=0;i<10;i++){{var px=Math.sin(t*0.3+i)*30;var py=Math.cos(t*0.25+i)*22-8;ctx.fillStyle='rgba(255,80,80,'+(0.35-(i%4)*0.06)+')';ctx.beginPath();ctx.arc(px,py,4+(i%3),0,6.28);ctx.fill();}}}}
+  ctx.fillStyle='rgba(0,0,0,0.3)';ctx.beginPath();ctx.ellipse(0,48,22,5,0,0,6.28);ctx.fill();
+  ctx.fillStyle='#1e4fa8';ctx.beginPath();ctx.moveTo(-12,8);ctx.lineTo(-13,30);ctx.lineTo(-4,30);ctx.lineTo(-3,8);ctx.closePath();ctx.fill();ctx.beginPath();ctx.moveTo(3,8);ctx.lineTo(4,30);ctx.lineTo(13,30);ctx.lineTo(12,8);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#153d85';ctx.fillRect(-13,28,10,2);ctx.fillRect(3,28,10,2);
+  ctx.fillStyle='#FFCC88';ctx.fillRect(-10,30,7,14);ctx.fillRect(3,30,7,14);
+  ctx.fillStyle='#8B4513';ctx.fillRect(-12,44,11,5);ctx.fillRect(1,44,11,5);ctx.fillStyle='#5D3817';ctx.fillRect(-11,41,9,2);ctx.fillRect(2,41,9,2);
+  ctx.fillStyle='#FFCC88';ctx.fillRect(-14,-14,28,22);
+  ctx.strokeStyle='#8B3A3A';ctx.lineWidth=1.8;ctx.beginPath();ctx.moveTo(-5,-8);ctx.lineTo(5,-2);ctx.moveTo(5,-8);ctx.lineTo(-5,-2);ctx.stroke();
+  ctx.fillStyle=evo>=3?'#B0181C':'#DC2626';
+  ctx.beginPath();ctx.moveTo(-16,-14);ctx.lineTo(-18,10);ctx.lineTo(-10,10);ctx.lineTo(-7,-14);ctx.closePath();ctx.fill();
+  ctx.beginPath();ctx.moveTo(16,-14);ctx.lineTo(18,10);ctx.lineTo(10,10);ctx.lineTo(7,-14);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#FFD700';ctx.fillRect(-15,6,30,5);ctx.fillStyle='#E6B800';ctx.fillRect(-15,10,30,1);
+  ctx.fillStyle='#FFCC88';
+  ctx.beginPath();ctx.moveTo(-16,-12);ctx.lineTo(-28,-4);ctx.lineTo(-26,22);ctx.lineTo(-14,10);ctx.closePath();ctx.fill();
+  ctx.beginPath();ctx.moveTo(16,-12);ctx.lineTo(28,-4);ctx.lineTo(26,22);ctx.lineTo(14,10);ctx.closePath();ctx.fill();
+  ctx.beginPath();ctx.arc(-26,26,4.5,0,6.28);ctx.fill();ctx.beginPath();ctx.arc(26,26,4.5,0,6.28);ctx.fill();
+  if(evo>=3){{ctx.fillStyle='rgba(20,20,30,0.55)';ctx.beginPath();ctx.moveTo(-16,-12);ctx.lineTo(-28,-4);ctx.lineTo(-26,22);ctx.lineTo(-14,10);ctx.closePath();ctx.fill();ctx.beginPath();ctx.moveTo(16,-12);ctx.lineTo(28,-4);ctx.lineTo(26,22);ctx.lineTo(14,10);ctx.closePath();ctx.fill();ctx.fillStyle='#FFCC88';ctx.fillRect(-20,-18,40,30);ctx.fillStyle=evo>=3?'#B0181C':'#DC2626';ctx.fillRect(-20,-18,4,30);ctx.fillRect(16,-18,4,30);}}
+  ctx.fillStyle='#FFCC88';ctx.fillRect(-4,-20,8,7);
+  ctx.fillStyle='#FFCC88';ctx.beginPath();ctx.moveTo(-14,-32);ctx.quadraticCurveTo(-16,-45,0,-48);ctx.quadraticCurveTo(16,-45,14,-32);ctx.quadraticCurveTo(12,-18,0,-13);ctx.quadraticCurveTo(-12,-18,-14,-32);ctx.closePath();ctx.fill();
+  ctx.fillStyle=evo>=5?'#ffffff':'#0a0a0a';
+  ctx.beginPath();ctx.moveTo(-14,-40);ctx.lineTo(-10,-35);ctx.lineTo(-6,-38);ctx.lineTo(-2,-34);ctx.lineTo(2,-38);ctx.lineTo(6,-34);ctx.lineTo(10,-38);ctx.lineTo(14,-40);ctx.lineTo(12,-30);ctx.lineTo(-12,-30);ctx.closePath();ctx.fill();
+  ctx.fillRect(-14,-35,3,6);ctx.fillRect(11,-35,3,6);
+  ctx.fillStyle='#F5C97B';ctx.beginPath();ctx.ellipse(0,-47,23,4,0,0,6.28);ctx.fill();
+  ctx.fillStyle='#D9A85B';ctx.beginPath();ctx.ellipse(0,-46,23,1.5,0,0,6.28);ctx.fill();
+  ctx.fillStyle='#E6B86A';ctx.beginPath();ctx.ellipse(0,-52,13,8,0,0,6.28);ctx.fill();
+  ctx.fillStyle='#CC1122';ctx.fillRect(-13,-50,26,3.5);ctx.fillStyle='#8B0912';ctx.fillRect(-13,-47,26,0.8);
+  ctx.strokeStyle='#C99D54';ctx.lineWidth=0.5;for(var i=-18;i<19;i+=4){{ctx.beginPath();ctx.moveTo(i,-55);ctx.lineTo(i+1,-50);ctx.stroke();}}
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(-6,-30,3.5,5,0,0,6.28);ctx.fill();ctx.beginPath();ctx.ellipse(6,-30,3.5,5,0,0,6.28);ctx.fill();
+  ctx.fillStyle='#000';ctx.beginPath();ctx.ellipse(-6,-30,1.5,3,0,0,6.28);ctx.fill();ctx.beginPath();ctx.ellipse(6,-30,1.5,3,0,0,6.28);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-5,-31.5,1,0,6.28);ctx.fill();ctx.beginPath();ctx.arc(7,-31.5,1,0,6.28);ctx.fill();
+  ctx.strokeStyle='#8B3A3A';ctx.lineWidth=0.8;ctx.beginPath();ctx.moveTo(-8,-24);ctx.lineTo(-4,-24);ctx.stroke();ctx.beginPath();ctx.moveTo(-7,-25);ctx.lineTo(-7,-23);ctx.stroke();ctx.beginPath();ctx.moveTo(-5,-25);ctx.lineTo(-5,-23);ctx.stroke();
+  ctx.fillStyle='rgba(139,70,50,0.2)';ctx.beginPath();ctx.moveTo(0,-22);ctx.lineTo(-1,-19);ctx.lineTo(1,-19);ctx.closePath();ctx.fill();
+  ctx.strokeStyle='#000';ctx.lineWidth=1.3;ctx.beginPath();ctx.arc(0,-18,4,0.3,2.84);ctx.stroke();ctx.fillStyle='#fff';ctx.fillRect(-2.5,-16.5,5,1.5);
+  if(evo>=5){{ctx.fillStyle='rgba(255,255,255,0.35)';ctx.beginPath();ctx.arc(0,-15,45,0,6.28);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;for(var i=0;i<4;i++){{var a=t*0.3+i*1.57;ctx.beginPath();ctx.moveTo(Math.cos(a)*30,Math.sin(a)*30-15);ctx.lineTo(Math.cos(a)*45+5,Math.sin(a)*45-15);ctx.stroke();}}}}
+}}
+
+function drawZoro(evo,t){{
+  if(evo>=3){{ctx.fillStyle='rgba(100,0,100,'+(0.2+Math.sin(t*0.3)*0.08)+')';ctx.beginPath();ctx.arc(0,-15,50,0,6.28);ctx.fill();}}
+  if(evo>=4){{for(var i=0;i<8;i++){{var a=t*0.15+i*0.785;var r=48+Math.sin(t*0.4+i)*6;ctx.fillStyle='rgba(200,0,50,0.5)';ctx.beginPath();ctx.arc(Math.cos(a)*r,Math.sin(a)*r-12,3,0,6.28);ctx.fill();}}}}
+  ctx.fillStyle='rgba(0,0,0,0.3)';ctx.beginPath();ctx.ellipse(0,48,24,5,0,0,6.28);ctx.fill();
+  ctx.fillStyle='#0a0a0a';ctx.beginPath();ctx.moveTo(-13,8);ctx.lineTo(-14,42);ctx.lineTo(-5,42);ctx.lineTo(-3,8);ctx.closePath();ctx.fill();ctx.beginPath();ctx.moveTo(3,8);ctx.lineTo(5,42);ctx.lineTo(14,42);ctx.lineTo(13,8);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#000';ctx.fillRect(-17,42,13,8);ctx.fillRect(4,42,13,8);ctx.fillStyle='#2a2a2a';ctx.fillRect(-17,42,13,1.5);ctx.fillRect(4,42,13,1.5);
+  ctx.fillStyle='#F5F5DC';ctx.beginPath();ctx.moveTo(-19,-12);ctx.lineTo(-21,12);ctx.lineTo(-12,10);ctx.lineTo(-8,-12);ctx.closePath();ctx.fill();ctx.beginPath();ctx.moveTo(19,-12);ctx.lineTo(21,12);ctx.lineTo(12,10);ctx.lineTo(8,-12);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#FFD700';ctx.fillRect(-21,10,9,1.5);ctx.fillRect(12,10,9,1.5);
+  ctx.fillStyle='#FFCC88';ctx.fillRect(-10,-12,20,18);ctx.fillStyle='#E6A572';ctx.beginPath();ctx.ellipse(-5,-4,4,6,0,0,6.28);ctx.fill();ctx.beginPath();ctx.ellipse(5,-4,4,6,0,0,6.28);ctx.fill();
+  ctx.fillStyle='#2D8B2D';ctx.fillRect(-13,4,26,10);ctx.fillStyle='#1F6B1F';ctx.fillRect(-13,13,26,1.5);ctx.fillRect(8,6,4,6);
+  ctx.fillStyle='#FFCC88';ctx.beginPath();ctx.moveTo(-18,-10);ctx.lineTo(-32,-4);ctx.lineTo(-30,22);ctx.lineTo(-16,10);ctx.closePath();ctx.fill();ctx.beginPath();ctx.moveTo(18,-10);ctx.lineTo(32,-4);ctx.lineTo(30,22);ctx.lineTo(16,10);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#E6A572';ctx.beginPath();ctx.ellipse(-24,-1,3,5,0,0,6.28);ctx.fill();ctx.beginPath();ctx.ellipse(24,-1,3,5,0,0,6.28);ctx.fill();
+  ctx.fillStyle='#FFCC88';ctx.beginPath();ctx.arc(-30,26,4.5,0,6.28);ctx.fill();ctx.beginPath();ctx.arc(30,26,4.5,0,6.28);ctx.fill();
+  if(evo<1){{ctx.fillStyle='#000';ctx.fillRect(-28,6,10,4);ctx.beginPath();ctx.moveTo(-26,10);ctx.lineTo(-32,18);ctx.lineTo(-28,19);ctx.closePath();ctx.fill();}}
+  ctx.fillStyle='#FFCC88';ctx.fillRect(-5,-20,10,8);
+  ctx.fillStyle='#FFCC88';ctx.beginPath();ctx.moveTo(-14,-32);ctx.quadraticCurveTo(-16,-46,0,-49);ctx.quadraticCurveTo(16,-46,14,-32);ctx.quadraticCurveTo(12,-18,0,-13);ctx.quadraticCurveTo(-12,-18,-14,-32);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#3D8B37';ctx.beginPath();ctx.moveTo(-15,-38);ctx.quadraticCurveTo(-10,-48,-2,-49);ctx.quadraticCurveTo(10,-48,15,-38);ctx.lineTo(15,-32);ctx.lineTo(-15,-32);ctx.closePath();ctx.fill();
+  for(var i=0;i<4;i++){{var hx=-9+i*6;ctx.beginPath();ctx.moveTo(hx-2,-48);ctx.lineTo(hx,-53);ctx.lineTo(hx+2,-48);ctx.closePath();ctx.fill();}}
+  ctx.fillRect(-15,-32,3,6);ctx.fillRect(12,-32,3,6);
+  if(evo>=1){{ctx.fillStyle='#000';ctx.fillRect(-16,-45,32,5);ctx.beginPath();ctx.moveTo(14,-42);ctx.lineTo(22,-30);ctx.lineTo(18,-28);ctx.lineTo(12,-42);ctx.closePath();ctx.fill();}}
+  ctx.fillStyle='#FFD700';ctx.beginPath();ctx.arc(-14,-28,1.2,0,6.28);ctx.fill();ctx.beginPath();ctx.arc(-14,-25,1.2,0,6.28);ctx.fill();ctx.beginPath();ctx.arc(-14,-22,1.2,0,6.28);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(-6,-30,3.5,4.5,0,0,6.28);ctx.fill();ctx.beginPath();ctx.ellipse(6,-30,3.5,4.5,0,0,6.28);ctx.fill();
+  ctx.fillStyle='#333';ctx.beginPath();ctx.ellipse(-6,-30,1.5,3,0,0,6.28);ctx.fill();ctx.beginPath();ctx.ellipse(6,-30,1.5,3,0,0,6.28);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-5,-31,0.8,0,6.28);ctx.fill();ctx.beginPath();ctx.arc(7,-31,0.8,0,6.28);ctx.fill();
+  ctx.strokeStyle='#8B3A3A';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(-11,-36);ctx.lineTo(-3,-26);ctx.stroke();
+  ctx.strokeStyle='#2a5a24';ctx.lineWidth=1.8;ctx.beginPath();ctx.moveTo(-10,-38);ctx.lineTo(-3,-37);ctx.stroke();ctx.beginPath();ctx.moveTo(10,-38);ctx.lineTo(3,-37);ctx.stroke();
+  ctx.fillStyle='rgba(139,70,50,0.2)';ctx.beginPath();ctx.moveTo(0,-22);ctx.lineTo(-1,-19);ctx.lineTo(1,-19);ctx.closePath();ctx.fill();
+  ctx.strokeStyle='#000';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(-3,-17);ctx.lineTo(3,-17);ctx.stroke();
+  if(evo<1){{ctx.fillStyle='#CC1122';ctx.fillRect(-32,4,4,8);ctx.fillStyle='#C0C0C0';ctx.fillRect(-36,12,3,22);}}
+  else if(evo===1||evo===2){{ctx.fillStyle='#C0C0C0';ctx.fillRect(-36,-6,3,32);ctx.fillRect(33,-6,3,32);ctx.fillStyle='#CC1122';ctx.fillRect(-38,-8,7,3);ctx.fillStyle='#FFD700';ctx.fillRect(31,-8,7,3);if(evo>=2){{ctx.save();ctx.rotate(-0.28);ctx.fillStyle='#C0C0C0';ctx.fillRect(-1,-(34+evo*2),3,26);ctx.fillStyle='#fff';ctx.fillRect(-4,-(34+evo*2),7,3);ctx.restore();}}}}
+  else{{ctx.fillStyle='#C0C0C0';ctx.fillRect(-36,-6,3,30);ctx.fillRect(33,-6,3,30);ctx.fillRect(-30,-10,3,24);ctx.fillRect(27,-10,3,24);ctx.fillRect(-25,-14,3,20);ctx.fillRect(22,-14,3,20);ctx.save();ctx.rotate(-0.28);ctx.fillStyle='#C0C0C0';ctx.fillRect(-1,-38,3,26);ctx.fillStyle='#fff';ctx.fillRect(-4,-38,7,3);ctx.restore();}}
+}}
+
+function drawMario(evo,t){{
+  if(evo>=5){{var aC=['#FF0000','#FFFF00','#00FF00','#00FFFF','#FF00FF','#FFFFFF','#FF8800','#88FF88'];for(var i=0;i<8;i++){{ctx.fillStyle=aC[(i+Math.floor(t*2))%8]+'66';ctx.beginPath();ctx.arc(0,-15,50-i*2,0,6.28);ctx.fill();}}}}
+  ctx.fillStyle='rgba(0,0,0,0.3)';ctx.beginPath();ctx.ellipse(0,48,22,4,0,0,6.28);ctx.fill();
+  ctx.fillStyle=evo>=4?'#888':'#1B3DA4';ctx.beginPath();ctx.moveTo(-14,6);ctx.lineTo(-16,40);ctx.lineTo(-3,40);ctx.lineTo(-2,6);ctx.closePath();ctx.fill();ctx.beginPath();ctx.moveTo(2,6);ctx.lineTo(3,40);ctx.lineTo(16,40);ctx.lineTo(14,6);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#5D3817';ctx.fillRect(-18,38,14,10);ctx.fillRect(4,38,14,10);ctx.fillStyle='#8B4513';ctx.fillRect(-18,38,14,1.5);ctx.fillRect(4,38,14,1.5);
+  ctx.fillStyle=(evo===1)?'#FFFFFF':(evo>=4?'#888':'#E41E26');ctx.fillRect(-16,-14,32,22);
+  ctx.fillStyle=evo>=4?'#888':'#1B3DA4';ctx.fillRect(-10,-6,20,14);ctx.fillRect(-10,-14,4,8);ctx.fillRect(6,-14,4,8);
+  ctx.fillStyle='#FFD700';ctx.beginPath();ctx.arc(-7,0,2.5,0,6.28);ctx.fill();ctx.beginPath();ctx.arc(7,0,2.5,0,6.28);ctx.fill();ctx.fillStyle='#8B7500';ctx.beginPath();ctx.arc(-7,0,1,0,6.28);ctx.fill();ctx.beginPath();ctx.arc(7,0,1,0,6.28);ctx.fill();
+  ctx.fillStyle=(evo===1)?'#fff':(evo>=4?'#888':'#E41E26');ctx.beginPath();ctx.moveTo(-16,-12);ctx.lineTo(-28,-6);ctx.lineTo(-26,14);ctx.lineTo(-16,10);ctx.closePath();ctx.fill();ctx.beginPath();ctx.moveTo(16,-12);ctx.lineTo(28,-6);ctx.lineTo(26,14);ctx.lineTo(16,10);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-26,18,5,0,6.28);ctx.fill();ctx.beginPath();ctx.arc(26,18,5,0,6.28);ctx.fill();ctx.strokeStyle='#ccc';ctx.lineWidth=0.6;ctx.beginPath();ctx.arc(-26,18,5,0,6.28);ctx.stroke();ctx.beginPath();ctx.arc(26,18,5,0,6.28);ctx.stroke();
+  ctx.fillStyle='#FFCC88';ctx.fillRect(-4,-20,8,7);
+  ctx.fillStyle='#FFCC88';ctx.beginPath();ctx.ellipse(0,-30,16,17,0,0,6.28);ctx.fill();ctx.beginPath();ctx.ellipse(-16,-30,3,4.5,0,0,6.28);ctx.fill();ctx.beginPath();ctx.ellipse(16,-30,3,4.5,0,0,6.28);ctx.fill();
+  ctx.fillStyle='#3E2010';ctx.beginPath();ctx.moveTo(-8,-22);ctx.quadraticCurveTo(-10,-19,-7,-17);ctx.lineTo(-4,-19);ctx.quadraticCurveTo(0,-20,4,-19);ctx.lineTo(7,-17);ctx.quadraticCurveTo(10,-19,8,-22);ctx.lineTo(0,-23);ctx.closePath();ctx.fill();ctx.strokeStyle='#2a1508';ctx.lineWidth=0.5;for(var i=0;i<4;i++){{ctx.beginPath();ctx.moveTo(-7+i*3.5,-22);ctx.lineTo(-7+i*3.5,-18);ctx.stroke();}}
+  ctx.fillStyle='#E8A882';ctx.beginPath();ctx.arc(0,-25,3.5,0,6.28);ctx.fill();ctx.fillStyle='#D18862';ctx.beginPath();ctx.arc(0.5,-24,1.2,0,6.28);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(-6,-32,2.5,3,0,0,6.28);ctx.fill();ctx.beginPath();ctx.ellipse(6,-32,2.5,3,0,0,6.28);ctx.fill();ctx.fillStyle='#1B4DA8';ctx.beginPath();ctx.arc(-6,-32,1.8,0,6.28);ctx.fill();ctx.beginPath();ctx.arc(6,-32,1.8,0,6.28);ctx.fill();ctx.fillStyle='#000';ctx.beginPath();ctx.arc(-6,-32,0.8,0,6.28);ctx.fill();ctx.beginPath();ctx.arc(6,-32,0.8,0,6.28);ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-5,-33,0.6,0,6.28);ctx.fill();ctx.beginPath();ctx.arc(7,-33,0.6,0,6.28);ctx.fill();
+  ctx.strokeStyle='#000';ctx.lineWidth=0.8;ctx.beginPath();ctx.arc(0,-16,3,0.4,2.74);ctx.stroke();
+  ctx.fillStyle=(evo===1)?'#fff':(evo>=4?'#888':'#E41E26');ctx.beginPath();ctx.ellipse(0,-44,16,8,0,0,6.28);ctx.fill();ctx.fillRect(-16,-44,32,6);ctx.fillStyle=(evo===1)?'#ddd':(evo>=4?'#666':'#B01820');ctx.fillRect(-12,-38,24,2.5);
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(0,-45,5,0,6.28);ctx.fill();ctx.fillStyle=evo>=4?'#666':'#E41E26';ctx.font='bold 7px monospace';ctx.textAlign='center';ctx.fillText('M',0,-43);ctx.textAlign='left';
+  if(evo===2){{ctx.fillStyle='#FFD700';ctx.beginPath();ctx.moveTo(-16,-10);ctx.lineTo(-24,36);ctx.lineTo(24,36);ctx.lineTo(16,-10);ctx.closePath();ctx.fill();ctx.fillStyle='#B09000';ctx.fillRect(-16,-10,32,3);}}
+  if(evo===3){{ctx.fillStyle='#6B4423';ctx.beginPath();ctx.ellipse(-20,25,6,12,0.5,0,6.28);ctx.fill();ctx.fillStyle='#3E2010';ctx.fillRect(-23,28,6,1.5);ctx.fillRect(-23,33,6,1.5);ctx.fillStyle='#6B4423';ctx.beginPath();ctx.arc(-12,-48,3,0,6.28);ctx.fill();ctx.beginPath();ctx.arc(12,-48,3,0,6.28);ctx.fill();}}
+}}
+
+function drawNaruto(evo,t){{
+  if(evo===2){{for(var i=0;i<12;i++){{var a=t*0.3+i*0.523;var r=35+Math.sin(t*0.5+i)*5;ctx.fillStyle='rgba(255,140,0,'+(0.5-(i%4)*0.08)+')';ctx.beginPath();ctx.arc(Math.cos(a)*r,Math.sin(a)*r-15,4+i%3,0,6.28);ctx.fill();}}}}
+  if(evo>=4){{ctx.fillStyle='rgba(255,215,0,0.3)';ctx.beginPath();ctx.arc(0,-15,55,0,6.28);ctx.fill();for(var i=0;i<6;i++){{var a=t*0.1+i*1.047;ctx.fillStyle='rgba(50,50,50,0.9)';ctx.beginPath();ctx.arc(Math.cos(a)*35,Math.sin(a)*20-30,3,0,6.28);ctx.fill();}}}}
+  ctx.fillStyle='rgba(0,0,0,0.3)';ctx.beginPath();ctx.ellipse(0,48,20,4,0,0,6.28);ctx.fill();
+  ctx.fillStyle=evo>=4?'#FFD700':'#E67E00';ctx.beginPath();ctx.moveTo(-12,8);ctx.lineTo(-14,40);ctx.lineTo(-4,40);ctx.lineTo(-3,8);ctx.closePath();ctx.fill();ctx.beginPath();ctx.moveTo(3,8);ctx.lineTo(4,40);ctx.lineTo(14,40);ctx.lineTo(12,8);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#1B3DA4';ctx.fillRect(-16,40,12,8);ctx.fillRect(4,40,12,8);
+  ctx.fillStyle=evo>=4?'#FFD700':'#E67E00';ctx.fillRect(-17,-14,34,24);ctx.fillStyle=evo>=4?'#FFB800':'#1B3DA4';ctx.fillRect(-17,-14,34,6);
+  ctx.fillStyle='#B34F00';ctx.beginPath();ctx.arc(0,-2,3,0,6.28);ctx.fill();ctx.fillStyle=evo>=4?'#FFD700':'#E67E00';ctx.beginPath();ctx.arc(0,-2,2,0,6.28);ctx.fill();
+  ctx.fillStyle=evo>=4?'#FFD700':'#E67E00';ctx.beginPath();ctx.moveTo(-17,-12);ctx.lineTo(-30,-6);ctx.lineTo(-28,12);ctx.lineTo(-17,10);ctx.closePath();ctx.fill();ctx.beginPath();ctx.moveTo(17,-12);ctx.lineTo(30,-6);ctx.lineTo(28,12);ctx.lineTo(17,10);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#FFCC88';ctx.beginPath();ctx.moveTo(-28,12);ctx.lineTo(-31,22);ctx.lineTo(-22,22);ctx.lineTo(-17,12);ctx.closePath();ctx.fill();ctx.beginPath();ctx.moveTo(28,12);ctx.lineTo(31,22);ctx.lineTo(22,22);ctx.lineTo(17,12);ctx.closePath();ctx.fill();ctx.beginPath();ctx.arc(-26,26,4,0,6.28);ctx.fill();ctx.beginPath();ctx.arc(26,26,4,0,6.28);ctx.fill();
+  if(evo===2){{ctx.fillStyle='rgba(255,140,0,0.5)';ctx.fillRect(-17,-14,34,24);ctx.fillStyle='rgba(255,80,0,0.7)';for(var i=0;i<5;i++){{ctx.beginPath();ctx.moveTo(-17+i*8,-16);ctx.lineTo(-13+i*8,-22-Math.sin(t+i)*4);ctx.lineTo(-10+i*8,-16);ctx.fill();}}}}
+  ctx.fillStyle='#FFCC88';ctx.fillRect(-4,-20,8,7);
+  ctx.fillStyle='#FFCC88';ctx.beginPath();ctx.moveTo(-14,-32);ctx.quadraticCurveTo(-16,-45,0,-48);ctx.quadraticCurveTo(16,-45,14,-32);ctx.quadraticCurveTo(12,-18,0,-13);ctx.quadraticCurveTo(-12,-18,-14,-32);ctx.closePath();ctx.fill();
+  ctx.fillStyle=evo>=4?'#FFFFFF':'#FFDD33';ctx.fillRect(-16,-43,32,6);for(var i=0;i<7;i++){{var hx=-15+i*5;var sh=14+(i%2)*6+Math.min(evo,4)*2;ctx.beginPath();ctx.moveTo(hx-3,-43);ctx.lineTo(hx,-43-sh);ctx.lineTo(hx+3,-43);ctx.closePath();ctx.fill();}}ctx.fillRect(-16,-37,3,8);ctx.fillRect(13,-37,3,8);
+  ctx.fillStyle='#1B3DA4';ctx.fillRect(-16,-37,32,6);ctx.fillStyle='#C0C0C0';ctx.fillRect(-10,-36,20,4);ctx.fillStyle='#1B3DA4';ctx.beginPath();ctx.arc(0,-34,1.5,0,6.28);ctx.fill();ctx.beginPath();ctx.moveTo(0,-32);ctx.lineTo(-3,-34);ctx.lineTo(0,-35);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(-6,-28,3.5,5,0,0,6.28);ctx.fill();ctx.beginPath();ctx.ellipse(6,-28,3.5,5,0,0,6.28);ctx.fill();
+  ctx.fillStyle=(evo===1)?'#FF9900':'#3D8BEB';ctx.beginPath();ctx.ellipse(-6,-28,2.5,4,0,0,6.28);ctx.fill();ctx.beginPath();ctx.ellipse(6,-28,2.5,4,0,0,6.28);ctx.fill();
+  ctx.fillStyle='#000';if(evo===1){{ctx.beginPath();ctx.ellipse(-6,-28,0.8,3,0,0,6.28);ctx.fill();ctx.beginPath();ctx.ellipse(6,-28,0.8,3,0,0,6.28);ctx.fill();}}else{{ctx.beginPath();ctx.ellipse(-6,-28,1.3,2.8,0,0,6.28);ctx.fill();ctx.beginPath();ctx.ellipse(6,-28,1.3,2.8,0,0,6.28);ctx.fill();}}
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-5,-29,0.9,0,6.28);ctx.fill();ctx.beginPath();ctx.arc(7,-29,0.9,0,6.28);ctx.fill();
+  if(evo===1){{ctx.fillStyle='rgba(255,140,0,0.6)';ctx.beginPath();ctx.ellipse(-6,-25,4,1.5,0,0,6.28);ctx.fill();ctx.beginPath();ctx.ellipse(6,-25,4,1.5,0,0,6.28);ctx.fill();}}
+  ctx.strokeStyle='#2a5a8a';ctx.lineWidth=0.8;for(var i=0;i<3;i++){{ctx.beginPath();ctx.moveTo(-12,-25+i*3);ctx.lineTo(-5,-25+i*3);ctx.stroke();ctx.beginPath();ctx.moveTo(5,-25+i*3);ctx.lineTo(12,-25+i*3);ctx.stroke();}}
+  ctx.fillStyle='rgba(139,70,50,0.2)';ctx.beginPath();ctx.moveTo(0,-22);ctx.lineTo(-1,-19);ctx.lineTo(1,-19);ctx.closePath();ctx.fill();
+  ctx.strokeStyle='#000';ctx.lineWidth=1.3;ctx.beginPath();ctx.arc(0,-18,3.5,0.3,2.84);ctx.stroke();
+  if(evo>=3){{ctx.fillStyle='rgba(100,200,255,0.7)';ctx.beginPath();ctx.arc(30,26,8,0,6.28);ctx.fill();ctx.fillStyle='rgba(200,230,255,0.9)';ctx.beginPath();ctx.arc(30,26,5,0,6.28);ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(30,26,2.5,0,6.28);ctx.fill();}}
+}}
+
+function drawSonic(evo,t){{
+  if(evo===2){{ctx.fillStyle='rgba(255,240,0,0.4)';ctx.beginPath();ctx.arc(0,-15,45,0,6.28);ctx.fill();}}
+  if(evo===3){{var hc=['#FF0000','#FFFF00','#00FF00','#00FFFF','#FF00FF'];for(var i=0;i<5;i++){{ctx.fillStyle=hc[i]+'44';ctx.beginPath();ctx.arc(0,-15,40+i*3,0,6.28);ctx.fill();}}}}
+  if(evo===1){{ctx.strokeStyle='rgba(200,200,255,0.4)';ctx.lineWidth=2;for(var i=0;i<6;i++){{var yy=-10+i*8;ctx.beginPath();ctx.moveTo(-40,yy);ctx.lineTo(-25-i*2,yy);ctx.stroke();}}}}
+  ctx.fillStyle='rgba(0,0,0,0.3)';ctx.beginPath();ctx.ellipse(0,48,20,4,0,0,6.28);ctx.fill();
+  ctx.fillStyle=evo===4?'#440066':'#DC2626';ctx.fillRect(-14,36,12,12);ctx.fillRect(2,36,12,12);ctx.fillStyle='#fff';ctx.fillRect(-14,42,12,2.5);ctx.fillRect(2,42,12,2.5);ctx.fillStyle='#FFD700';ctx.fillRect(-9,40,3,2);ctx.fillRect(7,40,3,2);
+  ctx.fillStyle=evo===2?'#F5D73A':(evo===3?'#88DDDD':(evo===4?'#4A1A66':'#1A6FCE'));ctx.beginPath();ctx.moveTo(-12,8);ctx.lineTo(-13,36);ctx.lineTo(-3,36);ctx.lineTo(-2,8);ctx.closePath();ctx.fill();ctx.beginPath();ctx.moveTo(2,8);ctx.lineTo(3,36);ctx.lineTo(13,36);ctx.lineTo(12,8);ctx.closePath();ctx.fill();
+  ctx.fillStyle=evo===4?'#6A3A88':'#F5D8A8';ctx.beginPath();ctx.ellipse(0,2,11,12,0,0,6.28);ctx.fill();
+  ctx.fillStyle=evo===2?'#F5D73A':(evo===3?'#88DDDD':(evo===4?'#4A1A66':'#1A6FCE'));ctx.beginPath();ctx.moveTo(-16,-14);ctx.lineTo(-16,10);ctx.lineTo(-8,10);ctx.lineTo(-8,-14);ctx.closePath();ctx.fill();ctx.beginPath();ctx.moveTo(16,-14);ctx.lineTo(16,10);ctx.lineTo(8,10);ctx.lineTo(8,-14);ctx.closePath();ctx.fill();
+  ctx.beginPath();ctx.moveTo(-16,-10);ctx.lineTo(-26,0);ctx.lineTo(-24,16);ctx.lineTo(-14,6);ctx.closePath();ctx.fill();ctx.beginPath();ctx.moveTo(16,-10);ctx.lineTo(26,0);ctx.lineTo(24,16);ctx.lineTo(14,6);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-24,20,5,0,6.28);ctx.fill();ctx.beginPath();ctx.arc(24,20,5,0,6.28);ctx.fill();ctx.fillStyle='#FFD700';ctx.fillRect(-27,16,6,2);ctx.fillRect(21,16,6,2);
+  ctx.fillStyle=evo===2?'#F5D73A':(evo===3?'#88DDDD':(evo===4?'#4A1A66':'#1A6FCE'));ctx.beginPath();ctx.ellipse(0,-28,16,15,0,0,6.28);ctx.fill();
+  ctx.fillStyle='#F5D8A8';ctx.beginPath();ctx.ellipse(0,-20,10,7,0,0,6.28);ctx.fill();
+  ctx.fillStyle=evo===2?'#F5D73A':(evo===3?'#88DDDD':(evo===4?'#4A1A66':'#1A6FCE'));
+  ctx.beginPath();ctx.moveTo(-8,-38);ctx.lineTo(-22,-42);ctx.lineTo(-14,-30);ctx.closePath();ctx.fill();ctx.beginPath();ctx.moveTo(-10,-32);ctx.lineTo(-26,-32);ctx.lineTo(-14,-24);ctx.closePath();ctx.fill();ctx.beginPath();ctx.moveTo(-8,-24);ctx.lineTo(-22,-22);ctx.lineTo(-12,-20);ctx.closePath();ctx.fill();ctx.beginPath();ctx.moveTo(-4,-40);ctx.lineTo(-8,-46);ctx.lineTo(2,-42);ctx.closePath();ctx.fill();ctx.beginPath();ctx.moveTo(4,-42);ctx.lineTo(10,-44);ctx.lineTo(6,-36);ctx.closePath();ctx.fill();
+  ctx.beginPath();ctx.moveTo(-12,-40);ctx.lineTo(-8,-48);ctx.lineTo(-4,-40);ctx.closePath();ctx.fill();ctx.beginPath();ctx.moveTo(4,-40);ctx.lineTo(8,-48);ctx.lineTo(12,-40);ctx.closePath();ctx.fill();ctx.fillStyle='#E68AC2';ctx.beginPath();ctx.moveTo(-10,-42);ctx.lineTo(-8,-46);ctx.lineTo(-6,-42);ctx.closePath();ctx.fill();ctx.beginPath();ctx.moveTo(6,-42);ctx.lineTo(8,-46);ctx.lineTo(10,-42);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(-3,-28,5,8,0,0,6.28);ctx.fill();ctx.beginPath();ctx.ellipse(3,-28,5,8,0,0,6.28);ctx.fill();ctx.fillStyle=evo===2?'#FF0000':'#00A050';ctx.beginPath();ctx.ellipse(-3,-28,2.5,4,0,0,6.28);ctx.fill();ctx.beginPath();ctx.ellipse(3,-28,2.5,4,0,0,6.28);ctx.fill();ctx.fillStyle='#000';ctx.beginPath();ctx.ellipse(-3,-28,1,2.5,0,0,6.28);ctx.fill();ctx.beginPath();ctx.ellipse(3,-28,1,2.5,0,0,6.28);ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-2,-30,0.8,0,6.28);ctx.fill();ctx.beginPath();ctx.arc(4,-30,0.8,0,6.28);ctx.fill();
+  ctx.fillStyle='#000';ctx.beginPath();ctx.moveTo(0,-18);ctx.lineTo(-2.5,-14);ctx.lineTo(2.5,-14);ctx.closePath();ctx.fill();ctx.strokeStyle='#000';ctx.lineWidth=1.2;ctx.beginPath();ctx.arc(0,-14,4,0.3,2.84);ctx.stroke();ctx.fillStyle='#fff';ctx.fillRect(-2,-12,4,1.2);
+}}
+
+function drawSuperman(evo,t){{
+  if(evo>=4){{for(var i=0;i<8;i++){{ctx.fillStyle='rgba(255,215,0,'+(0.35-i*0.04)+')';ctx.beginPath();ctx.arc(0,-15,55-i*4,0,6.28);ctx.fill();}}}}
+  if(evo===2){{ctx.strokeStyle='rgba(255,40,40,0.85)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-6,-30);ctx.lineTo(-35,-32);ctx.stroke();ctx.beginPath();ctx.moveTo(6,-30);ctx.lineTo(35,-32);ctx.stroke();ctx.fillStyle='rgba(255,80,0,0.5)';ctx.beginPath();ctx.arc(-6,-30,3,0,6.28);ctx.fill();ctx.beginPath();ctx.arc(6,-30,3,0,6.28);ctx.fill();}}
+  ctx.fillStyle='rgba(0,0,0,0.3)';ctx.beginPath();ctx.ellipse(0,48,24,5,0,0,6.28);ctx.fill();
+  ctx.fillStyle='#CC0000';ctx.beginPath();ctx.moveTo(-18,-14);ctx.lineTo(-28,35);ctx.lineTo(28,35);ctx.lineTo(18,-14);ctx.closePath();ctx.fill();ctx.fillStyle='rgba(100,0,0,0.4)';ctx.beginPath();ctx.moveTo(-10,-12);ctx.lineTo(-18,35);ctx.lineTo(-2,35);ctx.lineTo(-6,-12);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#1A4FB8';ctx.beginPath();ctx.moveTo(-13,8);ctx.lineTo(-15,42);ctx.lineTo(-5,42);ctx.lineTo(-3,8);ctx.closePath();ctx.fill();ctx.beginPath();ctx.moveTo(3,8);ctx.lineTo(5,42);ctx.lineTo(15,42);ctx.lineTo(13,8);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#CC0000';ctx.fillRect(-15,4,30,10);ctx.fillStyle='#FFD700';ctx.fillRect(-15,13,30,3);ctx.fillStyle='#B89500';ctx.fillRect(-15,16,30,0.8);
+  ctx.fillStyle='#CC0000';ctx.fillRect(-17,38,13,10);ctx.fillRect(4,38,13,10);ctx.fillStyle='#880000';ctx.fillRect(-17,38,13,1.5);ctx.fillRect(4,38,13,1.5);
+  ctx.fillStyle='#1A4FB8';ctx.fillRect(-18,-14,36,22);ctx.fillStyle='#143D94';ctx.beginPath();ctx.ellipse(-8,-4,5,8,0,0,6.28);ctx.fill();ctx.beginPath();ctx.ellipse(8,-4,5,8,0,0,6.28);ctx.fill();ctx.fillRect(-0.5,2,1,10);
+  ctx.fillStyle='#FFD700';ctx.beginPath();ctx.moveTo(0,-14);ctx.lineTo(-8,-10);ctx.lineTo(-6,2);ctx.lineTo(0,6);ctx.lineTo(6,2);ctx.lineTo(8,-10);ctx.closePath();ctx.fill();ctx.fillStyle='#CC0000';ctx.font='bold 11px serif';ctx.textAlign='center';ctx.fillText('S',0,0);ctx.textAlign='left';
+  ctx.fillStyle='#1A4FB8';ctx.beginPath();ctx.moveTo(-18,-12);ctx.lineTo(-32,-4);ctx.lineTo(-30,18);ctx.lineTo(-18,10);ctx.closePath();ctx.fill();ctx.beginPath();ctx.moveTo(18,-12);ctx.lineTo(32,-4);ctx.lineTo(30,18);ctx.lineTo(18,10);ctx.closePath();ctx.fill();ctx.fillStyle='#143D94';ctx.beginPath();ctx.ellipse(-26,-1,3,5,0,0,6.28);ctx.fill();ctx.beginPath();ctx.ellipse(26,-1,3,5,0,0,6.28);ctx.fill();
+  ctx.fillStyle='#FFCC88';ctx.beginPath();ctx.arc(-28,22,4.5,0,6.28);ctx.fill();ctx.beginPath();ctx.arc(28,22,4.5,0,6.28);ctx.fill();
+  ctx.fillStyle='#FFCC88';ctx.fillRect(-5,-20,10,8);
+  ctx.fillStyle='#FFCC88';ctx.beginPath();ctx.moveTo(-16,-48);ctx.quadraticCurveTo(-18,-52,-12,-52);ctx.lineTo(12,-52);ctx.quadraticCurveTo(18,-52,16,-48);ctx.lineTo(16,-22);ctx.lineTo(11,-14);ctx.lineTo(-11,-14);ctx.lineTo(-16,-22);ctx.closePath();ctx.fill();ctx.fillStyle='#E6A572';ctx.beginPath();ctx.ellipse(-11,-25,4,3,0,0,6.28);ctx.fill();ctx.beginPath();ctx.ellipse(11,-25,4,3,0,0,6.28);ctx.fill();
+  ctx.fillStyle='#0a0a0a';ctx.beginPath();ctx.moveTo(-16,-52);ctx.lineTo(-16,-44);ctx.quadraticCurveTo(-10,-49,0,-48);ctx.quadraticCurveTo(10,-49,16,-44);ctx.lineTo(16,-52);ctx.closePath();ctx.fill();ctx.beginPath();ctx.moveTo(-5,-46);ctx.quadraticCurveTo(-8,-44,-3,-42);ctx.lineTo(-1,-44);ctx.quadraticCurveTo(-4,-44,-2,-46);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(-6,-32,3.5,2,0,0,6.28);ctx.fill();ctx.beginPath();ctx.ellipse(6,-32,3.5,2,0,0,6.28);ctx.fill();ctx.fillStyle=evo===2?'#FF0000':'#1A6FCE';ctx.beginPath();ctx.arc(-6,-32,1.8,0,6.28);ctx.fill();ctx.beginPath();ctx.arc(6,-32,1.8,0,6.28);ctx.fill();ctx.fillStyle='#000';ctx.beginPath();ctx.arc(-6,-32,0.8,0,6.28);ctx.fill();ctx.beginPath();ctx.arc(6,-32,0.8,0,6.28);ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-5,-32.5,0.5,0,6.28);ctx.fill();ctx.beginPath();ctx.arc(7,-32.5,0.5,0,6.28);ctx.fill();
+  ctx.fillStyle='#0a0a0a';ctx.fillRect(-10,-38,8,2.5);ctx.fillRect(2,-38,8,2.5);ctx.beginPath();ctx.moveTo(-10,-38);ctx.lineTo(-3,-36);ctx.lineTo(-3,-35);ctx.lineTo(-10,-37);ctx.closePath();ctx.fill();ctx.beginPath();ctx.moveTo(10,-38);ctx.lineTo(3,-36);ctx.lineTo(3,-35);ctx.lineTo(10,-37);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#CC9966';ctx.beginPath();ctx.moveTo(0,-28);ctx.lineTo(-3,-20);ctx.lineTo(3,-20);ctx.closePath();ctx.fill();ctx.fillStyle='#8B6030';ctx.beginPath();ctx.arc(-1.3,-20.5,0.5,0,6.28);ctx.fill();ctx.beginPath();ctx.arc(1.3,-20.5,0.5,0,6.28);ctx.fill();
+  ctx.fillStyle='#8B3A3A';ctx.fillRect(-4,-17,8,1.8);ctx.fillStyle='#CC9966';ctx.fillRect(-0.5,-14,1,2);
+}}
+
 function drHUD(){{
   const php=Math.max(0,P.hp/P.maxHp);const phc=php>0.5?'#00FF44':php>0.25?'#FF8800':'#FF2222';
   ctx.fillStyle='rgba(0,0,0,0.6)';ctx.fillRect(12,12,200,18);ctx.fillStyle=phc;ctx.fillRect(12,12,200*php,18);
@@ -690,6 +889,66 @@ def detect_art_style(universe: str) -> str:
     return 'default'
 
 
+CHARACTER_REGISTRY = {
+    "luffy": {
+        "name": "Monkey D. Luffy",
+        "universe": "One Piece",
+        "keywords": ["luffy", "monkey d luffy", "monkey d. luffy", "straw hat luffy"],
+        "evolutions": ["Base Form", "Gear Second", "Gear Third", "Gear Fourth — Boundman", "Gear Fifth — Nika", "Joyboy Awakening"],
+    },
+    "zoro": {
+        "name": "Roronoa Zoro",
+        "universe": "One Piece",
+        "keywords": ["zoro", "roronoa zoro", "roronoa"],
+        "evolutions": ["Base Form", "Bandana Up", "Santoryu — Three Swords", "Asura — Nine Swords", "King of Hell", "Enma Unleashed"],
+    },
+    "mario": {
+        "name": "Mario",
+        "universe": "Super Mario Bros",
+        "keywords": ["mario", "super mario", "mario bros"],
+        "evolutions": ["Small Mario", "Fire Mario", "Cape Mario", "Tanooki Mario", "Metal Mario", "Invincible Star"],
+    },
+    "naruto": {
+        "name": "Naruto Uzumaki",
+        "universe": "Naruto",
+        "keywords": ["naruto", "uzumaki naruto", "naruto uzumaki"],
+        "evolutions": ["Academy Student", "Sage Mode", "Kurama Chakra Cloak", "Bijuu Mode", "Six Paths Sage Mode", "Baryon Mode"],
+    },
+    "sonic": {
+        "name": "Sonic the Hedgehog",
+        "universe": "SEGA",
+        "keywords": ["sonic", "sonic the hedgehog", "sega", "sonic hedgehog"],
+        "evolutions": ["Base Sonic", "Sonic Boost", "Super Sonic", "Hyper Sonic", "Darkspine Sonic", "Excalibur Sonic"],
+    },
+    "superman": {
+        "name": "Superman",
+        "universe": "DC Comics",
+        "keywords": ["superman", "clark kent", "kal-el", "man of steel"],
+        "evolutions": ["Base Superman", "Flight Mode", "Heat Vision", "Super-Speed", "Solar Energy Aura", "Solar Flare"],
+    },
+}
+
+def detect_character(universe: str) -> str | None:
+    """Match a universe string to a hardcoded character ID. Returns char_id or None."""
+    if not universe: return None
+    l = universe.lower().strip()
+    for char_id, char_data in CHARACTER_REGISTRY.items():
+        for kw in char_data["keywords"]:
+            if kw in l:
+                return char_id
+    universe_defaults = {
+        "one piece": "luffy",
+        "dc comics": "superman",
+        "justice league": "superman",
+        "super mario": "mario",
+        "mario bros": "mario",
+    }
+    for kw, char_id in universe_defaults.items():
+        if kw in l:
+            return char_id
+    return None
+
+
 def _fallback_config(universe: str, mode: str, subject: str, q_count: int) -> dict:
     questions = [
         {"q":f"In the {universe} world: What is 15 × 8?","choices":["A: 100","B: 112","C: 120","D: 130"],"answer":"C","hint":"15×8","time":20},
@@ -809,6 +1068,21 @@ Make {q_count} questions total. Make them fun — the easy ones should feel like
         if isinstance(_vd, dict):
             _vd.setdefault("art_style", _as)
             cfg[_vd_key] = _vd
+    # ── Stamp hardcoded character ID if universe matches one of our 6 ──
+    _char_id = detect_character(universe)
+    if _char_id:
+        cfg["player_character_id"] = _char_id
+        _char_evos = CHARACTER_REGISTRY[_char_id].get("evolutions", [])
+        if _char_evos:
+            cfg["evolutions"] = _char_evos[:max_evo]
+    # ── Read custom uploaded images from session state (set by the upload widget) ──
+    try:
+        _cp_img = st.session_state.get("custom_player_image")
+        _ce_img = st.session_state.get("custom_enemy_image")
+        if _cp_img: cfg["custom_player_image"] = _cp_img
+        if _ce_img: cfg["custom_enemy_image"] = _ce_img
+    except Exception:
+        pass
     return cfg
 
 
@@ -2905,6 +3179,37 @@ if st.session_state.get("battle_state") == "ready" or view == "battle":
         st.markdown(f"<p style='text-align:center;color:#aaa;font-family:Space Mono,monospace;font-size:12px'>Arena: <b>{cfg.get('arena_name','?')}</b> · Mode: <b style='color:{C}'>{cfg.get('mode','?')}</b></p>", unsafe_allow_html=True)
         st.markdown("<p style='text-align:center;color:#fff;font-size:13px;font-family:Space Mono,monospace'>Pick your subject — correct answers = power attacks. Wrong = enemy hits back.</p>", unsafe_allow_html=True)
 
+        # ── Custom Character Upload (optional, sits above subject picker) ──
+        _detected_char = detect_character(theme)
+        if _detected_char:
+            _char_info = CHARACTER_REGISTRY[_detected_char]
+            st.markdown(f"<div style='text-align:center;background:linear-gradient(90deg,{C}22,#0a0a1a,{C}22);border:2px solid {C};border-radius:12px;padding:12px 16px;margin:10px 0'><span style='font-family:Bebas Neue,sans-serif;font-size:17px;color:{C};letter-spacing:3px'>🥊 PLAYING AS: {_char_info['name'].upper()}</span><div style='font-family:Space Mono,monospace;font-size:10px;color:#888;margin-top:4px'>auto-detected from {_char_info['universe']} · you can override below</div></div>", unsafe_allow_html=True)
+        with st.expander("🎨 Use a custom character image instead (optional)", expanded=False):
+            st.markdown("<div style='font-family:Space Mono,monospace;font-size:11px;color:#aaa;margin-bottom:8px'>Paste an image URL or upload a file from your device. This will override the hardcoded character for this battle.</div>", unsafe_allow_html=True)
+            _tab_url, _tab_file = st.tabs(["🌐 Paste URL", "📁 Upload File"])
+            with _tab_url:
+                _img_url = st.text_input("Image URL (right-click image → 'Copy image address'):", key="char_upload_url", placeholder="https://example.com/zoro.png")
+                if _img_url.strip():
+                    if st.button("✅ Use this URL", key="apply_char_url_btn"):
+                        st.session_state.custom_player_image = _img_url.strip()
+                        st.toast("✅ Custom image set!", icon="🎨")
+                        st.rerun()
+            with _tab_file:
+                _img_file = st.file_uploader("Upload image:", type=["png","jpg","jpeg","webp","gif"], key="char_upload_file")
+                if _img_file is not None:
+                    import base64 as _b64char
+                    _img_bytes = _img_file.read()
+                    _b64_data = _b64char.b64encode(_img_bytes).decode()
+                    _mime = _img_file.type or "image/png"
+                    st.session_state.custom_player_image = f"data:{_mime};base64,{_b64_data}"
+                    st.toast("✅ Custom image loaded!", icon="🎨")
+            if st.session_state.get("custom_player_image"):
+                st.markdown("<div style='color:#00FF44;font-size:11px;font-family:Space Mono,monospace;margin-top:8px'>✅ Custom image active for next battle</div>", unsafe_allow_html=True)
+                if st.button("🗑 Remove custom image", key="clear_custom_char_img"):
+                    st.session_state.custom_player_image = None
+                    st.rerun()
+        st.markdown("<div style='height:10px'></div>", unsafe_allow_html=True)
+
         st.markdown(f"<p style='text-align:center;color:{C};font-family:Bebas Neue,sans-serif;font-size:16px;letter-spacing:3px'>✏️ TYPE ANY SUBJECT</p>", unsafe_allow_html=True)
         if True:
             _, custom_col, _ = st.columns([1,2,1])
@@ -3120,10 +3425,18 @@ Make questions test real understanding of the material. Keep question text short
         st.stop()
 
     cfg["battles_fought"] = st.session_state.get("battles_fought", 0)
-    # Path C: Flux character portraits disabled — they produce generic anime
-    # instead of specific characters like Zoro/Mihawk. Using upgraded canvas art.
+    # Path C: Flux character portraits disabled — using canvas art + optional user uploads.
     cfg.pop("player_portrait_url", None)
     cfg.pop("enemy_portrait_url", None)
+    # ── Stamp custom uploaded images into cfg (override hardcoded character) ──
+    _cp_late = st.session_state.get("custom_player_image")
+    _ce_late = st.session_state.get("custom_enemy_image")
+    if _cp_late: cfg["custom_player_image"] = _cp_late
+    if _ce_late: cfg["custom_enemy_image"] = _ce_late
+    # ── Re-check character_id in case universe string changed ──
+    if not cfg.get("player_character_id"):
+        _char_late = detect_character(theme)
+        if _char_late: cfg["player_character_id"] = _char_late
     st.session_state.battle_config = cfg
     cfg_clean = {k:v for k,v in cfg.items() if k != "client"}
     game_html = _build_game_html(cfg_clean, C)
