@@ -2972,6 +2972,52 @@ with st.sidebar:
         db_save(st.session_state.user_name, st.session_state.user_theme)
         st.success("✅ Saved!")
     st.write("---")
+    st.markdown("<p style='color:#00CCFF;font-weight:bold'>🔍 FLUX DIAGNOSTIC</p>", unsafe_allow_html=True)
+    if st.button("⚡ RUN FLUX DIAGNOSTIC", key="flux_diag_btn"):
+        st.session_state._flux_diag_run = True
+    if st.session_state.get("_flux_diag_run"):
+        try:
+            _dk = st.secrets["REPLICATE_KEY"]
+            st.success(f"✅ 1: Key found, {len(str(_dk))} chars, starts {str(_dk)[:4]}")
+        except Exception as _e:
+            st.error(f"❌ 1: Key missing — {_e}")
+            _dk = ""
+        try:
+            import replicate as _rd
+            st.success(f"✅ 2: replicate v{getattr(_rd,'__version__','?')} installed")
+        except Exception as _e:
+            st.error(f"❌ 2: replicate not installed — {_e}")
+        if _dk:
+            try:
+                import replicate as _rd2
+                _cl = _rd2.Client(api_token=_dk)
+                with st.spinner("Calling Flux (15-30 sec)..."):
+                    _o = _cl.run(
+                        "black-forest-labs/flux-schnell",
+                        input={"prompt": "red apple on white background", "width": 256, "height": 256, "num_outputs": 1, "output_format": "webp"},
+                    )
+                st.success(f"✅ 3: Flux responded. Type: {type(_o).__name__}")
+                st.code(repr(_o)[:400])
+                try:
+                    _u = str(_o[0]) if isinstance(_o, list) and len(_o) > 0 else str(_o)
+                    if _u.startswith("http"):
+                        st.success(f"✅ URL: {_u[:90]}")
+                        st.image(_u, width=150, caption="If image shows, Flux works fully")
+                    else:
+                        st.warning(f"⚠️ Output is not a URL: {_u[:200]}")
+                except Exception as _pe:
+                    st.error(f"❌ Could not parse output: {_pe}")
+            except Exception as _e:
+                st.error(f"❌ 3: Flux call FAILED — {type(_e).__name__}: {_e}")
+        _t = st.session_state.get("sub_tier", "Free")
+        if _t in ("Premium", "Elite"):
+            st.success(f"✅ 4: Tier = {_t} — portraits should generate")
+        else:
+            st.warning(f"⚠️ 4: Tier = {_t} — Free tier skips portrait generation")
+        _c2 = st.session_state.get("battle_config", {}) or {}
+        _pp = _c2.get("player_portrait_url", "(none)")
+        _ep = _c2.get("enemy_portrait_url", "(none)")
+        st.info("5: Current battle portrait URLs  Player: " + str(_pp) + "  Enemy: " + str(_ep))
     st.markdown("<p style='color:#FF2222;font-weight:bold'>💀 DELETE ACCOUNT</p>", unsafe_allow_html=True)
     st.markdown("<p style='color:#888;font-size:10px;font-family:Space Mono,monospace'>This permanently deletes your account and ALL progress from the database. This cannot be undone.</p>", unsafe_allow_html=True)
     delete_input = st.text_input("Type exactly: I WANT TO DELETE MY ACCOUNT FOREVER", key="delete_confirm_input", placeholder="Type the full phrase above")
