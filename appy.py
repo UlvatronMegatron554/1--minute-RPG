@@ -1170,11 +1170,22 @@ def generate_image(prompt: str, cache_key: str = None, width: int = 768, height:
     if cache_key:
         cached = db_get_image(cache_key)
         if cached: return cached
-    if not REPLICATE_AVAILABLE: return None
+    if not REPLICATE_AVAILABLE:
+        st.toast("⚠️ Replicate not installed — pixel art fallback", icon="⚠️")
+        return None
     try:
         import replicate as _rep
-        api_token = st.secrets.get("REPLICATE_KEY", "")
-        if not api_token: return None
+        api_token = ""
+        try:
+            api_token = st.secrets["REPLICATE_KEY"]
+        except Exception:
+            try:
+                api_token = st.secrets.get("REPLICATE_KEY", "")
+            except Exception:
+                pass
+        if not api_token:
+            st.toast("⚠️ REPLICATE_KEY not found in secrets", icon="⚠️")
+            return None
         client = _rep.Client(api_token=api_token)
         output = client.run(
             "black-forest-labs/flux-schnell",
@@ -1183,8 +1194,11 @@ def generate_image(prompt: str, cache_key: str = None, width: int = 768, height:
         url = str(output[0]) if output else None
         if url and cache_key:
             db_save_image(cache_key, url)
+        if not url:
+            st.toast("⚠️ FLUX returned no image", icon="⚠️")
         return url
-    except Exception:
+    except Exception as _img_err:
+        st.toast(f"⚠️ Portrait error: {str(_img_err)[:80]}", icon="⚠️")
         return None
 
 def generate_universe_banner(theme: str, color: str) -> str | None:
@@ -2928,14 +2942,25 @@ Make questions test real understanding of the material. Keep question text short
     if _battle_tier in ("Premium", "Elite") and cfg.get("universe"):
         _p_vis = cfg.get("player_visual", {})
         _e_vis = cfg.get("enemy_visual", {})
+        _needs_portraits = False
         if _p_vis and not cfg.get("player_portrait_url"):
-            _p_url = generate_character_portrait(cfg["universe"], _p_vis, is_enemy=False, tier=_battle_tier, char_name=cfg.get("player_title",""))
-            if _p_url:
-                cfg["player_portrait_url"] = _p_url
+            _needs_portraits = True
         if _e_vis and not cfg.get("enemy_portrait_url"):
-            _e_url = generate_character_portrait(cfg["universe"], _e_vis, is_enemy=True, tier=_battle_tier, char_name=cfg.get("enemy_name",""))
-            if _e_url:
-                cfg["enemy_portrait_url"] = _e_url
+            _needs_portraits = True
+        if _needs_portraits:
+            with st.spinner(f"🎨 Generating {_battle_tier} character portraits..."):
+                if _p_vis and not cfg.get("player_portrait_url"):
+                    _p_url = generate_character_portrait(cfg["universe"], _p_vis, is_enemy=False, tier=_battle_tier, char_name=cfg.get("player_title",""))
+                    if _p_url:
+                        cfg["player_portrait_url"] = _p_url
+                    else:
+                        st.warning(f"⚠️ Player portrait failed. REPLICATE_AVAILABLE={REPLICATE_AVAILABLE}")
+                if _e_vis and not cfg.get("enemy_portrait_url"):
+                    _e_url = generate_character_portrait(cfg["universe"], _e_vis, is_enemy=True, tier=_battle_tier, char_name=cfg.get("enemy_name",""))
+                    if _e_url:
+                        cfg["enemy_portrait_url"] = _e_url
+                    else:
+                        st.warning(f"⚠️ Enemy portrait failed. REPLICATE_AVAILABLE={REPLICATE_AVAILABLE}")
         st.session_state.battle_config = cfg
     cfg_clean = {k:v for k,v in cfg.items() if k != "client"}
     game_html = _build_game_html(cfg_clean, C)
