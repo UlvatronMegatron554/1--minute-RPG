@@ -1590,41 +1590,51 @@ def db_get_image(key: str) -> str | None:
 # FLUX IMAGE GENERATION (via Replicate)
 # ─────────────────────────────────────────────────────────────────────────────
 def generate_image(prompt: str, cache_key: str = None, width: int = 768, height: int = 768) -> str | None:
-    """Generate an image with FLUX. Returns URL or None. Uses cache if available."""
-    # Check cache first
+    """Generate an image with FLUX. Returns URL or None. Cached. Retries up to 3 times on 429 rate limit with exponential backoff (4s, 8s)."""
     if cache_key:
         cached = db_get_image(cache_key)
         if cached: return cached
     if not REPLICATE_AVAILABLE:
-        st.toast("⚠️ Replicate not installed — pixel art fallback", icon="⚠️")
         return None
     try:
-        import replicate as _rep
+        api_token = st.secrets.get("REPLICATE_KEY", "") or ""
+    except Exception:
         api_token = ""
-        try:
-            api_token = st.secrets["REPLICATE_KEY"]
-        except Exception:
-            try:
-                api_token = st.secrets.get("REPLICATE_KEY", "")
-            except Exception:
-                pass
-        if not api_token:
-            st.toast("⚠️ REPLICATE_KEY not found in secrets", icon="⚠️")
-            return None
-        client = _rep.Client(api_token=api_token)
-        output = client.run(
-            "black-forest-labs/flux-schnell",
-            input={"prompt": prompt, "width": width, "height": height, "num_outputs": 1, "output_format": "webp"}
-        )
-        url = str(output[0]) if output else None
-        if url and cache_key:
-            db_save_image(cache_key, url)
-        if not url:
-            st.toast("⚠️ FLUX returned no image", icon="⚠️")
-        return url
-    except Exception as _img_err:
-        st.toast(f"⚠️ Portrait error: {str(_img_err)[:80]}", icon="⚠️")
+    if not api_token:
+        st.toast("⚠️ REPLICATE_KEY not set in Streamlit secrets", icon="⚠️")
         return None
+    import replicate as _rep
+    import time as _t_retry
+    client = _rep.Client(api_token=api_token)
+    _max_attempts = 3
+    _wait = 4
+    for _attempt in range(_max_attempts):
+        try:
+            output = client.run(
+                "black-forest-labs/flux-schnell",
+                input={"prompt": prompt, "width": width, "height": height, "num_outputs": 1, "output_format": "webp"}
+            )
+            url = str(output[0]) if output else None
+            if url and cache_key:
+                db_save_image(cache_key, url)
+            if not url:
+                st.toast("⚠️ FLUX returned no image", icon="⚠️")
+            return url
+        except Exception as _e:
+            _msg = str(_e)
+            _is_rate = ("429" in _msg) or ("throttle" in _msg.lower()) or ("rate limit" in _msg.lower())
+            if _is_rate and _attempt < _max_attempts - 1:
+                st.toast(f"⏳ Flux busy — retrying in {_wait}s (try {_attempt+2}/{_max_attempts})", icon="⏳")
+                _t_retry.sleep(_wait)
+                _wait *= 2
+                continue
+            else:
+                if _is_rate:
+                    st.toast(f"⚠️ Flux rate limit hit after {_max_attempts} tries — using pixel art", icon="⚠️")
+                else:
+                    st.toast(f"⚠️ Portrait error: {_msg[:90]}", icon="⚠️")
+                return None
+    return None
 
 def generate_universe_banner(theme: str, color: str) -> str | None:
     """Generate a cinematic banner for the universe gateway screen."""
