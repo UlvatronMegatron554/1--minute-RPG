@@ -1408,6 +1408,74 @@ def readable_color(theme_color, bg_color):
     except: pass
     return theme_color
 
+def get_tone(context: str) -> dict:
+    """Return tone-appropriate text based on user's Study Type."""
+    _st = st.session_state.get("study_type", "climber") or "climber"
+    tones = {
+        "sprouter": {
+            "xp_msg_high": "🌱 Almost there! You're doing amazing. One more mission!",
+            "xp_msg_mid": "🌱 Great progress! Every step forward counts.",
+            "xp_msg_low": "🌱 You started. That's already more than most people do today.",
+            "timer_study": "YOU'RE DOING IT — KEEP GOING 💚",
+            "timer_idle_label": "YOUR PACE, YOUR RULES",
+            "tribunal_title": "⚖️ PROOF TIME — YOU GOT THIS!",
+            "tribunal_reject": "No worries! Just upload a quick photo of what you studied. You can do it! 💚",
+            "tribunal_success_prefix": "Amazing work! ",
+            "reward_display_label": "YOUR REWARD — EARNED IT!",
+            "streak_danger": "Your streak is at risk — but even 30 seconds saves it! You can do this.",
+            "mission_complete": "You showed up. That's what matters. Proud of you! 🌱",
+            "battle_encourage": "Take your time with the questions. No rush!",
+            "sidebar_badge": "🐢 SPROUTER",
+        },
+        "climber": {
+            "xp_msg_high": "🔥 SO CLOSE! One more mission and you level up!",
+            "xp_msg_mid": "⚡ Keep grinding. You're building something real.",
+            "xp_msg_low": "💪 Every mission gets you closer. Stay consistent.",
+            "timer_study": "STUDY NOW — DON'T STOP",
+            "timer_idle_label": "READY WHEN YOU ARE",
+            "tribunal_title": "⚖️ THE TRIBUNAL",
+            "tribunal_reject": "That doesn't look like study material. Upload real notes or homework.",
+            "tribunal_success_prefix": "Solid work! ",
+            "reward_display_label": "POTENTIAL REWARD",
+            "streak_danger": "Your streak needs a mission TODAY. Don't lose the momentum.",
+            "mission_complete": "Clean session. Keep stacking these wins. 🎯",
+            "battle_encourage": "Focus up. You know this material.",
+            "sidebar_badge": "🎯 CLIMBER",
+        },
+        "grinder": {
+            "xp_msg_high": "⚡⚡ ONE MORE. You're about to break through.",
+            "xp_msg_mid": "🔥 The grind is paying off. Don't slow down now.",
+            "xp_msg_low": "💀 You've been quiet. Time to remind this universe who you are.",
+            "timer_study": "LOCKED IN — NO DISTRACTIONS",
+            "timer_idle_label": "TIME TO WORK",
+            "tribunal_title": "⚖️ THE TRIBUNAL DEMANDS PROOF",
+            "tribunal_reject": "The tribunal rejects this. Real evidence only. No exceptions.",
+            "tribunal_success_prefix": "Respect. ",
+            "reward_display_label": "SPOILS OF WAR",
+            "streak_danger": "Your streak is about to DIE. Get in there NOW.",
+            "mission_complete": "Another one down. The grind never stops. 🔥",
+            "battle_encourage": "You've trained for this. Dominate.",
+            "sidebar_badge": "🔥 GRINDER",
+        },
+        "beast": {
+            "xp_msg_high": "💀 FINISH IT. You don't stop this close to the edge.",
+            "xp_msg_mid": "👑 Adequate. But you're not here for adequate.",
+            "xp_msg_low": "💀 Is this really all you've got? Prove otherwise.",
+            "timer_study": "EXECUTE. NO MERCY. NO EXCUSES.",
+            "timer_idle_label": "WAITING IS FOR THE WEAK",
+            "tribunal_title": "⚖️ THE TRIBUNAL JUDGES YOU",
+            "tribunal_reject": "REJECTED. The tribunal doesn't accept weakness. Real proof or nothing.",
+            "tribunal_success_prefix": "Acceptable. ",
+            "reward_display_label": "CONQUEST SPOILS",
+            "streak_danger": "Your streak DIES at midnight. A Beast doesn't let that happen.",
+            "mission_complete": "Expected. Now do it again. 👑",
+            "battle_encourage": "Crush them. No mercy.",
+            "sidebar_badge": "👑 BEAST",
+        },
+    }
+    return tones.get(_st, tones["climber"])
+
+
 def check_achievements(session):
     newly_unlocked = []
     unlocked = session.get("unlocked_achievements", set())
@@ -2345,6 +2413,8 @@ with st.sidebar:
     st.markdown(f"<p style='color:#ffffff;margin:3px 0'><b>UNIVERSE:</b> {st.session_state.user_theme}</p>", unsafe_allow_html=True)
     mode_badge = {"chill":"⚡ CHILL","grinder":"🔥 GRINDER","obsessed":"💀 OBSESSED"}.get(MODE,"⚡ CHILL")
     st.markdown(f"<p style='color:#ffffff;margin:3px 0'><b>MODE:</b> {mode_badge}</p>", unsafe_allow_html=True)
+    _st_badge = get_tone("sidebar").get("sidebar_badge", "🎯 CLIMBER")
+    st.markdown(f"<p style='color:#ffffff;margin:3px 0'><b>STUDY TYPE:</b> {_st_badge}</p>", unsafe_allow_html=True)
     st.markdown(f"<p style='color:#ffffff;margin:3px 0'><b>RANK:</b> {st.session_state.sub_tier.upper()}</p>", unsafe_allow_html=True)
     _m_done   = st.session_state.get("total_missions", 0)
     _eggs     = st.session_state.get("incubator_eggs", 0)
@@ -2910,7 +2980,8 @@ if view == "main":
     xp_display = int(xp_pct * 100)
     bar_filled = int(xp_pct * 30); bar_empty = 30 - bar_filled
     xp_bar_str = "█" * bar_filled + "░" * bar_empty
-    xp_msg = "🔥 SO CLOSE! One more mission and you level up!" if xp_pct > 0.9 else "⚡ Keep grinding." if xp_pct > 0.7 else "💪 Every mission gets you closer."
+    _tone = get_tone("xp")
+    xp_msg = _tone["xp_msg_high"] if xp_pct > 0.9 else _tone["xp_msg_mid"] if xp_pct > 0.7 else _tone["xp_msg_low"]
     st.markdown(f"""<div style='background:#111;border:1px solid {C}44;border-radius:12px;padding:14px 20px;margin:8px 0 20px'><div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:6px'><span style='font-family:Bebas Neue,sans-serif;font-size:14px;color:{C};letter-spacing:2px'>LEVEL {level_now} → LEVEL {level_now+1}</span><span style='font-family:Space Mono,monospace;font-size:12px;color:#ffffff'>{xp_display}%</span></div><div style='font-family:Space Mono,monospace;font-size:11px;color:{C}'>{xp_bar_str}</div><div style='font-size:10px;color:#888;margin-top:4px;font-family:Space Mono,monospace'>{xp_msg}</div></div>""", unsafe_allow_html=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
@@ -2921,7 +2992,7 @@ if view == "main":
     timer = st.session_state.get("micro_timer_seconds",30)
     reward_min = round(base*0.3,1); reward_max = round(base*20,1)
 
-    _reward_parts = [f"<div style='font-family:Space Mono,monospace;font-size:10px;color:#888;letter-spacing:2px;margin-bottom:2px'>POTENTIAL REWARD</div>",
+    _reward_parts = [f"<div style='font-family:Space Mono,monospace;font-size:10px;color:#888;letter-spacing:2px;margin-bottom:2px'>{get_tone('reward')['reward_display_label']}</div>",
                      f"<div style='font-family:Bebas Neue,sans-serif;font-size:26px;color:{C};line-height:1.1'>{reward_min} — {reward_max} {currency}</div>"]
     if shield:  _reward_parts.append("<div style='font-size:11px;color:#00FF44;margin-top:3px'>🛡️ SHIELD ACTIVE</div>")
     if boost:   _reward_parts.append("<div style='font-size:11px;color:#FF8800;margin-top:3px'>🚀 3× BOOSTER ACTIVE</div>")
@@ -3031,7 +3102,7 @@ if view == "main":
         st.progress(_pct)
         st.markdown(f"""<div style='text-align:center;background:#111;border:2px solid {_bar_color}66;border-radius:14px;padding:16px;margin:8px 0'>
             <div style='font-family:Bebas Neue,sans-serif;font-size:56px;color:{_bar_color};line-height:1'>{_remaining}s</div>
-            <div style='font-family:Space Mono,monospace;font-size:12px;color:#888;letter-spacing:2px'>STUDY NOW — DON'T STOP</div>
+            <div style='font-family:Space Mono,monospace;font-size:12px;color:#888;letter-spacing:2px'>{get_tone("timer")["timer_study"]}</div>
         </div>""", unsafe_allow_html=True)
         _tc1, _tc2 = st.columns(2)
         with _tc1:
@@ -3861,7 +3932,7 @@ if view == "main":
             _show_tribunal = False
     if _show_tribunal:
         st.markdown("---")
-        st.markdown(f"<h2 style='text-align:center;font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:4px'>⚖️ THE TRIBUNAL</h2>", unsafe_allow_html=True)
+        st.markdown(f"<h2 style='text-align:center;font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:4px'>{get_tone('tribunal')['tribunal_title']}</h2>", unsafe_allow_html=True)
         _, col, _ = st.columns([1,2,1])
         with col:
             _stated_goals = st.session_state.get("mission_goals", [])
@@ -3904,7 +3975,7 @@ if view == "main":
                     except Exception:
                         _proof_legit = True
                 if not _proof_legit:
-                    st.error(f"❌ PROOF REJECTED — That doesn't look like study material. Upload a screenshot of real notes, textbook, or homework. ({_proof_msg})")
+                    st.error(f"❌ PROOF REJECTED — {get_tone('tribunal')['tribunal_reject']} ({_proof_msg})")
                     st.stop()
                 base_gold = st.session_state.pending_gold
                 earned, rarity_label, rarity_msg, near_miss = variable_reward(base_gold, st.session_state.get("total_missions", 0))
@@ -3974,5 +4045,6 @@ if view == "main":
                 near_miss_display = f" · 🎯 {near_miss}" if near_miss else ""
                 play_app_sound("coin")
                 st.balloons()
-                st.success(f"✅ {rarity_label}! +{earned:.1f} {currency} · 🔥 {new_streak}-day streak · +{spins} spins{near_miss_display}")
+                _t_tone = get_tone("success")
+                st.success(f"✅ {_t_tone['tribunal_success_prefix']}{rarity_label}! +{earned:.1f} {currency} · 🔥 {new_streak}-day streak · +{spins} spins{near_miss_display}")
                 time.sleep(1); st.rerun()    # ── MISSION TIMER — side buttons small, center button big ─────────────────
