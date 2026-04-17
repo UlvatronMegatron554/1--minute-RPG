@@ -940,6 +940,7 @@ def db_save(user_name: str, theme: str):
             "study_type": st.session_state.get("study_type"),
             "quiz_completed": bool(st.session_state.get("quiz_completed", False)),
             "quiz_answers": json.dumps(st.session_state.get("quiz_answers", {})),
+            "goal_history": json.dumps(st.session_state.get("goal_history", [])[-50:]),
         }
         # save_key = name_universe_mode (unique per combo)
         _mode  = st.session_state.get("game_mode", "chill") or "chill"
@@ -1020,6 +1021,8 @@ def db_apply(row: dict):
     st.session_state.quiz_completed = bool(row.get("quiz_completed", False))
     try: st.session_state.quiz_answers = json.loads(row.get("quiz_answers", "{}"))
     except: st.session_state.quiz_answers = {}
+    try: st.session_state.goal_history = json.loads(row.get("goal_history", "[]"))
+    except: st.session_state.goal_history = []
     st.session_state.tribunal_due_time = None
     st.session_state.pending_gold = 0.0
     st.session_state.pending_xp = 0
@@ -1452,6 +1455,7 @@ if "gold" not in st.session_state:
         "last_spin_time": None, "spin_awarded_this_view": False,
         "last_auto_save": None, "password_hash": "", "leaderboard_visible": True, "user_email": "", "gw_page": 1, "ret_saves_found": None, "ret_pass_hash": "", "ret_name": "", "ret_single_save": None, "sidebar_color": "#0a0a1a",
         "study_type": None, "quiz_completed": False, "quiz_answers": {},
+        "mission_goals": [], "mission_goals_text": "", "goal_history": [], "checkpoint_submitted": False, "checkpoint_count": 0,
     })
 
 
@@ -2955,6 +2959,70 @@ if view == "main":
     _timer_dur     = st.session_state.get("timer_duration", timer)
     _timer_rem_saved = st.session_state.get("timer_remaining_saved", _timer_dur)
 
+    # ── NOTEPAD GOAL POPUP (appears before timer starts for sessions 5min+) ──
+    if st.session_state.get("_show_goal_notepad", False):
+        _np_dur = st.session_state.get("_notepad_timer_dur", 300)
+        _np_mins = _np_dur // 60
+        _np_base = st.session_state.get("_notepad_base", base)
+
+        if _np_dur <= 300:
+            _num_goals = 1
+            _goal_label = "What will you do in this 5-minute session?"
+        elif _np_dur <= 1500:
+            _num_goals = 2
+            _goal_label = "What will you do in this 25-minute session? (2 goals)"
+        elif _np_dur <= 3600:
+            _num_goals = 3
+            _goal_label = "Plan your 60-minute session (3 goals, first 2 = first half, last = second half)"
+        else:
+            _num_goals = 4
+            _goal_label = "Plan your 2-hour marathon (4 goals, split across checkpoints)"
+
+        st.markdown(f"<div style='background:linear-gradient(135deg,#0a0a2e,#1a0040);border:3px solid {C};border-radius:20px;padding:28px;margin:16px 0;box-shadow:0 0 40px {C}33'><div style='font-family:Bebas Neue,sans-serif;font-size:28px;color:{C};letter-spacing:4px;text-align:center;margin-bottom:8px'>📝 STUDY PLAN — {_np_mins} MIN SESSION</div><div style='font-family:Space Mono,monospace;font-size:12px;color:#aaa;text-align:center;margin-bottom:16px'>{_goal_label}</div></div>", unsafe_allow_html=True)
+
+        _goal_texts = []
+        for _gi in range(_num_goals):
+            _placeholder = {
+                0: "e.g. Read pages 14-20 of my biology textbook",
+                1: "e.g. Take notes on the key concepts",
+                2: "e.g. Do practice problems 1-10",
+                3: "e.g. Review and memorize definitions",
+            }.get(_gi, "What will you do?")
+            _goal_input = st.text_input(f"Goal {_gi + 1}:", placeholder=_placeholder, key=f"goal_input_{_gi}")
+            _goal_texts.append(_goal_input.strip())
+
+        st.markdown(f"<div style='font-family:Space Mono,monospace;font-size:10px;color:#888;text-align:center;margin:8px 0'>Writing your goals makes you 2-3× more likely to follow through. Be specific!</div>", unsafe_allow_html=True)
+
+        _gc1, _gc2 = st.columns(2)
+        with _gc1:
+            if st.button("← CANCEL", key="cancel_notepad"):
+                st.session_state._show_goal_notepad = False
+                st.rerun()
+        with _gc2:
+            if st.button(f"⚡ START {_np_mins} MIN MISSION", key="confirm_notepad", use_container_width=True):
+                _filled_goals = [g for g in _goal_texts if g]
+                if not _filled_goals:
+                    st.error("Write at least one goal before starting!")
+                else:
+                    st.session_state.mission_goals = _filled_goals
+                    st.session_state.mission_goals_text = " | ".join(_filled_goals)
+                    st.session_state._show_goal_notepad = False
+                    st.session_state.checkpoint_submitted = False
+                    st.session_state.checkpoint_count = 0
+                    st.session_state.needs_verification = True
+                    st.session_state.pending_gold = _np_base
+                    st.session_state.pending_xp = st.session_state.get("pending_xp", 0) + int(_np_base * 10)
+                    st.session_state.tribunal_missions_since = st.session_state.get("tribunal_missions_since", 0) + 1
+                    st.session_state.tribunal_seconds_done = st.session_state.get("tribunal_seconds_done", 0) + _np_dur
+                    if st.session_state.get("tribunal_seconds_done", 0) >= 240:
+                        st.session_state.tribunal_due_time = _dt.datetime.now().isoformat()
+                    st.session_state.timer_running = True
+                    st.session_state.timer_start = _dt.datetime.now().isoformat()
+                    st.session_state.timer_duration = _np_dur
+                    st.session_state.micro_timer_seconds = _np_dur
+                    st.rerun()
+        st.stop()
+
     if _timer_running and _timer_start:
         _elapsed   = (_dt.datetime.now() - _dt.datetime.fromisoformat(_timer_start)).total_seconds()
         _remaining = max(0, _timer_dur - int(_elapsed))
@@ -3073,17 +3141,9 @@ if view == "main":
                 </div>""", unsafe_allow_html=True)
 
                 if st.button(f"START {_d_opt['display']} SESSION", key=f"deep_{_d_idx}", use_container_width=True):
-                    st.session_state.needs_verification = True
-                    st.session_state.pending_gold = base
-                    st.session_state.pending_xp = st.session_state.get("pending_xp", 0) + int(base * 10)
-                    st.session_state.tribunal_missions_since = st.session_state.get("tribunal_missions_since", 0) + 1
-                    st.session_state.tribunal_seconds_done = st.session_state.get("tribunal_seconds_done", 0) + _d_opt['time']
-                    if st.session_state.get("tribunal_seconds_done", 0) >= 240:
-                        st.session_state.tribunal_due_time = _dt.datetime.now().isoformat()
-                    st.session_state.timer_running = True
-                    st.session_state.timer_start = _dt.datetime.now().isoformat()
-                    st.session_state.timer_duration = _d_opt['time']
-                    st.session_state.micro_timer_seconds = _d_opt['time']
+                    st.session_state._show_goal_notepad = True
+                    st.session_state._notepad_timer_dur = _d_opt['time']
+                    st.session_state._notepad_base = base
                     st.rerun()
 
             st.markdown(f"<div style='font-family:Space Mono,monospace;font-size:9px;color:#555;text-align:center;margin-top:8px'>Sessions 60min+ will have checkpoints where you submit progress · Re-take your Study Type quiz in settings anytime</div>", unsafe_allow_html=True)
@@ -3804,7 +3864,17 @@ if view == "main":
         st.markdown(f"<h2 style='text-align:center;font-family:Bebas Neue,sans-serif;color:{C};letter-spacing:4px'>⚖️ THE TRIBUNAL</h2>", unsafe_allow_html=True)
         _, col, _ = st.columns([1,2,1])
         with col:
-            st.info(f"Upload proof of work to claim **{st.session_state.pending_gold:.1f} {currency}** + a 🔮 Universe Secret + 📖 Story Chapter + 🎁 Loot Box")
+            _stated_goals = st.session_state.get("mission_goals", [])
+            if _stated_goals:
+                _goals_display = "".join([f"<div style='font-family:Space Mono,monospace;font-size:12px;color:#fff;padding:6px 12px;margin:4px 0;background:rgba(255,255,255,0.06);border-left:3px solid {C};border-radius:4px'>✅ {_g}</div>" for _g in _stated_goals])
+                st.markdown(f"""<div style='background:#0a0a1a;border:2px solid {C};border-radius:14px;padding:16px 20px;margin-bottom:12px'>
+                    <div style='font-family:Bebas Neue,sans-serif;font-size:16px;color:{C};letter-spacing:3px;margin-bottom:8px'>📝 YOUR STATED GOALS</div>
+                    {_goals_display}
+                    <div style='font-family:Space Mono,monospace;font-size:10px;color:#888;margin-top:8px'>Upload proof that matches these goals. AI will verify.</div>
+                </div>""", unsafe_allow_html=True)
+                st.info(f"Upload proof matching your goals to claim **{st.session_state.pending_gold:.1f} {currency}** + 🔮 Secret + 📖 Story + 🎁 Loot Box")
+            else:
+                st.info(f"Upload proof of work to claim **{st.session_state.pending_gold:.1f} {currency}** + a 🔮 Universe Secret + 📖 Story Chapter + 🎁 Loot Box")
             uploaded = st.file_uploader("PROOF OF LABOR:", type=["png", "jpg", "jpeg", "webp", "pdf", "docx", "doc", "txt", "csv", "md"], key="proof_upload")
             if uploaded and st.button("⚡ SUBMIT FOR JUDGMENT", key="submit_proof"):
                 # ── AI PROOF CHECK ────────────────────────────────────
@@ -3824,7 +3894,7 @@ if view == "main":
                                 max_tokens=100,
                                 messages=[{"role": "user", "content": [
                                     {"type": "image", "source": {"type": "base64", "media_type": _proof_media, "data": _proof_b64}},
-                                    {"type": "text", "text": "Is this image of actual study material, notes, textbook, homework, flashcards, or academic work? Reply ONLY with YES or NO followed by a 5-word reason."}
+                                    {"type": "text", "text": f"The student said they would do: {st.session_state.get('mission_goals_text', 'study')}. Does this image show evidence of that work (notes, textbook, homework, flashcards, or academic work related to their stated goals)? Reply ONLY with YES or NO followed by a 5-word reason."}
                                 ]}]
                             )
                             _proof_answer = _proof_resp.content[0].text.strip().upper()
@@ -3847,6 +3917,11 @@ if view == "main":
                 st.session_state.level = 1 + st.session_state.xp // 100
                 st.session_state.total_missions += 1
                 st.session_state.needs_verification = False; st.session_state.pending_gold = 0.0
+                if st.session_state.get("mission_goals"):
+                    if "goal_history" not in st.session_state: st.session_state.goal_history = []
+                    st.session_state.goal_history.append({"goals": st.session_state.mission_goals, "date": _dt.date.today().isoformat(), "completed": True})
+                    st.session_state.mission_goals = []
+                    st.session_state.mission_goals_text = ""
                 st.session_state.tribunal_seconds_done = 0
                 st.session_state.tribunal_due_time = None
                 st.session_state.tribunal_missions_since = 0
