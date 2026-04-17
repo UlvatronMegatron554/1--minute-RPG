@@ -266,8 +266,8 @@ const SND={{ctx:null,
   defeat(){{const b=this.theme.b;[1.5,1.2,1,0.8,0.6].forEach((m,i)=>setTimeout(()=>this.play(b*m,0.4,'sawtooth',0.12),i*220))}}
 }};
 var playerImg=null,enemyImg=null;
-if(CFG.player_portrait_url){{playerImg=new Image();playerImg.src=CFG.player_portrait_url;}}
-if(CFG.enemy_portrait_url){{enemyImg=new Image();enemyImg.src=CFG.enemy_portrait_url;}}
+if(CFG.player_portrait_url){{playerImg=new Image();playerImg.crossOrigin='anonymous';playerImg.onerror=function(){{console.error('Player portrait failed:',CFG.player_portrait_url);playerImg=null;}};playerImg.onload=function(){{console.log('Player portrait loaded OK');}};playerImg.src=CFG.player_portrait_url;}}
+if(CFG.enemy_portrait_url){{enemyImg=new Image();enemyImg.crossOrigin='anonymous';enemyImg.onerror=function(){{console.error('Enemy portrait failed:',CFG.enemy_portrait_url);enemyImg=null;}};enemyImg.onload=function(){{console.log('Enemy portrait loaded OK');}};enemyImg.src=CFG.enemy_portrait_url;}}
 function lh(hex,a){{const c=parseInt(hex.replace('#',''),16),r=Math.min(255,((c>>16)&255)+a*255),g=Math.min(255,((c>>8)&255)+a*255),b=Math.min(255,(c&255)+a*255);return '#'+[r,g,b].map(v=>Math.floor(v).toString(16).padStart(2,'0')).join('');}}
 function dk(hex,a){{const c=parseInt(hex.replace('#',''),16),r=Math.max(0,((c>>16)&255)-a*255),g=Math.max(0,((c>>8)&255)-a*255),b=Math.max(0,(c&255)-a*255);return '#'+[r,g,b].map(v=>Math.floor(v).toString(16).padStart(2,'0')).join('');}}
 function ap(x,y,col,n,spd,r,life){{for(let i=0;i<n;i++){{const a=Math.random()*6.28,s=spd*(0.4+Math.random()*0.8);parts.push({{x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,col,r:r*(0.5+Math.random()),life,ml:life}});}}}}
@@ -306,8 +306,8 @@ function drChar(x,y,col,evo,isEnemy,hit,shake){{try{{
   if(evo>0){{const ar=28+evo*11;const ag=ctx.createRadialGradient(0,0,4,0,0,ar);ag.addColorStop(0,col+'88');ag.addColorStop(1,'transparent');ctx.fillStyle=ag;ctx.beginPath();ctx.arc(0,0,ar,0,6.28);ctx.fill();}}
   ctx.scale(s,s);
   const vis=isEnemy?(CFG.enemy_visual||{{}}):(CFG.player_visual||{{}});
-  if(!isEnemy&&playerImg&&playerImg.complete){{ctx.drawImage(playerImg,-40,-70,80,120);}}
-  else if(isEnemy&&enemyImg&&enemyImg.complete){{ctx.drawImage(enemyImg,-40,-70,80,120);}}
+  if(!isEnemy&&playerImg&&playerImg.complete&&playerImg.naturalWidth>0){{ctx.drawImage(playerImg,-40,-70,80,120);}}
+  else if(isEnemy&&enemyImg&&enemyImg.complete&&enemyImg.naturalWidth>0){{ctx.drawImage(enemyImg,-40,-70,80,120);}}
   else if(vis&&vis.hair_color){{drCustom(col,evo,t,vis);}}
   else if(MODE==='FIGHTER')drFighter(col,evo,t,isEnemy);
   else if(MODE==='RPG')drRPG(col,evo,t);
@@ -1151,12 +1151,20 @@ def db_save_image(key: str, url: str):
         pass
 
 def db_get_image(key: str) -> str | None:
-    """Retrieve a cached image URL."""
+    """Retrieve a cached image URL. Rejects cached entries older than 45 min (Replicate URLs expire around 1 hour)."""
     sb = get_supabase()
     if not sb: return None
     try:
-        res = sb.table("images").select("url").eq("key", key).execute()
-        if res.data: return res.data[0]["url"]
+        res = sb.table("images").select("url,created_at").eq("key", key).execute()
+        if res.data:
+            row = res.data[0]
+            created = row.get("created_at", "")
+            try:
+                age = (_dt.datetime.utcnow() - _dt.datetime.fromisoformat(created.replace("Z",""))).total_seconds()
+                if age < 2700:
+                    return row["url"]
+            except Exception:
+                return row["url"]
     except Exception:
         pass
     return None
