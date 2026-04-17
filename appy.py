@@ -1002,6 +1002,34 @@ def detect_character(universe: str) -> str | None:
     return None
 
 
+def detect_crossover(universe: str) -> dict:
+    """Parse the universe string for crossover intent.
+    Returns a dict with: {"is_crossover": bool, "mode": "split"|"mashup"|None,
+                         "franchises": [list of strings], "connector": str|None}
+    """
+    if not universe:
+        return {"is_crossover": False, "mode": None, "franchises": [universe or ""], "connector": None}
+    text = f" {universe.strip()} "
+    text_lower = text.lower()
+    mashup_connectors = [" in ", " vs ", " vs. ", " versus ", " meets ", " from ", " inside ", " within ", " becomes ", " as ", " crossed with ", " cross ", " x "]
+    split_connectors = [" and ", " plus ", " + ", " & ", " mixed with ", " combined with ", " with "]
+    for conn in mashup_connectors:
+        if conn in text_lower:
+            import re as _re_cx
+            split_parts = _re_cx.split(conn, text, flags=_re_cx.IGNORECASE)
+            parts = [p.strip() for p in split_parts if p.strip()]
+            if len(parts) >= 2:
+                return {"is_crossover": True, "mode": "mashup", "franchises": parts, "connector": conn.strip()}
+    for conn in split_connectors:
+        if conn in text_lower:
+            import re as _re_cx2
+            split_parts = _re_cx2.split(conn, text, flags=_re_cx2.IGNORECASE)
+            parts = [p.strip() for p in split_parts if p.strip()]
+            if len(parts) >= 2:
+                return {"is_crossover": True, "mode": "split", "franchises": parts, "connector": conn.strip()}
+    return {"is_crossover": False, "mode": None, "franchises": [universe.strip()], "connector": None}
+
+
 def _fallback_config(universe: str, mode: str, subject: str, q_count: int) -> dict:
     questions = [
         {"q":f"In the {universe} world: What is 15 × 8?","choices":["A: 100","B: 112","C: 120","D: 130"],"answer":"C","hint":"15×8","time":20},
@@ -1017,6 +1045,8 @@ def _fallback_config(universe: str, mode: str, subject: str, q_count: int) -> di
 
 def generate_battle_config(universe: str, subject: str, tier: str, client, difficulty: int = 1) -> dict:
     mode = detect_game_mode(universe)
+    # ── Crossover detection ──
+    _crossover = detect_crossover(universe)
     tier_q = 8 if tier == "Elite" else (6 if tier == "Premium" else 4)
     q_count = min(tier_q + difficulty, 12)
     evolutions_by_mode = {
@@ -1031,8 +1061,32 @@ def generate_battle_config(universe: str, subject: str, tier: str, client, diffi
         "BUILDER": ["Novice","Builder","Engineer","Architect","Master Builder","City Planner","Overlord","God Mode","OMNIPOTENT"],
         "AUTO":    ["Level 1","Level 2","Level 3","Level 4","Level 5","Level 6","Level 7","Level 8","MAXED"],
     }
+    _cx_instr = ""
+    if _crossover["is_crossover"]:
+        _fl = _crossover["franchises"]
+        _fl_str = ", ".join([f'"{f}"' for f in _fl])
+        if _crossover["mode"] == "split":
+            _cx_instr = f"""
+
+CROSSOVER MODE — SPLIT STYLE:
+The user has combined multiple franchises: {_fl_str}.
+Generate the 4 abilities so they are DIVIDED roughly evenly across these franchises. For example, if 2 franchises, do 2 abilities from each. If 3 franchises, distribute naturally (e.g., 2+1+1 or 1+1+2). If 4+ franchises, give each franchise at least one representative ability.
+Label each ability with the franchise it's from, e.g. "[One Piece] Oni Giri".
+The arena name should combine elements from all franchises.
+The evolutions should cycle through the franchises' iconic power-ups.
+"""
+        elif _crossover["mode"] == "mashup":
+            _cx_instr = f"""
+
+CROSSOVER MODE — MASHUP/FUSION STYLE:
+The user has requested a fusion of: {_fl_str}.
+Generate 4 abilities that CREATIVELY BLEND elements from ALL the franchises into fused techniques. Each ability name should mix vocabulary and concepts from the franchises. For example, "Warp Pipe Santoryu" (Mario + One Piece), or "Wingardium Rasengan" (Harry Potter + Naruto), or "Creeper-Style Oni Giri" (Minecraft + One Piece).
+The arena name should be a fused location (e.g., "The Grand Line Overworld" for One Piece + Minecraft).
+The visuals should mix aesthetic elements from all franchises.
+Be wildly creative — this is fanfiction-mode, lean into it.
+"""
     prompt = f"""You are a game designer for "30 Second Infiniteverse".
-Universe: "{universe}" | Game Mode: {mode} | Subject: {subject} | Tier: {tier}
+Universe: "{universe}" | Game Mode: {mode} | Subject: {subject} | Tier: {tier}{_cx_instr}
 
 ⚠️ CRITICAL — SUBJECT IS: {subject} ⚠️
 EVERY question MUST test knowledge of {subject}. NOT math. NOT science. NOT random trivia.
@@ -1136,6 +1190,8 @@ Make {q_count} questions total. Make them fun — the easy ones should feel like
         if _ce_img: cfg["custom_enemy_image"] = _ce_img
     except Exception:
         pass
+    # ── Stamp crossover metadata onto cfg so UI can show it ──
+    cfg["crossover_info"] = _crossover
     return cfg
 
 
@@ -3231,6 +3287,14 @@ if st.session_state.get("battle_state") == "ready" or view == "battle":
         st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>⚔️ {theme.upper()} BATTLE</h2>", unsafe_allow_html=True)
         st.markdown(f"<p style='text-align:center;color:#aaa;font-family:Space Mono,monospace;font-size:12px'>Arena: <b>{cfg.get('arena_name','?')}</b> · Mode: <b style='color:{C}'>{cfg.get('mode','?')}</b></p>", unsafe_allow_html=True)
         st.markdown("<p style='text-align:center;color:#fff;font-size:13px;font-family:Space Mono,monospace'>Pick your subject — correct answers = power attacks. Wrong = enemy hits back.</p>", unsafe_allow_html=True)
+
+        # ── Crossover detection banner ──
+        _cx_info = detect_crossover(theme)
+        if _cx_info["is_crossover"]:
+            _cx_franchises = " · ".join(_cx_info["franchises"])
+            _cx_label = "SPLIT (divided abilities)" if _cx_info["mode"] == "split" else "MASHUP (fused abilities)"
+            _cx_emoji = "🔀" if _cx_info["mode"] == "split" else "🌀"
+            st.markdown(f"<div style='text-align:center;background:linear-gradient(90deg,#1a0a2a,#2a1a3a,#1a0a2a);border:2px solid #a855f7;border-radius:12px;padding:12px 16px;margin:10px 0'><span style='font-family:Bebas Neue,sans-serif;font-size:15px;color:#d946ef;letter-spacing:3px'>{_cx_emoji} CROSSOVER DETECTED — {_cx_label}</span><div style='font-family:Space Mono,monospace;font-size:10px;color:#c084fc;margin-top:4px'>{_cx_franchises}</div></div>", unsafe_allow_html=True)
 
         # ── Character Display + Custom Image Upload (shown for ALL universes) ──
         _detected_char = detect_character(theme)
