@@ -266,8 +266,8 @@ const SND={{ctx:null,
   defeat(){{const b=this.theme.b;[1.5,1.2,1,0.8,0.6].forEach((m,i)=>setTimeout(()=>this.play(b*m,0.4,'sawtooth',0.12),i*220))}}
 }};
 var playerImg=null,enemyImg=null;
-if(CFG.player_portrait_url){{playerImg=new Image();playerImg.crossOrigin='anonymous';playerImg.src=CFG.player_portrait_url;}}
-if(CFG.enemy_portrait_url){{enemyImg=new Image();enemyImg.crossOrigin='anonymous';enemyImg.src=CFG.enemy_portrait_url;}}
+if(CFG.player_portrait_url){{playerImg=new Image();playerImg.src=CFG.player_portrait_url;}}
+if(CFG.enemy_portrait_url){{enemyImg=new Image();enemyImg.src=CFG.enemy_portrait_url;}}
 function lh(hex,a){{const c=parseInt(hex.replace('#',''),16),r=Math.min(255,((c>>16)&255)+a*255),g=Math.min(255,((c>>8)&255)+a*255),b=Math.min(255,(c&255)+a*255);return '#'+[r,g,b].map(v=>Math.floor(v).toString(16).padStart(2,'0')).join('');}}
 function dk(hex,a){{const c=parseInt(hex.replace('#',''),16),r=Math.max(0,((c>>16)&255)-a*255),g=Math.max(0,((c>>8)&255)-a*255),b=Math.max(0,(c&255)-a*255);return '#'+[r,g,b].map(v=>Math.floor(v).toString(16).padStart(2,'0')).join('');}}
 function ap(x,y,col,n,spd,r,life){{for(let i=0;i<n;i++){{const a=Math.random()*6.28,s=spd*(0.4+Math.random()*0.8);parts.push({{x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,col,r:r*(0.5+Math.random()),life,ml:life}});}}}}
@@ -2939,61 +2939,18 @@ Make questions test real understanding of the material. Keep question text short
 
     cfg["battles_fought"] = st.session_state.get("battles_fought", 0)
     _battle_tier = st.session_state.get("sub_tier", "Free")
-
-    # ── PORTRAIT DEBUG — VISIBLE RED BOX ──────────────────────────────
-    _portrait_debug = []
-    _portrait_debug.append(f"TIER: {_battle_tier}")
-    _portrait_debug.append(f"REPLICATE_AVAILABLE: {REPLICATE_AVAILABLE}")
-    _has_rep_key = False
-    try:
-        _rep_key_val = st.secrets.get("REPLICATE_KEY", "") if hasattr(st.secrets, 'get') else ""
-        if not _rep_key_val:
-            try: _rep_key_val = st.secrets["REPLICATE_KEY"]
-            except: pass
-        _has_rep_key = bool(_rep_key_val)
-        _portrait_debug.append(f"REPLICATE_KEY exists: {_has_rep_key}")
-        if _has_rep_key:
-            _portrait_debug.append(f"KEY starts with: {str(_rep_key_val)[:8]}...")
-    except Exception as _ke:
-        _portrait_debug.append(f"KEY ERROR: {_ke}")
-
-    _p_vis = cfg.get("player_visual", {})
-    _e_vis = cfg.get("enemy_visual", {})
-    _portrait_debug.append(f"player_visual has data: {bool(_p_vis)}")
-    _portrait_debug.append(f"enemy_visual has data: {bool(_e_vis)}")
-    _portrait_debug.append(f"player_portrait_url exists: {bool(cfg.get('player_portrait_url'))}")
-    _portrait_debug.append(f"enemy_portrait_url exists: {bool(cfg.get('enemy_portrait_url'))}")
-
     if _battle_tier in ("Premium", "Elite") and cfg.get("universe"):
+        _p_vis = cfg.get("player_visual", {})
+        _e_vis = cfg.get("enemy_visual", {})
         if _p_vis and not cfg.get("player_portrait_url"):
-            _portrait_debug.append("ATTEMPTING player portrait generation...")
-            try:
-                _p_url = generate_character_portrait(cfg["universe"], _p_vis, is_enemy=False, tier=_battle_tier, char_name=cfg.get("player_title",""))
-                if _p_url:
-                    cfg["player_portrait_url"] = _p_url
-                    _portrait_debug.append(f"SUCCESS: player URL = {str(_p_url)[:60]}...")
-                else:
-                    _portrait_debug.append("FAILED: generate_character_portrait returned None")
-            except Exception as _pe:
-                _portrait_debug.append(f"EXCEPTION: {str(_pe)[:100]}")
+            _p_url = generate_character_portrait(cfg["universe"], _p_vis, is_enemy=False, tier=_battle_tier, char_name=cfg.get("player_title",""))
+            if _p_url:
+                cfg["player_portrait_url"] = _p_url
         if _e_vis and not cfg.get("enemy_portrait_url"):
-            _portrait_debug.append("ATTEMPTING enemy portrait generation...")
-            try:
-                _e_url = generate_character_portrait(cfg["universe"], _e_vis, is_enemy=True, tier=_battle_tier, char_name=cfg.get("enemy_name",""))
-                if _e_url:
-                    cfg["enemy_portrait_url"] = _e_url
-                    _portrait_debug.append(f"SUCCESS: enemy URL = {str(_e_url)[:60]}...")
-                else:
-                    _portrait_debug.append("FAILED: generate_character_portrait returned None")
-            except Exception as _ee:
-                _portrait_debug.append(f"EXCEPTION: {str(_ee)[:100]}")
+            _e_url = generate_character_portrait(cfg["universe"], _e_vis, is_enemy=True, tier=_battle_tier, char_name=cfg.get("enemy_name",""))
+            if _e_url:
+                cfg["enemy_portrait_url"] = _e_url
         st.session_state.battle_config = cfg
-    else:
-        _portrait_debug.append(f"SKIPPED: tier={_battle_tier}, universe={cfg.get('universe','???')}")
-
-    _debug_color = "#00FF44" if cfg.get("player_portrait_url") else "#FF4444"
-    _debug_lines = "<br>".join(_portrait_debug)
-    st.markdown(f"<div style='background:#1a0000;border:2px solid {_debug_color};border-radius:10px;padding:12px 16px;margin:8px 0;font-family:Space Mono,monospace;font-size:11px;color:{_debug_color};line-height:1.8'><b>🔍 PORTRAIT DEBUG:</b><br>{_debug_lines}</div>", unsafe_allow_html=True)
     cfg_clean = {k:v for k,v in cfg.items() if k != "client"}
     game_html = _build_game_html(cfg_clean, C)
     st.markdown(f"""<div style='border:2px solid {C}33;border-radius:12px;overflow:hidden;margin:8px 0;'><div style='background:rgba(0,0,0,0.8);padding:6px 16px;font-family:Bebas Neue,sans-serif;font-size:13px;color:{C};letter-spacing:3px;display:flex;justify-content:space-between;'><span>⚔️ {(cfg.get("arena_name","BATTLE")).upper()}</span><span style='color:#888;font-size:10px'>CORRECT = ATTACK · 3 WRONG = DEFEAT</span></div></div>""", unsafe_allow_html=True)
