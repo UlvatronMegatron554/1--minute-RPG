@@ -214,11 +214,21 @@ body{{background:#000;overflow:hidden;font-family:'Space Mono',monospace;}}
 .qhdr{{display:flex;justify-content:space-between;margin-bottom:5px;}}
 .qlbl{{font-size:8px;letter-spacing:3px;color:{col};font-family:Orbitron,monospace;}}
 #result{{position:absolute;top:0;left:0;width:820px;height:480px;display:none;pointer-events:all;background:rgba(0,0,0,0.93);flex-direction:column;align-items:center;justify-content:center;font-family:Orbitron,monospace;text-align:center;}}
+#moves{{position:absolute;bottom:0;left:0;width:100%;pointer-events:all;display:none;}}
+.mbox{{background:rgba(0,0,0,0.96);border-top:2px solid {col};padding:10px;}}
+.mhdr{{font-family:Orbitron,monospace;font-size:9px;letter-spacing:3px;color:{col};text-align:center;margin-bottom:8px;}}
+.mgrid{{display:grid;grid-template-columns:1fr 1fr;gap:6px;}}
+.mv{{padding:10px 8px;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.18);border-radius:8px;cursor:pointer;font-family:'Space Mono',monospace;transition:all 0.12s;text-align:center;}}
+.mv:hover{{background:{col}33;border-color:{col};transform:scale(1.03);}}
+.mv-name{{font-family:Orbitron,monospace;font-size:11px;color:#fff;letter-spacing:1px;}}
+.mv-info{{font-size:8px;color:#888;margin-top:3px;}}
+.mv-atk{{color:#FF6644;}}.mv-def{{color:#44AAFF;}}
 </style></head><body>
 <div id="wrap">
   <canvas id="gc" width="820" height="480"></canvas>
   <div id="questions"></div>
   <div id="result"></div>
+  <div id="moves"></div>
 </div>
 <script>
 'use strict';
@@ -227,6 +237,18 @@ const cv=document.getElementById('gc');const ctx=cv.getContext('2d');
 let FC=0,STATE='IN',stT=0,evolveT=0;let subject=CFG.subject||'General';
 let questions=[],qI=0,lives=3,wrongs=0,qTimer=0,qMax=25,aLocked=false;
 let parts=[],beams=[],dmgNums=[];
+let curMove=null;
+const MOVES=CFG.player_attacks?[
+  {{name:CFG.player_attacks[0]||'Strike',dmgMult:1.0,defMult:1.0,type:'atk',icon:'⚔️',desc:'Standard attack'}},
+  {{name:CFG.player_attacks[1]||'Special',dmgMult:1.5,defMult:1.0,type:'atk',icon:'✨',desc:'1.5× damage'}},
+  {{name:CFG.player_attacks[2]||'Ultimate',dmgMult:2.0,defMult:1.5,type:'atk',icon:'💀',desc:'2× damage but 1.5× risk'}},
+  {{name:'Guard',dmgMult:0.5,defMult:0.4,type:'def',icon:'🛡️',desc:'Weak hit but blocks 60% damage'}}
+]:[
+  {{name:'Strike',dmgMult:1.0,defMult:1.0,type:'atk',icon:'⚔️',desc:'Standard attack'}},
+  {{name:'Special',dmgMult:1.5,defMult:1.0,type:'atk',icon:'✨',desc:'1.5× damage'}},
+  {{name:'Ultimate',dmgMult:2.0,defMult:1.5,type:'atk',icon:'💀',desc:'2× damage but 1.5× risk'}},
+  {{name:'Guard',dmgMult:0.5,defMult:0.4,type:'def',icon:'🛡️',desc:'Weak hit but blocks 60% damage'}}
+];
 const P={{hp:100,maxHp:100,power:0,evo:0,streak:0,total:0,x:160,y:270,shake:0,hit:false,color:COL}};
 const E={{hp:100,maxHp:100,phase:0,x:620,y:270,shake:0,hit:false,color:CFG.enemy_color||'#CC2222'}};
 const INTENSITY=Math.min(3, 1 + (CFG.battles_fought||0) * 0.15);
@@ -418,21 +440,38 @@ function drHUD(){{
   ctx.fillStyle='rgba(255,255,255,0.3)';ctx.font='9px "Space Mono",monospace';ctx.textAlign='center';ctx.fillText((CFG.arena_name||'').toUpperCase(),W/2,H-8);ctx.textAlign='left';
   if(P.streak>=2){{ctx.fillStyle='#FFD700';ctx.font='bold 11px Orbitron,monospace';ctx.textAlign='center';ctx.fillText('🔥 '+P.streak+' STREAK',W/2,18);ctx.textAlign='left';}}
 }}
+function showMoves(){{
+  if(qI>=questions.length){{if(P.total>0&&E.hp<=0)win();else if(P.total===0)lose();else if(E.hp>0)lose();else win();return;}}
+  curMove=null;
+  const md=document.getElementById('moves');md.style.display='block';
+  document.getElementById('questions').style.display='none';
+  var mHtml='<div class="mbox"><div class="mhdr">CHOOSE YOUR MOVE</div><div class="mgrid">';
+  MOVES.forEach(function(m,i){{var tc=m.type==='def'?'mv-def':'mv-atk';mHtml+='<button class="mv" onclick="pickMove('+i+')"><div class="mv-name">'+m.icon+' '+m.name+'</div><div class="mv-info '+tc+'">'+m.desc+'</div></button>';}})
+  mHtml+='</div></div>';
+  md.innerHTML=mHtml;
+}}
+function pickMove(idx){{
+  curMove=MOVES[idx];
+  document.getElementById('moves').style.display='none';
+  showQ();
+}}
 function showQ(){{
   if(qI>=questions.length){{if(P.total>0&&E.hp<=0)win();else if(P.total===0)lose();else if(E.hp>0)lose();else win();return;}}
   const q=questions[qI];const d=document.getElementById('questions');d.style.display='block';
+  const mLabel=curMove?curMove.icon+' '+curMove.name:'⚔️ Attack';
   qMax=(typeof q.time==='number'&&q.time>0)?q.time:25;qTimer=qMax;aLocked=false;
-  d.innerHTML=`<div class="qbox"><div class="qhdr"><span class="qlbl">Q${{qI+1}}/${{questions.length}} · ${{subject}} · ${{qMax}}s</span><span style="font-size:13px">${{'❤️'.repeat(lives)+'🖤'.repeat(3-lives)}}</span></div><div class="tbar" id="tb"></div><div class="qtxt">${{q.q}}</div><div class="choices">${{q.choices.map((c2,i)=>`<button class="ch" onclick="ans(${{i}},'${{String.fromCharCode(65+i)}}')">${{c2}}</button>`).join('')}}</div></div>`;
+  d.innerHTML=`<div class="qbox"><div class="qhdr"><span class="qlbl">Q${{qI+1}}/${{questions.length}} · ${{subject}} · ${{qMax}}s</span><span style="font-size:13px">${{mLabel}} &nbsp; ${{'❤️'.repeat(lives)+'🖤'.repeat(3-lives)}}</span></div><div class="tbar" id="tb"></div><div class="qtxt">${{q.q}}</div><div class="choices">${{q.choices.map((c2,i)=>`<button class="ch" onclick="ans(${{i}},'${{String.fromCharCode(65+i)}}')">${{c2}}</button>`).join('')}}</div></div>`;
 }}
 function ans(idx,letter){{
   if(aLocked)return;aLocked=true;const q=questions[qI];const ok=(letter===q.answer);
   document.querySelectorAll('.ch')[idx].classList.add(ok?'ok':'no');
   if(!ok){{const ci=['A','B','C','D'].indexOf(q.answer);if(ci>=0)document.querySelectorAll('.ch')[ci].classList.add('ok');}}
-  setTimeout(()=>{{document.getElementById('questions').style.display='none';ok?onOk():onNo();qI++;if(STATE==='B')setTimeout(()=>{{if(STATE==='B')showQ();}},1100);}},650);
+  setTimeout(()=>{{document.getElementById('questions').style.display='none';ok?onOk():onNo();qI++;if(STATE==='B')setTimeout(()=>{{if(STATE==='B')showMoves();}},1100);}},650);
 }}
 function onOk(){{
   P.streak++;P.total++;P.power=Math.min(100,P.power+22);
-  const dmg=15+P.evo*5+Math.floor(Math.random()*10)+(P.streak>=3?15:0);
+  const _mm=curMove?curMove.dmgMult:1.0;
+  const dmg=Math.floor((15+P.evo*5+Math.floor(Math.random()*10)+(P.streak>=3?15:0))*_mm);
   E.hp=Math.max(0,E.hp-dmg);E.hit=true;E.shake=12;setTimeout(()=>E.hit=false,380);
   SND.correct();SND.hit();
   ab(P.x,P.y-30,E.x,E.y-30,COL,(6+P.evo*2)*INTENSITY,24);ap(E.x,E.y-30,COL,Math.floor((20+P.evo*4)*INTENSITY),4*INTENSITY,6*INTENSITY,28);
@@ -445,7 +484,8 @@ function onOk(){{
 }}
 function onNo(){{
   P.streak=0;wrongs++;
-  const dmg=10+E.phase*8+Math.floor(Math.random()*8);
+  const _dm=curMove?curMove.defMult:1.0;
+  const dmg=Math.floor((10+E.phase*8+Math.floor(Math.random()*8))*_dm);
   P.hp=Math.max(0,P.hp-dmg);P.hit=true;P.shake=14;setTimeout(()=>P.hit=false,380);
   SND.wrong();SND.miss();
   if(wrongs>=3){{lives--;wrongs=0;}}
@@ -456,7 +496,7 @@ function onNo(){{
 function evolve(idx){{
   STATE='EV';evolveT=0;P.evo=idx;ap(P.x,P.y,COL,60,8,10,60);ap(P.x,P.y,'#FFD700',30,6,7,48);
   SND.evo();
-  setTimeout(()=>{{STATE='B';showQ();}},1800);
+  setTimeout(()=>{{STATE='B';showMoves();}},1800);
 }}
 function win(){{
   STATE='WIN';document.getElementById('questions').style.display='none';
@@ -506,7 +546,7 @@ function loop(){{
 }}
 var allQ=CFG.questions||[];questions=allQ.slice().sort(function(){{return Math.random()-0.5;}}).slice(0,Math.min(10,allQ.length));
 if(!questions.length)questions=[{{q:'What is 2+2?',choices:['A: 3','B: 4','C: 5','D: 6'],answer:'B',hint:'math'}}];
-setTimeout(function(){{STATE='B';showQ();}},2800);
+setTimeout(function(){{STATE='B';showMoves();}},2800);
 loop();
 </script></body></html>"""
 
@@ -2929,6 +2969,18 @@ if view == "main":
     if streak_urgency: _sh += f"<div style='font-size:11px;color:#FF8888;margin-top:6px;font-family:Space Mono,monospace'>{streak_urgency}</div>"
     _sh += "</div>"
     st.markdown(_sh, unsafe_allow_html=True)
+
+    # ── GROWING UNIVERSE TOWER — visual progress ─────────────────────
+    _tower_missions = st.session_state.get("total_missions", 0)
+    _tower_battles = st.session_state.get("battles_won", 0)
+    _tower_blocks = min(_tower_missions + _tower_battles, 200)
+    _tower_level = 1 + _tower_blocks // 10
+    _tower_titles = {1:"Empty Plot",2:"Foundation",3:"Small Camp",4:"Outpost",5:"Village",6:"Town",7:"City",8:"Fortress",9:"Kingdom",10:"Empire",11:"Legendary Realm",12:"Mythic Dominion",13:"Celestial Domain",14:"Infinite Citadel"}
+    _tower_title = _tower_titles.get(min(_tower_level, 14), "Infinite Citadel")
+    _tower_next = _tower_titles.get(min(_tower_level + 1, 14), "???")
+    _blocks_to_next = max(0, (_tower_level * 10) - _tower_blocks)
+    _tower_html = """ + repr(tower_html) + """.replace("COLVAL", C).replace("BLOCKSVAL", str(_tower_blocks)).replace("LVLVAL", str(_tower_level)).replace("TITLEVAL", _tower_title.upper()).replace("NEXTVAL", _tower_next).replace("BTNVAL", str(_blocks_to_next))
+    components.html(_tower_html, height=185)
 
     missions_done = st.session_state.get("total_missions",0)  # used by sidebar counter
 
