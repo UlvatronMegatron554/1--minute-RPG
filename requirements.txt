@@ -5,3 +5,4 @@ anthropic
 supabase
 replicate>=0.25.0
 pydantic>=2.0
+pypdf>=3.0.0
