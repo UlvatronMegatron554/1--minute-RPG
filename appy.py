@@ -848,6 +848,26 @@ function showQ(){{
 function ans(idx,letter){{
   if(aLocked)return;aLocked=true;const q=questions[qI];const ok=(letter===q.answer);
   try{{if(ok){{if(Math.random()<0.2){{SND.play('crit');}}else{{SND.play('hit');}}}}else{{SND.play('miss');}}}}catch(e){{}}
+  // ── Force-evolve: every 2 correct answers, increment player level and fire evolve() ──
+  if(ok){{
+    if(typeof window._forceEvoCount==='undefined'){{window._forceEvoCount=0;}}
+    window._forceEvoCount++;
+    if(window._forceEvoCount>=2){{
+      window._forceEvoCount=0;
+      try{{
+        var _maxLvl=(((CFG.evolutions)||[]).length)-1;
+        if(typeof P==='object'&&P){{
+          if(typeof P.lvl==='number'&&P.lvl<_maxLvl){{P.lvl++;}}
+          if(typeof P.evo==='number'){{P.evo++;}}
+        }}
+        if(typeof E==='object'&&E){{
+          if(typeof E.lvl==='number'&&E.lvl<_maxLvl){{E.lvl++;}}
+          if(typeof E.evo==='number'){{E.evo++;}}
+        }}
+        if(typeof evolve==='function'){{evolve();}}
+      }}catch(_ee){{console.error('forceEvo failed',_ee);}}
+    }}
+  }}
   document.querySelectorAll('.ch')[idx].classList.add(ok?'ok':'no');
   if(!ok){{const ci=['A','B','C','D'].indexOf(q.answer);if(ci>=0)document.querySelectorAll('.ch')[ci].classList.add('ok');}}
   setTimeout(()=>{{document.getElementById('questions').style.display='none';ok?onOk():onNo();qI++;if(STATE==='B')setTimeout(()=>{{if(STATE==='B')showMoves();}},1100);}},650);
