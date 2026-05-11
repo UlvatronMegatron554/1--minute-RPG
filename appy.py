@@ -3097,6 +3097,7 @@ with st.sidebar:
     if st.button("💬 FEEDBACK",      key="nav_feedback"): st.session_state.view = "feedback";   st.session_state.battle_state = None; st.session_state.battle_subject_chosen = False; st.rerun()
     if st.button("🏆 LEADERBOARD",   key="nav_leader"):   st.session_state.view = "leaderboard"; st.session_state.battle_state = None; st.session_state.battle_subject_chosen = False; st.rerun()
     if st.button("📦 MY BOXES",       key="nav_boxes"):   st.session_state.view = "boxes";      st.session_state.battle_state = None; st.session_state.battle_subject_chosen = False; st.rerun()
+    if st.button("📜 TERMS & DMCA",   key="nav_terms"):   st.session_state.view = "terms";      st.session_state.battle_state = None; st.session_state.battle_subject_chosen = False; st.rerun()
     if st.button("📝 FLASHCARDS",     key="nav_flash"):   st.session_state.view = "flashcards"; st.session_state.battle_state = None; st.session_state.battle_subject_chosen = False; st.rerun()
     if MODE in ("grinder","obsessed"):
         if st.button("🏆 ACHIEVEMENTS", key="nav_ach"):  st.session_state.view = "achievements"; st.session_state.battle_state = None; st.session_state.battle_subject_chosen = False; st.rerun()
@@ -3362,8 +3363,11 @@ if st.session_state.get("battle_state") == "ready" or view == "battle":
             st.markdown(f"<div style='text-align:center;background:linear-gradient(90deg,{C}22,#0a0a1a,{C}22);border:2px solid {C};border-radius:12px;padding:12px 16px;margin:10px 0'><span style='font-family:Bebas Neue,sans-serif;font-size:17px;color:{C};letter-spacing:3px'>🥊 PLAYING AS: {_char_info['name'].upper()}</span><div style='font-family:Space Mono,monospace;font-size:10px;color:#888;margin-top:4px'>auto-detected from {_char_info['universe']} · override with your own image below</div></div>", unsafe_allow_html=True)
         else:
             st.markdown(f"<div style='text-align:center;background:#0a0a1a;border:1px dashed {C}66;border-radius:12px;padding:10px 16px;margin:10px 0'><span style='font-family:Space Mono,monospace;font-size:11px;color:#888'>Want a specific character? Upload an image below — your character, any universe.</span></div>", unsafe_allow_html=True)
-        with st.expander("🎨 Upload your own character image (any universe, any character)", expanded=False):
-            st.markdown("<div style='font-family:Space Mono,monospace;font-size:11px;color:#aaa;margin-bottom:8px'>Paste an image URL or upload a file. Your image becomes the fighter in this battle. Works for any universe — upload Zoro in a Germa suit, Goku in a Mario outfit, or anything else.</div>", unsafe_allow_html=True)
+        with st.expander("🎨 Upload your own character art", expanded=False):
+            st.markdown("<div style='font-family:Space Mono,monospace;font-size:11px;color:#aaa;margin-bottom:8px'>Paste an image URL or upload a file. Your image becomes the fighter in this battle. By uploading, you confirm you own this image or have permission to use it. See Terms & DMCA in the sidebar for details.</div>", unsafe_allow_html=True)
+            _rights_ok = st.checkbox("✅ I confirm I have the rights to use this image.", key="rights_confirm_check")
+            if not _rights_ok:
+                st.markdown("<div style='font-family:Space Mono,monospace;font-size:10px;color:#888;margin-bottom:6px'>Check the box above to enable upload.</div>", unsafe_allow_html=True)
             _tab_url, _tab_file = st.tabs(["🌐 Paste URL", "📁 Upload File"])
             with _tab_url:
                 _img_url = st.text_input("Image URL (right-click image → 'Copy image address'):", key="char_upload_url", placeholder="https://example.com/zoro.png")
@@ -4717,6 +4721,69 @@ elif view == "flashcards":
             db_save(st.session_state.user_name, st.session_state.user_theme)
             st.success("All cards deleted.")
             st.rerun()
+
+elif view == "terms":
+    st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>📜 TERMS OF USE & DMCA POLICY</h2>", unsafe_allow_html=True)
+    st.markdown(f"""<div style='background:#0a0a1a;border:2px solid {C}66;border-radius:14px;padding:24px 28px;margin:12px 0;font-family:Space Mono,monospace;font-size:12px;color:#fff;line-height:1.9'>
+
+<div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:{C};letter-spacing:3px;margin-bottom:8px'>1. ACCEPTANCE OF TERMS</div>
+
+By using 30 Second Infiniteverse, you agree to these terms. If you don't agree, please don't use the app.
+
+<div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:{C};letter-spacing:3px;margin-top:20px;margin-bottom:8px'>2. USER-UPLOADED CONTENT</div>
+
+You are solely responsible for any images, art, text, or other content you upload to this app, including custom character art.
+
+You agree to only upload content that you:
+&nbsp;&nbsp;• Created yourself, OR<br>
+&nbsp;&nbsp;• Own the rights to, OR<br>
+&nbsp;&nbsp;• Have explicit permission to use<br><br>
+
+Do NOT upload copyrighted material (characters, art, logos, photos) that you do not own or have rights to use.
+
+<div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:{C};letter-spacing:3px;margin-top:20px;margin-bottom:8px'>3. CONTENT REMOVAL</div>
+
+We reserve the right to remove any uploaded content at our discretion, including content reported as infringing on intellectual property rights, content that violates these terms, or content that is otherwise inappropriate.
+
+<div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:{C};letter-spacing:3px;margin-top:20px;margin-bottom:8px'>4. DMCA / COPYRIGHT COMPLAINTS</div>
+
+If you believe content on this app infringes your copyright, please send a takedown notice to:
+
+<div style='background:#1a1a2a;border:2px solid {C};border-radius:10px;padding:14px 18px;margin:12px 0;text-align:center'>
+<div style='font-family:Bebas Neue,sans-serif;font-size:18px;color:{C};letter-spacing:2px'>📧 DMCA CONTACT</div>
+<div style='font-family:Space Mono,monospace;font-size:14px;color:#fff;margin-top:6px'>AntraialKarrier403210@gmail.com</div>
+</div>
+
+Your takedown notice should include:
+&nbsp;&nbsp;• A description of the copyrighted work you claim is infringed<br>
+&nbsp;&nbsp;• The location (URL, username, or screenshot) of the allegedly infringing content<br>
+&nbsp;&nbsp;• Your full name and contact information<br>
+&nbsp;&nbsp;• A statement that you have a good-faith belief the use is unauthorized<br>
+&nbsp;&nbsp;• A statement, under penalty of perjury, that the information is accurate and you are the rights holder or authorized to act on their behalf<br><br>
+
+We will review and remove infringing content promptly upon receiving a valid notice.
+
+<div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:{C};letter-spacing:3px;margin-top:20px;margin-bottom:8px'>5. PRIVACY</div>
+
+Custom uploaded character art is stored privately and only displayed to the user who uploaded it. We do not share, sell, or publicly distribute user-uploaded content.
+
+<div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:{C};letter-spacing:3px;margin-top:20px;margin-bottom:8px'>6. NO WARRANTY</div>
+
+This app is provided "as is" without warranties of any kind, express or implied. We make no guarantees about uptime, accuracy, or fitness for any particular purpose.
+
+<div style='font-family:Bebas Neue,sans-serif;font-size:22px;color:{C};letter-spacing:3px;margin-top:20px;margin-bottom:8px'>7. CONTACT</div>
+
+For any questions about these terms, content removal, copyright complaints, or anything else:
+
+<div style='background:#1a1a2a;border:1px solid {C}66;border-radius:8px;padding:10px 14px;margin:8px 0;text-align:center'>
+<div style='font-family:Space Mono,monospace;font-size:13px;color:{C}'>AntraialKarrier403210@gmail.com</div>
+</div>
+
+<div style='font-family:Space Mono,monospace;font-size:10px;color:#888;margin-top:24px;text-align:center;letter-spacing:1px'>
+Last updated: November 2025 · 30 Second Infiniteverse
+</div>
+
+</div>""", unsafe_allow_html=True)
 
 elif view == "feedback":
     st.markdown(f"<h2 style='font-family:Bebas Neue,sans-serif;text-align:center;color:{C};letter-spacing:4px'>💬 FEEDBACK PORTAL</h2>", unsafe_allow_html=True)
