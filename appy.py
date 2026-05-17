@@ -2981,7 +2981,7 @@ html, body, [data-testid="stAppViewContainer"], [data-testid="stApp"] {{
     display: none !important;
 }}
 .block-container {{ max-width: 1000px !important; }}
-.block-container p, .block-container span, .block-container div,
+.block-container p, .block-container span,
 .block-container li, .block-container td, .block-container th,
 .block-container label {{
     color: {TEXT} !important;
