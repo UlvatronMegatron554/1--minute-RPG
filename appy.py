@@ -2559,14 +2559,6 @@ frame();
                                     st.error(f"Database error: {_e}")
                             if not _all_saves:
                                 st.error("❌ No account found with that email.")
-                                with st.expander("🔍 Debug — show me what's in the database"):
-                                    st.write(f"**You entered:** `{_input_email_lower}`")
-                                    st.write(f"**Emails in database ({len(_all_emails_in_db)} total):**")
-                                    if _all_emails_in_db:
-                                        for _de in _all_emails_in_db[:30]:
-                                            st.code(_de)
-                                    else:
-                                        st.write("⚠️ No emails saved in database. Sign up first via NEW PLAYER.")
                             else:
                                 _first_save = _all_saves[0]
                                 _stored_hash = _first_save.get("password_hash", "")
